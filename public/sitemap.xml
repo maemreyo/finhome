@@ -1,0 +1,258 @@
+// Basic sitemap
+
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://yourdomain.com</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/about</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/pricing</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/contact</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/legal/privacy</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/legal/terms</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+</urlset>
+
+// README-SETUP.md
+// Comprehensive setup guide
+
+# SaaS Template Setup Guide
+
+This is a complete, production-ready SaaS template built with Next.js, Supabase, Stripe, and more.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ 
+- pnpm 8+
+- Git
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/saas-template.git
+cd saas-template
+```
+
+### 2. Install Dependencies
+
+```bash
+pnpm install
+```
+
+### 3. Environment Setup
+
+Copy the environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+Fill in your environment variables (see detailed setup below).
+
+### 4. Start Development Server
+
+```bash
+pnpm dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to see your app.
+
+## 🔧 Detailed Setup
+
+### Supabase Setup
+
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to Settings > API to get your keys
+3. Update `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   ```
+
+4. Run the database migration:
+   ```bash
+   # Copy the SQL from supabase/migrations/001_initial_schema.sql
+   # and run it in your Supabase SQL Editor
+   ```
+
+5. Configure authentication providers in Supabase:
+   - Enable Email authentication
+   - Configure Google OAuth (optional)
+   - Configure GitHub OAuth (optional)
+
+### Stripe Setup
+
+1. Create account at [stripe.com](https://stripe.com)
+2. Get your API keys from the Dashboard
+3. Update `.env.local`:
+   ```env
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+   STRIPE_SECRET_KEY=sk_test_...
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   ```
+
+4. Create products and prices in Stripe Dashboard
+5. Update pricing plan IDs in `src/lib/stripe/config.ts`
+6. Set up webhooks pointing to `/api/stripe/webhooks`
+
+### Resend Email Setup
+
+1. Create account at [resend.com](https://resend.com)
+2. Get your API key
+3. Add a verified domain
+4. Update `.env.local`:
+   ```env
+   RESEND_API_KEY=re_...
+   FROM_EMAIL=noreply@yourdomain.com
+   CONTACT_EMAIL=contact@yourdomain.com
+   ```
+
+### Optional: Analytics Setup
+
+#### Vercel Analytics
+```env
+NEXT_PUBLIC_VERCEL_ANALYTICS_ID=your_analytics_id
+```
+
+#### Plausible Analytics
+```env
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=yourdomain.com
+```
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Connect your repository to [vercel.com](https://vercel.com)
+3. Configure environment variables in Vercel dashboard
+4. Deploy!
+
+### Environment Variables for Production
+
+Make sure to set these in your hosting platform:
+
+**Required:**
+- `NEXT_PUBLIC_APP_NAME`
+- `NEXT_PUBLIC_APP_URL`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `RESEND_API_KEY`
+
+**Optional:**
+- `NEXT_PUBLIC_VERCEL_ANALYTICS_ID`
+- `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`
+- `SENTRY_DSN`
+
+## 📁 Project Structure
+
+```
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── (marketing)/        # Marketing pages
+│   │   ├── auth/              # Authentication pages
+│   │   ├── dashboard/         # Protected dashboard
+│   │   └── api/               # API routes
+│   ├── components/            # React components
+│   │   ├── ui/                # shadcn/ui components
+│   │   ├── auth/              # Auth components
+│   │   ├── billing/           # Billing components
+│   │   └── email/             # Email templates
+│   ├── hooks/                 # Custom React hooks
+│   ├── lib/                   # Utilities and configurations
+│   │   ├── supabase/          # Supabase clients
+│   │   ├── stripe/            # Stripe configuration
+│   │   ├── email/             # Email utilities
+│   │   └── analytics/         # Analytics setup
+│   └── types/                 # TypeScript type definitions
+├── public/                    # Static assets
+├── supabase/                  # Database migrations
+└── emails/                    # Email templates
+```
+
+## 🔒 Security Checklist
+
+- [ ] Environment variables are properly configured
+- [ ] Supabase RLS policies are enabled
+- [ ] Stripe webhook signatures are verified
+- [ ] CORS is properly configured
+- [ ] Security headers are set
+- [ ] Authentication is working correctly
+- [ ] Email verification is enabled
+- [ ] Password requirements are enforced
+
+## 🧪 Testing
+
+```bash
+# Type checking
+pnpm type-check
+
+# Linting
+pnpm lint
+
+# Build test
+pnpm build
+```
+
+## 📚 Key Features
+
+- ✅ **Authentication**: Complete auth flow with Supabase
+- ✅ **Billing**: Stripe subscriptions with customer portal
+- ✅ **Dashboard**: Responsive admin interface
+- ✅ **Email**: Transactional emails with Resend
+- ✅ **Analytics**: User tracking and monitoring
+- ✅ **SEO**: Optimized for search engines
+- ✅ **Legal**: Privacy policy, terms of service
+- ✅ **Mobile**: Fully responsive design
+- ✅ **TypeScript**: Full type safety
+- ✅ **Dark Mode**: Theme switching support
+
+## 🆘 Support
+
+If you encounter any issues:
+
+1. Check the [documentation](./docs/)
+2. Search [existing issues](https://github.com/your-username/saas-template/issues)
+3. Create a [new issue](https://github.com/your-username/saas-template/issues/new)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Happy building! 🚀**
