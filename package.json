@@ -1,13 +1,18 @@
 {
-  "name": "lean-saas",
-  "version": "0.1.0",
+  "name": "saas-template",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
+  "description": "Complete SaaS template with Next.js, Supabase, Stripe, and more",
+  "keywords": ["nextjs", "saas", "template", "stripe", "supabase", "typescript"],
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "email:dev": "email dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -32,7 +37,10 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@stripe/stripe-js": "^7.4.0",
+    "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.50.5",
+    "@react-email/components": "^0.0.25",
+    "@react-email/render": "^1.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -45,7 +53,9 @@
     "react-day-picker": "^9.8.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.60.0",
+    "resend": "^4.0.1",
     "sonner": "^2.0.6",
+    "stripe": "^18.5.0",
     "tailwind-merge": "^3.3.1",
     "zod": "^4.0.5"
   },
@@ -57,8 +67,14 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
+    "react-email": "^3.0.1",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.5",
     "typescript": "^5"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.0.0"
 }

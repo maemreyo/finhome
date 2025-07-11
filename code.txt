@@ -1,436 +1,343 @@
-// src/app/(marketing)/layout.tsx
-// Marketing website layout
+// .github/workflows/ci.yml
+// GitHub Actions CI/CD pipeline
 
-import { MarketingHeader } from '@/components/marketing/Header'
-import { MarketingFooter } from '@/components/marketing/Footer'
+name: CI/CD Pipeline
 
-export default function MarketingLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <MarketingHeader />
-      <main className="flex-1">
-        {children}
-      </main>
-      <MarketingFooter />
-    </div>
-  )
-}
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
 
-// src/app/(marketing)/about/page.tsx
-// About page
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Type check
+        run: pnpm type-check
+      
+      - name: Lint
+        run: pnpm lint
+      
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_APP_NAME: ${{ secrets.NEXT_PUBLIC_APP_NAME }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, Target, Award, Heart } from 'lucide-react'
-import Link from 'next/link'
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
 
-export const metadata = {
-  title: 'About Us',
-  description: 'Learn about our mission to help entrepreneurs build amazing SaaS products.',
-}
+// robots.txt
+// SEO robots file
 
-function StatsSection() {
-  const stats = [
-    { label: 'Happy Customers', value: '10,000+' },
-    { label: 'Products Launched', value: '500+' },
-    { label: 'Countries Reached', value: '50+' },
-    { label: 'Team Members', value: '25+' },
-  ]
+User-agent: *
+Allow: /
 
-  return (
-    <section className="py-16 bg-muted/20">
-      <div className="container px-4 mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
-            <div key={index} className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                {stat.value}
-              </div>
-              <div className="text-muted-foreground">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
+# Sitemaps
+Sitemap: https://yourdomain.com/sitemap.xml
 
-function ValuesSection() {
-  const values = [
-    {
-      icon: <Users className="h-8 w-8" />,
-      title: 'Customer First',
-      description: 'Everything we do is designed to help our customers succeed and grow their businesses.',
-    },
-    {
-      icon: <Target className="h-8 w-8" />,
-      title: 'Focus on Quality',
-      description: 'We believe in building products that are reliable, secure, and performant from day one.',
-    },
-    {
-      icon: <Award className="h-8 w-8" />,
-      title: 'Continuous Innovation',
-      description: 'We constantly push the boundaries of what\'s possible to deliver cutting-edge solutions.',
-    },
-    {
-      icon: <Heart className="h-8 w-8" />,
-      title: 'Open & Transparent',
-      description: 'We build in the open, share our learnings, and believe in honest communication.',
-    },
-  ]
+# Disallow admin areas
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /auth/
 
-  return (
-    <section className="py-24">
-      <div className="container px-4 mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Values</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            The principles that guide everything we do and help us serve our customers better.
-          </p>
-        </div>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {values.map((value, index) => (
-            <Card key={index} className="text-center">
-              <CardHeader>
-                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  {value.icon}
-                </div>
-                <CardTitle className="text-xl">{value.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>{value.description}</CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
+# Allow specific public API endpoints
+Allow: /api/auth/callback
 
-export default function AboutPage() {
-  return (
-    <div>
-      {/* Hero Section */}
-      <section className="py-24 bg-gradient-to-br from-background via-background to-muted/20">
-        <div className="container px-4 mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-              Building the Future of
-              <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                {" "}SaaS Development
-              </span>
-            </h1>
-            
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              We're on a mission to democratize SaaS development by providing entrepreneurs 
-              and developers with the tools they need to build world-class products.
-            </p>
-          </div>
-        </div>
-      </section>
+// public/sitemap.xml
+// Basic sitemap
 
-      <StatsSection />
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://yourdomain.com</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/about</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/pricing</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/contact</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/legal/privacy</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://yourdomain.com/legal/terms</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+</urlset>
 
-      {/* Story Section */}
-      <section className="py-24">
-        <div className="container px-4 mx-auto">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Story</h2>
-                <div className="space-y-4 text-muted-foreground">
-                  <p>
-                    Founded in 2023, we started with a simple observation: building a SaaS product 
-                    shouldn't require months of boilerplate code and infrastructure setup.
-                  </p>
-                  <p>
-                    After launching multiple successful SaaS products ourselves, we noticed we were 
-                    rebuilding the same components over and over again - authentication, billing, 
-                    user management, and analytics.
-                  </p>
-                  <p>
-                    That's when we decided to create the ultimate SaaS template that would allow 
-                    entrepreneurs to focus on what matters most: building amazing products that 
-                    solve real problems.
-                  </p>
-                </div>
-              </div>
-              <div className="bg-muted/20 rounded-lg aspect-square flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-6xl mb-4">🚀</div>
-                  <p className="text-muted-foreground">Our journey begins</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+// README-SETUP.md
+// Comprehensive setup guide
 
-      <ValuesSection />
+# SaaS Template Setup Guide
 
-      {/* CTA Section */}
-      <section className="py-24 bg-primary text-primary-foreground">
-        <div className="container px-4 mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Join Our Mission?
-          </h2>
-          <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Whether you're building your first SaaS or your tenth, we're here to help you succeed.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" asChild>
-              <Link href="/auth/signup">Start Building Today</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-              <Link href="/contact">Get in Touch</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-    </div>
-  )
-}
+This is a complete, production-ready SaaS template built with Next.js, Supabase, Stripe, and more.
 
-// src/app/(marketing)/contact/page.tsx
-// Contact page with form
+## 🚀 Quick Start
 
-'use client'
+### Prerequisites
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { MapPin, Mail, Phone, Clock } from 'lucide-react'
-import { toast } from 'sonner'
+- Node.js 18+ 
+- pnpm 8+
+- Git
 
-const contactSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  subject: z.string().min(5, 'Subject must be at least 5 characters'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-})
+### 1. Clone the Repository
 
-type ContactForm = z.infer<typeof contactSchema>
+```bash
+git clone https://github.com/your-username/saas-template.git
+cd saas-template
+```
 
-export default function ContactPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+### 2. Install Dependencies
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<ContactForm>({
-    resolver: zodResolver(contactSchema),
-  })
+```bash
+pnpm install
+```
 
-  const onSubmit = async (data: ContactForm) => {
-    setIsSubmitting(true)
+### 3. Environment Setup
 
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
+Copy the environment file:
 
-      if (response.ok) {
-        setIsSubmitted(true)
-        reset()
-        toast.success('Message sent successfully!')
-      } else {
-        throw new Error('Failed to send message')
-      }
-    } catch (error) {
-      toast.error('Failed to send message. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+```bash
+cp .env.example .env.local
+```
 
-  const contactInfo = [
-    {
-      icon: <Mail className="h-5 w-5" />,
-      title: 'Email',
-      details: 'hello@yoursaas.com',
-      description: 'Send us an email anytime',
-    },
-    {
-      icon: <Phone className="h-5 w-5" />,
-      title: 'Phone',
-      details: '+1 (555) 123-4567',
-      description: 'Mon-Fri from 8am to 6pm',
-    },
-    {
-      icon: <MapPin className="h-5 w-5" />,
-      title: 'Office',
-      details: 'San Francisco, CA',
-      description: 'Come say hello at our office',
-    },
-    {
-      icon: <Clock className="h-5 w-5" />,
-      title: 'Support',
-      details: '24/7 Online',
-      description: 'We\'re here to help anytime',
-    },
-  ]
+Fill in your environment variables (see detailed setup below).
 
-  return (
-    <div className="py-24">
-      <div className="container px-4 mx-auto">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Get in Touch</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Have a question about our product? We'd love to hear from you. 
-              Send us a message and we'll respond as soon as possible.
-            </p>
-          </div>
+### 4. Start Development Server
 
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Send us a message</CardTitle>
-                <CardDescription>
-                  Fill out the form below and we'll get back to you within 24 hours.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isSubmitted && (
-                  <Alert className="mb-6">
-                    <AlertDescription>
-                      Thank you for your message! We'll get back to you soon.
-                    </AlertDescription>
-                  </Alert>
-                )}
+```bash
+pnpm dev
+```
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Name</Label>
-                      <Input
-                        id="name"
-                        placeholder="Your name"
-                        {...register('name')}
-                      />
-                      {errors.name && (
-                        <p className="text-sm text-destructive">{errors.name.message}</p>
-                      )}
-                    </div>
+Visit [http://localhost:3000](http://localhost:3000) to see your app.
 
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="your@email.com"
-                        {...register('email')}
-                      />
-                      {errors.email && (
-                        <p className="text-sm text-destructive">{errors.email.message}</p>
-                      )}
-                    </div>
-                  </div>
+## 🔧 Detailed Setup
 
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
-                    <Input
-                      id="subject"
-                      placeholder="What's this about?"
-                      {...register('subject')}
-                    />
-                    {errors.subject && (
-                      <p className="text-sm text-destructive">{errors.subject.message}</p>
-                    )}
-                  </div>
+### Supabase Setup
 
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
-                    <Textarea
-                      id="message"
-                      placeholder="Tell us more about how we can help you..."
-                      rows={5}
-                      {...register('message')}
-                    />
-                    {errors.message && (
-                      <p className="text-sm text-destructive">{errors.message.message}</p>
-                    )}
-                  </div>
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to Settings > API to get your keys
+3. Update `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   ```
 
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+4. Run the database migration:
+   ```bash
+   # Copy the SQL from supabase/migrations/001_initial_schema.sql
+   # and run it in your Supabase SQL Editor
+   ```
 
-            {/* Contact Information */}
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold mb-4">Contact Information</h2>
-                <p className="text-muted-foreground mb-8">
-                  Choose the best way to reach us. We're here to help and answer any questions you might have.
-                </p>
-              </div>
+5. Configure authentication providers in Supabase:
+   - Enable Email authentication
+   - Configure Google OAuth (optional)
+   - Configure GitHub OAuth (optional)
 
-              <div className="grid gap-6">
-                {contactInfo.map((info, index) => (
-                  <Card key={index}>
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4">
-                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                          {info.icon}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold mb-1">{info.title}</h3>
-                          <p className="text-primary font-medium mb-1">{info.details}</p>
-                          <p className="text-sm text-muted-foreground">{info.description}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+### Stripe Setup
 
-              <Card className="bg-primary text-primary-foreground">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">Need immediate help?</h3>
-                  <p className="text-sm opacity-90 mb-4">
-                    Check out our documentation or join our community for quick answers.
-                  </p>
-                  <div className="flex gap-2">
-                    <Button variant="secondary" size="sm" asChild>
-                      <a href="/docs">View Docs</a>
-                    </Button>
-                    <Button variant="outline" size="sm" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-                      <a href="/community">Join Community</a>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+1. Create account at [stripe.com](https://stripe.com)
+2. Get your API keys from the Dashboard
+3. Update `.env.local`:
+   ```env
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+   STRIPE_SECRET_KEY=sk_test_...
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   ```
+
+4. Create products and prices in Stripe Dashboard
+5. Update pricing plan IDs in `src/lib/stripe/config.ts`
+6. Set up webhooks pointing to `/api/stripe/webhooks`
+
+### Resend Email Setup
+
+1. Create account at [resend.com](https://resend.com)
+2. Get your API key
+3. Add a verified domain
+4. Update `.env.local`:
+   ```env
+   RESEND_API_KEY=re_...
+   FROM_EMAIL=noreply@yourdomain.com
+   CONTACT_EMAIL=contact@yourdomain.com
+   ```
+
+### Optional: Analytics Setup
+
+#### Vercel Analytics
+```env
+NEXT_PUBLIC_VERCEL_ANALYTICS_ID=your_analytics_id
+```
+
+#### Plausible Analytics
+```env
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=yourdomain.com
+```
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Connect your repository to [vercel.com](https://vercel.com)
+3. Configure environment variables in Vercel dashboard
+4. Deploy!
+
+### Environment Variables for Production
+
+Make sure to set these in your hosting platform:
+
+**Required:**
+- `NEXT_PUBLIC_APP_NAME`
+- `NEXT_PUBLIC_APP_URL`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `RESEND_API_KEY`
+
+**Optional:**
+- `NEXT_PUBLIC_VERCEL_ANALYTICS_ID`
+- `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`
+- `SENTRY_DSN`
+
+## 📁 Project Structure
+
+```
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── (marketing)/        # Marketing pages
+│   │   ├── auth/              # Authentication pages
+│   │   ├── dashboard/         # Protected dashboard
+│   │   └── api/               # API routes
+│   ├── components/            # React components
+│   │   ├── ui/                # shadcn/ui components
+│   │   ├── auth/              # Auth components
+│   │   ├── billing/           # Billing components
+│   │   └── email/             # Email templates
+│   ├── hooks/                 # Custom React hooks
+│   ├── lib/                   # Utilities and configurations
+│   │   ├── supabase/          # Supabase clients
+│   │   ├── stripe/            # Stripe configuration
+│   │   ├── email/             # Email utilities
+│   │   └── analytics/         # Analytics setup
+│   └── types/                 # TypeScript type definitions
+├── public/                    # Static assets
+├── supabase/                  # Database migrations
+└── emails/                    # Email templates
+```
+
+## 🔒 Security Checklist
+
+- [ ] Environment variables are properly configured
+- [ ] Supabase RLS policies are enabled
+- [ ] Stripe webhook signatures are verified
+- [ ] CORS is properly configured
+- [ ] Security headers are set
+- [ ] Authentication is working correctly
+- [ ] Email verification is enabled
+- [ ] Password requirements are enforced
+
+## 🧪 Testing
+
+```bash
+# Type checking
+pnpm type-check
+
+# Linting
+pnpm lint
+
+# Build test
+pnpm build
+```
+
+## 📚 Key Features
+
+- ✅ **Authentication**: Complete auth flow with Supabase
+- ✅ **Billing**: Stripe subscriptions with customer portal
+- ✅ **Dashboard**: Responsive admin interface
+- ✅ **Email**: Transactional emails with Resend
+- ✅ **Analytics**: User tracking and monitoring
+- ✅ **SEO**: Optimized for search engines
+- ✅ **Legal**: Privacy policy, terms of service
+- ✅ **Mobile**: Fully responsive design
+- ✅ **TypeScript**: Full type safety
+- ✅ **Dark Mode**: Theme switching support
+
+## 🆘 Support
+
+If you encounter any issues:
+
+1. Check the [documentation](./docs/)
+2. Search [existing issues](https://github.com/your-username/saas-template/issues)
+3. Create a [new issue](https://github.com/your-username/saas-template/issues/new)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Happy building! 🚀**
