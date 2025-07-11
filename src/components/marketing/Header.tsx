@@ -7,17 +7,19 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-
-const navigation = [
-  { name: 'Features', href: '#features' },
-  { name: 'Pricing', href: '/pricing' },
-  { name: 'About', href: '/about' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Contact', href: '/contact' },
-]
+import { useTranslations } from 'next-intl';
 
 export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const t = useTranslations('Marketing.Header');
+
+  const navigation = [
+    { name: t('features'), href: '#features' },
+    { name: t('pricing'), href: '/pricing' },
+    { name: t('about'), href: '/about' },
+    { name: t('blog'), href: '/blog' },
+    { name: t('contact'), href: '/contact' },
+  ]
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -64,10 +66,10 @@ export function MarketingHeader() {
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4 lg:items-center">
           <ThemeToggle />
           <Link href="/auth/login">
-            <Button variant="ghost">Sign in</Button>
+            <Button variant="ghost">{t('signIn')}</Button>
           </Link>
           <Link href="/auth/signup">
-            <Button>Get Started</Button>
+            <Button>{t('getStarted')}</Button>
           </Link>
         </div>
       </nav>
@@ -116,10 +118,10 @@ export function MarketingHeader() {
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-muted-foreground hover:bg-accent"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Sign in
+                    {t('signIn')}
                   </Link>
                   <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full">Get Started</Button>
+                    <Button className="w-full">{t('getStarted')}</Button>
                   </Link>
                 </div>
               </div>

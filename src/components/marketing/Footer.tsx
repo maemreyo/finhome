@@ -1,32 +1,35 @@
 // Marketing website footer
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl';
 
 export function MarketingFooter() {
+  const t = useTranslations('Marketing.Footer');
+
   const footerNavigation = {
     product: [
-      { name: 'Features', href: '#features' },
-      { name: 'Pricing', href: '/pricing' },
-      { name: 'Security', href: '/security' },
-      { name: 'Roadmap', href: '/roadmap' },
+      { name: t('features'), href: '#features' },
+      { name: t('pricing'), href: '/pricing' },
+      { name: t('security'), href: '/security' },
+      { name: t('roadmap'), href: '/roadmap' },
     ],
     company: [
-      { name: 'About', href: '/about' },
-      { name: 'Blog', href: '/blog' },
-      { name: 'Careers', href: '/careers' },
-      { name: 'Contact', href: '/contact' },
+      { name: t('about'), href: '/about' },
+      { name: t('blog'), href: '/blog' },
+      { name: t('careers'), href: '/careers' },
+      { name: t('contact'), href: '/contact' },
     ],
     support: [
-      { name: 'Help Center', href: '/help' },
-      { name: 'Community', href: '/community' },
-      { name: 'API Docs', href: '/docs' },
-      { name: 'Status', href: '/status' },
+      { name: t('helpCenter'), href: '/help' },
+      { name: t('community'), href: '/community' },
+      { name: t('apiDocs'), href: '/docs' },
+      { name: t('status'), href: '/status' },
     ],
     legal: [
-      { name: 'Privacy', href: '/legal/privacy' },
-      { name: 'Terms', href: '/legal/terms' },
-      { name: 'Cookies', href: '/legal/cookies' },
-      { name: 'GDPR', href: '/legal/gdpr' },
+      { name: t('privacy'), href: '/legal/privacy' },
+      { name: t('terms'), href: '/legal/terms' },
+      { name: t('cookies'), href: '/legal/cookies' },
+      { name: t('gdpr'), href: '/legal/gdpr' },
     ],
   }
 
@@ -35,7 +38,7 @@ export function MarketingFooter() {
       <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
         <div className="grid grid-cols-2 gap-8 xl:col-span-2 xl:grid-cols-4">
           <div>
-            <h3 className="text-sm font-semibold leading-6">Product</h3>
+            <h3 className="text-sm font-semibold leading-6">{t('product')}</h3>
             <ul className="mt-6 space-y-4">
               {footerNavigation.product.map((item) => (
                 <li key={item.name}>
@@ -47,7 +50,7 @@ export function MarketingFooter() {
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold leading-6">Company</h3>
+            <h3 className="text-sm font-semibold leading-6">{t('company')}</h3>
             <ul className="mt-6 space-y-4">
               {footerNavigation.company.map((item) => (
                 <li key={item.name}>
@@ -59,7 +62,7 @@ export function MarketingFooter() {
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold leading-6">Support</h3>
+            <h3 className="text-sm font-semibold leading-6">{t('support')}</h3>
             <ul className="mt-6 space-y-4">
               {footerNavigation.support.map((item) => (
                 <li key={item.name}>
@@ -71,7 +74,7 @@ export function MarketingFooter() {
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold leading-6">Legal</h3>
+            <h3 className="text-sm font-semibold leading-6">{t('legal')}</h3>
             <ul className="mt-6 space-y-4">
               {footerNavigation.legal.map((item) => (
                 <li key={item.name}>
@@ -95,7 +98,7 @@ export function MarketingFooter() {
             </span>
           </div>
           <p className="mt-4 text-xs leading-5 text-muted-foreground">
-            &copy; 2024 {process.env.NEXT_PUBLIC_APP_NAME || 'SaaS Template'}. All rights reserved.
+            {t('copyright', { appName: process.env.NEXT_PUBLIC_APP_NAME || 'SaaS Template' })}
           </p>
         </div>
       </div>

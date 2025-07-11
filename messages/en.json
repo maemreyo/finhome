@@ -1,5 +1,95 @@
 {
   "Index": {
     "title": "Hello world!"
+  },
+  "LandingPage": {
+    "HeroSection": {
+      "badge": "🚀 New: Advanced Analytics Dashboard",
+      "heading1": "Build Your SaaS",
+      "heading2": "Faster Than Ever",
+      "description": "The complete SaaS template with authentication, billing, analytics, and more. Launch your next big idea in days, not months.",
+      "getStartedButton": "Get Started Free",
+      "viewDemoButton": "View Demo",
+      "noCreditCard": "No credit card required",
+      "freeTrial": "Free 14-day trial",
+      "cancelAnytime": "Cancel anytime"
+    },
+    "FeaturesSection": {
+      "heading": "Everything You Need to Succeed",
+      "description": "Powerful features designed to help you build, launch, and scale your SaaS business.",
+      "feature1Title": "Lightning Fast",
+      "feature1Description": "Built with Next.js 15 and optimized for performance. Your users will love the speed.",
+      "feature2Title": "Secure by Default",
+      "feature2Description": "Authentication, authorization, and data protection built-in with industry best practices.",
+      "feature3Title": "Team Collaboration",
+      "feature3Description": "Built-in team management, permissions, and collaboration tools for growing businesses.",
+      "feature4Title": "Advanced Analytics",
+      "feature4Description": "Comprehensive analytics and reporting to understand your users and grow your business."
+    },
+    "SocialProofSection": {
+      "heading": "Loved by Builders Worldwide",
+      "reviews": "4.9/5 from 1,200+ reviews",
+      "testimonial1Content": "This template saved us months of development time. We were able to launch our SaaS in just 2 weeks!",
+      "testimonial1Author": "Sarah Chen",
+      "testimonial1Role": "CEO, TechStart",
+      "testimonial2Content": "The code quality is exceptional and the documentation is crystal clear. Highly recommended!",
+      "testimonial2Author": "Mike Johnson",
+      "testimonial2Role": "CTO, InnovateCorp",
+      "testimonial3Content": "Finally, a SaaS template that includes everything we need. The billing integration works flawlessly.",
+      "testimonial3Author": "Emily Rodriguez",
+      "testimonial3Role": "Founder, StartupXYZ"
+    },
+    "CTASection": {
+      "heading": "Ready to Launch Your SaaS?",
+      "description": "Join thousands of entrepreneurs who have already built successful businesses with our template.",
+      "startButton": "Start Building Today",
+      "talkToSalesButton": "Talk to Sales"
+    }
+  },
+  "Layout": {
+    "metadata": {
+      "titleDefault": "SaaS Template",
+      "titleTemplate": "%s | SaaS Template",
+      "description": "The complete SaaS template for indie hackers",
+      "openGraphTitle": "SaaS Template",
+      "openGraphDescription": "The complete SaaS template for indie hackers",
+      "openGraphSiteName": "SaaS Template",
+      "twitterTitle": "SaaS Template",
+      "twitterDescription": "The complete SaaS template for indie hackers"
+    }
+  },
+  "Marketing": {
+    "Header": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "about": "About",
+      "blog": "Blog",
+      "contact": "Contact",
+      "signIn": "Sign in",
+      "getStarted": "Get Started"
+    },
+    "Footer": {
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "security": "Security",
+      "roadmap": "Roadmap",
+      "company": "Company",
+      "about": "About",
+      "blog": "Blog",
+      "careers": "Careers",
+      "contact": "Contact",
+      "support": "Support",
+      "helpCenter": "Help Center",
+      "community": "Community",
+      "apiDocs": "API Docs",
+      "status": "Status",
+      "legal": "Legal",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookies": "Cookies",
+      "gdpr": "GDPR",
+      "copyright": "© 2024 {appName}. All rights reserved."
+    }
   }
 }

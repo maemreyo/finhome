@@ -1,4 +1,4 @@
-// Main landing page
+"use client";
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -7,39 +7,40 @@ import { PricingSection } from '@/components/pricing/PricingSection'
 import { ArrowRight, Check, Star, Zap, Shield, Users, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl';
 
 // Hero Section
 function HeroSection() {
+  const t = useTranslations('LandingPage.HeroSection');
   return (
     <section className="py-24 bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container px-4 mx-auto">
         <div className="max-w-4xl mx-auto text-center">
           <Badge variant="secondary" className="mb-6">
-            🚀 New: Advanced Analytics Dashboard
+            {t('badge')}
           </Badge>
           
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-            Build Your SaaS
+            {t('heading1')}
             <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-              {" "}Faster Than Ever
+              {" "}{t('heading2')}
             </span>
           </h1>
           
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            The complete SaaS template with authentication, billing, analytics, and more. 
-            Launch your next big idea in days, not months.
+            {t('description')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild>
               <Link href="/auth/signup">
-                Get Started Free
+                {t('getStartedButton')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
               <Link href="/demo">
-                View Demo
+                {t('viewDemoButton')}
               </Link>
             </Button>
           </div>
@@ -47,15 +48,15 @@ function HeroSection() {
           <div className="mt-8 flex items-center justify-center space-x-6 text-sm text-muted-foreground">
             <div className="flex items-center">
               <Check className="h-4 w-4 text-green-500 mr-2" />
-              No credit card required
+              {t('noCreditCard')}
             </div>
             <div className="flex items-center">
               <Check className="h-4 w-4 text-green-500 mr-2" />
-              Free 14-day trial
+              {t('freeTrial')}
             </div>
             <div className="flex items-center">
               <Check className="h-4 w-4 text-green-500 mr-2" />
-              Cancel anytime
+              {t('cancelAnytime')}
             </div>
           </div>
         </div>
@@ -66,26 +67,27 @@ function HeroSection() {
 
 // Features Section
 function FeaturesSection() {
+  const t = useTranslations('LandingPage.FeaturesSection');
   const features = [
     {
       icon: <Zap className="h-6 w-6" />,
-      title: 'Lightning Fast',
-      description: 'Built with Next.js 15 and optimized for performance. Your users will love the speed.',
+      title: t('feature1Title'),
+      description: t('feature1Description'),
     },
     {
       icon: <Shield className="h-6 w-6" />,
-      title: 'Secure by Default',
-      description: 'Authentication, authorization, and data protection built-in with industry best practices.',
+      title: t('feature2Title'),
+      description: t('feature2Description'),
     },
     {
       icon: <Users className="h-6 w-6" />,
-      title: 'Team Collaboration',
-      description: 'Built-in team management, permissions, and collaboration tools for growing businesses.',
+      title: t('feature3Title'),
+      description: t('feature3Description'),
     },
     {
       icon: <BarChart3 className="h-6 w-6" />,
-      title: 'Advanced Analytics',
-      description: 'Comprehensive analytics and reporting to understand your users and grow your business.',
+      title: t('feature4Title'),
+      description: t('feature4Description'),
     },
   ]
 
@@ -94,10 +96,10 @@ function FeaturesSection() {
       <div className="container px-4 mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Everything You Need to Succeed
+            {t('heading')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Powerful features designed to help you build, launch, and scale your SaaS business.
+            {t('description')}
           </p>
         </div>
         
@@ -123,23 +125,24 @@ function FeaturesSection() {
 
 // Social Proof Section
 function SocialProofSection() {
+  const t = useTranslations('LandingPage.SocialProofSection');
   const testimonials = [
     {
-      content: "This template saved us months of development time. We were able to launch our SaaS in just 2 weeks!",
-      author: "Sarah Chen",
-      role: "CEO, TechStart",
+      content: t('testimonial1Content'),
+      author: t('testimonial1Author'),
+      role: t('testimonial1Role'),
       avatar: "SC",
     },
     {
-      content: "The code quality is exceptional and the documentation is crystal clear. Highly recommended!",
-      author: "Mike Johnson",
-      role: "CTO, InnovateCorp",
+      content: t('testimonial2Content'),
+      author: t('testimonial2Author'),
+      role: t('testimonial2Role'),
       avatar: "MJ",
     },
     {
-      content: "Finally, a SaaS template that includes everything we need. The billing integration works flawlessly.",
-      author: "Emily Rodriguez",
-      role: "Founder, StartupXYZ",
+      content: t('testimonial3Content'),
+      author: t('testimonial3Author'),
+      role: t('testimonial3Role'),
       avatar: "ER",
     },
   ]
@@ -149,13 +152,13 @@ function SocialProofSection() {
       <div className="container px-4 mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Loved by Builders Worldwide
+            {t('heading')}
           </h2>
           <div className="flex items-center justify-center space-x-1 mb-4">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
             ))}
-            <span className="ml-2 text-muted-foreground">4.9/5 from 1,200+ reviews</span>
+            <span className="ml-2 text-muted-foreground">{t('reviews')}</span>
           </div>
         </div>
         
@@ -189,25 +192,26 @@ function SocialProofSection() {
 
 // CTA Section
 function CTASection() {
+  const t = useTranslations('LandingPage.CTASection');
   return (
     <section className="py-24 bg-primary text-primary-foreground">
       <div className="container px-4 mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Ready to Launch Your SaaS?
+          {t('heading')}
         </h2>
         <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-          Join thousands of entrepreneurs who have already built successful businesses with our template.
+          {t('description')}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" variant="secondary" asChild>
             <Link href="/auth/signup">
-              Start Building Today
+              {t('startButton')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
           <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
             <Link href="/contact">
-              Talk to Sales
+              {t('talkToSalesButton')}
             </Link>
           </Button>
         </div>
