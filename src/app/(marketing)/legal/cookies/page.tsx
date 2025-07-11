@@ -1,12 +1,18 @@
 // Cookie Policy page
 
-export const metadata = {
-  title: 'Cookie Policy',
-  description: 'Learn about how we use cookies and similar technologies.',
+import { getTranslations } from 'next-intl/server';
+
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale, namespace: 'CookiePolicyPage.metadata' });
+  return {
+    title: t('title'),
+    description: t('description'),
+  }
 }
 
-export default function CookiePolicyPage() {
-  const lastUpdated = 'January 1, 2024'
+export default async function CookiePolicyPage({ params: { locale } }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale, namespace: 'CookiePolicyPage' });
+  const lastUpdated = 'January 1, 2024' // This could also be translated or fetched dynamically
   const contactEmail = process.env.CONTACT_EMAIL || 'privacy@company.com'
 
   return (
@@ -14,110 +20,104 @@ export default function CookiePolicyPage() {
       <div className="container px-4 mx-auto">
         <div className="max-w-4xl mx-auto">
           <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Cookie Policy</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('heading')}</h1>
             <p className="text-lg text-muted-foreground">
-              Last updated: {lastUpdated}
+              {t('lastUpdated', { date: lastUpdated })}
             </p>
           </div>
 
           <div className="prose prose-lg max-w-none">
             <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">What Are Cookies</h2>
+              <h2 className="text-2xl font-bold mb-4">{t('whatAreCookiesHeading')}</h2>
               <p>
-                Cookies are small text files that are stored on your device when you visit our 
-                website. They help us provide you with a better experience by remembering your 
-                preferences and analyzing how you use our site.
+                {t('whatAreCookiesParagraph')}
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">How We Use Cookies</h2>
-              <p className="mb-4">We use cookies for the following purposes:</p>
+              <h2 className="text-2xl font-bold mb-4">{t('howWeUseCookiesHeading')}</h2>
+              <p className="mb-4">{t('howWeUseCookiesParagraph')}</p>
               
-              <h3 className="text-xl font-semibold mb-3">Essential Cookies</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('essentialCookiesHeading')}</h3>
               <p className="mb-4">
-                These cookies are necessary for our website to function properly and cannot be 
-                turned off. They include:
+                {t('essentialCookiesParagraph')}
               </p>
               <ul className="list-disc pl-6 mb-4 space-y-2">
-                <li>Authentication and security cookies</li>
-                <li>Session management cookies</li>
-                <li>Load balancing cookies</li>
+                <li>{t('essentialCookiesList1')}</li>
+                <li>{t('essentialCookiesList2')}</li>
+                <li>{t('essentialCookiesList3')}</li>
               </ul>
 
-              <h3 className="text-xl font-semibold mb-3">Analytics Cookies</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('analyticsCookiesHeading')}</h3>
               <p className="mb-4">
-                These cookies help us understand how visitors interact with our website:
+                {t('analyticsCookiesParagraph')}
               </p>
               <ul className="list-disc pl-6 mb-4 space-y-2">
-                <li>Page views and navigation patterns</li>
-                <li>Time spent on different pages</li>
-                <li>Error tracking and performance monitoring</li>
+                <li>{t('analyticsCookiesList1')}</li>
+                <li>{t('analyticsCookiesList2')}</li>
+                <li>{t('analyticsCookiesList3')}</li>
               </ul>
 
-              <h3 className="text-xl font-semibold mb-3">Preference Cookies</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('preferenceCookiesHeading')}</h3>
               <p className="mb-4">
-                These cookies remember your choices and preferences:
+                {t('preferenceCookiesParagraph')}
               </p>
               <ul className="list-disc pl-6 mb-4 space-y-2">
-                <li>Language and region settings</li>
-                <li>Theme preferences (dark/light mode)</li>
-                <li>Customization settings</li>
+                <li>{t('preferenceCookiesList1')}</li>
+                <li>{t('preferenceCookiesList2')}</li>
+                <li>{t('preferenceCookiesList3')}</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">Managing Your Cookie Preferences</h2>
+              <h2 className="text-2xl font-bold mb-4">{t('managingPreferencesHeading')}</h2>
               <p className="mb-4">
-                You can control and manage cookies in several ways:
+                {t('managingPreferencesParagraph')}
               </p>
               
-              <h3 className="text-xl font-semibold mb-3">Browser Settings</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('browserSettingsHeading')}</h3>
               <p className="mb-4">
-                Most browsers allow you to control cookies through their settings. You can:
+                {t('browserSettingsParagraph')}
               </p>
               <ul className="list-disc pl-6 mb-4 space-y-2">
-                <li>Block all cookies</li>
-                <li>Accept only first-party cookies</li>
-                <li>Delete existing cookies</li>
-                <li>Set up notifications when cookies are created</li>
+                <li>{t('browserSettingsList1')}</li>
+                <li>{t('browserSettingsList2')}</li>
+                <li>{t('browserSettingsList3')}</li>
+                <li>{t('browserSettingsList4')}</li>
               </ul>
 
-              <h3 className="text-xl font-semibold mb-3">Impact of Disabling Cookies</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('impactOfDisablingHeading')}</h3>
               <p>
-                Please note that disabling certain cookies may affect the functionality of our 
-                website and limit your ability to use some features.
+                {t('impactOfDisablingParagraph')}
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">Third-Party Cookies</h2>
+              <h2 className="text-2xl font-bold mb-4">{t('thirdPartyCookiesHeading')}</h2>
               <p className="mb-4">
-                We may use third-party services that set their own cookies, including:
+                {t('thirdPartyCookiesParagraph')}
               </p>
               <ul className="list-disc pl-6 mb-4 space-y-2">
-                <li><strong>Vercel Analytics:</strong> For website performance monitoring</li>
-                <li><strong>Stripe:</strong> For payment processing</li>
-                <li><strong>Supabase:</strong> For authentication and data storage</li>
+                <li><strong>{t('thirdPartyCookiesList1')}</strong></li>
+                <li><strong>{t('thirdPartyCookiesList2')}</strong></li>
+                <li><strong>{t('thirdPartyCookiesList3')}</strong></li>
               </ul>
               <p>
-                These third parties have their own privacy policies and cookie practices, 
-                which we encourage you to review.
+                {t('thirdPartyCookiesReview')}
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">Updates to This Policy</h2>
+              <h2 className="text-2xl font-bold mb-4">{t('updatesToPolicyHeading')}</h2>
               <p>
-                We may update this Cookie Policy from time to time. Any changes will be posted 
-                on this page with an updated revision date.
+                {t('updatesToPolicyParagraph')}
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
+              <h2 className="text-2xl font-bold mb-4">{t('contactUsHeading')}</h2>
               <p className="mb-4">
-                If you have any questions about our use of cookies, please contact us at:
+                {t('contactUsParagraph')}
               </p>
               <div className="bg-muted p-4 rounded-lg">
                 <p><strong>Email:</strong> {contactEmail}</p>

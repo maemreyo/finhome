@@ -14,17 +14,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { MapPin, Mail, Phone, Clock } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-const contactSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  subject: z.string().min(5, 'Subject must be at least 5 characters'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-})
-
-type ContactForm = z.infer<typeof contactSchema>
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale, namespace: 'ContactPage.metadata' });
+  return {
+    title: t('title'),
+    description: t('description'),
+  }
+}
 
 export default function ContactPage() {
+  const t = useTranslations('ContactPage');
+  const tForm = useTranslations('ContactPage.Form');
+  const tContactInfo = useTranslations('ContactPage.ContactInfo');
+
+  const contactSchema = z.object({
+    name: z.string().min(2, tForm('nameMinLength')),
+    email: z.string().email(tForm('emailInvalid')),
+    subject: z.string().min(5, tForm('subjectMinLength')),
+    message: z.string().min(10, tForm('messageMinLength')),
+  })
+  
+  type ContactForm = z.infer<typeof contactSchema>
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
@@ -52,12 +66,12 @@ export default function ContactPage() {
       if (response.ok) {
         setIsSubmitted(true)
         reset()
-        toast.success('Message sent successfully!')
+        toast.success(tForm('successMessage'))
       } else {
         throw new Error('Failed to send message')
       }
     } catch {
-      toast.error('Failed to send message. Please try again.')
+      toast.error(tForm('failedToSend'))
     } finally {
       setIsSubmitting(false)
     }
@@ -66,27 +80,27 @@ export default function ContactPage() {
   const contactInfo = [
     {
       icon: <Mail className="h-5 w-5" />,
-      title: 'Email',
+      title: tContactInfo('emailTitle'),
       details: 'hello@yoursaas.com',
-      description: 'Send us an email anytime',
+      description: tContactInfo('emailDescription'),
     },
     {
       icon: <Phone className="h-5 w-5" />,
-      title: 'Phone',
+      title: tContactInfo('phoneTitle'),
       details: '+1 (555) 123-4567',
-      description: 'Mon-Fri from 8am to 6pm',
+      description: tContactInfo('phoneDescription'),
     },
     {
       icon: <MapPin className="h-5 w-5" />,
-      title: 'Office',
+      title: tContactInfo('officeTitle'),
       details: 'San Francisco, CA',
-      description: 'Come say hello at our office',
+      description: tContactInfo('officeDescription'),
     },
     {
       icon: <Clock className="h-5 w-5" />,
-      title: 'Support',
+      title: tContactInfo('supportTitle'),
       details: '24/7 Online',
-      description: 'We\'re here to help anytime',
+      description: tContactInfo('supportDescription'),
     },
   ]
 
@@ -96,10 +110,9 @@ export default function ContactPage() {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Get in Touch</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('HeroSection.heading')}</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Have a question about our product? We'd love to hear from you. 
-              Send us a message and we'll respond as soon as possible.
+              {t('HeroSection.description')}
             </p>
           </div>
 
@@ -107,16 +120,16 @@ export default function ContactPage() {
             {/* Contact Form */}
             <Card>
               <CardHeader>
-                <CardTitle>Send us a message</CardTitle>
+                <CardTitle>{tForm('cardTitle')}</CardTitle>
                 <CardDescription>
-                  Fill out the form below and we'll get back to you within 24 hours.
+                  {tForm('cardDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {isSubmitted && (
                   <Alert className="mb-6">
                     <AlertDescription>
-                      Thank you for your message! We'll get back to you soon.
+                      {tForm('successMessage')}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -124,10 +137,10 @@ export default function ContactPage() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Name</Label>
+                      <Label htmlFor="name">{tForm('nameLabel')}</Label>
                       <Input
                         id="name"
-                        placeholder="Your name"
+                        placeholder={tForm('namePlaceholder')}
                         {...register('name')}
                       />
                       {errors.name && (
@@ -136,11 +149,11 @@ export default function ContactPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">{tForm('emailLabel')}</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="your@email.com"
+                        placeholder={tForm('emailPlaceholder')}
                         {...register('email')}
                       />
                       {errors.email && (
@@ -150,10 +163,10 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
+                    <Label htmlFor="subject">{tForm('subjectLabel')}</Label>
                     <Input
                       id="subject"
-                      placeholder="What's this about?"
+                      placeholder={tForm('subjectPlaceholder')}
                       {...register('subject')}
                     />
                     {errors.subject && (
@@ -162,10 +175,10 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
+                    <Label htmlFor="message">{tForm('messageLabel')}</Label>
                     <Textarea
                       id="message"
-                      placeholder="Tell us more about how we can help you..."
+                      placeholder={tForm('messagePlaceholder')}
                       rows={5}
                       {...register('message')}
                     />
@@ -175,7 +188,7 @@ export default function ContactPage() {
                   </div>
 
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                    {isSubmitting ? tForm('sending') : tForm('sendMessage')}
                   </Button>
                 </form>
               </CardContent>
@@ -184,9 +197,9 @@ export default function ContactPage() {
             {/* Contact Information */}
             <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-bold mb-4">Contact Information</h2>
+                <h2 className="text-2xl font-bold mb-4">{tContactInfo('heading')}</h2>
                 <p className="text-muted-foreground mb-8">
-                  Choose the best way to reach us. We&apos;re here to help and answer any questions you might have.
+                  {tContactInfo('description')}
                 </p>
               </div>
 
@@ -211,16 +224,16 @@ export default function ContactPage() {
 
               <Card className="bg-primary text-primary-foreground">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">Need immediate help?</h3>
+                  <h3 className="font-semibold mb-2">{tContactInfo('needHelpHeading')}</h3>
                   <p className="text-sm opacity-90 mb-4">
-                    Check out our documentation or join our community for quick answers.
+                    {tContactInfo('needHelpDescription')}
                   </p>
                   <div className="flex gap-2">
                     <Button variant="secondary" size="sm" asChild>
-                      <a href="/docs">View Docs</a>
+                      <a href="/docs">{tContactInfo('viewDocs')}</a>
                     </Button>
                     <Button variant="outline" size="sm" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-                      <a href="/community">Join Community</a>
+                      <a href="/community">{tContactInfo('joinCommunity')}</a>
                     </Button>
                   </div>
                 </CardContent>

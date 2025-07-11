@@ -1,21 +1,24 @@
-// About page
-
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, Target, Award, Heart } from 'lucide-react'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server';
 
-export const metadata = {
-  title: 'About Us',
-  description: 'Learn about our mission to help entrepreneurs build amazing SaaS products.',
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale, namespace: 'AboutPage.metadata' });
+  return {
+    title: t('title'),
+    description: t('description'),
+  }
 }
 
-function StatsSection() {
+async function StatsSection({ locale }: { locale: string }) {
+  const t = await getTranslations({ locale, namespace: 'AboutPage.StatsSection' });
   const stats = [
-    { label: 'Happy Customers', value: '10,000+' },
-    { label: 'Products Launched', value: '500+' },
-    { label: 'Countries Reached', value: '50+' },
-    { label: 'Team Members', value: '25+' },
+    { label: t('happyCustomers'), value: '10,000+' },
+    { label: t('productsLaunched'), value: '500+' },
+    { label: t('countriesReached'), value: '50+' },
+    { label: t('teamMembers'), value: '25+' },
   ]
 
   return (
@@ -38,27 +41,28 @@ function StatsSection() {
   )
 }
 
-function ValuesSection() {
+async function ValuesSection({ locale }: { locale: string }) {
+  const t = await getTranslations({ locale, namespace: 'AboutPage.ValuesSection' });
   const values = [
     {
       icon: <Users className="h-8 w-8" />,
-      title: 'Customer First',
-      description: 'Everything we do is designed to help our customers succeed and grow their businesses.',
+      title: t('customerFirstTitle'),
+      description: t('customerFirstDescription'),
     },
     {
       icon: <Target className="h-8 w-8" />,
-      title: 'Focus on Quality',
-      description: 'We believe in building products that are reliable, secure, and performant from day one.',
+      title: t('focusOnQualityTitle'),
+      description: t('focusOnQualityDescription'),
     },
     {
       icon: <Award className="h-8 w-8" />,
-      title: 'Continuous Innovation',
-      description: 'We constantly push the boundaries of what&apos;s possible to deliver cutting-edge solutions.',
+      title: t('continuousInnovationTitle'),
+      description: t('continuousInnovationDescription'),
     },
     {
       icon: <Heart className="h-8 w-8" />,
-      title: 'Open & Transparent',
-      description: 'We build in the open, share our learnings, and believe in honest communication.',
+      title: t('openTransparentTitle'),
+      description: t('openTransparentDescription'),
     },
   ]
 
@@ -66,9 +70,9 @@ function ValuesSection() {
     <section className="py-24">
       <div className="container px-4 mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Values</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('heading')}</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            The principles that guide everything we do and help us serve our customers better.
+            {t('description')}
           </p>
         </div>
         
@@ -92,7 +96,11 @@ function ValuesSection() {
   )
 }
 
-export default function AboutPage() {
+export default async function AboutPage({ params: { locale } }: { params: { locale: string } }) {
+  const tHero = await getTranslations({ locale, namespace: 'AboutPage.HeroSection' });
+  const tStory = await getTranslations({ locale, namespace: 'AboutPage.StorySection' });
+  const tCTA = await getTranslations({ locale, namespace: 'AboutPage.CTASection' });
+
   return (
     <div>
       {/* Hero Section */}
@@ -100,21 +108,20 @@ export default function AboutPage() {
         <div className="container px-4 mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-              Building the Future of
+              {tHero('heading1')}
               <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                {" "}SaaS Development
+                {" "}{tHero('heading2')}
               </span>
             </h1>
             
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              We're on a mission to democratize SaaS development by providing entrepreneurs 
-              and developers with the tools they need to build world-class products.
+              {tHero('description')}
             </p>
           </div>
         </div>
       </section>
 
-      <StatsSection />
+      <StatsSection locale={locale} />
 
       {/* Story Section */}
       <section className="py-24">
@@ -122,28 +129,23 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Story</h2>
+                <h2 className="text-3xl md:text-4xl font-bold mb-6">{tStory('heading')}</h2>
                 <div className="space-y-4 text-muted-foreground">
                   <p>
-                    Founded in 2023, we started with a simple observation: building a SaaS product 
-                    shouldn't require months of boilerplate code and infrastructure setup.
+                    {tStory('paragraph1')}
                   </p>
                   <p>
-                    After launching multiple successful SaaS products ourselves, we noticed we were 
-                    rebuilding the same components over and over again - authentication, billing, 
-                    user management, and analytics.
+                    {tStory('paragraph2')}
                   </p>
                   <p>
-                    That's when we decided to create the ultimate SaaS template that would allow 
-                    entrepreneurs to focus on what matters most: building amazing products that 
-                    solve real problems.
+                    {tStory('paragraph3')}
                   </p>
                 </div>
               </div>
               <div className="bg-muted/20 rounded-lg aspect-square flex items-center justify-center">
                 <div className="text-center">
                   <div className="text-6xl mb-4">🚀</div>
-                  <p className="text-muted-foreground">Our journey begins</p>
+                  <p className="text-muted-foreground">{tStory('journeyBegins')}</p>
                 </div>
               </div>
             </div>
@@ -151,23 +153,23 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <ValuesSection />
+      <ValuesSection locale={locale} />
 
       {/* CTA Section */}
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="container px-4 mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Join Our Mission?
+            {tCTA('heading')}
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Whether you&apos;re building your first SaaS or your tenth, we&apos;re here to help you succeed.
+            {tCTA('description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>
-              <Link href="/auth/signup">Start Building Today</Link>
+              <Link href="/auth/signup">{tCTA('startButton')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-              <Link href="/contact">Get in Touch</Link>
+              <Link href="/contact">{tCTA('getInTouchButton')}</Link>
             </Button>
           </div>
         </div>

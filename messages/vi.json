@@ -90,6 +90,48 @@
         "gdpr": "GDPR",
         "copyright": "© 2024 {appName}. Đã đăng ký bản quyền."
       }
+    },
+    "AboutPage": {
+      "metadata": {
+        "title": "Về chúng tôi",
+        "description": "Tìm hiểu về sứ mệnh của chúng tôi nhằm giúp các doanh nhân xây dựng các sản phẩm SaaS tuyệt vời."
+      },
+      "HeroSection": {
+        "heading1": "Xây dựng tương lai của",
+        "heading2": "Phát triển SaaS",
+        "description": "Chúng tôi có sứ mệnh dân chủ hóa phát triển SaaS bằng cách cung cấp cho các doanh nhân và nhà phát triển các công cụ họ cần để xây dựng các sản phẩm đẳng cấp thế giới."
+      },
+      "StatsSection": {
+        "happyCustomers": "Khách hàng hài lòng",
+        "productsLaunched": "Sản phẩm đã ra mắt",
+        "countriesReached": "Quốc gia đã tiếp cận",
+        "teamMembers": "Thành viên nhóm"
+      },
+      "ValuesSection": {
+        "heading": "Giá trị của chúng tôi",
+        "description": "Các nguyên tắc hướng dẫn mọi việc chúng tôi làm và giúp chúng tôi phục vụ khách hàng tốt hơn.",
+        "customerFirstTitle": "Khách hàng là trên hết",
+        "customerFirstDescription": "Mọi thứ chúng tôi làm đều được thiết kế để giúp khách hàng thành công và phát triển doanh nghiệp của họ.",
+        "focusOnQualityTitle": "Tập trung vào chất lượng",
+        "focusOnQualityDescription": "Chúng tôi tin vào việc xây dựng các sản phẩm đáng tin cậy, an toàn và hiệu suất cao ngay từ ngày đầu tiên.",
+        "continuousInnovationTitle": "Đổi mới liên tục",
+        "continuousInnovationDescription": "Chúng tôi không ngừng vượt qua các giới hạn của những gì có thể để cung cấp các giải pháp tiên tiến.",
+        "openTransparentTitle": "Mở và minh bạch",
+        "openTransparentDescription": "Chúng tôi xây dựng công khai, chia sẻ những gì đã học được và tin vào giao tiếp trung thực."
+      },
+      "StorySection": {
+        "heading": "Câu chuyện của chúng tôi",
+        "paragraph1": "Được thành lập vào năm 2023, chúng tôi bắt đầu với một quan sát đơn giản: xây dựng một sản phẩm SaaS không nên mất hàng tháng để viết mã boilerplate và thiết lập cơ sở hạ tầng.",
+        "paragraph2": "Sau khi tự mình ra mắt nhiều sản phẩm SaaS thành công, chúng tôi nhận thấy mình đang xây dựng lại các thành phần tương tự lặp đi lặp lại - xác thực, thanh toán, quản lý người dùng và phân tích.",
+        "paragraph3": "Đó là lúc chúng tôi quyết định tạo ra mẫu SaaS tối ưu cho phép các doanh nhân tập trung vào những gì quan trọng nhất: xây dựng các sản phẩm tuyệt vời giải quyết các vấn đề thực sự.",
+        "journeyBegins": "Hành trình của chúng tôi bắt đầu"
+      },
+      "CTASection": {
+        "heading": "Sẵn sàng tham gia sứ mệnh của chúng tôi?",
+        "description": "Cho dù bạn đang xây dựng SaaS đầu tiên hay thứ mười, chúng tôi luôn ở đây để giúp bạn thành công.",
+        "startButton": "Bắt đầu xây dựng ngay hôm nay",
+        "getInTouchButton": "Liên hệ"
+      }
     }
   }
 }
