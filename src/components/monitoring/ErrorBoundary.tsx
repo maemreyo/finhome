@@ -28,7 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     errorTracker.captureError(error, {
       componentStack: errorInfo.componentStack,
       errorBoundary: true,
@@ -47,7 +47,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Something went wrong</AlertTitle>
             <AlertDescription className="mt-2">
-              We've been notified about this error and are working to fix it.
+              We&apos;ve been notified about this error and are working to fix it.
             </AlertDescription>
             <Button
               variant="outline"

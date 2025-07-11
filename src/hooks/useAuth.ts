@@ -325,7 +325,7 @@ export function useProfile() {
 // Subscription hook
 export function useSubscription() {
   const { user } = useAuth()
-  const [subscription, setSubscription] = useState<any>(null)
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

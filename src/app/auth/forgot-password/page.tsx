@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
               <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold text-center">Check your email</CardTitle>
                 <CardDescription className="text-center">
-                  We've sent a password reset link to your email address.
+                  We&apos;ve sent a password reset link to your email address.
                 </CardDescription>
               </CardHeader>
               
@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
                 <Alert>
                   <Mail className="h-4 w-4" />
                   <AlertDescription>
-                    If you don't see the email, check your spam folder.
+                    If you don&apos;t see the email, check your spam folder.
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -96,7 +96,7 @@ export default function ForgotPasswordPage() {
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold text-center">Forgot password?</CardTitle>
               <CardDescription className="text-center">
-                Enter your email address and we'll send you a reset link.
+                Enter your email address and we&apos;ll send you a reset link.
               </CardDescription>
             </CardHeader>
             

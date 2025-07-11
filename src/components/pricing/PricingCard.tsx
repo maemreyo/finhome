@@ -24,7 +24,6 @@ export function PricingCard({ plan, annual = false, onSelectPlan }: PricingCardP
 
   const isCurrentPlan = subscription?.plan_name === plan.name
   const price = annual ? Math.floor(plan.price * 12 * 0.8) : plan.price // 20% discount for annual
-  const displayPrice = annual ? `$${price}/year` : `$${plan.price}/month`
 
   const handleSelectPlan = async () => {
     if (!user) {

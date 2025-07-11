@@ -61,7 +61,7 @@ export function WelcomeEmail({
 
             <Text style={paragraph}>
               If you have any questions, feel free to reach out to our support team. 
-              We're here to help!
+              We&apos;re here to help!
             </Text>
 
             <Hr style={hr} />

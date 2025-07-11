@@ -143,7 +143,7 @@ export default function TermsOfServicePage() {
               <h3 className="text-xl font-semibold mb-3">Service Availability</h3>
               <p className="mb-4">
                 We strive to maintain high availability but do not guarantee uninterrupted access. 
-                The Service is provided "as is" without warranties of any kind.
+                The Service is provided &quot;as is&quot; without warranties of any kind.
               </p>
 
               <h3 className="text-xl font-semibold mb-3">Limitation of Liability</h3>

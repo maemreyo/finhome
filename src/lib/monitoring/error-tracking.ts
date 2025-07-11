@@ -93,7 +93,7 @@ class ErrorTracker {
   }
 
   // Send feedback
-  private async sendFeedback(feedback: any) {
+  private async sendFeedback(feedback: Record<string, unknown>) {
     try {
       await fetch('/api/monitoring/feedback', {
         method: 'POST',

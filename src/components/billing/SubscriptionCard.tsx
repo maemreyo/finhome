@@ -10,7 +10,7 @@ import { format } from 'date-fns'
 import { CreditCard, Calendar } from 'lucide-react'
 
 export function SubscriptionCard() {
-  const { subscription, loading, isActive } = useSubscription()
+  const { subscription, loading } = useSubscription()
 
   const handleManageSubscription = async () => {
     try {
@@ -109,7 +109,7 @@ export function SubscriptionCard() {
               <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
                 <p className="text-sm text-orange-800">
                   Your subscription will be canceled at the end of the current billing period.
-                  You'll continue to have access until then.
+                  You&apos;ll continue to have access until then.
                 </p>
               </div>
             )}

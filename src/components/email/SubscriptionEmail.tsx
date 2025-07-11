@@ -76,7 +76,7 @@ export function SubscriptionEmail({
             <Hr style={hr} />
 
             <Text style={paragraph}>
-              If you have any questions about your subscription, don't hesitate to contact our support team.
+              If you have any questions about your subscription, don&apos;t hesitate to contact our support team.
             </Text>
 
             <Text style={paragraph}>

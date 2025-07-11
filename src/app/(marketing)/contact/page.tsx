@@ -56,7 +56,7 @@ export default function ContactPage() {
       } else {
         throw new Error('Failed to send message')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to send message. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -186,7 +186,7 @@ export default function ContactPage() {
               <div>
                 <h2 className="text-2xl font-bold mb-4">Contact Information</h2>
                 <p className="text-muted-foreground mb-8">
-                  Choose the best way to reach us. We're here to help and answer any questions you might have.
+                  Choose the best way to reach us. We&apos;re here to help and answer any questions you might have.
                 </p>
               </div>
 

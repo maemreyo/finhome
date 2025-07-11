@@ -104,7 +104,7 @@ class Analytics {
     }
 
     // Plausible Analytics
-    if (typeof window !== 'undefined' && (window as any).plausible) {
+    if (typeof window !== 'undefined' && (window as Window & typeof globalThis & { plausible: any }).plausible) {
       (window as any).plausible(eventData.event, {
         props: eventData.properties,
       })

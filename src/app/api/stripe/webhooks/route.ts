@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { verifyStripeWebhook, getPlanByStripePriceId } from '@/lib/stripe/config'
 import { sendSubscriptionConfirmation, sendPaymentFailedNotification } from '@/lib/email/resend'
 import Stripe from 'stripe'
+import { Database } from '@/lib/supabase/client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -95,7 +96,7 @@ async function handleSubscriptionUpdate(supabase: any, subscription: Stripe.Subs
     .update({
       stripe_subscription_id: subscriptionId,
       stripe_price_id: priceId,
-      status: status as any,
+      status: status as Database['public']['Enums']['subscription_status'],
       plan_name: plan?.name || 'Unknown',
       current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
       current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
@@ -134,7 +135,6 @@ async function handleSubscriptionUpdate(supabase: any, subscription: Stripe.Subs
 }
 
 async function handleSubscriptionCancellation(supabase: any, subscription: Stripe.Subscription) {
-  const subscriptionId = subscription.id
 
   // Update subscription status
   const { error } = await supabase
@@ -223,7 +223,7 @@ async function handleInvoicePaymentFailed(supabase: any, invoice: Stripe.Invoice
   if (invoice.attempt_count >= 3) {
     await supabase
       .from('subscriptions')
-      .update({ status: 'past_due' })
+      .update({ status: 'past_due' as Database['public']['Enums']['subscription_status'] })
       .eq('stripe_customer_id', customerId)
   }
 }

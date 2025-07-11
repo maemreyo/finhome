@@ -61,7 +61,7 @@ export async function sendEmail({
       ...(text && { text }),
     }
 
-    const result = await resend.emails.send(emailData as any)
+    const result = await resend.emails.send(emailData)
     
     if (result.error) {
       console.error('Resend email error:', result.error)

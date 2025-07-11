@@ -37,7 +37,7 @@ export default function PricingPage() {
                   What happens if I cancel?
                 </h3>
                 <p className="text-muted-foreground">
-                  You can cancel your subscription at any time. You'll continue to have access to 
+                  You can cancel your subscription at any time. You&apos;ll continue to have access to 
                   all features until the end of your current billing period.
                 </p>
               </div>
@@ -47,7 +47,7 @@ export default function PricingPage() {
                   Do you offer refunds?
                 </h3>
                 <p className="text-muted-foreground">
-                  We offer a 30-day money-back guarantee for all paid plans. If you're not satisfied, 
+                  We offer a 30-day money-back guarantee for all paid plans. If you&apos;re not satisfied, 
                   contact us for a full refund.
                 </p>
               </div>
@@ -58,7 +58,7 @@ export default function PricingPage() {
                 </h3>
                 <p className="text-muted-foreground">
                   Absolutely. We use industry-standard encryption and security measures to protect 
-                  your data. We're SOC 2 Type II compliant and GDPR ready.
+                  your data. We&apos;re SOC 2 Type II compliant and GDPR ready.
                 </p>
               </div>
             </div>

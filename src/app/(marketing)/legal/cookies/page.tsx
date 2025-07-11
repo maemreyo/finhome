@@ -7,7 +7,6 @@ export const metadata = {
 
 export default function CookiePolicyPage() {
   const lastUpdated = 'January 1, 2024'
-  const companyName = process.env.NEXT_PUBLIC_APP_NAME || 'SaaS Company'
   const contactEmail = process.env.CONTACT_EMAIL || 'privacy@company.com'
 
   return (

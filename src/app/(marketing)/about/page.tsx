@@ -53,7 +53,7 @@ function ValuesSection() {
     {
       icon: <Award className="h-8 w-8" />,
       title: 'Continuous Innovation',
-      description: 'We constantly push the boundaries of what\'s possible to deliver cutting-edge solutions.',
+      description: 'We constantly push the boundaries of what&apos;s possible to deliver cutting-edge solutions.',
     },
     {
       icon: <Heart className="h-8 w-8" />,
@@ -160,7 +160,7 @@ export default function AboutPage() {
             Ready to Join Our Mission?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Whether you're building your first SaaS or your tenth, we're here to help you succeed.
+            Whether you&apos;re building your first SaaS or your tenth, we&apos;re here to help you succeed.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>
