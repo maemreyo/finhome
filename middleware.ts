@@ -1,17 +1,22 @@
-// Next.js middleware for authentication and route protection
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+const locales = ['en', 'vi']; // Assuming these are the locales based on messages/en.json and messages/vi.json
+const defaultLocale = 'en'; // Assuming 'en' is the default
+
+const i18nMiddleware = createMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'always', // Or 'as-needed' if you prefer
+});
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  // Run next-intl middleware first
+  const response = i18nMiddleware(request);
 
-  // Create a response object
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+  // Now, apply your existing authentication and route protection logic
+  const { pathname } = request.nextUrl;
 
   // Create a Supabase client configured to use cookies
   const supabase = createServerClient(
@@ -20,20 +25,20 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set({ name, value })
-            response.cookies.set({ name, value, ...options })
-          })
+            request.cookies.set({ name, value });
+            response.cookies.set({ name, value, ...options }); // Use the response from i18nMiddleware
+          });
         },
       },
     }
-  )
+  );
 
   // Refresh session if expired - required for Server Components
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { user }, error } = await supabase.auth.getUser();
 
   // Define protected and public routes
   const protectedRoutes = [
@@ -42,35 +47,41 @@ export async function middleware(request: NextRequest) {
     '/settings',
     '/billing',
     '/api/protected'
-  ]
-  
+  ];
+
   const authRoutes = [
     '/auth/login',
     '/auth/signup',
     '/auth/forgot-password',
     '/auth/reset-password'
-  ]
+  ];
 
-  const isProtectedRoute = protectedRoutes.some(route => 
+  // Adjust paths for locale prefix
+  const protectedRoutesWithLocale = locales.flatMap(locale =>
+    protectedRoutes.map(route => `/${locale}${route}`)
+  );
+  const authRoutesWithLocale = locales.flatMap(locale =>
+    authRoutes.map(route => `/${locale}${route}`)
+  );
+
+  const isProtectedRoute = protectedRoutesWithLocale.some(route =>
     pathname.startsWith(route)
-  )
-  
-  const isAuthRoute = authRoutes.some(route => 
+  );
+
+  const isAuthRoute = authRoutesWithLocale.some(route =>
     pathname.startsWith(route)
-  )
+  );
 
   // Handle protected routes
   if (isProtectedRoute && !user) {
-    // Redirect to login with return URL
-    const redirectUrl = new URL('/auth/login', request.url)
-    redirectUrl.searchParams.set('redirectTo', pathname)
-    return NextResponse.redirect(redirectUrl)
+    const redirectUrl = new URL(`/${defaultLocale}/auth/login`, request.url); // Use defaultLocale
+    redirectUrl.searchParams.set('redirectTo', pathname);
+    return NextResponse.redirect(redirectUrl);
   }
 
   // Handle auth routes (redirect authenticated users away)
   if (isAuthRoute && user) {
-    // Redirect to dashboard if already authenticated
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL(`/${defaultLocale}/dashboard`, request.url)); // Use defaultLocale
   }
 
   // Special handling for API routes
@@ -78,34 +89,31 @@ export async function middleware(request: NextRequest) {
     return NextResponse.json(
       { error: 'Unauthorized' },
       { status: 401 }
-    )
+    );
   }
 
   // Handle auth callback
-  if (pathname === '/auth/callback') {
-    // The callback is handled by the route handler
-    return response
+  if (pathname.includes('/auth/callback')) { // Use includes for robustness with locale prefix
+    return response;
   }
 
   // CORS headers for API routes
   if (pathname.startsWith('/api/')) {
-    response.headers.set('Access-Control-Allow-Origin', '*')
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   }
 
-  return response
+  return response;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (public folder)
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Match all request paths except for the ones starting with:
+    // - _next (Next.js internals)
+    // - api (API routes)
+    // - public files (public folder)
+    // - All other files in the root (e.g. favicon.ico)
+    '/((?!_next|api|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
