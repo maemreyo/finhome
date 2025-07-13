@@ -6,7 +6,7 @@ import { useState, useEffect, use } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+
 import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -29,9 +29,7 @@ type PageProps = {
 
 export default function ResetPasswordPage({ params }: PageProps) {
   const { locale } = use(params);
-  setRequestLocale(locale);
   const t = useTranslations("Auth.ResetPassword");
-  type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
   const resetPasswordSchema = z
     .object({
@@ -42,6 +40,8 @@ export default function ResetPasswordPage({ params }: PageProps) {
       message: t("form.passwordMismatch"),
       path: ["confirmPassword"],
     });
+
+  type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();

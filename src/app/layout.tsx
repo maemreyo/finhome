@@ -1,17 +1,14 @@
-import { notFound } from 'next/navigation';
+import type { Metadata } from "next";
 
-const locales = ['en', 'vi'];
+export const metadata: Metadata = {
+  title: "SaaS Template",
+  description: "A modern SaaS template built with Next.js",
+};
 
-export default async function LocaleLayout({
+export default function RootLayout({
   children,
-  params
-}: LayoutProps) {
-  const { locale } = await params;
-  if (!locales.includes(locale as any)) notFound();
-
-  return (
-    <html lang={locale}>
-      <body>{children}</body>
-    </html>
-  );
+}: {
+  children: React.ReactNode;
+}) {
+  return children;
 }
