@@ -2,10 +2,11 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuthActions } from "@/hooks/useAuth";
 import { Loader2, Lock } from "lucide-react";
 
-export default function ResetPasswordPage() {
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default function ResetPasswordPage({ params }: PageProps) {
+  const { locale } = use(params);
+  setRequestLocale(locale);
   const t = useTranslations("Auth.ResetPassword");
   type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 

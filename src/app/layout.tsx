@@ -2,10 +2,11 @@ import { notFound } from 'next/navigation';
 
 const locales = ['en', 'vi'];
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
-  params: { locale }
+  params
 }: LayoutProps) {
+  const { locale } = await params;
   if (!locales.includes(locale as any)) notFound();
 
   return (

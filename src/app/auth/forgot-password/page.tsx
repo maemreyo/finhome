@@ -2,10 +2,11 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
+import { setRequestLocale } from 'next-intl/server'
 import { z } from 'zod'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuthActions } from '@/hooks/useAuth'
 import { Loader2, Mail, ArrowLeft } from 'lucide-react'
 
-export default function ForgotPasswordPage() {
+type PageProps = {
+  params: Promise<{ locale: string }>
+}
+
+export default function ForgotPasswordPage({ params }: PageProps) {
+  const { locale } = use(params);
+  setRequestLocale(locale);
   const t = useTranslations('Auth.ForgotPassword');
 
   const forgotPasswordSchema = z.object({

@@ -2,11 +2,16 @@
 
 import { Suspense } from 'react'
 import { LoginForm } from '@/components/auth/LoginForm'
-import { useTranslations } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
+
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Loader2 } from 'lucide-react'
 
-export async function generateMetadata({ params: { locale } }: PageProps) {
+type PageProps = {
+  params: Promise<{ locale: string }>
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Auth.Login' });
   return {
     title: t('metadata.title'),
@@ -14,8 +19,10 @@ export async function generateMetadata({ params: { locale } }: PageProps) {
   }
 }
 
-export default function LoginPage() {
-  const t = useTranslations('Auth.Login');
+export default async function LoginPage({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'Auth.Login' });
   return (
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       {/* Left side - Branding (hidden on mobile) */}

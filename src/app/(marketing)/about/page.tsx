@@ -5,11 +5,12 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
-type Props = {
-  params: { locale: string };
+type PageProps = {
+  params: Promise<{ locale: string }>;
 };
 
-export async function generateMetadata({ params: { locale } }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'AboutPage.metadata' });
   return {
     title: t('title'),
@@ -101,7 +102,8 @@ async function ValuesSection({ locale }: { locale: string }) {
   )
 }
 
-export default async function AboutPage({ params: { locale } }: PageProps) {
+export default async function AboutPage({ params }: PageProps) {
+  const { locale } = await params;
   const tHero = await getTranslations({ locale, namespace: 'AboutPage.HeroSection' });
   const tStory = await getTranslations({ locale, namespace: 'AboutPage.StorySection' });
   const tCTA = await getTranslations({ locale, namespace: 'AboutPage.CTASection' });

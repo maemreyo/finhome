@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -16,8 +16,15 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { MapPin, Mail, Phone, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
 
-export default function ContactPage() {
+type PageProps = {
+  params: Promise<{ locale: string }>
+}
+
+export default function ContactPage({ params }: PageProps) {
+  const { locale } = use(params);
+  setRequestLocale(locale);
   const t = useTranslations('ContactPage');
   const tForm = useTranslations('ContactPage.Form');
   const tContactInfo = useTranslations('ContactPage.ContactInfo');

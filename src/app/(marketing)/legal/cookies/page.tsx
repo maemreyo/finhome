@@ -3,11 +3,12 @@
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
-type Props = {
-  params: { locale: string };
+type PageProps = {
+  params: Promise<{ locale: string }>;
 };
 
-export async function generateMetadata({ params: { locale } }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'CookiePolicyPage.metadata' });
   return {
     title: t('title'),
@@ -15,7 +16,8 @@ export async function generateMetadata({ params: { locale } }: PageProps): Promi
   }
 }
 
-export default async function CookiePolicyPage({ params: { locale } }: PageProps) {
+export default async function CookiePolicyPage({ params }: PageProps) {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'CookiePolicyPage' });
   const lastUpdated = 'January 1, 2024' // This could also be translated or fetched dynamically
   const contactEmail = process.env.CONTACT_EMAIL || 'privacy@company.com'

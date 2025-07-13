@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export async function generateMetadata({ params: { locale } }: LayoutProps): Promise<Metadata> {
+export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Layout.metadata" });
 
   return {
@@ -50,10 +51,11 @@ export async function generateMetadata({ params: { locale } }: LayoutProps): Pro
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-  params: { locale },
+  params,
 }: LayoutProps) {
+  const { locale } = await params;
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
