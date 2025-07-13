@@ -374,7 +374,7 @@ export function useSubscription() {
         },
         (payload) => {
           if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-            setSubscription(payload.new)
+            setSubscription(payload.new as Subscription)
           }
         }
       )
@@ -389,7 +389,7 @@ export function useSubscription() {
     subscription,
     loading,
     isActive: subscription?.status === 'active',
-    isPro: subscription?.status === 'active' && subscription?.plan_name !== 'starter',
+    isPro: subscription?.status === 'active',
     hasActiveTrial: subscription?.status === 'trialing',
   }
 }

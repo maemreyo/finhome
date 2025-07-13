@@ -49,17 +49,24 @@ export async function sendEmail({
   }>
 }) {
   try {
-    const emailData = {
+    // Ensure at least one content type is provided
+    if (!react && !html && !text) {
+      throw new Error('At least one of react, html, or text must be provided')
+    }
+
+    const emailData: any = {
       from,
       to: Array.isArray(to) ? to : [to],
       subject,
       cc,
       bcc,
       attachments,
-      ...(react && { react }),
-      ...(html && { html }),
-      ...(text && { text }),
     }
+
+    // Add content based on what's available
+    if (react) emailData.react = react
+    if (html) emailData.html = html
+    if (text) emailData.text = text
 
     const result = await resend.emails.send(emailData)
     

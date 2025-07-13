@@ -41,7 +41,7 @@ class Analytics {
         url: window.location.href,
         referrer: document.referrer,
       },
-      userId: this.userId,
+      userId: this.userId || undefined,
     }
 
     // Send to analytics providers

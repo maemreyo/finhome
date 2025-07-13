@@ -6,11 +6,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useSubscription } from '@/hooks/useAuth'
+import { getPlanByStripePriceId } from '@/lib/stripe/config'
 import { format } from 'date-fns'
 import { CreditCard, Calendar } from 'lucide-react'
 
 export function SubscriptionCard() {
   const { subscription, loading } = useSubscription()
+  
+  // Get plan name from stripe price ID
+  const getPlanName = (subscription: any) => {
+    if (!subscription?.stripe_price_id) return 'Pro Plan'
+    const plan = getPlanByStripePriceId(subscription.stripe_price_id)
+    return plan?.name || subscription.plan_name || 'Pro Plan'
+  }
 
   const handleManageSubscription = async () => {
     try {
@@ -87,7 +95,7 @@ export function SubscriptionCard() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold">
-                  {subscription.plan_name || 'Pro Plan'}
+                  {getPlanName(subscription)}
                 </h3>
                 <p className="text-muted-foreground">
                   {subscription.status === 'trialing' ? 'Trial period' : 'Active subscription'}
