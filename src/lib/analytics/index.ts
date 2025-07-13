@@ -31,7 +31,7 @@ class Analytics {
 
   // Track custom events
   track(event: string, properties?: Record<string, any>) {
-    if (!this.isEnabled) return
+    if (!this.isEnabled || typeof window === 'undefined') return
 
     const eventData: AnalyticsEvent = {
       event,
@@ -55,7 +55,7 @@ class Analytics {
 
   // Track page views
   page(name?: string, properties?: Record<string, any>) {
-    if (!this.isEnabled) return
+    if (!this.isEnabled || typeof window === 'undefined') return
 
     this.track('Page Viewed', {
       page: name || document.title,
@@ -136,8 +136,33 @@ class Analytics {
   }
 }
 
-// Export singleton instance
-export const analytics = new Analytics()
+// Export factory function instead of singleton
+export function createAnalytics() {
+  return new Analytics()
+}
+
+// Lazy singleton for client-side use only
+let analyticsInstance: Analytics | null = null
+export const analytics = {
+  get instance() {
+    if (typeof window === 'undefined') {
+      // Return a no-op analytics object for server-side
+      return {
+        identify: () => {},
+        track: () => {},
+        page: () => {},
+        signUp: () => {},
+        signIn: () => {},
+        subscribe: () => {},
+        featureUsed: () => {},
+      }
+    }
+    if (!analyticsInstance) {
+      analyticsInstance = new Analytics()
+    }
+    return analyticsInstance
+  }
+}
 
 // React hook for analytics
 import { useAuth } from '@/hooks/useAuth'
@@ -147,13 +172,13 @@ export function useAnalytics() {
   const { user } = useAuth()
 
   useEffect(() => {
-    if (user) {
-      analytics.identify(user.id, {
+    if (user && typeof window !== 'undefined') {
+      analytics.instance.identify(user.id, {
         email: user.email,
         created_at: user.created_at,
       })
     }
   }, [user])
 
-  return analytics
+  return analytics.instance
 }

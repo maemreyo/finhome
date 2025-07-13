@@ -6,6 +6,8 @@ import { LoginForm } from '@/components/auth/LoginForm'
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Loader2 } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 type PageProps = {
   params: Promise<{ locale: string }>
 }

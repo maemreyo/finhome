@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
-import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
-import { ErrorBoundary } from "@/components/monitoring/ErrorBoundary";
 import "@/app/globals.css";
 import { getTranslations } from "next-intl/server";
 
@@ -78,19 +76,15 @@ export default async function LocaleLayout({
         )}
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ErrorBoundary>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <AnalyticsProvider>
-              {children}
-            </AnalyticsProvider>
-            <Toaster />
-          </ThemeProvider>
-        </ErrorBoundary>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

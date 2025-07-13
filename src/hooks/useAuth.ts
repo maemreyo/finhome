@@ -98,7 +98,7 @@ export function useAuthActions() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '/auth/callback',
           data: {
             full_name: options?.fullName || '',
           },
@@ -150,7 +150,7 @@ export function useAuthActions() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo || '/dashboard')}`,
+          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo || '/dashboard')}` : '/auth/callback',
         },
       })
 
@@ -183,7 +183,7 @@ export function useAuthActions() {
   const resetPassword = async (email: string) => {
     try {
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+        redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/reset-password` : '/auth/reset-password',
       })
 
       if (error) throw error
@@ -323,7 +323,7 @@ export function useProfile() {
 }
 
 // Subscription hook
-import { Database } from '@/lib/supabase/client'
+import { Database } from '@/lib/supabase/types'
 
 type Subscription = Database['public']['Tables']['subscriptions']['Row'];
 
@@ -401,7 +401,7 @@ export function useRequireAuth(redirectTo: string = '/auth/login') {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push(`${redirectTo}?redirectTo=${encodeURIComponent(window.location.pathname)}`)
+      router.push(`${redirectTo}?redirectTo=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`)
     }
   }, [user, loading, router, redirectTo])
 

@@ -1,5 +1,7 @@
 // Marketing website layout
 
+export const dynamic = 'force-dynamic'
+
 import { MarketingHeader } from '@/components/marketing/Header'
 import { MarketingFooter } from '@/components/marketing/Footer'
 

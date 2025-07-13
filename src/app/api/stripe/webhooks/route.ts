@@ -12,7 +12,7 @@ import {
   sendPaymentFailedNotification,
 } from "@/lib/email/resend";
 import Stripe from "stripe";
-import { Database } from '@/lib/supabase/client'
+import { Database } from '@/lib/supabase/types'
 
 interface CustomStripeInvoice extends Stripe.Invoice {
   subscription?: string | Stripe.Subscription | null;
