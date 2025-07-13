@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,15 +16,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { MapPin, Mail, Phone, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
-
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
-  const t = await getTranslations({ locale, namespace: 'ContactPage.metadata' });
-  return {
-    title: t('title'),
-    description: t('description'),
-  }
-}
 
 export default function ContactPage() {
   const t = useTranslations('ContactPage');
@@ -230,10 +222,10 @@ export default function ContactPage() {
                   </p>
                   <div className="flex gap-2">
                     <Button variant="secondary" size="sm" asChild>
-                      <a href="/docs">{tContactInfo('viewDocs')}</a>
+                      <Link href="/docs">{tContactInfo('viewDocs')}</Link>
                     </Button>
                     <Button variant="outline" size="sm" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-                      <a href="/community">{tContactInfo('joinCommunity')}</a>
+                      <Link href="/community">{tContactInfo('joinCommunity')}</Link>
                     </Button>
                   </div>
                 </CardContent>

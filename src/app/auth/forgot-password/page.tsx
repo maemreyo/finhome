@@ -5,6 +5,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
 import { z } from 'zod'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -15,13 +16,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuthActions } from '@/hooks/useAuth'
 import { Loader2, Mail, ArrowLeft } from 'lucide-react'
 
-const forgotPasswordSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-})
-
-type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>
-
 export default function ForgotPasswordPage() {
+  const t = useTranslations('Auth.ForgotPassword');
+
+  const forgotPasswordSchema = z.object({
+    email: z.string().email(t('form.emailInvalid')),
+  })
+  
+  type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -58,9 +60,9 @@ export default function ForgotPasswordPage() {
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
             <Card>
               <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold text-center">Check your email</CardTitle>
+                <CardTitle className="text-2xl font-bold text-center">{t('success.title')}</CardTitle>
                 <CardDescription className="text-center">
-                  We&apos;ve sent a password reset link to your email address.
+                  {t('success.description')}
                 </CardDescription>
               </CardHeader>
               
@@ -68,7 +70,7 @@ export default function ForgotPasswordPage() {
                 <Alert>
                   <Mail className="h-4 w-4" />
                   <AlertDescription>
-                    If you don&apos;t see the email, check your spam folder.
+                    {t('success.spamCheck')}
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -77,7 +79,7 @@ export default function ForgotPasswordPage() {
                 <Link href="/auth/login" className="w-full">
                   <Button variant="outline" className="w-full">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to login
+                    {t('backToLogin')}
                   </Button>
                 </Link>
               </CardFooter>
@@ -94,9 +96,9 @@ export default function ForgotPasswordPage() {
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-center">Forgot password?</CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">{t('form.title')}</CardTitle>
               <CardDescription className="text-center">
-                Enter your email address and we&apos;ll send you a reset link.
+                {t('form.description')}
               </CardDescription>
             </CardHeader>
             
@@ -109,13 +111,13 @@ export default function ForgotPasswordPage() {
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('form.emailLabel')}</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="email"
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder={t('form.emailPlaceholder')}
                       className="pl-9"
                       {...register('email')}
                     />
@@ -131,7 +133,7 @@ export default function ForgotPasswordPage() {
                   disabled={isLoading || isSubmitting}
                 >
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Send reset link
+                  {t('form.sendResetLink')}
                 </Button>
               </form>
             </CardContent>
@@ -140,7 +142,7 @@ export default function ForgotPasswordPage() {
               <Link href="/auth/login" className="w-full">
                 <Button variant="outline" className="w-full">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to login
+                  {t('backToLogin')}
                 </Button>
               </Link>
             </CardFooter>

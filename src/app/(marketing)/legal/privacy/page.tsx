@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-bold mb-4">Introduction</h2>
               <p className="mb-4">
-                {companyName} ("we," "our," or "us") is committed to protecting your privacy. 
+                {companyName} (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. 
                 This Privacy Policy explains how we collect, use, disclose, and safeguard your 
                 information when you visit our website {websiteUrl} and use our services.
               </p>
@@ -188,8 +188,8 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-2xl font-bold mb-4">Changes to This Policy</h2>
               <p>
                 We may update this Privacy Policy from time to time. We will notify you of any 
-                changes by posting the new Privacy Policy on this page and updating the "Last 
-                updated" date. Your continued use of our services after any changes constitutes 
+                changes by posting the new Privacy Policy on this page and updating the &quot;Last 
+                updated&quot; date. Your continued use of our services after any changes constitutes 
                 acceptance of the updated policy.
               </p>
             </section>

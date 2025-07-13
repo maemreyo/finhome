@@ -2,14 +2,20 @@
 
 import { Suspense } from 'react'
 import { SignUpForm } from '@/components/auth/SignUpForm'
+import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Loader2 } from 'lucide-react'
 
-export const metadata = {
-  title: 'Sign Up',
-  description: 'Create a new account',
+export async function generateMetadata({ params: { locale } }: PageProps) {
+  const t = await getTranslations({ locale, namespace: 'Auth.SignUp' });
+  return {
+    title: t('metadata.title'),
+    description: t('metadata.description'),
+  }
 }
 
 export default function SignUpPage() {
+  const t = useTranslations('Auth.SignUp');
   return (
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       {/* Left side - Branding (hidden on mobile) */}
@@ -28,15 +34,14 @@ export default function SignUpPage() {
           >
             <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
           </svg>
-          {process.env.NEXT_PUBLIC_APP_NAME}
+          {t('appName')}
         </div>
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              &ldquo;Join thousands of users who trust our platform to build 
-              and scale their businesses successfully.&rdquo;
+              &ldquo;{t('testimonial.quote')}&rdquo;
             </p>
-            <footer className="text-sm">Marcus Johnson</footer>
+            <footer className="text-sm">{t('testimonial.author')}</footer>
           </blockquote>
         </div>
       </div>

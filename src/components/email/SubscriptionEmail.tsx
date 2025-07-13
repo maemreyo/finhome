@@ -127,47 +127,71 @@ const detailsText = {
   color: '#525252',
 }
 
-// Updated src/lib/email/resend.ts - Add React Email templates
-// (Add this to the existing resend.ts file)
+const main = {
+  backgroundColor: '#ffffff',
+  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+};
 
-import { WelcomeEmail } from '@/components/email/WelcomeEmail'
-import { PasswordResetEmail } from '@/components/email/PasswordResetEmail'
-import { SubscriptionEmail } from '@/components/email/SubscriptionEmail'
+const container = {
+  margin: '0 auto',
+  padding: '20px 0 48px',
+  width: '580px',
+};
 
-// Enhanced email functions using React Email templates
-export async function sendWelcomeEmailWithTemplate(to: string, userName: string) {
-  return sendEmail({
-    to,
-    subject: `Welcome to ${process.env.NEXT_PUBLIC_APP_NAME}!`,
-    react: WelcomeEmail({ userName }),
-  })
-}
+const content = {
+  border: '1px solid #eaeaea',
+  borderRadius: '4px',
+  margin: '20px 0',
+  padding: '20px',
+};
 
-export async function sendPasswordResetWithTemplate(to: string, resetUrl: string, userName?: string) {
-  return sendEmail({
-    to,
-    subject: 'Reset your password',
-    react: PasswordResetEmail({ resetUrl, userName }),
-  })
-}
+const title = {
+  fontSize: '24px',
+  fontWeight: 'bold',
+  textAlign: 'center' as const,
+  color: '#333',
+};
 
-export async function sendSubscriptionConfirmationWithTemplate(
-  to: string,
-  userName: string,
-  planName: string,
-  amount: number,
-  billingInterval?: string,
-  nextBillingDate?: string
-) {
-  return sendEmail({
-    to,
-    subject: 'Subscription Confirmed!',
-    react: SubscriptionEmail({ 
-      userName, 
-      planName, 
-      amount, 
-      billingInterval,
-      nextBillingDate 
-    }),
-  })
-}
+const paragraph = {
+  fontSize: '16px',
+  lineHeight: '24px',
+  color: '#333',
+};
+
+const buttonContainer = {
+  textAlign: 'center' as const,
+  margin: '20px 0',
+};
+
+const button = {
+  backgroundColor: '#007bff',
+  borderRadius: '6px',
+  color: '#ffffff',
+  fontSize: '16px',
+  fontWeight: 'bold',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+  display: 'inline-block',
+  padding: '12px 24px',
+};
+
+const hr = {
+  borderColor: '#eaeaea',
+  margin: '20px 0',
+};
+
+const footer = {
+  color: '#8898aa',
+  fontSize: '12px',
+  textAlign: 'center' as const,
+};
+
+const footerText = {
+  fontSize: '12px',
+  color: '#8898aa',
+};
+
+const link = {
+  color: '#007bff',
+  textDecoration: 'underline',
+};

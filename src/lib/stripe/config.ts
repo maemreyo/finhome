@@ -5,7 +5,7 @@ import { loadStripe, type Stripe as StripeJS } from '@stripe/stripe-js'
 
 // Server-side Stripe instance
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-06-30.basil',
   typescript: true,
 })
 
@@ -13,7 +13,11 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 let stripePromise: Promise<StripeJS | null>
 export const getStripe = () => {
   if (!stripePromise) {
-    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+    const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    if (!publishableKey) {
+      throw new Error('Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY environment variable')
+    }
+    stripePromise = loadStripe(publishableKey)
   }
   return stripePromise
 }
@@ -106,15 +110,17 @@ export function verifyStripeWebhook(
   body: string | Buffer,
   signature: string
 ): Stripe.Event {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!webhookSecret) {
+    throw new Error('Missing STRIPE_WEBHOOK_SECRET environment variable')
+  }
+
   try {
-    return stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    )
+    return stripe.webhooks.constructEvent(body, signature, webhookSecret)
   } catch (error) {
-    console.error('Stripe webhook signature verification failed:', error)
-    throw new Error('Invalid webhook signature')
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Stripe webhook signature verification failed:', errorMessage)
+    throw new Error(`Invalid webhook signature: ${errorMessage}`)
   }
 }
 

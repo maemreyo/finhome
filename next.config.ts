@@ -1,13 +1,11 @@
 import createNextIntlPlugin from 'next-intl/plugin';
+import type { Configuration } from 'webpack';
 
 const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable experimental features
-  experimental: {
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
-  },
+  serverExternalPackages: ['@supabase/supabase-js'],
   
   // Image optimization
   images: {
@@ -16,7 +14,7 @@ const nextConfig = {
       'avatars.githubusercontent.com',
       'lh3.googleusercontent.com',
     ],
-    formats: ['image/webp', 'image/avif'],
+    
   },
   
   // Security headers
@@ -69,8 +67,8 @@ const nextConfig = {
   },
   
   // Webpack configuration
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
+  webpack: (config: import('webpack').Configuration, { isServer }: { isServer: boolean }) => {
+    if (!isServer && config.resolve) {
       config.resolve.fallback = {
         fs: false,
         net: false,

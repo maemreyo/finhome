@@ -5,6 +5,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
 import { z } from 'zod'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -17,22 +18,23 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useAuthActions } from '@/hooks/useAuth'
 import { Loader2, Mail, Lock, User, Github } from 'lucide-react'
 
-const signUpSchema = z.object({
-  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string(),
-  acceptTerms: z.boolean().refine(val => val === true, {
-    message: 'You must accept the terms and conditions',
-  }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-})
-
-type SignUpForm = z.infer<typeof signUpSchema>
-
 export function SignUpForm() {
+  const t = useTranslations('Auth.SignUpForm');
+
+  const signUpSchema = z.object({
+    fullName: z.string().min(2, t('form.fullNameMinLength')),
+    email: z.string().email(t('form.emailInvalid')),
+    password: z.string().min(8, t('form.passwordMinLength')),
+    confirmPassword: z.string(),
+    acceptTerms: z.boolean().refine(val => val === true, {
+      message: t('form.acceptTermsRequired'),
+    }),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('form.passwordMismatch'),
+    path: ["confirmPassword"],
+  })
+  
+  type SignUpForm = z.infer<typeof signUpSchema>
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
@@ -80,9 +82,9 @@ export function SignUpForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Create account</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">{t('title')}</CardTitle>
         <CardDescription className="text-center">
-          Sign up to get started with your free account
+          {t('description')}
         </CardDescription>
       </CardHeader>
       
@@ -137,7 +139,7 @@ export function SignUpForm() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
+              {t('orContinueWith')}
             </span>
           </div>
         </div>
@@ -145,13 +147,13 @@ export function SignUpForm() {
         {/* Email/Password Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
+            <Label htmlFor="fullName">{t('form.fullNameLabel')}</Label>
             <div className="relative">
               <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="fullName"
                 type="text"
-                placeholder="Enter your full name"
+                placeholder={t('form.fullNamePlaceholder')}
                 className="pl-9"
                 {...register('fullName')}
               />
@@ -162,13 +164,13 @@ export function SignUpForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('form.emailLabel')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('form.emailPlaceholder')}
                 className="pl-9"
                 {...register('email')}
               />
@@ -179,13 +181,13 @@ export function SignUpForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('form.passwordLabel')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password"
+                placeholder={t('form.passwordPlaceholder')}
                 className="pl-9"
                 {...register('password')}
               />
@@ -196,13 +198,13 @@ export function SignUpForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">{t('form.confirmPasswordLabel')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Confirm your password"
+                placeholder={t('form.confirmPasswordPlaceholder')}
                 className="pl-9"
                 {...register('confirmPassword')}
               />
@@ -222,13 +224,13 @@ export function SignUpForm() {
               htmlFor="terms"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              I agree to the{' '}
+              {t('form.agreeTo')}{' '}
               <Link href="/legal/terms" className="text-primary hover:underline">
-                Terms of Service
+                {t('form.termsOfService')}
               </Link>{' '}
-              and{' '}
+              {t('form.and')}{' '}
               <Link href="/legal/privacy" className="text-primary hover:underline">
-                Privacy Policy
+                {t('form.privacyPolicy')}
               </Link>
             </label>
           </div>
@@ -242,16 +244,16 @@ export function SignUpForm() {
             disabled={isLoading || isSubmitting}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create Account
+            {t('form.createAccount')}
           </Button>
         </form>
       </CardContent>
 
       <CardFooter>
         <p className="text-center text-sm text-muted-foreground w-full">
-          Already have an account?{' '}
+          {t('alreadyHaveAccount')}{' '}
           <Link href="/auth/login" className="text-primary hover:underline">
-            Sign in
+            {t('signIn')}
           </Link>
         </p>
       </CardFooter>

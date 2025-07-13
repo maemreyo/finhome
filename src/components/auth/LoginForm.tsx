@@ -5,6 +5,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
 import { z } from 'zod'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -17,14 +18,15 @@ import { Separator } from '@/components/ui/separator'
 import { useAuthActions } from '@/hooks/useAuth'
 import { Loader2, Mail, Lock, Github } from 'lucide-react'
 
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
-})
-
-type LoginForm = z.infer<typeof loginSchema>
-
 export function LoginForm() {
+  const t = useTranslations('Auth.LoginForm');
+
+  const loginSchema = z.object({
+    email: z.string().email(t('form.emailInvalid')),
+    password: z.string().min(1, t('form.passwordRequired')),
+  })
+  
+  type LoginForm = z.infer<typeof loginSchema>
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const searchParams = useSearchParams()
@@ -68,9 +70,9 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">{t('title')}</CardTitle>
         <CardDescription className="text-center">
-          Sign in to your account to continue
+          {t('description')}
         </CardDescription>
       </CardHeader>
       
@@ -125,7 +127,7 @@ export function LoginForm() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
+              {t('orContinueWith')}
             </span>
           </div>
         </div>
@@ -133,13 +135,13 @@ export function LoginForm() {
         {/* Email/Password Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('form.emailLabel')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('form.emailPlaceholder')}
                 className="pl-9"
                 {...register('email')}
               />
@@ -151,12 +153,12 @@ export function LoginForm() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('form.passwordLabel')}</Label>
               <Link
                 href="/auth/forgot-password"
                 className="text-sm text-primary hover:underline"
               >
-                Forgot password?
+                {t('form.forgotPassword')}
               </Link>
             </div>
             <div className="relative">
@@ -164,7 +166,7 @@ export function LoginForm() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder={t('form.passwordPlaceholder')}
                 className="pl-9"
                 {...register('password')}
               />
@@ -180,16 +182,16 @@ export function LoginForm() {
             disabled={isLoading || isSubmitting}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign In
+            {t('form.signIn')}
           </Button>
         </form>
       </CardContent>
 
       <CardFooter>
         <p className="text-center text-sm text-muted-foreground w-full">
-          Don&apos;t have an account?{' '}
+          {t('noAccount')}{' '}
           <Link href="/auth/signup" className="text-primary hover:underline">
-            Sign up
+            {t('signUp')}
           </Link>
         </p>
       </CardFooter>

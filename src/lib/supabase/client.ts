@@ -60,8 +60,8 @@ export interface Database {
           stripe_subscription_id: string | null
           stripe_price_id: string | null
           status: 'active' | 'inactive' | 'trialing' | 'past_due' | 'canceled' | 'unpaid'
-          current_period_start: string | null
-          current_period_end: string | null
+          current_period_start: number | null
+          current_period_end: number | null
           cancel_at_period_end: boolean
           created_at: string
           updated_at: string
@@ -73,8 +73,8 @@ export interface Database {
           stripe_subscription_id?: string | null
           stripe_price_id?: string | null
           status?: 'active' | 'inactive' | 'trialing' | 'past_due' | 'canceled' | 'unpaid'
-          current_period_start?: string | null
-          current_period_end?: string | null
+          current_period_start?: number | null
+          current_period_end?: number | null
           cancel_at_period_end?: boolean
           created_at?: string
           updated_at?: string
@@ -86,8 +86,8 @@ export interface Database {
           stripe_subscription_id?: string | null
           stripe_price_id?: string | null
           status?: 'active' | 'inactive' | 'trialing' | 'past_due' | 'canceled' | 'unpaid'
-          current_period_start?: string | null
-          current_period_end?: string | null
+          current_period_start?: number | null
+          current_period_end?: number | null
           cancel_at_period_end?: boolean
           updated_at?: string
         }

@@ -45,12 +45,12 @@ export function PasswordResetEmail({ resetUrl, userName }: PasswordResetEmailPro
             <Hr style={hr} />
 
             <Text style={paragraph}>
-              If you didn't request this password reset, please ignore this email. 
+              If you didn&apos;t request this password reset, please ignore this email. 
               Your password will remain unchanged.
             </Text>
 
             <Text style={paragraph}>
-              If you're having trouble clicking the button, copy and paste the URL below into your browser:
+              If you&apos;re having trouble clicking the button, copy and paste the URL below into your browser:
             </Text>
 
             <Text style={urlText}>{resetUrl}</Text>
@@ -96,3 +96,55 @@ const urlText = {
   borderRadius: '4px',
   fontFamily: 'monospace',
 }
+
+const main = {
+  backgroundColor: '#ffffff',
+  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+};
+
+const container = {
+  margin: '0 auto',
+  padding: '20px 0 48px',
+  width: '580px',
+};
+
+const content = {
+  border: '1px solid #eaeaea',
+  borderRadius: '4px',
+  margin: '20px 0',
+  padding: '20px',
+};
+
+const title = {
+  fontSize: '24px',
+  fontWeight: 'bold',
+  textAlign: 'center' as const,
+  color: '#333',
+};
+
+const paragraph = {
+  fontSize: '16px',
+  lineHeight: '24px',
+  color: '#333',
+};
+
+const buttonContainer = {
+  textAlign: 'center' as const,
+  margin: '20px 0',
+};
+
+const hr = {
+  borderColor: '#eaeaea',
+  margin: '20px 0',
+};
+
+const footer = {
+  color: '#8898aa',
+  fontSize: '12px',
+  textAlign: 'center' as const,
+};
+
+const footerText = {
+  fontSize: '12px',
+  color: '#8898aa',
+};

@@ -48,7 +48,7 @@ export function WelcomeEmail({
             <Text style={paragraph}>Hi {userName},</Text>
             
             <Text style={paragraph}>
-              Thanks for signing up! We're excited to have you on board. 
+              Thanks for signing up! We&apos;re excited to have you on board. 
               You can now access your dashboard and start exploring all the 
               features we have to offer.
             </Text>
@@ -100,7 +100,7 @@ export function WelcomeEmail({
 // Styles
 const main = {
   backgroundColor: '#f6f9fc',
-  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+  fontFamily: '-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,&quot;Helvetica Neue&quot;,Ubuntu,sans-serif',
 }
 
 const container = {

@@ -1,8 +1,13 @@
 // Cookie Policy page
 
 import { getTranslations } from 'next-intl/server';
+import type { Metadata } from 'next';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+type Props = {
+  params: { locale: string };
+};
+
+export async function generateMetadata({ params: { locale } }: PageProps): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: 'CookiePolicyPage.metadata' });
   return {
     title: t('title'),
@@ -10,7 +15,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   }
 }
 
-export default async function CookiePolicyPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function CookiePolicyPage({ params: { locale } }: PageProps) {
   const t = await getTranslations({ locale, namespace: 'CookiePolicyPage' });
   const lastUpdated = 'January 1, 2024' // This could also be translated or fetched dynamically
   const contactEmail = process.env.CONTACT_EMAIL || 'privacy@company.com'

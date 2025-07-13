@@ -26,9 +26,9 @@ export default function TermsOfServicePage() {
             <section className="mb-8">
               <h2 className="text-2xl font-bold mb-4">Agreement to Terms</h2>
               <p className="mb-4">
-                These Terms of Service ("Terms") govern your use of {companyName}'s website 
-                located at {websiteUrl} and our services (collectively, the "Service") 
-                operated by {companyName} ("us," "we," or "our").
+                These Terms of Service (&quot;Terms&quot;) govern your use of {companyName}&apos;s website 
+                located at {websiteUrl} and our services (collectively, the &quot;Service&quot;) 
+                operated by {companyName} (&quot;us,&quot; &quot;we,&quot; or &quot;our&quot;).
               </p>
               <p>
                 By accessing or using our Service, you agree to be bound by these Terms. 

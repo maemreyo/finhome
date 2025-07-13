@@ -76,7 +76,7 @@ export function SubscriptionCard() {
           <div className="text-center py-8">
             <h3 className="text-lg font-semibold mb-2">Free Plan</h3>
             <p className="text-muted-foreground mb-4">
-              You're currently on the free plan
+              You&apos;re currently on the free plan
             </p>
             <Button onClick={() => window.location.href = '/pricing'}>
               Upgrade Plan

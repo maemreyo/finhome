@@ -3,8 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Users, Target, Award, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server';
+import type { Metadata } from 'next';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+type Props = {
+  params: { locale: string };
+};
+
+export async function generateMetadata({ params: { locale } }: PageProps): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: 'AboutPage.metadata' });
   return {
     title: t('title'),
@@ -96,7 +101,7 @@ async function ValuesSection({ locale }: { locale: string }) {
   )
 }
 
-export default async function AboutPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function AboutPage({ params: { locale } }: PageProps) {
   const tHero = await getTranslations({ locale, namespace: 'AboutPage.HeroSection' });
   const tStory = await getTranslations({ locale, namespace: 'AboutPage.StorySection' });
   const tCTA = await getTranslations({ locale, namespace: 'AboutPage.CTASection' });

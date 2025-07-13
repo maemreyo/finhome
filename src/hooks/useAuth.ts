@@ -323,6 +323,10 @@ export function useProfile() {
 }
 
 // Subscription hook
+import { Database } from '@/lib/supabase/client'
+
+type Subscription = Database['public']['Tables']['subscriptions']['Row'];
+
 export function useSubscription() {
   const { user } = useAuth()
   const [subscription, setSubscription] = useState<Subscription | null>(null)

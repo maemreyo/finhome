@@ -57,81 +57,198 @@
         "twitterDescription": "Mẫu SaaS hoàn chỉnh cho các nhà phát triển độc lập"
       }
     },
-    "Marketing": {
-      "Header": {
-        "features": "Tính năng",
-        "pricing": "Giá cả",
-        "about": "Về chúng tôi",
-        "blog": "Blog",
-        "contact": "Liên hệ",
-        "signIn": "Đăng nhập",
-        "getStarted": "Bắt đầu"
+    "Auth": {
+      "Login": {
+        "metadata": {
+          "title": "Đăng nhập",
+          "description": "Đăng nhập vào tài khoản của bạn"
+        },
+        "appName": "Mẫu SaaS",
+        "testimonial": {
+          "quote": "Ứng dụng này đã giúp tôi tiết kiệm vô số giờ làm việc và giúp tôi xây dựng các sản phẩm tuyệt vời nhanh hơn bao giờ hết.",
+          "author": "Sofia Davis"
+        }
       },
-      "Footer": {
-        "product": "Sản phẩm",
-        "features": "Tính năng",
-        "pricing": "Giá cả",
-        "security": "Bảo mật",
-        "roadmap": "Lộ trình",
-        "company": "Công ty",
-        "about": "Về chúng tôi",
-        "blog": "Blog",
-        "careers": "Nghề nghiệp",
-        "contact": "Liên hệ",
-        "support": "Hỗ trợ",
-        "helpCenter": "Trung tâm trợ giúp",
-        "community": "Cộng đồng",
-        "apiDocs": "Tài liệu API",
-        "status": "Trạng thái",
-        "legal": "Pháp lý",
-        "privacy": "Quyền riêng tư",
-        "terms": "Điều khoản",
-        "cookies": "Cookie",
-        "gdpr": "GDPR",
-        "copyright": "© 2024 {appName}. Đã đăng ký bản quyền."
+      "SignUp": {
+        "metadata": {
+          "title": "Đăng ký",
+          "description": "Tạo tài khoản mới"
+        },
+        "appName": "Mẫu SaaS",
+        "testimonial": {
+          "quote": "Tham gia cùng hàng ngàn người dùng tin tưởng nền tảng của chúng tôi để xây dựng và mở rộng quy mô kinh doanh thành công.",
+          "author": "Marcus Johnson"
+        }
+      },
+      "ForgotPassword": {
+        "success": {
+          "title": "Kiểm tra email của bạn",
+          "description": "Chúng tôi đã gửi một liên kết đặt lại mật khẩu đến địa chỉ email của bạn.",
+          "spamCheck": "Nếu bạn không thấy email, hãy kiểm tra thư mục spam của bạn."
+        },
+        "backToLogin": "Quay lại đăng nhập",
+        "form": {
+          "title": "Quên mật khẩu?",
+          "description": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn một liên kết đặt lại.",
+          "emailLabel": "Email",
+          "emailPlaceholder": "Nhập email của bạn",
+          "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
+          "sendResetLink": "Gửi liên kết đặt lại"
+        }
+      },
+      "ResetPassword": {
+        "invalidLink": "Liên kết đặt lại không hợp lệ. Vui lòng yêu cầu đặt lại mật khẩu mới.",
+        "invalidLinkTitle": "Liên kết đặt lại không hợp lệ",
+        "invalidLinkDescription": "Liên kết đặt lại mật khẩu này không hợp lệ hoặc đã hết hạn.",
+        "requestNewLink": "Yêu cầu liên kết đặt lại mới",
+        "form": {
+          "title": "Đặt lại mật khẩu",
+          "description": "Nhập mật khẩu mới của bạn bên dưới.",
+          "newPasswordLabel": "Mật khẩu mới",
+          "newPasswordPlaceholder": "Nhập mật khẩu mới",
+          "confirmPasswordLabel": "Xác nhận mật khẩu",
+          "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
+          "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+          "passwordMismatch": "Mật khẩu không khớp",
+          "updatePassword": "Cập nhật mật khẩu"
+        }
+      },
+      "SignUpForm": {
+        "title": "Tạo tài khoản",
+        "description": "Đăng ký để bắt đầu với tài khoản miễn phí của bạn",
+        "orContinueWith": "Hoặc tiếp tục với",
+        "form": {
+          "fullNameLabel": "Họ và tên",
+          "fullNamePlaceholder": "Nhập họ và tên của bạn",
+          "fullNameMinLength": "Họ và tên phải có ít nhất 2 ký tự",
+          "emailLabel": "Email",
+          "emailPlaceholder": "Nhập email của bạn",
+          "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
+          "passwordLabel": "Mật khẩu",
+          "passwordPlaceholder": "Tạo mật khẩu",
+          "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+          "confirmPasswordLabel": "Xác nhận mật khẩu",
+          "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
+          "passwordMismatch": "Mật khẩu không khớp",
+          "agreeTo": "Tôi đồng ý với",
+          "termsOfService": "Điều khoản dịch vụ",
+          "and": "và",
+          "privacyPolicy": "Chính sách bảo mật",
+          "acceptTermsRequired": "Bạn phải chấp nhận các điều khoản và điều kiện",
+          "createAccount": "Tạo tài khoản"
+        },
+        "alreadyHaveAccount": "Đã có tài khoản?",
+        "signIn": "Đăng nhập"
       }
     },
-    "AboutPage": {
-      "metadata": {
-        "title": "Về chúng tôi",
-        "description": "Tìm hiểu về sứ mệnh của chúng tôi nhằm giúp các doanh nhân xây dựng các sản phẩm SaaS tuyệt vời."
+    "Marketing": {
+      "success": {
+        "title": "Kiểm tra email của bạn",
+        "description": "Chúng tôi đã gửi một liên kết đặt lại mật khẩu đến địa chỉ email của bạn.",
+        "spamCheck": "Nếu bạn không thấy email, hãy kiểm tra thư mục spam của bạn."
       },
-      "HeroSection": {
-        "heading1": "Xây dựng tương lai của",
-        "heading2": "Phát triển SaaS",
-        "description": "Chúng tôi có sứ mệnh dân chủ hóa phát triển SaaS bằng cách cung cấp cho các doanh nhân và nhà phát triển các công cụ họ cần để xây dựng các sản phẩm đẳng cấp thế giới."
-      },
-      "StatsSection": {
-        "happyCustomers": "Khách hàng hài lòng",
-        "productsLaunched": "Sản phẩm đã ra mắt",
-        "countriesReached": "Quốc gia đã tiếp cận",
-        "teamMembers": "Thành viên nhóm"
-      },
-      "ValuesSection": {
-        "heading": "Giá trị của chúng tôi",
-        "description": "Các nguyên tắc hướng dẫn mọi việc chúng tôi làm và giúp chúng tôi phục vụ khách hàng tốt hơn.",
-        "customerFirstTitle": "Khách hàng là trên hết",
-        "customerFirstDescription": "Mọi thứ chúng tôi làm đều được thiết kế để giúp khách hàng thành công và phát triển doanh nghiệp của họ.",
-        "focusOnQualityTitle": "Tập trung vào chất lượng",
-        "focusOnQualityDescription": "Chúng tôi tin vào việc xây dựng các sản phẩm đáng tin cậy, an toàn và hiệu suất cao ngay từ ngày đầu tiên.",
-        "continuousInnovationTitle": "Đổi mới liên tục",
-        "continuousInnovationDescription": "Chúng tôi không ngừng vượt qua các giới hạn của những gì có thể để cung cấp các giải pháp tiên tiến.",
-        "openTransparentTitle": "Mở và minh bạch",
-        "openTransparentDescription": "Chúng tôi xây dựng công khai, chia sẻ những gì đã học được và tin vào giao tiếp trung thực."
-      },
-      "StorySection": {
-        "heading": "Câu chuyện của chúng tôi",
-        "paragraph1": "Được thành lập vào năm 2023, chúng tôi bắt đầu với một quan sát đơn giản: xây dựng một sản phẩm SaaS không nên mất hàng tháng để viết mã boilerplate và thiết lập cơ sở hạ tầng.",
-        "paragraph2": "Sau khi tự mình ra mắt nhiều sản phẩm SaaS thành công, chúng tôi nhận thấy mình đang xây dựng lại các thành phần tương tự lặp đi lặp lại - xác thực, thanh toán, quản lý người dùng và phân tích.",
-        "paragraph3": "Đó là lúc chúng tôi quyết định tạo ra mẫu SaaS tối ưu cho phép các doanh nhân tập trung vào những gì quan trọng nhất: xây dựng các sản phẩm tuyệt vời giải quyết các vấn đề thực sự.",
-        "journeyBegins": "Hành trình của chúng tôi bắt đầu"
-      },
-      "CTASection": {
-        "heading": "Sẵn sàng tham gia sứ mệnh của chúng tôi?",
-        "description": "Cho dù bạn đang xây dựng SaaS đầu tiên hay thứ mười, chúng tôi luôn ở đây để giúp bạn thành công.",
-        "startButton": "Bắt đầu xây dựng ngay hôm nay",
-        "getInTouchButton": "Liên hệ"
+      "backToLogin": "Quay lại đăng nhập",
+      "form": {
+        "title": "Quên mật khẩu?",
+        "description": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn một liên kết đặt lại.",
+        "emailLabel": "Email",
+        "emailPlaceholder": "Nhập email của bạn",
+        "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
+        "sendResetLink": "Gửi liên kết đặt lại"
       }
+    },
+    "ResetPassword": {
+      "invalidLink": "Liên kết đặt lại không hợp lệ. Vui lòng yêu cầu đặt lại mật khẩu mới.",
+      "invalidLinkTitle": "Liên kết đặt lại không hợp lệ",
+      "invalidLinkDescription": "Liên kết đặt lại mật khẩu này không hợp lệ hoặc đã hết hạn.",
+      "requestNewLink": "Yêu cầu liên kết đặt lại mới",
+      "form": {
+        "title": "Đặt lại mật khẩu",
+        "description": "Nhập mật khẩu mới của bạn bên dưới.",
+        "newPasswordLabel": "Mật khẩu mới",
+        "newPasswordPlaceholder": "Nhập mật khẩu mới",
+        "confirmPasswordLabel": "Xác nhận mật khẩu",
+        "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
+        "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+        "passwordMismatch": "Mật khẩu không khớp",
+        "updatePassword": "Cập nhật mật khẩu"
+      }
+    }
+  },
+  "Marketing": {
+    "Header": {
+      "features": "Tính năng",
+      "pricing": "Giá cả",
+      "about": "Về chúng tôi",
+      "blog": "Blog",
+      "contact": "Liên hệ",
+      "signIn": "Đăng nhập",
+      "getStarted": "Bắt đầu"
+    },
+    "Footer": {
+      "product": "Sản phẩm",
+      "features": "Tính năng",
+      "pricing": "Giá cả",
+      "security": "Bảo mật",
+      "roadmap": "Lộ trình",
+      "company": "Công ty",
+      "about": "Về chúng tôi",
+      "blog": "Blog",
+      "careers": "Nghề nghiệp",
+      "contact": "Liên hệ",
+      "support": "Hỗ trợ",
+      "helpCenter": "Trung tâm trợ giúp",
+      "community": "Cộng đồng",
+      "apiDocs": "Tài liệu API",
+      "status": "Trạng thái",
+      "legal": "Pháp lý",
+      "privacy": "Quyền riêng tư",
+      "terms": "Điều khoản",
+      "cookies": "Cookie",
+      "gdpr": "GDPR",
+      "copyright": "© 2024 {appName}. Đã đăng ký bản quyền."
+    }
+  },
+  "AboutPage": {
+    "metadata": {
+      "title": "Về chúng tôi",
+      "description": "Tìm hiểu về sứ mệnh của chúng tôi nhằm giúp các doanh nhân xây dựng các sản phẩm SaaS tuyệt vời."
+    },
+    "HeroSection": {
+      "heading1": "Xây dựng tương lai của",
+      "heading2": "Phát triển SaaS",
+      "description": "Chúng tôi có sứ mệnh dân chủ hóa phát triển SaaS bằng cách cung cấp cho các doanh nhân và nhà phát triển các công cụ họ cần để xây dựng các sản phẩm đẳng cấp thế giới."
+    },
+    "StatsSection": {
+      "happyCustomers": "Khách hàng hài lòng",
+      "productsLaunched": "Sản phẩm đã ra mắt",
+      "countriesReached": "Quốc gia đã tiếp cận",
+      "teamMembers": "Thành viên nhóm"
+    },
+    "ValuesSection": {
+      "heading": "Giá trị của chúng tôi",
+      "description": "Các nguyên tắc hướng dẫn mọi việc chúng tôi làm và giúp chúng tôi phục vụ khách hàng tốt hơn.",
+      "customerFirstTitle": "Khách hàng là trên hết",
+      "customerFirstDescription": "Mọi thứ chúng tôi làm đều được thiết kế để giúp khách hàng thành công và phát triển doanh nghiệp của họ.",
+      "focusOnQualityTitle": "Tập trung vào chất lượng",
+      "focusOnQualityDescription": "Chúng tôi tin vào việc xây dựng các sản phẩm đáng tin cậy, an toàn và hiệu suất cao ngay từ ngày đầu tiên.",
+      "continuousInnovationTitle": "Đổi mới liên tục",
+      "continuousInnovationDescription": "Chúng tôi không ngừng vượt qua các giới hạn của những gì có thể để cung cấp các giải pháp tiên tiến.",
+      "openTransparentTitle": "Mở và minh bạch",
+      "openTransparentDescription": "Chúng tôi xây dựng công khai, chia sẻ những gì đã học được và tin vào giao tiếp trung thực."
+    },
+    "StorySection": {
+      "heading": "Câu chuyện của chúng tôi",
+      "paragraph1": "Được thành lập vào năm 2023, chúng tôi bắt đầu với một quan sát đơn giản: xây dựng một sản phẩm SaaS không nên mất hàng tháng để viết mã boilerplate và thiết lập cơ sở hạ tầng.",
+      "paragraph2": "Sau khi tự mình ra mắt nhiều sản phẩm SaaS thành công, chúng tôi nhận thấy mình đang xây dựng lại các thành phần tương tự lặp đi lặp lại - xác thực, thanh toán, quản lý người dùng và phân tích.",
+      "paragraph3": "Đó là lúc chúng tôi quyết định tạo ra mẫu SaaS tối ưu cho phép các doanh nhân tập trung vào những gì quan trọng nhất: xây dựng các sản phẩm tuyệt vời giải quyết các vấn đề thực sự.",
+      "journeyBegins": "Hành trình của chúng tôi bắt đầu"
+    },
+    "CTASection": {
+      "heading": "Sẵn sàng tham gia sứ mệnh của chúng tôi?",
+      "description": "Cho dù bạn đang xây dựng SaaS đầu tiên hay thứ mười, chúng tôi luôn ở đây để giúp bạn thành công.",
+      "startButton": "Bắt đầu xây dựng ngay hôm nay",
+      "getInTouchButton": "Liên hệ"
     }
   }
 }

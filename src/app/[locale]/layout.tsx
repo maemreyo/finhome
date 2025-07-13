@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
 import { ErrorBoundary } from "@/components/monitoring/ErrorBoundary";
-import "./globals.css";
+import "@/app/globals.css";
 import { getTranslations } from "next-intl/server";
 
 const geistSans = Geist({
@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params: { locale } }: LayoutProps): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "Layout.metadata" });
 
   return {
@@ -53,10 +53,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 export default function RootLayout({
   children,
   params: { locale },
-}: Readonly<{
-  children: React.ReactNode;
-  params: { locale: string };
-}>) {
+}: LayoutProps) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
