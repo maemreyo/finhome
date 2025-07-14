@@ -66,7 +66,7 @@ export async function getUser() {
 export async function getUserProfile(userId: string) {
   const supabase = await createClient()
   const { data: profile, error } = await supabase
-    .from('profiles')
+    .from('user_profiles')
     .select('*')
     .eq('id', userId)
     .single()
@@ -79,19 +79,79 @@ export async function getUserProfile(userId: string) {
   return profile
 }
 
-// Helper function to get user subscription
-export async function getUserSubscription(userId: string) {
+// Helper function to get user's financial plans
+export async function getUserFinancialPlans(userId: string) {
   const supabase = await createClient()
-  const { data: subscription, error } = await supabase
-    .from('subscriptions')
+  const { data: plans, error } = await supabase
+    .from('financial_plans')
     .select('*')
     .eq('user_id', userId)
-    .single()
+    .order('updated_at', { ascending: false })
   
   if (error) {
-    console.error('Error getting user subscription:', error)
+    console.error('Error getting financial plans:', error)
+    return []
+  }
+  
+  return plans
+}
+
+// Helper function to get financial plan with loan terms
+export async function getFinancialPlanWithDetails(planId: string) {
+  const supabase = await createClient()
+  const { data: plan, error: planError } = await supabase
+    .from('financial_plans')
+    .select(`
+      *,
+      loan_terms (*),
+      scenarios (*),
+      properties (*)
+    `)
+    .eq('id', planId)
+    .single()
+  
+  if (planError) {
+    console.error('Error getting financial plan details:', planError)
     return null
   }
   
-  return subscription
+  return plan
+}
+
+// Helper function to get current interest rates
+export async function getCurrentInterestRates() {
+  const supabase = await createClient()
+  const { data: rates, error } = await supabase
+    .from('interest_rates')
+    .select('*')
+    .eq('is_current', true)
+    .order('bank_name', { ascending: true })
+  
+  if (error) {
+    console.error('Error getting interest rates:', error)
+    return []
+  }
+  
+  return rates
+}
+
+// Helper function to create or update user profile
+export async function upsertUserProfile(userId: string, profileData: any) {
+  const supabase = await createClient()
+  const { data: profile, error } = await supabase
+    .from('user_profiles')
+    .upsert({ 
+      id: userId, 
+      ...profileData,
+      updated_at: new Date().toISOString()
+    })
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Error upserting user profile:', error)
+    return null
+  }
+  
+  return profile
 }

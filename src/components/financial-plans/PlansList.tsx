@@ -1,0 +1,513 @@
+// src/components/financial-plans/PlansList.tsx
+// Component for displaying and managing financial plans list
+
+'use client'
+
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { 
+  Plus, 
+  MoreHorizontal, 
+  Eye, 
+  Edit, 
+  Trash2, 
+  Copy, 
+  Star,
+  StarOff,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Home,
+  Building,
+  DollarSign,
+  Calendar,
+  Target
+} from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator 
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
+import { formatCurrency } from '@/lib/utils'
+
+// Types for financial plans
+export interface FinancialPlan {
+  id: string
+  planName: string
+  planDescription?: string
+  planType: 'home_purchase' | 'investment' | 'upgrade' | 'refinance'
+  purchasePrice: number
+  downPayment: number
+  monthlyIncome: number
+  monthlyExpenses: number
+  currentSavings: number
+  expectedRentalIncome?: number
+  planStatus: 'draft' | 'active' | 'completed' | 'archived'
+  isPublic: boolean
+  isFavorite?: boolean
+  createdAt: Date
+  updatedAt: Date
+  
+  // Calculated metrics (cached)
+  monthlyPayment?: number
+  totalInterest?: number
+  affordabilityScore?: number
+  riskLevel?: 'low' | 'medium' | 'high'
+  roi?: number
+}
+
+interface PlansListProps {
+  plans: FinancialPlan[]
+  onCreateNew: () => void
+  onViewPlan: (planId: string) => void
+  onEditPlan: (planId: string) => void
+  onDeletePlan: (planId: string) => void
+  onDuplicatePlan: (planId: string) => void
+  onToggleFavorite: (planId: string) => void
+  isLoading?: boolean
+  className?: string
+}
+
+const getPlanTypeIcon = (type: string) => {
+  const icons = {
+    home_purchase: Home,
+    investment: Building,
+    upgrade: TrendingUp,
+    refinance: DollarSign
+  }
+  return icons[type as keyof typeof icons] || Home
+}
+
+const getPlanTypeLabel = (type: string) => {
+  const labels = {
+    home_purchase: 'Mua nhà ở',
+    investment: 'Đầu tư',
+    upgrade: 'Nâng cấp',
+    refinance: 'Đảo nợ'
+  }
+  return labels[type as keyof typeof labels] || 'Khác'
+}
+
+const getPlanStatusColor = (status: string) => {
+  const colors = {
+    draft: 'bg-gray-100 text-gray-800 border-gray-300',
+    active: 'bg-blue-100 text-blue-800 border-blue-300',
+    completed: 'bg-green-100 text-green-800 border-green-300',
+    archived: 'bg-gray-100 text-gray-600 border-gray-200'
+  }
+  return colors[status as keyof typeof colors] || colors.draft
+}
+
+const getRiskLevelColor = (riskLevel?: string) => {
+  if (!riskLevel) return 'bg-gray-100 text-gray-600'
+  
+  const colors = {
+    low: 'bg-green-100 text-green-700',
+    medium: 'bg-amber-100 text-amber-700',
+    high: 'bg-red-100 text-red-700'
+  }
+  return colors[riskLevel as keyof typeof colors]
+}
+
+const PlanCard: React.FC<{
+  plan: FinancialPlan
+  onView: () => void
+  onEdit: () => void
+  onDelete: () => void
+  onDuplicate: () => void
+  onToggleFavorite: () => void
+}> = ({ plan, onView, onEdit, onDelete, onDuplicate, onToggleFavorite }) => {
+  const IconComponent = getPlanTypeIcon(plan.planType)
+  
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                <IconComponent className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <CardTitle 
+                  className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate cursor-pointer hover:text-blue-600"
+                  onClick={onView}
+                >
+                  {plan.planName}
+                </CardTitle>
+                
+                <div className="flex items-center space-x-2 mt-1">
+                  <Badge variant="outline" className="text-xs">
+                    {getPlanTypeLabel(plan.planType)}
+                  </Badge>
+                  
+                  <Badge className={cn("text-xs", getPlanStatusColor(plan.planStatus))}>
+                    {plan.planStatus.charAt(0).toUpperCase() + plan.planStatus.slice(1)}
+                  </Badge>
+                  
+                  {plan.riskLevel && (
+                    <Badge className={cn("text-xs", getRiskLevelColor(plan.riskLevel))}>
+                      {plan.riskLevel.toUpperCase()}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={onToggleFavorite}
+              >
+                {plan.isFavorite ? (
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                ) : (
+                  <StarOff className="w-4 h-4 text-gray-400" />
+                )}
+              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onView}>
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Details
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onEdit}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Plan
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onDuplicate}>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Duplicate
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={onDelete} className="text-red-600">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          {/* Financial Summary */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Purchase Price</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">
+                {formatCurrency(plan.purchasePrice)}
+              </p>
+            </div>
+            
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Down Payment</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">
+                {formatCurrency(plan.downPayment)}
+                <span className="text-xs text-gray-500 ml-1">
+                  ({((plan.downPayment / plan.purchasePrice) * 100).toFixed(0)}%)
+                </span>
+              </p>
+            </div>
+          </div>
+          
+          {/* Monthly Metrics */}
+          {plan.monthlyPayment && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Monthly Payment</p>
+                <p className="font-semibold text-blue-600">
+                  {formatCurrency(plan.monthlyPayment)}
+                </p>
+              </div>
+              
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Affordability</p>
+                <div className="flex items-center space-x-2">
+                  <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min((plan.affordabilityScore || 0) * 10, 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-medium">
+                    {plan.affordabilityScore || 0}/10
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* ROI for Investment Properties */}
+          {plan.planType === 'investment' && plan.roi && (
+            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                  Expected ROI
+                </span>
+              </div>
+              <span className="font-bold text-green-600">
+                {plan.roi.toFixed(1)}%
+              </span>
+            </div>
+          )}
+          
+          {/* Timestamps */}
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center space-x-1">
+              <Calendar className="w-3 h-3" />
+              <span>Created {plan.createdAt.toLocaleDateString('vi-VN')}</span>
+            </div>
+            
+            {plan.isPublic && (
+              <Badge variant="outline" className="text-xs">
+                Public
+              </Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  )
+}
+
+const EmptyState: React.FC<{ onCreateNew: () => void }> = ({ onCreateNew }) => (
+  <div className="text-center py-12">
+    <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+      <Target className="w-12 h-12 text-gray-400" />
+    </div>
+    
+    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+      No Financial Plans Yet
+    </h3>
+    
+    <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
+      Create your first financial plan to start analyzing your real estate investment opportunities
+    </p>
+    
+    <Button onClick={onCreateNew} className="mx-auto">
+      <Plus className="w-4 h-4 mr-2" />
+      Create Your First Plan
+    </Button>
+  </div>
+)
+
+const PlansListSkeleton: React.FC = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {[...Array(6)].map((_, i) => (
+      <Card key={i} className="animate-pulse">
+        <CardHeader>
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+            <div className="flex-1">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-1" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+              </div>
+              <div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-1" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+              </div>
+            </div>
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+          </div>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+)
+
+export const PlansList: React.FC<PlansListProps> = ({
+  plans,
+  onCreateNew,
+  onViewPlan,
+  onEditPlan,
+  onDeletePlan,
+  onDuplicatePlan,
+  onToggleFavorite,
+  isLoading = false,
+  className
+}) => {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [sortBy, setSortBy] = useState<'name' | 'created' | 'updated' | 'price'>('updated')
+  
+  // Filter and sort plans
+  const filteredAndSortedPlans = React.useMemo(() => {
+    let filtered = plans.filter(plan => {
+      const matchesSearch = plan.planName.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesStatus = filterStatus === 'all' || plan.planStatus === filterStatus
+      return matchesSearch && matchesStatus
+    })
+    
+    // Sort plans
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.planName.localeCompare(b.planName)
+        case 'created':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        case 'updated':
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        case 'price':
+          return b.purchasePrice - a.purchasePrice
+        default:
+          return 0
+      }
+    })
+    
+    // Favorites first
+    return filtered.sort((a, b) => {
+      if (a.isFavorite && !b.isFavorite) return -1
+      if (!a.isFavorite && b.isFavorite) return 1
+      return 0
+    })
+  }, [plans, searchQuery, filterStatus, sortBy])
+  
+  if (isLoading) {
+    return (
+      <div className={className}>
+        <PlansListSkeleton />
+      </div>
+    )
+  }
+  
+  return (
+    <div className={cn("space-y-6", className)}>
+      {/* Header and Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Financial Plans
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            {plans.length} {plans.length === 1 ? 'plan' : 'plans'} total
+          </p>
+        </div>
+        
+        <Button onClick={onCreateNew} className="flex items-center gap-2">
+          <Plus className="w-4 h-4" />
+          New Plan
+        </Button>
+      </div>
+      
+      {/* Search and Filters */}
+      {plans.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <Input
+              placeholder="Search plans..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-md"
+            />
+          </div>
+          
+          <div className="flex gap-2">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800"
+            >
+              <option value="all">All Status</option>
+              <option value="draft">Draft</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="archived">Archived</option>
+            </select>
+            
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800"
+            >
+              <option value="updated">Last Updated</option>
+              <option value="created">Date Created</option>
+              <option value="name">Name</option>
+              <option value="price">Price</option>
+            </select>
+          </div>
+        </div>
+      )}
+      
+      {/* Plans Grid */}
+      {filteredAndSortedPlans.length === 0 ? (
+        plans.length === 0 ? (
+          <EmptyState onCreateNew={onCreateNew} />
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500 dark:text-gray-400">
+              No plans match your current filters
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setSearchQuery('')
+                setFilterStatus('all')
+              }}
+              className="mt-4"
+            >
+              Clear Filters
+            </Button>
+          </div>
+        )
+      ) : (
+        <motion.div 
+          layout
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          <AnimatePresence>
+            {filteredAndSortedPlans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                onView={() => onViewPlan(plan.id)}
+                onEdit={() => onEditPlan(plan.id)}
+                onDelete={() => onDeletePlan(plan.id)}
+                onDuplicate={() => onDuplicatePlan(plan.id)}
+                onToggleFavorite={() => onToggleFavorite(plan.id)}
+              />
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      )}
+    </div>
+  )
+}
+
+export default PlansList
