@@ -18,7 +18,12 @@ import {
   X,
   BarChart3,
   FileText,
-  Users
+  Users,
+  Calculator,
+  TrendingUp,
+  Trophy,
+  Home,
+  Flask
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -32,37 +37,47 @@ const navigation = [
     icon: LayoutDashboard,
   },
   {
-    name: 'Analytics',
+    name: 'Kế Hoạch Tài Chính',
+    href: '/dashboard/plans',
+    icon: FileText,
+  },
+  {
+    name: 'So Sánh Kịch Bản',
+    href: '/dashboard/scenarios',
+    icon: Calculator,
+  },
+  {
+    name: 'Phòng Thí Nghiệm',
+    href: '/dashboard/laboratory',
+    icon: Flask,
+  },
+  {
+    name: 'Phân Tích',
     href: '/dashboard/analytics',
     icon: BarChart3,
   },
   {
-    name: 'Projects',
-    href: '/dashboard/projects',
-    icon: FileText,
+    name: 'Thành Tích',
+    href: '/dashboard/achievements',
+    icon: Trophy,
   },
   {
-    name: 'Team',
-    href: '/dashboard/team',
-    icon: Users,
-  },
-  {
-    name: 'Profile',
+    name: 'Hồ Sơ',
     href: '/dashboard/profile',
     icon: User,
   },
   {
-    name: 'Billing',
+    name: 'Thanh Toán',
     href: '/dashboard/billing',
     icon: CreditCard,
   },
   {
-    name: 'Settings',
+    name: 'Cài Đặt',
     href: '/dashboard/settings',
     icon: Settings,
   },
   {
-    name: 'Help',
+    name: 'Trợ Giúp',
     href: '/dashboard/help',
     icon: HelpCircle,
   },
@@ -103,12 +118,10 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="flex h-16 items-center border-b px-6">
             <Link href="/dashboard" className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">
-                  {process.env.NEXT_PUBLIC_APP_NAME?.[0] || 'S'}
-                </span>
+                <Home className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="font-bold text-xl">
-                {process.env.NEXT_PUBLIC_APP_NAME || 'SaaS'}
+                FinHome
               </span>
             </Link>
           </div>
@@ -143,7 +156,7 @@ export function Sidebar({ className }: SidebarProps) {
           {/* Footer */}
           <div className="border-t p-4">
             <div className="text-xs text-muted-foreground">
-              © 2024 {process.env.NEXT_PUBLIC_APP_NAME}
+              © 2024 FinHome
             </div>
           </div>
         </div>
