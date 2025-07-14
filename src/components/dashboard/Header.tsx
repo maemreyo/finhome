@@ -13,16 +13,19 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuth, useAuthActions } from '@/hooks/useAuth'
-import { User, Settings, CreditCard, LogOut, Bell } from 'lucide-react'
+import { User, Settings, CreditCard, LogOut, Bell, Trophy } from 'lucide-react'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { LevelIndicator } from '@/components/gamification/LevelIndicator'
+import { UserProgress } from '@/lib/gamification/achievements'
 
 interface HeaderProps {
   title?: string
   description?: string
+  userProgress?: UserProgress
 }
 
-export function Header({ title, description }: HeaderProps) {
+export function Header({ title, description, userProgress }: HeaderProps) {
   const { user } = useAuth()
   const { signOut } = useAuthActions()
 
@@ -41,6 +44,15 @@ export function Header({ title, description }: HeaderProps) {
 
         {/* Right Section */}
         <div className="flex items-center space-x-4">
+          {/* User Level Indicator */}
+          {userProgress && (
+            <LevelIndicator 
+              userProgress={userProgress} 
+              compact={true}
+              className="hidden md:flex"
+            />
+          )}
+
           {/* Notifications */}
           <Button variant="ghost" size="icon">
             <Bell className="h-4 w-4" />
@@ -87,6 +99,12 @@ export function Header({ title, description }: HeaderProps) {
                 <Link href="/dashboard/billing">
                   <CreditCard className="mr-2 h-4 w-4" />
                   <span>Billing</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/achievements">
+                  <Trophy className="mr-2 h-4 w-4" />
+                  <span>Achievements</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
