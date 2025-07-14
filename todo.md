@@ -16,7 +16,7 @@
 - [x] Identify state management patterns
 - [x] Research animation and interaction patterns
 
-## Current Status: UI RESEARCH COMPLETED ✅
+## Current Status: DATABASE SCHEMA & TYPE RESEARCH COMPLETED ✅
 
 ## Key Findings Summary
 
@@ -25,12 +25,15 @@
 - **User onboarding tracking**: `onboarding_completed` boolean field in user_profiles
 - **Progress tracking**: `experience_points` and `achievement_badges` fields ready for gamification
 - **Notification system**: Built-in notifications table with types including 'achievement', 'system', 'marketing'
+- **Key user_profiles fields**: subscription_tier, onboarding_completed, experience_points, achievement_badges, notification_preferences
 
 ### TypeScript Types
-- **Complete type coverage**: Full Database interface with proper typing
+- **Complete type coverage**: Full Database interface with proper typing in `/src/lib/supabase/types.ts`
 - **User management types**: user_profiles, financial_plans, scenarios, etc.
 - **Onboarding-ready**: subscription_tier, experience_points, achievement_badges typed
-- **Missing**: Specific onboarding step types, help system types, contextual help types
+- **Onboarding types**: Comprehensive `/src/types/onboarding.ts` with OnboardingFlow, OnboardingStep, UserOnboardingProgress
+- **Help system types**: Complete `/src/types/help.ts` with ContextualHelp, HelpContent, UserHelpState
+- **Achievement types**: Full gamification system in `/src/lib/gamification/achievements.ts` with Achievement, UserProgress, AchievementEngine
 
 ### UI Components
 - **Rich component library**: shadcn/ui with tooltip, dialog, popover, progress components
