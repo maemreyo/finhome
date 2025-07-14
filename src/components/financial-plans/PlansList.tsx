@@ -21,7 +21,8 @@ import {
   Building,
   DollarSign,
   Calendar,
-  Target
+  Target,
+  Download
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -36,6 +37,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
+import { toast } from 'sonner'
+
+// Import export functions
+import { exportFinancialPlanToPDF } from '@/lib/export/pdfExport'
+import { exportFinancialPlanToExcel, exportPlansComparison } from '@/lib/export/excelExport'
 
 // Types for financial plans
 export interface FinancialPlan {
@@ -125,6 +131,42 @@ const PlanCard: React.FC<{
   onToggleFavorite: () => void
 }> = ({ plan, onView, onEdit, onDelete, onDuplicate, onToggleFavorite }) => {
   const IconComponent = getPlanTypeIcon(plan.planType)
+  const [isExporting, setIsExporting] = useState(false)
+
+  const handleExportPDF = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsExporting(true)
+    try {
+      await exportFinancialPlanToPDF(plan, {
+        includeTimeline: true,
+        includeAnalysis: true,
+        includeRecommendations: true
+      })
+      toast.success('PDF exported successfully!')
+    } catch (error) {
+      toast.error('Failed to export PDF. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleExportExcel = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsExporting(true)
+    try {
+      await exportFinancialPlanToExcel(plan, {
+        includeAmortizationSchedule: true,
+        includeCashFlowProjection: true,
+        includeScenarioComparison: true,
+        projectionYears: 20
+      })
+      toast.success('Excel file exported successfully!')
+    } catch (error) {
+      toast.error('Failed to export Excel. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
   
   return (
     <motion.div
@@ -188,6 +230,7 @@ const PlanCard: React.FC<{
                     variant="ghost" 
                     size="sm"
                     className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    disabled={isExporting}
                   >
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
@@ -204,6 +247,15 @@ const PlanCard: React.FC<{
                   <DropdownMenuItem onClick={onDuplicate}>
                     <Copy className="w-4 h-4 mr-2" />
                     Duplicate
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleExportPDF} disabled={isExporting}>
+                    <Download className="w-4 h-4 mr-2" />
+                    {isExporting ? 'Exporting...' : 'Export PDF'}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleExportExcel} disabled={isExporting}>
+                    <Download className="w-4 h-4 mr-2" />
+                    {isExporting ? 'Exporting...' : 'Export Excel'}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onDelete} className="text-red-600">
@@ -366,6 +418,24 @@ export const PlansList: React.FC<PlansListProps> = ({
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [sortBy, setSortBy] = useState<'name' | 'created' | 'updated' | 'price'>('updated')
+  const [isExportingComparison, setIsExportingComparison] = useState(false)
+
+  const handleExportComparison = async () => {
+    if (filteredAndSortedPlans.length === 0) {
+      toast.error('No plans to export')
+      return
+    }
+    
+    setIsExportingComparison(true)
+    try {
+      await exportPlansComparison(filteredAndSortedPlans, 'financial_plans_comparison')
+      toast.success('Plans comparison exported successfully!')
+    } catch (error) {
+      toast.error('Failed to export comparison. Please try again.')
+    } finally {
+      setIsExportingComparison(false)
+    }
+  }
   
   // Filter and sort plans
   const filteredAndSortedPlans = React.useMemo(() => {
@@ -420,10 +490,24 @@ export const PlansList: React.FC<PlansListProps> = ({
           </p>
         </div>
         
-        <Button onClick={onCreateNew} className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          New Plan
-        </Button>
+        <div className="flex items-center gap-2">
+          {plans.length > 1 && (
+            <Button 
+              variant="outline" 
+              onClick={handleExportComparison}
+              disabled={isExportingComparison}
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              {isExportingComparison ? 'Exporting...' : 'Export Comparison'}
+            </Button>
+          )}
+          
+          <Button onClick={onCreateNew} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            New Plan
+          </Button>
+        </div>
       </div>
       
       {/* Search and Filters */}

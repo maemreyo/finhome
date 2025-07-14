@@ -14,7 +14,6 @@ import {
   Calculator,
   TrendingUp,
   DollarSign,
-  Calendar,
   Home,
   Building,
   Target,
@@ -23,7 +22,7 @@ import {
   Info,
   PieChart,
   BarChart3,
-  Timeline
+  Calendar
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -39,10 +38,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
+import { toast } from 'sonner'
 
 // Import our components
 import { TimelineVisualization, TimelineScenario } from '@/components/timeline/TimelineVisualization'
 import { FinancialPlan } from './PlansList'
+
+// Import export functions
+import { exportFinancialPlanToPDF } from '@/lib/export/pdfExport'
+import { exportFinancialPlanToExcel } from '@/lib/export/excelExport'
 
 interface PlanDetailViewProps {
   plan: FinancialPlan
@@ -305,11 +309,11 @@ const CashFlowBreakdown: React.FC<{
 const InvestmentMetrics: React.FC<{
   plan: FinancialPlan
 }> = ({ plan }) => {
-  if (plan.planType !== 'investment' || !plan.expectedRentalIncome) {
-    return null
-  }
-  
   const metrics = useMemo(() => {
+    if (plan.planType !== 'investment' || !plan.expectedRentalIncome) {
+      return null
+    }
+    
     const annualRental = plan.expectedRentalIncome! * 12
     const purchasePrice = plan.purchasePrice
     const grossYield = (annualRental / purchasePrice) * 100
@@ -332,6 +336,10 @@ const InvestmentMetrics: React.FC<{
       breakEvenRent: ((plan.monthlyPayment || 0) + (annualExpenses / 12))
     }
   }, [plan])
+  
+  if (!metrics) {
+    return null
+  }
   
   return (
     <Card>
@@ -406,6 +414,40 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
   const [selectedScenarioId, setSelectedScenarioId] = useState(
     scenarios.find(s => s.type === 'baseline')?.id || scenarios[0]?.id || ''
   )
+  const [isExporting, setIsExporting] = useState(false)
+
+  const handleExportPDF = async () => {
+    setIsExporting(true)
+    try {
+      await exportFinancialPlanToPDF(plan, {
+        includeTimeline: true,
+        includeAnalysis: true,
+        includeRecommendations: true
+      })
+      toast.success('PDF exported successfully!')
+    } catch (error) {
+      toast.error('Failed to export PDF. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleExportExcel = async () => {
+    setIsExporting(true)
+    try {
+      await exportFinancialPlanToExcel(plan, {
+        includeAmortizationSchedule: true,
+        includeCashFlowProjection: true,
+        includeScenarioComparison: true,
+        projectionYears: 20
+      })
+      toast.success('Excel file exported successfully!')
+    } catch (error) {
+      toast.error('Failed to export Excel. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
   
   const getPlanTypeIcon = () => {
     const icons = {
@@ -467,14 +509,18 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" disabled={isExporting}>
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onDownload}>
+              <DropdownMenuItem onClick={handleExportPDF} disabled={isExporting}>
                 <Download className="w-4 h-4 mr-2" />
-                Download Report
+                {isExporting ? 'Exporting...' : 'Export PDF Report'}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportExcel} disabled={isExporting}>
+                <Download className="w-4 h-4 mr-2" />
+                {isExporting ? 'Exporting...' : 'Export Excel Analysis'}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -537,7 +583,7 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Timeline className="w-5 h-5" />
+                <Calendar className="w-5 h-5" />
                 Financial Timeline
               </CardTitle>
             </CardHeader>

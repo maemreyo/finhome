@@ -22,20 +22,18 @@ const updatePlanSchema = z.object({
   is_public: z.boolean().optional(),
 })
 
-interface RouteParams {
-  params: {
-    planId: string
-  }
-}
-
 // GET /api/plans/[planId] - Get specific financial plan
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ planId: string }> }
+) {
   try {
     const user = await getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { planId } = await params
     const supabase = await createClient()
     const { data: plan, error } = await supabase
       .from('financial_plans')
@@ -45,7 +43,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         scenarios (*),
         properties (*)
       `)
-      .eq('id', params.planId)
+      .eq('id', planId)
       .single()
 
     if (error) {
@@ -66,7 +64,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 // PUT /api/plans/[planId] - Update financial plan
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ planId: string }> }
+) {
   try {
     const user = await getUser()
     if (!user) {
@@ -76,13 +77,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const body = await request.json()
     const validatedData = updatePlanSchema.parse(body)
 
+    const { planId } = await params
     const supabase = await createClient()
 
     // First check if user owns the plan
     const { data: existingPlan, error: fetchError } = await supabase
       .from('financial_plans')
       .select('user_id')
-      .eq('id', params.planId)
+      .eq('id', planId)
       .single()
 
     if (fetchError || !existingPlan) {
@@ -100,7 +102,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         ...validatedData,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.planId)
+      .eq('id', planId)
       .select()
       .single()
 
@@ -125,7 +127,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 // DELETE /api/plans/[planId] - Delete financial plan
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ planId: string }> }
+) {
   try {
     const user = await getUser()
     if (!user) {
