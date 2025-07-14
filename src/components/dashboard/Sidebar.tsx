@@ -23,7 +23,7 @@ import {
   TrendingUp,
   Trophy,
   Home,
-  Flask
+  Beaker
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -49,7 +49,7 @@ const navigation = [
   {
     name: 'Phòng Thí Nghiệm',
     href: '/dashboard/laboratory',
-    icon: Flask,
+    icon: Beaker,
   },
   {
     name: 'Phân Tích',

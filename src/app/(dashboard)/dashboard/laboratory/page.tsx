@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Flask, Calculator, TrendingUp, AlertCircle, Plus } from 'lucide-react'
+import { Calculator, TrendingUp, AlertCircle, Plus, Beaker } from 'lucide-react'
 import { FinancialPlan } from '@/components/financial-plans/PlansList'
 
 // Mock financial plans data
@@ -178,7 +178,7 @@ export default function LaboratoryPage() {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <Flask className="w-4 h-4 text-blue-500" />
+                  <Beaker className="w-4 h-4 text-blue-500" />
                   <div className="text-sm font-medium">Kế Hoạch</div>
                 </div>
                 <div className="text-xl font-bold mt-1">{selectedPlan.planName}</div>
@@ -280,7 +280,7 @@ export default function LaboratoryPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <div className="font-semibold flex items-center gap-2">
-                  <Flask className="w-4 h-4 text-blue-500" />
+                  <Beaker className="w-4 h-4 text-blue-500" />
                   Trả Nợ Sớm
                 </div>
                 <div className="text-sm text-gray-600">
