@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   const lastUpdated = 'January 1, 2024'
-  const companyName = process.env.NEXT_PUBLIC_APP_NAME || 'SaaS Company'
+  const companyName = process.env.NEXT_PUBLIC_APP_NAME || 'FinHome'
   const contactEmail = process.env.CONTACT_EMAIL || 'privacy@company.com'
   const websiteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yourcompany.com'
 

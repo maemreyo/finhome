@@ -30,11 +30,11 @@ export function MarketingHeader() {
           <Link href={`/${locale}`} className="-m-1.5 p-1.5 flex items-center space-x-2">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">
-                {process.env.NEXT_PUBLIC_APP_NAME?.[0] || 'S'}
+                {process.env.NEXT_PUBLIC_APP_NAME?.[0] || 'F'}
               </span>
             </div>
             <span className="font-bold text-xl">
-              {process.env.NEXT_PUBLIC_APP_NAME || 'SaaS'}
+              {process.env.NEXT_PUBLIC_APP_NAME || 'FinHome'}
             </span>
           </Link>
         </div>
@@ -84,11 +84,11 @@ export function MarketingHeader() {
               <Link href={`/${locale}`} className="-m-1.5 p-1.5 flex items-center space-x-2">
                 <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                   <span className="text-primary-foreground font-bold text-sm">
-                    {process.env.NEXT_PUBLIC_APP_NAME?.[0] || 'S'}
+                    {process.env.NEXT_PUBLIC_APP_NAME?.[0] || 'F'}
                   </span>
                 </div>
                 <span className="font-bold text-xl">
-                  {process.env.NEXT_PUBLIC_APP_NAME || 'SaaS'}
+                  {process.env.NEXT_PUBLIC_APP_NAME || 'FinHome'}
                 </span>
               </Link>
               <button

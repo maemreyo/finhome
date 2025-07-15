@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SaaS Template",
-  description: "A modern SaaS template built with Next.js",
+  title: "FinHome",
+  description: "Vietnamese real estate financial planning platform",
 };
 
 export default function RootLayout({

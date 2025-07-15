@@ -94,11 +94,11 @@ export function MarketingFooter() {
               </span>
             </div>
             <span className="font-bold text-xl">
-              {process.env.NEXT_PUBLIC_APP_NAME || 'SaaS'}
+              {process.env.NEXT_PUBLIC_APP_NAME || 'FinHome'}
             </span>
           </div>
           <p className="mt-4 text-xs leading-5 text-muted-foreground">
-            {t('copyright', { appName: process.env.NEXT_PUBLIC_APP_NAME || 'SaaS Template' })}
+            {t('copyright', { appName: process.env.NEXT_PUBLIC_APP_NAME || 'FinHome' })}
           </p>
         </div>
       </div>

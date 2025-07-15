@@ -5,9 +5,9 @@
   "LandingPage": {
     "HeroSection": {
       "badge": "🚀 Mới: Bảng điều khiển phân tích nâng cao",
-      "heading1": "Xây dựng SaaS của bạn",
-      "heading2": "Nhanh hơn bao giờ hết",
-      "description": "Mẫu SaaS hoàn chỉnh với xác thực, thanh toán, phân tích và nhiều hơn nữa. Khởi chạy ý tưởng lớn tiếp theo của bạn trong vài ngày, không phải vài tháng.",
+      "heading1": "Lập Kế Hoạch Bất Động Sản",
+      "heading2": "Với Sự Tự Tin",
+      "description": "Nền tảng hoạch định tài chính bất động sản toàn diện. Biến giấc mơ sở hữu nhà thành kế hoạch tài chính khả thi với tính toán thông minh và thông tin thị trường.",
       "getStartedButton": "Bắt đầu miễn phí",
       "viewDemoButton": "Xem bản demo",
       "noCreditCard": "Không yêu cầu thẻ tín dụng",
@@ -16,7 +16,7 @@
     },
     "FeaturesSection": {
       "heading": "Mọi thứ bạn cần để thành công",
-      "description": "Các tính năng mạnh mẽ được thiết kế để giúp bạn xây dựng, khởi chạy và mở rộng quy mô kinh doanh SaaS của mình.",
+      "description": "Công cụ lập kế hoạch tài chính mạnh mẽ giúp bạn mua, đầu tư và phát triển danh mục bất động sản.",
       "feature1Title": "Nhanh như chớp",
       "feature1Description": "Được xây dựng với Next.js 15 và tối ưu hóa hiệu suất. Người dùng của bạn sẽ yêu thích tốc độ.",
       "feature2Title": "Bảo mật theo mặc định",
@@ -29,32 +29,32 @@
     "SocialProofSection": {
       "heading": "Được các nhà xây dựng trên toàn thế giới yêu thích",
       "reviews": "4.9/5 từ hơn 1.200 đánh giá",
-      "testimonial1Content": "Mẫu này đã giúp chúng tôi tiết kiệm hàng tháng phát triển. Chúng tôi đã có thể ra mắt SaaS của mình chỉ trong 2 tuần!",
+      "testimonial1Content": "FinHome đã giúp chúng tôi hiểu rõ khả năng chi trả và lập kế hoạch mua nhà. Chúng tôi đã mua được ngôi nhà đầu tiên một cách tự tin!",
       "testimonial1Author": "Sarah Chen",
       "testimonial1Role": "CEO, TechStart",
       "testimonial2Content": "Chất lượng mã đặc biệt và tài liệu rõ ràng. Rất khuyến khích!",
       "testimonial2Author": "Mike Johnson",
       "testimonial2Role": "CTO, InnovateCorp",
-      "testimonial3Content": "Cuối cùng, một mẫu SaaS bao gồm mọi thứ chúng tôi cần. Tích hợp thanh toán hoạt động hoàn hảo.",
+      "testimonial3Content": "Các kịch bản tài chính và hình ảnh hóa dòng thời gian giúp việc so sánh các khoản đầu tư bất động sản trở nên dễ dàng. Công cụ tuyệt vời!",
       "testimonial3Author": "Emily Rodriguez",
       "testimonial3Role": "Người sáng lập, StartupXYZ"
     },
     "CTASection": {
-      "heading": "Sẵn sàng ra mắt SaaS của bạn?",
+      "heading": "Sẵn Sàng Bắt Đầu Hành Trình Bất Động Sản?",
       "description": "Tham gia cùng hàng ngàn doanh nhân đã xây dựng thành công các doanh nghiệp với mẫu của chúng tôi.",
       "startButton": "Bắt đầu xây dựng ngay hôm nay",
       "talkToSalesButton": "Nói chuyện với bộ phận bán hàng"
     },
     "Layout": {
       "metadata": {
-        "titleDefault": "Mẫu SaaS",
-        "titleTemplate": "%s | Mẫu SaaS",
-        "description": "Mẫu SaaS hoàn chỉnh cho các nhà phát triển độc lập",
-        "openGraphTitle": "Mẫu SaaS",
-        "openGraphDescription": "Mẫu SaaS hoàn chỉnh cho các nhà phát triển độc lập",
-        "openGraphSiteName": "Mẫu SaaS",
-        "twitterTitle": "Mẫu SaaS",
-        "twitterDescription": "Mẫu SaaS hoàn chỉnh cho các nhà phát triển độc lập"
+        "titleDefault": "FinHome",
+        "titleTemplate": "%s | FinHome",
+        "description": "Nền tảng hoạch định tài chính bất động sản Việt Nam",
+        "openGraphTitle": "FinHome",
+        "openGraphDescription": "Nền tảng hoạch định tài chính bất động sản Việt Nam",
+        "openGraphSiteName": "FinHome",
+        "twitterTitle": "FinHome",
+        "twitterDescription": "Nền tảng hoạch định tài chính bất động sản Việt Nam"
       }
     },
     "Auth": {
@@ -63,7 +63,7 @@
           "title": "Đăng nhập",
           "description": "Đăng nhập vào tài khoản của bạn"
         },
-        "appName": "Mẫu SaaS",
+        "appName": "FinHome",
         "testimonial": {
           "quote": "Ứng dụng này đã giúp tôi tiết kiệm vô số giờ làm việc và giúp tôi xây dựng các sản phẩm tuyệt vời nhanh hơn bao giờ hết.",
           "author": "Sofia Davis"
@@ -74,10 +74,10 @@
           "title": "Đăng ký",
           "description": "Tạo tài khoản mới"
         },
-        "appName": "Mẫu SaaS",
+        "appName": "FinHome",
         "testimonial": {
           "quote": "Tham gia cùng hàng ngàn người dùng tin tưởng nền tảng của chúng tôi để xây dựng và mở rộng quy mô kinh doanh thành công.",
-          "author": "Marcus Johnson"
+          "author": "Ruthless Code - Matthew Ngo"
         }
       },
       "ForgotPassword": {

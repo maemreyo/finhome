@@ -5,9 +5,9 @@
   "LandingPage": {
     "HeroSection": {
       "badge": "🚀 New: Advanced Analytics Dashboard",
-      "heading1": "Build Your SaaS",
-      "heading2": "Faster Than Ever",
-      "description": "The complete SaaS template with authentication, billing, analytics, and more. Launch your next big idea in days, not months.",
+      "heading1": "Plan Your Real Estate Journey",
+      "heading2": "With Confidence",
+      "description": "Comprehensive real estate financial planning platform. Turn your property dreams into achievable financial plans with intelligent calculations and market insights.",
       "getStartedButton": "Get Started Free",
       "viewDemoButton": "View Demo",
       "noCreditCard": "No credit card required",
@@ -16,7 +16,7 @@
     },
     "FeaturesSection": {
       "heading": "Everything You Need to Succeed",
-      "description": "Powerful features designed to help you build, launch, and scale your SaaS business.",
+      "description": "Powerful financial planning tools designed to help you buy, invest, and grow your real estate portfolio.",
       "feature1Title": "Lightning Fast",
       "feature1Description": "Built with Next.js 15 and optimized for performance. Your users will love the speed.",
       "feature2Title": "Secure by Default",
@@ -29,18 +29,18 @@
     "SocialProofSection": {
       "heading": "Loved by Builders Worldwide",
       "reviews": "4.9/5 from 1,200+ reviews",
-      "testimonial1Content": "This template saved us months of development time. We were able to launch our SaaS in just 2 weeks!",
+      "testimonial1Content": "FinHome helped us understand exactly what we could afford and plan our home purchase timeline. We bought our first home with confidence!",
       "testimonial1Author": "Sarah Chen",
       "testimonial1Role": "CEO, TechStart",
       "testimonial2Content": "The code quality is exceptional and the documentation is crystal clear. Highly recommended!",
       "testimonial2Author": "Mike Johnson",
       "testimonial2Role": "CTO, InnovateCorp",
-      "testimonial3Content": "Finally, a SaaS template that includes everything we need. The billing integration works flawlessly.",
+      "testimonial3Content": "The financial scenarios and timeline visualization made it easy to compare different property investments. Great tool for planning!",
       "testimonial3Author": "Emily Rodriguez",
       "testimonial3Role": "Founder, StartupXYZ"
     },
     "CTASection": {
-      "heading": "Ready to Launch Your SaaS?",
+      "heading": "Ready to Start Your Real Estate Journey?",
       "description": "Join thousands of entrepreneurs who have already built successful businesses with our template.",
       "startButton": "Start Building Today",
       "talkToSalesButton": "Talk to Sales"
@@ -48,14 +48,14 @@
   },
   "Layout": {
     "metadata": {
-      "titleDefault": "SaaS Template",
-      "titleTemplate": "%s | SaaS Template",
-      "description": "The complete SaaS template for indie hackers",
-      "openGraphTitle": "SaaS Template",
-      "openGraphDescription": "The complete SaaS template for indie hackers",
-      "openGraphSiteName": "SaaS Template",
-      "twitterTitle": "SaaS Template",
-      "twitterDescription": "The complete SaaS template for indie hackers"
+      "titleDefault": "FinHome",
+      "titleTemplate": "%s | FinHome",
+      "description": "Vietnamese real estate financial planning platform",
+      "openGraphTitle": "FinHome",
+      "openGraphDescription": "Vietnamese real estate financial planning platform",
+      "openGraphSiteName": "FinHome",
+      "twitterTitle": "FinHome",
+      "twitterDescription": "Vietnamese real estate financial planning platform"
     }
   },
   "Auth": {
@@ -64,7 +64,7 @@
         "title": "Sign In",
         "description": "Sign in to your account"
       },
-      "appName": "SaaS Template",
+      "appName": "FinHome",
       "testimonial": {
         "quote": "This application has saved me countless hours of work and helped me build amazing products faster than ever before.",
         "author": "Sofia Davis"
@@ -75,10 +75,10 @@
         "title": "Sign Up",
         "description": "Create a new account"
       },
-      "appName": "SaaS Template",
+      "appName": "FinHome",
       "testimonial": {
         "quote": "Join thousands of users who trust our platform to build and scale their businesses successfully.",
-        "author": "Marcus Johnson"
+        "author": "Ruthless Code - Matthew Ngo"
       }
     },
     "ForgotPassword": {
@@ -202,12 +202,12 @@
   "AboutPage": {
     "metadata": {
       "title": "About Us",
-      "description": "Learn about our mission to help entrepreneurs build amazing SaaS products."
+      "description": "Learn about our mission to help Vietnamese families achieve their real estate dreams through smart financial planning."
     },
     "HeroSection": {
       "heading1": "Building the Future of",
-      "heading2": "SaaS Development",
-      "description": "We're on a mission to democratize SaaS development by providing entrepreneurs and developers with the tools they need to build world-class products."
+      "heading2": "Real Estate Finance",
+      "description": "We're on a mission to democratize real estate investment by providing Vietnamese families with the financial planning tools they need to make informed property decisions."
     },
     "StatsSection": {
       "happyCustomers": "Happy Customers",
@@ -229,14 +229,14 @@
     },
     "StorySection": {
       "heading": "Our Story",
-      "paragraph1": "Founded in 2023, we started with a simple observation: building a SaaS product shouldn't require months of boilerplate code and infrastructure setup.",
-      "paragraph2": "After launching multiple successful SaaS products ourselves, we noticed we were rebuilding the same components over and over again - authentication, billing, user management, and analytics.",
-      "paragraph3": "That's when we decided to create the ultimate SaaS template that would allow entrepreneurs to focus on what matters most: building amazing products that solve real problems.",
+      "paragraph1": "Founded in 2025, we started with a simple observation: buying property in Vietnam shouldn't require complex financial calculations and uncertainty about affordability.",
+      "paragraph2": "After helping numerous Vietnamese families with their real estate journeys, we noticed they were struggling with the same challenges - affordability calculations, market timing, and long-term financial planning.",
+      "paragraph3": "That's when we decided to create FinHome - a comprehensive platform that would allow families to focus on what matters most: finding and securing their perfect home with confidence.",
       "journeyBegins": "Our journey begins"
     },
     "CTASection": {
       "heading": "Ready to Join Our Mission?",
-      "description": "Whether you&apos;re building your first SaaS or your tenth, we&apos;re here to help you succeed.",
+      "description": "Whether you&apos;re buying your first home or expanding your property portfolio, we&apos;re here to help you succeed.",
       "startButton": "Start Building Today",
       "getInTouchButton": "Get in Touch"
     }
