@@ -48,6 +48,7 @@ interface UseScenariosReturn {
   calculateScenario: (params: ScenarioCalculationParams) => Omit<LoanScenario, 'id' | 'name' | 'createdAt'>
   getRecommendation: (scenario: LoanScenario) => LoanScenario['recommendation']
   compareScenarios: (scenarioIds: string[]) => LoanScenario[]
+  
 }
 
 // Vietnamese banking loan calculation with promotional rates
@@ -385,14 +386,50 @@ export function createScenariosFromPlan(plan: FinancialPlan): LoanScenario[] {
   ]
   
   return scenarios.map((params, index) => {
-    const { useScenarios } = require('./useScenarios')
-    const { calculateScenario } = useScenarios()
+    // Create a temporary calculation instance to avoid circular dependency
+    const downPayment = params.propertyPrice * (params.downPaymentPercent / 100)
+    const loanAmount = params.propertyPrice - downPayment
     
-    const calculated = calculateScenario(params)
+    const { monthlyPayment, totalInterest, totalPayment } = calculateMonthlyPayment(
+      loanAmount,
+      params.interestRate,
+      params.loanTermYears,
+      params.promotionalRate,
+      params.promotionalMonths
+    )
+    
+    const netCashFlow = params.monthlyIncome - params.monthlyExpenses - monthlyPayment
+    const riskLevel = assessRiskLevel(
+      monthlyPayment,
+      params.monthlyIncome,
+      netCashFlow,
+      params.downPaymentPercent,
+      params.loanTermYears
+    )
+    
+    const scenarioData = {
+      downPaymentPercent: params.downPaymentPercent,
+      loanTermYears: params.loanTermYears,
+      interestRate: params.interestRate,
+      propertyPrice: params.propertyPrice,
+      downPayment,
+      loanAmount,
+      monthlyPayment,
+      totalInterest,
+      totalPayment,
+      monthlyIncome: params.monthlyIncome,
+      monthlyExpenses: params.monthlyExpenses,
+      netCashFlow,
+      riskLevel
+    }
+    
+    const recommendation = generateRecommendation(scenarioData)
+    
     return {
       id: `scenario-${index + 1}`,
       name: ['Bảo Thủ', 'Cân Bằng', 'Tích Cực'][index],
-      ...calculated,
+      ...scenarioData,
+      recommendation,
       createdAt: new Date()
     }
   })
