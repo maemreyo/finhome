@@ -289,7 +289,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
                     <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
                       <CheckCircle className="w-5 h-5 text-green-600" />
                       <span className="text-sm text-green-700">
-                        +50 XP • Thành tích "Người Mới Bắt Đầu"
+                        +50 XP • Thành tích &quot;Người Mới Bắt Đầu&quot;
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center text-xs">

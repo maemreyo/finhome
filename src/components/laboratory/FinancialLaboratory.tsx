@@ -244,7 +244,7 @@ export const FinancialLaboratory: React.FC<FinancialLaboratoryProps> = ({
             Phòng Thí Nghiệm Tài Chính
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Mô phỏng các tình huống "Điều gì sẽ xảy ra nếu?" để tối ưu kế hoạch tài chính
+            Mô phỏng các tình huống &quot;Điều gì sẽ xảy ra nếu?&quot; để tối ưu kế hoạch tài chính
           </p>
         </div>
       </div>

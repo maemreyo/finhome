@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation'
 import Navigation from './Navigation'
 import { ToastProvider } from '@/components/notifications/ToastNotification'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -56,9 +57,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 </div>
                 
                 <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <a href="/privacy" className="hover:text-gray-700">Chính sách bảo mật</a>
-                  <a href="/terms" className="hover:text-gray-700">Điều khoản</a>
-                  <a href="/help" className="hover:text-gray-700">Trợ giúp</a>
+                  <Link href="/privacy" className="hover:text-gray-700">Chính sách bảo mật</Link>
+                  <Link href="/terms" className="hover:text-gray-700">Điều khoản</Link>
+                  <Link href="/help" className="hover:text-gray-700">Trợ giúp</Link>
                 </div>
               </div>
             </div>
