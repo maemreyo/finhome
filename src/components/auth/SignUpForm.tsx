@@ -5,7 +5,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { z } from 'zod'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,7 @@ import { Loader2, Mail, Lock, User, Github } from 'lucide-react'
 
 export function SignUpForm() {
   const t = useTranslations('Auth.SignUpForm');
+  const locale = useLocale();
 
   const signUpSchema = z.object({
     fullName: z.string().min(2, t('form.fullNameMinLength')),
@@ -225,11 +226,11 @@ export function SignUpForm() {
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               {t('form.agreeTo')}{' '}
-              <Link href="/legal/terms" className="text-primary hover:underline">
+              <Link href={`/${locale}/legal/terms`} className="text-primary hover:underline">
                 {t('form.termsOfService')}
               </Link>{' '}
               {t('form.and')}{' '}
-              <Link href="/legal/privacy" className="text-primary hover:underline">
+              <Link href={`/${locale}/legal/privacy`} className="text-primary hover:underline">
                 {t('form.privacyPolicy')}
               </Link>
             </label>
@@ -252,7 +253,7 @@ export function SignUpForm() {
       <CardFooter>
         <p className="text-center text-sm text-muted-foreground w-full">
           {t('alreadyHaveAccount')}{' '}
-          <Link href="/auth/login" className="text-primary hover:underline">
+          <Link href={`/${locale}/auth/login`} className="text-primary hover:underline">
             {t('signIn')}
           </Link>
         </p>

@@ -7,18 +7,19 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const t = useTranslations('Marketing.Header');
+  const locale = useLocale();
 
   const navigation = [
     { name: t('features'), href: '#features' },
-    { name: t('pricing'), href: '/pricing' },
-    { name: t('about'), href: '/about' },
-    { name: t('blog'), href: '/blog' },
-    { name: t('contact'), href: '/contact' },
+    { name: t('pricing'), href: `/${locale}/pricing` },
+    { name: t('about'), href: `/${locale}/about` },
+    { name: t('blog'), href: `/${locale}/blog` },
+    { name: t('contact'), href: `/${locale}/contact` },
   ]
 
   return (
@@ -26,7 +27,7 @@ export function MarketingHeader() {
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
         {/* Logo */}
         <div className="flex lg:flex-1">
-          <Link href="/" className="-m-1.5 p-1.5 flex items-center space-x-2">
+          <Link href={`/${locale}`} className="-m-1.5 p-1.5 flex items-center space-x-2">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">
                 {process.env.NEXT_PUBLIC_APP_NAME?.[0] || 'S'}
@@ -65,10 +66,10 @@ export function MarketingHeader() {
         {/* Right side actions */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4 lg:items-center">
           <ThemeToggle />
-          <Link href="/auth/login">
+          <Link href={`/${locale}/auth/login`}>
             <Button variant="ghost">{t('signIn')}</Button>
           </Link>
-          <Link href="/auth/signup">
+          <Link href={`/${locale}/auth/signup`}>
             <Button>{t('getStarted')}</Button>
           </Link>
         </div>
@@ -80,7 +81,7 @@ export function MarketingHeader() {
           <div className="fixed inset-0 z-50" />
           <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-background px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
-              <Link href="/" className="-m-1.5 p-1.5 flex items-center space-x-2">
+              <Link href={`/${locale}`} className="-m-1.5 p-1.5 flex items-center space-x-2">
                 <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                   <span className="text-primary-foreground font-bold text-sm">
                     {process.env.NEXT_PUBLIC_APP_NAME?.[0] || 'S'}
@@ -114,13 +115,13 @@ export function MarketingHeader() {
                 </div>
                 <div className="py-6 space-y-2">
                   <Link
-                    href="/auth/login"
+                    href={`/${locale}/auth/login`}
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-muted-foreground hover:bg-accent"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {t('signIn')}
                   </Link>
-                  <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href={`/${locale}/auth/signup`} onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full">{t('getStarted')}</Button>
                   </Link>
                 </div>

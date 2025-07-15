@@ -13,7 +13,7 @@ export default async function PlanDetailPage({ params }: PlanDetailPageProps) {
   const user = await getUser()
   
   if (!user) {
-    redirect('/auth/login')
+    redirect('/en/auth/login')
   }
 
   const { planId } = await params

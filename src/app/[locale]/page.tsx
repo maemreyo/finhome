@@ -7,11 +7,12 @@ import { PricingSection } from '@/components/pricing/PricingSection'
 import { ArrowRight, Check, Star, Zap, Shield, Users, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 // Hero Section
 function HeroSection() {
   const t = useTranslations('LandingPage.HeroSection');
+  const locale = useLocale();
   return (
     <section className="py-24 bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container px-4 mx-auto">
@@ -33,13 +34,13 @@ function HeroSection() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild>
-              <Link href="/auth/signup">
+              <Link href={`/${locale}/auth/signup`}>
                 {t('getStartedButton')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="/demo">
+              <Link href={`/${locale}/demo`}>
                 {t('viewDemoButton')}
               </Link>
             </Button>
@@ -204,13 +205,13 @@ function CTASection() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" variant="secondary" asChild>
-            <Link href="/auth/signup">
+            <Link href={`/${locale}/auth/signup`}>
               {t('startButton')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
           <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-            <Link href="/contact">
+            <Link href={`/${locale}/contact`}>
               {t('talkToSalesButton')}
             </Link>
           </Button>

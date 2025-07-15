@@ -173,10 +173,10 @@ export default async function AboutPage({ params }: PageProps) {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>
-              <Link href="/auth/signup">{tCTA('startButton')}</Link>
+              <Link href={`/${locale}/auth/signup`}>{tCTA('startButton')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-              <Link href="/contact">{tCTA('getInTouchButton')}</Link>
+              <Link href={`/${locale}/contact`}>{tCTA('getInTouchButton')}</Link>
             </Button>
           </div>
         </div>

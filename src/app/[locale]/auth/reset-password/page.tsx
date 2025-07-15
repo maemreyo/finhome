@@ -78,7 +78,7 @@ export default function ResetPasswordPage({ params }: PageProps) {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/auth/login?message=Password updated successfully");
+      router.push(`/${locale}/auth/login?message=Password updated successfully`);
     }
 
     setIsLoading(false);
@@ -104,7 +104,7 @@ export default function ResetPasswordPage({ params }: PageProps) {
                 </Alert>
                 <Button
                   className="w-full mt-4"
-                  onClick={() => router.push("/auth/forgot-password")}
+                  onClick={() => router.push(`/${locale}/auth/forgot-password`)}
                 >
                   {t("requestNewLink")}
                 </Button>

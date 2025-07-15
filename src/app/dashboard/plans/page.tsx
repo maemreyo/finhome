@@ -11,7 +11,7 @@ export default async function PlansPage() {
   const user = await getUser()
   
   if (!user) {
-    redirect('/auth/login')
+    redirect('/en/auth/login')
   }
 
   const plans = await getUserFinancialPlans(user.id)

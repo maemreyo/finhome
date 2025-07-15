@@ -229,10 +229,10 @@ export default function ContactPage({ params }: PageProps) {
                   </p>
                   <div className="flex gap-2">
                     <Button variant="secondary" size="sm" asChild>
-                      <Link href="/docs">{tContactInfo('viewDocs')}</Link>
+                      <Link href={`/${locale}/docs`}>{tContactInfo('viewDocs')}</Link>
                     </Button>
                     <Button variant="outline" size="sm" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-                      <Link href="/community">{tContactInfo('joinCommunity')}</Link>
+                      <Link href={`/${locale}/community`}>{tContactInfo('joinCommunity')}</Link>
                     </Button>
                   </div>
                 </CardContent>

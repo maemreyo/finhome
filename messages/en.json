@@ -113,6 +113,56 @@
       },
       "noAccount": "Don't have an account?",
       "signUp": "Sign up"
+    },
+    "SignUpForm": {
+      "title": "Create your account",
+      "description": "Get started with your free account today",
+      "orContinueWith": "Or continue with",
+      "form": {
+        "fullNameLabel": "Full Name",
+        "fullNamePlaceholder": "Enter your full name",
+        "fullNameMinLength": "Full name must be at least 2 characters",
+        "emailLabel": "Email",
+        "emailPlaceholder": "Enter your email",
+        "emailInvalid": "Please enter a valid email address",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Create a password",
+        "passwordMinLength": "Password must be at least 8 characters",
+        "confirmPasswordLabel": "Confirm Password",
+        "confirmPasswordPlaceholder": "Confirm your password",
+        "passwordMismatch": "Passwords don't match",
+        "acceptTermsLabel": "I accept the terms and conditions",
+        "acceptTermsRequired": "You must accept the terms and conditions",
+        "agreeTo": "I agree to the",
+        "termsOfService": "Terms of Service",
+        "and": "and",
+        "privacyPolicy": "Privacy Policy",
+        "createAccount": "Create Account",
+        "signUp": "Create Account"
+      },
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    },
+    "ResetPassword": {
+      "metadata": {
+        "title": "Reset Password",
+        "description": "Reset your password"
+      },
+      "form": {
+        "title": "Reset your password",
+        "description": "Enter your new password below",
+        "newPasswordLabel": "New Password",
+        "newPasswordPlaceholder": "Enter your new password",
+        "confirmPasswordLabel": "Confirm New Password",
+        "confirmPasswordPlaceholder": "Confirm your new password",
+        "passwordMinLength": "Password must be at least 8 characters",
+        "passwordMismatch": "Passwords don't match",
+        "updatePassword": "Update Password"
+      },
+      "invalidLink": "The password reset link is invalid or has expired",
+      "invalidLinkTitle": "Invalid Reset Link",
+      "invalidLinkDescription": "The password reset link is invalid or has expired. Please request a new one.",
+      "requestNewLink": "Request New Link"
     }
   },
   "Marketing": {

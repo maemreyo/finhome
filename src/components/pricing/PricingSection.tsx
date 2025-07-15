@@ -10,21 +10,23 @@ import { Label } from '@/components/ui/label'
 import { PRICING_PLANS } from '@/lib/stripe/client-config'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { useLocale } from 'next-intl'
 
 export function PricingSection() {
   const [isAnnual, setIsAnnual] = useState(false)
   const router = useRouter()
   const { user } = useAuth()
+  const locale = useLocale()
 
   const handleSelectPlan = async (planId: string) => {
     if (!user) {
-      router.push('/auth/signup')
+      router.push(`/${locale}/auth/signup`)
       return
     }
 
     if (planId === 'enterprise') {
       // Redirect to contact page
-      router.push('/contact?plan=enterprise')
+      router.push(`/${locale}/contact?plan=enterprise`)
       return
     }
 

@@ -20,7 +20,7 @@ interface WelcomeEmailProps {
 
 export function WelcomeEmail({ 
   userName, 
-  loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/login` 
+  loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/en/auth/login` 
 }: WelcomeEmailProps) {
   return (
     <Html>

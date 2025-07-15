@@ -84,7 +84,7 @@ export default function ForgotPasswordPage({ params }: PageProps) {
               </CardContent>
 
               <CardFooter>
-                <Link href="/auth/login" className="w-full">
+                <Link href={`/${locale}/auth/login`} className="w-full">
                   <Button variant="outline" className="w-full">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     {t('backToLogin')}
@@ -147,7 +147,7 @@ export default function ForgotPasswordPage({ params }: PageProps) {
             </CardContent>
 
             <CardFooter>
-              <Link href="/auth/login" className="w-full">
+              <Link href={`/${locale}/auth/login`} className="w-full">
                 <Button variant="outline" className="w-full">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   {t('backToLogin')}

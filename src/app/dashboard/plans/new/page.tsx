@@ -7,7 +7,7 @@ export default async function NewPlanPage() {
   const user = await getUser()
   
   if (!user) {
-    redirect('/auth/login')
+    redirect('/en/auth/login')
   }
 
   return (

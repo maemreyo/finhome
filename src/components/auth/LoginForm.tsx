@@ -5,7 +5,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { z } from 'zod'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -20,6 +20,7 @@ import { Loader2, Mail, Lock, Github } from 'lucide-react'
 
 export function LoginForm() {
   const t = useTranslations('Auth.LoginForm');
+  const locale = useLocale();
 
   const loginSchema = z.object({
     email: z.string().email(t('form.emailInvalid')),
@@ -155,7 +156,7 @@ export function LoginForm() {
             <div className="flex items-center justify-between">
               <Label htmlFor="password">{t('form.passwordLabel')}</Label>
               <Link
-                href="/auth/forgot-password"
+                href={`/${locale}/auth/forgot-password`}
                 className="text-sm text-primary hover:underline"
               >
                 {t('form.forgotPassword')}
@@ -190,7 +191,7 @@ export function LoginForm() {
       <CardFooter>
         <p className="text-center text-sm text-muted-foreground w-full">
           {t('noAccount')}{' '}
-          <Link href="/auth/signup" className="text-primary hover:underline">
+          <Link href={`/${locale}/auth/signup`} className="text-primary hover:underline">
             {t('signUp')}
           </Link>
         </p>
