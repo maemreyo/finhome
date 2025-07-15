@@ -1,199 +1,189 @@
-# FinHome Codebase Research - UI Components & Patterns Analysis
+# FinHome Development Plan - Mock Data & Admin Dashboard Strategy
 
-## Research Objectives
-- [x] Analyze database schema and migration files
-- [x] Identify TypeScript types for user management and onboarding
-- [x] Understand existing UI patterns and component structure
-- [x] Review user authentication and profile management
-- [x] Examine existing help/tutorial systems
-- [x] Check documentation for onboarding requirements
+## Current Project Status: MVP 85% Complete ✅
 
-## NEW RESEARCH PHASE: UI Components & Patterns for Contextual Help System
-- [x] Analyze existing tooltip/popover components (shadcn/ui)
-- [x] Find tooltip usage patterns in codebase
-- [x] Examine dialog and modal patterns
-- [x] Understand theme and styling system
-- [x] Identify state management patterns
-- [x] Research animation and interaction patterns
+### 📊 **Mock Data Analysis & Dashboard Management Strategy**
 
-## NEW RESEARCH PHASE: App Directory Structure & Route Consolidation
+#### **Mock Data Usage Patterns Identified**
 
-### Research Objectives
-- [x] Analyze duplicate route files in app directory
-- [x] Compare page implementations for functional duplicates
-- [x] Check current [locale] directory structure
-- [x] Identify consolidation strategy preserving all functionality
-- [x] Create migration plan for route consolidation
+**🔴 HIGH MOCK DATA USAGE (Needs Admin Dashboard)**
+- **Achievement System**: Hardcoded achievements, rewards, points (`AchievementSystem.tsx`)
+- **Notification Templates**: Mock notifications with static content (`NotificationCenter.tsx`)
+- **Marketing Content**: Hardcoded features, testimonials, pricing (`LandingPage components`)
+- **Property Market Data**: Mock neighborhood data, market trends (`PropertyService`)
+- **Onboarding Content**: Static tour steps and help content (`OnboardingTour.tsx`)
 
-## Current Status: COMPREHENSIVE PROJECT ASSESSMENT COMPLETED ✅
+**🟡 PARTIAL MOCK DATA (Database + Mock Enhancement)**
+- **Bank Service**: Real rates from database + mock recommendations
+- **Financial Calculations**: Real loan calculations + mock ROI projections
+- **User Stats**: Real user data + mock gamification metrics
+- **Property Portfolio**: Database structure + mock market analytics
 
-## CRITICAL FINDINGS: MVP READINESS ASSESSMENT
-
-### ✅ What's Already Implemented and Working
-
-#### 1. **Database & Backend Infrastructure (95% Complete)**
-- **Production-ready database schema**: Comprehensive unified schema with 20+ tables
-- **Complete financial calculations**: API endpoints for plans, loan calculations, scenarios
-- **User management system**: Full auth system with profiles, preferences, subscriptions
-- **Vietnam-specific features**: Vietnamese banks, interest rates, property market data
-- **Advanced features**: Gamification, achievements, notifications, community posts
-
-#### 2. **Authentication System (100% Complete)**
-- **Full auth flow**: Login, signup, password reset, OAuth (Google, GitHub)
-- **Profile management**: User profiles with financial data, preferences
-- **Subscription system**: Stripe integration for premium features
-- **Row Level Security**: Comprehensive RLS policies for data protection
-
-#### 3. **UI Components & Design System (85% Complete)**
-- **Complete shadcn/ui integration**: All UI components ready (buttons, cards, forms, dialogs)
-- **Responsive design**: Mobile-first approach with dark mode support
-- **Internationalization**: Next-intl setup for Vietnamese/English
-- **Financial dashboard**: Working dashboard with overview, stats, quick actions
-- **Property portfolio**: Property management and portfolio tracking
-
-#### 4. **Core Financial Planning Features (75% Complete)**
-- **Financial planning wizard**: Multi-step form for creating plans
-- **Loan calculations**: Real-time monthly payment, interest calculations
-- **Investment analysis**: ROI calculations, rental income projections
-- **Timeline visualization**: Interactive financial timeline with scenarios
-- **Market data integration**: Vietnamese bank rates, property market data
-
-### ❌ What's Missing for Basic MVP
-
-#### 1. **Critical Missing Components (25% of MVP)**
-
-**A. Financial Plan Management Pages**
-- ❌ **Plan list/overview page** - Users can't view all their plans
-- ❌ **Plan detail/edit page** - Users can't modify existing plans
-- ❌ **Plan comparison tool** - Can't compare different scenarios
-
-**B. Property Search & Management**
-- ❌ **Property search interface** - Core feature for finding properties
-- ❌ **Property detail pages** - Can't view property information
-- ❌ **Property favorites** - Can't save interesting properties
-
-**C. Bank Rate Comparison**
-- ❌ **Bank comparison tool** - Can't compare interest rates
-- ❌ **Rate tracking** - No historical rate data visualization
-- ❌ **Loan recommendation engine** - Missing smart recommendations
-
-**D. User Onboarding & Help**
-- ❌ **User onboarding flow** - New users lack guidance
-- ❌ **Tutorial system** - No contextual help or walkthroughs
-- ❌ **Help documentation** - Missing user guides
-
-#### 2. **Data Integration Issues (Critical)**
-- ❌ **Real property data** - No actual property listings
-- ❌ **Live bank rates** - Using mock data instead of real rates
-- ❌ **Market data feeds** - No real-time market information
-
-### 🔧 Next Logical Implementation Steps
-
-#### **Phase 1: Complete Core MVP (Weeks 1-2)**
-1. **Create Plan Management System**
-   - Build `/plans` list page with filtering, sorting
-   - Create `/plans/[id]` detail page with edit capability
-   - Add plan comparison functionality
-
-2. **Implement Property Search**
-   - Build `/properties` search interface
-   - Create `/properties/[id]` detail pages
-   - Add property favorites system
-
-3. **Add Bank Rate Comparison**
-   - Build `/banks` comparison tool
-   - Create rate tracking dashboard
-   - Add loan recommendation logic
-
-#### **Phase 2: User Experience (Weeks 3-4)**
-1. **User Onboarding System**
-   - Create welcome flow for new users
-   - Add contextual help system
-   - Build tutorial walkthrough
-
-2. **Data Integration**
-   - Integrate real property data sources
-   - Connect to Vietnamese bank APIs
-   - Add market data feeds
-
-### 🚨 Critical Issues & Gaps
-
-#### **1. Route Duplication Problem**
-- **Issue**: Duplicate route files (`/dashboard/*` and `/[locale]/dashboard/*`)
-- **Impact**: Maintenance burden, potential routing conflicts
-- **Priority**: High - needs immediate consolidation
-
-#### **2. Missing Core User Flows**
-- **Issue**: Users can create plans but can't manage them effectively
-- **Impact**: Poor user experience, low retention
-- **Priority**: Critical - blocks MVP launch
-
-#### **3. Data Source Dependencies**
-- **Issue**: Most features use mock data
-- **Impact**: Product not ready for real users
-- **Priority**: High - needed for production launch
-
-### 📊 MVP Completeness Score
-
-| Component | Status | Completeness |
-|-----------|--------|-------------|
-| Database Schema | ✅ Complete | 95% |
-| Authentication | ✅ Complete | 100% |
-| UI Components | ✅ Complete | 85% |
-| Financial Planning | ⚠️ Partial | 75% |
-| Property Management | ❌ Missing | 25% |
-| Bank Comparison | ❌ Missing | 20% |
-| User Onboarding | ❌ Missing | 10% |
-| Data Integration | ❌ Missing | 15% |
-
-**Overall MVP Readiness: 60%**
-
-### 🎯 Recommended Next Action
-
-**IMMEDIATE PRIORITY: Complete Plan Management System**
-- This is the core user journey that's partially implemented
-- Users can create plans but can't manage them effectively
-- Building the plan list and detail pages will immediately improve user experience
-- Estimated time: 3-5 days
-
-**REASON**: The infrastructure is solid, but the user-facing features are incomplete. Focus on completing the core financial planning flow before adding new features.
+**🟢 REAL DATABASE USAGE (Working Correctly)**
+- User authentication and profiles
+- Financial plans and scenarios
+- Bank interest rates (Vietnamese banks)
+- Property listings structure
+- Subscription and billing data
 
 ---
 
-## NEW RESEARCH PHASE: Mock Data Analysis & Admin Dashboard Requirements
+## 🎯 **Priority Action Plan**
 
-### Research Objectives
-- [ ] Identify hardcoded/mock data arrays in components
-- [ ] Analyze database vs mock data usage patterns
-- [ ] Find Vietnamese market-specific data that needs management
-- [ ] Identify content that should be admin-managed
-- [ ] Assess financial planning data (rates, loan products)
-- [ ] Review property listings and market data sources
-- [ ] Examine user-facing content (testimonials, features)
-- [ ] Check system configuration data
-- [ ] Prioritize admin dashboard management screens
+### **Phase 1: Database Setup (Week 1)**
+- [ ] Set up Supabase database following setup guide
+- [ ] Run database migrations for unified schema
+- [ ] Configure environment variables and authentication
+- [ ] Test database connections and basic CRUD operations
 
-### Research Areas
-1. **Financial Data Analysis**
-   - [ ] Bank rates and loan products
-   - [ ] Interest rate calculations
-   - [ ] Investment product data
-   - [ ] Market data feeds
+### **Phase 2: Core Admin Dashboard (Week 2)**
+**HIGH PRIORITY - These need admin management screens:**
 
-2. **Property & Market Data**
-   - [ ] Property listings sources
-   - [ ] Market analysis data
-   - [ ] Regional property data
-   - [ ] Property type configurations
+1. **Bank Rate Management Dashboard** 🏦
+   - [ ] Create `/admin/banks` - Manage Vietnamese banks
+   - [ ] Create `/admin/rates` - Update interest rates
+   - [ ] Create `/admin/loan-products` - Manage loan products
+   - **Why Admin**: Rates change frequently, need quick updates
 
-3. **User-Facing Content**
-   - [ ] Marketing content and testimonials
-   - [ ] Feature descriptions
-   - [ ] Help documentation
-   - [ ] Achievement configurations
+2. **Achievement System Management** 🏆
+   - [ ] Create `/admin/achievements` - Manage achievement definitions
+   - [ ] Create achievement editor with rewards/points system
+   - [ ] Connect to database instead of hardcoded arrays
+   - **Why Admin**: User engagement system needs flexibility
 
-4. **System Configuration**
-   - [ ] App settings and preferences
-   - [ ] Notification templates
-   - [ ] User onboarding content
-   - [ ] Gamification settings
+3. **Notification Management** 📧
+   - [ ] Create `/admin/notifications` - Manage notification templates
+   - [ ] Create notification composer with delivery rules
+   - [ ] Replace mock notifications with database-driven system
+   - **Why Admin**: Communication templates need regular updates
+
+### **Phase 3: Content Management (Week 3)**
+**MEDIUM PRIORITY - Content that changes occasionally:**
+
+4. **Marketing Content Dashboard** 📢
+   - [ ] Create `/admin/marketing` - Manage landing page content
+   - [ ] Create testimonials, features, pricing editor
+   - [ ] Connect to database instead of hardcoded content
+   - **Why Admin**: Marketing needs rapid iteration capability
+
+5. **Onboarding Flow Management** 🎓
+   - [ ] Create `/admin/onboarding` - Manage onboarding steps
+   - [ ] Create help content editor
+   - [ ] Replace static tour with dynamic content
+   - **Why Admin**: User experience needs optimization over time
+
+### **Phase 4: Advanced Features (Week 4)**
+**LOW PRIORITY - Keep as integrated APIs:**
+
+6. **Property Market Data** 🏠
+   - [ ] Integrate with external property APIs
+   - [ ] Create data sync jobs for market trends
+   - **Decision**: External API integration, not admin managed
+
+7. **User Activity Monitoring** 📈
+   - [ ] Auto-generate from user actions
+   - [ ] Create analytics dashboard
+   - **Decision**: System-generated, not admin managed
+
+---
+
+## 🏗️ **Admin Dashboard Architecture**
+
+### **Database Schema Additions Needed**
+```sql
+-- Content management tables
+CREATE TABLE admin_content (
+  id UUID PRIMARY KEY,
+  content_type TEXT, -- 'achievement', 'notification', 'marketing'
+  content_key TEXT,
+  content_data JSONB,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Admin user roles
+CREATE TABLE admin_users (
+  id UUID PRIMARY KEY REFERENCES auth.users(id),
+  role TEXT DEFAULT 'admin',
+  permissions TEXT[],
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### **Admin Dashboard Routes Structure**
+```
+/admin/
+├── dashboard/          # Admin overview
+├── banks/             # Bank management
+├── rates/             # Interest rate management
+├── achievements/      # Achievement system
+├── notifications/     # Notification templates
+├── marketing/         # Marketing content
+├── onboarding/        # Onboarding flow
+├── users/             # User management
+└── settings/          # System settings
+```
+
+---
+
+## 🔧 **Technical Implementation Strategy**
+
+### **Mock Data Migration Priority**
+1. **Keep as Database-Seeded** (One-time setup):
+   - Vietnamese bank information
+   - Property types and legal statuses
+   - Base system configurations
+   - Currency and locale settings
+
+2. **Convert to Admin-Managed** (Frequent updates):
+   - Achievement definitions and rewards
+   - Notification templates and content
+   - Marketing content and pricing
+   - Onboarding steps and help content
+
+3. **Integrate with External APIs** (Real-time data):
+   - Property market data
+   - Real-time bank rates
+   - Economic indicators
+   - Currency exchange rates
+
+### **Development Approach**
+- ✅ **Use hardcoded data initially** for rapid development
+- ✅ **Create admin management screens** for content that changes
+- ✅ **Integrate external APIs** for real-time market data
+- ✅ **Database seed** for static configuration data
+
+---
+
+## 📋 **Current TODO Status**
+
+### ✅ **Completed**
+- [x] Complete financial plan management system
+- [x] Plan list page with filtering and detail views
+- [x] Add missing translations for PlansPage
+- [x] Authentication system fully implemented
+- [x] Database schema designed and ready
+- [x] Core UI components and design system
+
+### 🔄 **In Progress**
+- [ ] Set up Supabase database and connect real data
+- [ ] Create admin dashboard architecture
+- [ ] Migrate mock data to admin-managed system
+
+### 📝 **Next Actions**
+1. **Week 1**: Set up Supabase database
+2. **Week 2**: Create core admin dashboard screens
+3. **Week 3**: Migrate mock data to admin-managed system
+4. **Week 4**: Polish and testing
+
+---
+
+## 🎯 **Key Decisions Made**
+
+1. **Admin Dashboard Strategy**: Create management screens for frequently changing content
+2. **Mock Data Approach**: Keep hardcoded data for rapid development, migrate to admin when needed
+3. **External API Integration**: Use APIs for real-time market data rather than manual management
+4. **Database Seeding**: Use for static configuration data and base system setup
+
+**Next Immediate Action**: Set up Supabase database following the setup guide, then create the bank rate management dashboard as the first admin screen.
