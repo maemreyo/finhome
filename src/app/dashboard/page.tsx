@@ -1,5 +1,5 @@
 // src/app/dashboard/page.tsx
-// Main dashboard page integrating all financial planning components
+// Main dashboard page integrating all financial overview components
 
 'use client'
 
@@ -21,17 +21,26 @@ import {
   Bell,
   Star,
   Eye,
-  Edit
+  Edit,
+  Settings,
+  RefreshCw,
+  Search
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
 
-// Import our components
+// Import our dashboard components
+import { FinancialOverview } from '@/components/dashboard/FinancialOverview'
+import { RecentActivity } from '@/components/dashboard/RecentActivity'
+import { PropertyPortfolio } from '@/components/dashboard/PropertyPortfolio'
+
+// Import legacy components for fallback
 import { TimelineVisualization } from '@/components/timeline/TimelineVisualization'
 import { FinancialPlan } from '@/components/financial-plans/PlansList'
 import { convertScenarioToTimeline } from '@/lib/timeline/timelineUtils'
@@ -356,8 +365,17 @@ const MarketInsights: React.FC = () => (
 )
 
 export default function DashboardPage() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const [selectedView, setSelectedView] = useState<'overview' | 'legacy'>('overview')
 
-  // Calculate portfolio summary
+  // Simulate loading
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1200)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Calculate portfolio summary (legacy support)
   const portfolioSummary = useMemo(() => {
     const totalValue = samplePlans.reduce((sum, plan) => sum + plan.purchasePrice, 0)
     const totalDownPayment = samplePlans.reduce((sum, plan) => sum + plan.downPayment, 0)
@@ -376,7 +394,7 @@ export default function DashboardPage() {
     }
   }, [])
 
-  // Generate timeline scenarios for overview
+  // Generate timeline scenarios for overview (legacy support)
   const timelineScenarios = useMemo(() => {
     if (samplePlans.length === 0) return []
 
@@ -436,212 +454,480 @@ export default function DashboardPage() {
     window.location.href = '/plans'
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              Financial Dashboard
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Track your real estate financial planning progress
-            </p>
+  // Quick actions data
+  const quickActions = [
+    {
+      id: '1',
+      title: 'Tìm Bất Động Sản',
+      description: 'Khám phá cơ hội đầu tư mới',
+      icon: <Search className="w-5 h-5" />,
+      href: '/properties'
+    },
+    {
+      id: '2',
+      title: 'Tạo Kế Hoạch Mới',
+      description: 'Lập kế hoạch tài chính chi tiết',
+      icon: <Calculator className="w-5 h-5" />,
+      href: '/plans/new'
+    },
+    {
+      id: '3',
+      title: 'So Sánh Lãi Suất',
+      description: 'Tìm gói vay ưu đãi nhất',
+      icon: <TrendingUp className="w-5 h-5" />,
+      href: '/banks'
+    },
+    {
+      id: '4',
+      title: 'Xem Mục Tiêu',
+      description: 'Theo dõi tiến độ mục tiêu',
+      icon: <Target className="w-5 h-5" />,
+      href: '/goals'
+    }
+  ]
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="h-64 bg-gray-200 rounded-lg"></div>
+                <div className="h-48 bg-gray-200 rounded-lg"></div>
+              </div>
+              <div className="space-y-6">
+                <div className="h-32 bg-gray-200 rounded-lg"></div>
+                <div className="h-48 bg-gray-200 rounded-lg"></div>
+              </div>
+            </div>
           </div>
-          
-          <Button onClick={handleCreatePlan} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            New Plan
-          </Button>
         </div>
+      </div>
+    )
+  }
 
-        {/* Portfolio Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard
-            title="Total Portfolio Value"
-            value={portfolioSummary.totalValue}
-            icon={Home}
-            color="text-blue-600"
-            onClick={handleViewAllPlans}
-          />
-          
-          <StatCard
-            title="Monthly Payments"
-            value={portfolioSummary.totalMonthlyPayment}
-            icon={Calculator}
-            color="text-green-600"
-          />
-          
-          <StatCard
-            title="Active Plans"
-            value={`${portfolioSummary.activePlans}/${samplePlans.length}`}
-            icon={Target}
-            color="text-purple-600"
-            onClick={handleViewAllPlans}
-          />
-          
-          {portfolioSummary.totalExpectedROI > 0 && (
-            <StatCard
-              title="Avg Expected ROI"
-              value={`${portfolioSummary.totalExpectedROI.toFixed(1)}%`}
-              change={portfolioSummary.totalExpectedROI}
-              changeType="up"
-              icon={TrendingUp}
-              color="text-amber-600"
-            />
-          )}
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Tổng Quan Tài Chính
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Theo dõi tiến độ và quản lý đầu tư bất động sản của bạn
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="text-sm">
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Cập nhật: {lastUpdated.toLocaleTimeString('vi-VN')}
+              </Badge>
+              <Button variant="outline" size="sm" onClick={() => setSelectedView(selectedView === 'overview' ? 'legacy' : 'overview')}>
+                <Eye className="w-4 h-4 mr-1" />
+                {selectedView === 'overview' ? 'Xem Cũ' : 'Xem Mới'}
+              </Button>
+              <Button variant="outline" size="sm">
+                <Settings className="w-4 h-4 mr-1" />
+                Cài Đặt
+              </Button>
+              <Button size="sm" onClick={handleCreatePlan}>
+                <Plus className="w-4 h-4 mr-1" />
+                Tạo Kế Hoạch
+              </Button>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Timeline and Plans */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Portfolio Timeline */}
-            {timelineScenarios.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
-                    Portfolio Timeline
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TimelineVisualization
-                    scenarios={timelineScenarios}
-                    currentScenarioId={timelineScenarios[0]?.id || ''}
-                    onScenarioChange={() => {}}
-                    interactionMode="view"
-                    showGhostTimeline={false}
-                    enableWhatIfMode={false}
-                  />
-                </CardContent>
-              </Card>
-            )}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {selectedView === 'overview' ? (
+          /* New Dashboard Layout */
+          <div className="grid lg:grid-cols-3 gap-6">
+            
+            {/* Main Content Area */}
+            <div className="lg:col-span-2 space-y-6">
+              
+              {/* Financial Overview */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <FinancialOverview />
+              </motion.div>
 
-            {/* Active Plans */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <Building className="w-5 h-5" />
-                    Your Financial Plans
-                  </CardTitle>
-                  <Button variant="outline" size="sm" onClick={handleViewAllPlans}>
-                    View All
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {samplePlans.length > 0 ? (
-                  <div className="space-y-4">
-                    {samplePlans.slice(0, 3).map((plan) => (
-                      <PlanSummaryCard
-                        key={plan.id}
-                        plan={plan}
-                        onView={() => handleViewPlan(plan.id)}
-                        onEdit={() => handleEditPlan(plan.id)}
-                      />
-                    ))}
+              {/* Quick Actions */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calculator className="w-5 h-5 text-blue-600" />
+                      Hành Động Nhanh
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      {quickActions.map((action, index) => (
+                        <motion.div
+                          key={action.id}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.4 + index * 0.1 }}
+                        >
+                          <Button
+                            variant="outline"
+                            className="h-auto p-4 justify-start text-left w-full"
+                            onClick={() => window.location.href = action.href}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+                                {action.icon}
+                              </div>
+                              <div>
+                                <div className="font-medium">{action.title}</div>
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  {action.description}
+                                </div>
+                              </div>
+                            </div>
+                          </Button>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Tabs for Additional Content */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <Tabs defaultValue="portfolio" className="space-y-4">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="portfolio" className="flex items-center gap-2">
+                      <Home className="w-4 h-4" />
+                      Danh Mục BDS
+                    </TabsTrigger>
+                    <TabsTrigger value="analytics" className="flex items-center gap-2">
+                      <PieChart className="w-4 h-4" />
+                      Phân Tích
+                    </TabsTrigger>
+                    <TabsTrigger value="calendar" className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      Lịch Trình
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="portfolio" className="space-y-4">
+                    <PropertyPortfolio />
+                  </TabsContent>
+
+                  <TabsContent value="analytics" className="space-y-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Phân Tích Đầu Tư</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <div className="text-center">
+                            <PieChart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                            <p className="text-muted-foreground">
+                              Biểu đồ phân tích đầu tư sẽ hiển thị ở đây
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="calendar" className="space-y-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Lịch Trình Tài Chính</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <div className="text-center">
+                            <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                            <p className="text-muted-foreground">
+                              Lịch trình thanh toán và mục tiêu sẽ hiển thị ở đây
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              </motion.div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              
+              {/* Recent Activity */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <RecentActivity limit={4} />
+              </motion.div>
+
+              {/* Market Insights */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <MarketInsights />
+              </motion.div>
+
+              {/* Quick Stats */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="w-5 h-5 text-purple-600" />
+                      Thống Kê Nhanh
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Tổng kế hoạch:</span>
+                        <span className="font-medium">3</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">BDS quan tâm:</span>
+                        <span className="font-medium">8</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Ngân hàng so sánh:</span>
+                        <span className="font-medium">12</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Thành tích:</span>
+                        <span className="font-medium">7</span>
+                      </div>
+                    </div>
                     
-                    {samplePlans.length > 3 && (
-                      <div className="text-center pt-4 border-t">
-                        <Button variant="outline" onClick={handleViewAllPlans}>
-                          View {samplePlans.length - 3} More Plans
+                    <div className="mt-4 pt-4 border-t">
+                      <Button variant="outline" size="sm" className="w-full">
+                        Xem Chi Tiết
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </div>
+        ) : (
+          /* Legacy Dashboard Layout */
+          <>
+            {/* Portfolio Overview Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <StatCard
+                title="Total Portfolio Value"
+                value={portfolioSummary.totalValue}
+                icon={Home}
+                color="text-blue-600"
+                onClick={handleViewAllPlans}
+              />
+              
+              <StatCard
+                title="Monthly Payments"
+                value={portfolioSummary.totalMonthlyPayment}
+                icon={Calculator}
+                color="text-green-600"
+              />
+              
+              <StatCard
+                title="Active Plans"
+                value={`${portfolioSummary.activePlans}/${samplePlans.length}`}
+                icon={Target}
+                color="text-purple-600"
+                onClick={handleViewAllPlans}
+              />
+              
+              {portfolioSummary.totalExpectedROI > 0 && (
+                <StatCard
+                  title="Avg Expected ROI"
+                  value={`${portfolioSummary.totalExpectedROI.toFixed(1)}%`}
+                  change={portfolioSummary.totalExpectedROI}
+                  changeType="up"
+                  icon={TrendingUp}
+                  color="text-amber-600"
+                />
+              )}
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left Column - Timeline and Plans */}
+              <div className="lg:col-span-2 space-y-8">
+                {/* Portfolio Timeline */}
+                {timelineScenarios.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Calendar className="w-5 h-5" />
+                        Portfolio Timeline
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <TimelineVisualization
+                        scenarios={timelineScenarios}
+                        currentScenarioId={timelineScenarios[0]?.id || ''}
+                        onScenarioChange={() => {}}
+                        interactionMode="view"
+                        showGhostTimeline={false}
+                        enableWhatIfMode={false}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Active Plans */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Building className="w-5 h-5" />
+                        Your Financial Plans
+                      </CardTitle>
+                      <Button variant="outline" size="sm" onClick={handleViewAllPlans}>
+                        View All
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {samplePlans.length > 0 ? (
+                      <div className="space-y-4">
+                        {samplePlans.slice(0, 3).map((plan) => (
+                          <PlanSummaryCard
+                            key={plan.id}
+                            plan={plan}
+                            onView={() => handleViewPlan(plan.id)}
+                            onEdit={() => handleEditPlan(plan.id)}
+                          />
+                        ))}
+                        
+                        {samplePlans.length > 3 && (
+                          <div className="text-center pt-4 border-t">
+                            <Button variant="outline" onClick={handleViewAllPlans}>
+                              View {samplePlans.length - 3} More Plans
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                          No Plans Yet
+                        </h3>
+                        <p className="text-gray-500 dark:text-gray-400 mb-4">
+                          Create your first financial plan to get started
+                        </p>
+                        <Button onClick={handleCreatePlan}>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Create Plan
                         </Button>
                       </div>
                     )}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-                      No Plans Yet
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400 mb-4">
-                      Create your first financial plan to get started
-                    </p>
-                    <Button onClick={handleCreatePlan}>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right Column - Sidebar */}
+              <div className="space-y-6">
+                {/* Market Insights */}
+                <MarketInsights />
+
+                {/* Upcoming Events */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Bell className="w-5 h-5" />
+                      Upcoming Events
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {upcomingEvents.length > 0 ? (
+                      <div className="space-y-3">
+                        {upcomingEvents.map((event) => {
+                          const planName = samplePlans.find(p => p.id === event.planId)?.planName
+                          return (
+                            <UpcomingEventCard
+                              key={event.id}
+                              event={event}
+                              planName={planName}
+                            />
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6">
+                        <Calendar className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-gray-500 dark:text-gray-400">
+                          No upcoming events
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Quick Actions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button onClick={handleCreatePlan} className="w-full justify-start">
                       <Plus className="w-4 h-4 mr-2" />
-                      Create Plan
+                      Create New Plan
                     </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - Sidebar */}
-          <div className="space-y-6">
-            {/* Market Insights */}
-            <MarketInsights />
-
-            {/* Upcoming Events */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="w-5 h-5" />
-                  Upcoming Events
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {upcomingEvents.length > 0 ? (
-                  <div className="space-y-3">
-                    {upcomingEvents.map((event) => {
-                      const planName = samplePlans.find(p => p.id === event.planId)?.planName
-                      return (
-                        <UpcomingEventCard
-                          key={event.id}
-                          event={event}
-                          planName={planName}
-                        />
-                      )
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <Calendar className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500 dark:text-gray-400">
-                      No upcoming events
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button onClick={handleCreatePlan} className="w-full justify-start">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create New Plan
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  onClick={handleViewAllPlans}
-                  className="w-full justify-start"
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  View All Plans
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  onClick={() => window.location.href = '/timeline'}
-                  className="w-full justify-start"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Timeline Analysis
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                    
+                    <Button 
+                      variant="outline" 
+                      onClick={handleViewAllPlans}
+                      className="w-full justify-start"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View All Plans
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      onClick={() => window.location.href = '/timeline'}
+                      className="w-full justify-start"
+                    >
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Timeline Analysis
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
