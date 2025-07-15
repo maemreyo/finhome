@@ -250,5 +250,31 @@
       "startButton": "Bắt đầu xây dựng ngay hôm nay",
       "getInTouchButton": "Liên hệ"
     }
+  },
+  "PlansPage": {
+    "title": "Kế Hoạch Tài Chính",
+    "description": "Quản lý và theo dõi các kế hoạch tài chính bất động sản của bạn",
+    "actions": {
+      "createNew": "Tạo Kế Hoạch Mới",
+      "copy": "Sao chép"
+    },
+    "errors": {
+      "loadFailed": "Không thể tải kế hoạch tài chính"
+    },
+    "messages": {
+      "createSuccess": "Tạo kế hoạch tài chính thành công!",
+      "createError": "Không thể tạo kế hoạch tài chính",
+      "editComingSoon": "Chức năng chỉnh sửa sắp ra mắt",
+      "deleteSuccess": "Xóa kế hoạch tài chính thành công",
+      "duplicateSuccess": "Sao chép kế hoạch tài chính thành công",
+      "shareComingSoon": "Chức năng chia sẻ sắp ra mắt",
+      "downloadComingSoon": "Chức năng tải xuống sắp ra mắt"
+    },
+    "scenarios": {
+      "baseline": {
+        "name": "Kịch Bản Cơ Bản",
+        "description": "Kế hoạch tài chính tiêu chuẩn với điều kiện thị trường hiện tại"
+      }
+    }
   }
 }

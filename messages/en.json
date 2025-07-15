@@ -411,5 +411,31 @@
     "changesToPolicyParagraph2": "Your continued use of our services after any changes constitutes acceptance of the updated policy.",
     "contactUsHeading": "Contact Us",
     "contactUsParagraph": "If you have any questions about this Privacy Policy or our data practices, please contact us at:"
+  },
+  "PlansPage": {
+    "title": "Financial Plans",
+    "description": "Manage and track your real estate financial plans",
+    "actions": {
+      "createNew": "Create New Plan",
+      "copy": "Copy"
+    },
+    "errors": {
+      "loadFailed": "Failed to load financial plans"
+    },
+    "messages": {
+      "createSuccess": "Financial plan created successfully!",
+      "createError": "Failed to create financial plan",
+      "editComingSoon": "Edit functionality coming soon",
+      "deleteSuccess": "Financial plan deleted successfully",
+      "duplicateSuccess": "Financial plan duplicated successfully",
+      "shareComingSoon": "Share functionality coming soon",
+      "downloadComingSoon": "Download functionality coming soon"
+    },
+    "scenarios": {
+      "baseline": {
+        "name": "Baseline Scenario",
+        "description": "Standard financial plan with current market conditions"
+      }
+    }
   }
 }
