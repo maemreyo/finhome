@@ -77,6 +77,13 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const [filter, setFilter] = useState<'all' | 'unread' | 'achievement' | 'market' | 'reminder'>('all')
   const [isOpen, setIsOpen] = useState(false)
 
+  // Type-safe filter handler
+  const handleFilterChange = (value: string) => {
+    if (['all', 'unread', 'achievement', 'market', 'reminder'].includes(value)) {
+      setFilter(value as 'all' | 'unread' | 'achievement' | 'market' | 'reminder')
+    }
+  }
+
   // Mock data - in real app, this would fetch from API
   useEffect(() => {
     const loadNotifications = async () => {
@@ -315,6 +322,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 </CardTitle>
                 <div className="flex items-center gap-2">
                   {unreadCount > 0 && (
+                    
                     <Button variant="ghost" size="sm" onClick={markAllAsRead}>
                       <CheckCircle className="w-4 h-4" />
                     </Button>
@@ -327,7 +335,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             </CardHeader>
             
             <div className="px-6 pb-3">
-              <Select value={filter} onValueChange={setFilter}>
+              <Select value={filter} onValueChange={handleFilterChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
