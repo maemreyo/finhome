@@ -117,8 +117,6 @@ export default function NewPlanPage() {
             // Authenticated users get the database-integrated form
             <CreatePlanForm 
               userId={user.id} 
-              onComplete={handlePlanComplete}
-              onCancel={handleBackToPlans}
             />
           ) : (
             // Non-authenticated users get the wizard experience

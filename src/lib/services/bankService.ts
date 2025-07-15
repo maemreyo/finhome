@@ -4,8 +4,8 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Database } from '@/lib/supabase/types'
 
-type InterestRateRow = Database['public']['Tables']['interest_rates']['Row']
-type InterestRateInsert = Database['public']['Tables']['interest_rates']['Insert']
+type InterestRateRow = Database['public']['Tables']['bank_interest_rates']['Row']
+type InterestRateInsert = Database['public']['Tables']['bank_interest_rates']['Insert']
 
 export interface BankLoanProduct {
   id: string
@@ -197,17 +197,15 @@ class BankService {
     const vietnameseBankRates: InterestRateInsert[] = [
       // Vietcombank
       {
-        bank_name: 'Vietcombank',
-        bank_code: 'VCB',
-        rate_type: 'promotional',
-        loan_term_years: 15,
+        bank_id: 'vcb-001',
+        product_name: 'VCB Home Loan Promotional',
+        loan_type: 'home_purchase',
         interest_rate: 7.5,
-        minimum_loan_amount: 500000000, // 500M VND
-        maximum_loan_amount: 50000000000, // 50B VND
-        minimum_down_payment_percent: 20,
+        min_loan_amount: 500000000, // 500M VND
+        max_loan_amount: 50000000000, // 50B VND
+        max_ltv_ratio: 80,
         effective_date: '2024-01-01',
-        is_current: true,
-        origination_fee: 0.8,
+        is_active: true,
         processing_fee: 0.2,
         early_payment_penalty_rate: 1.0,
         late_payment_penalty_rate: 2.0,

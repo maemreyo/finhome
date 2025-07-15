@@ -4,9 +4,9 @@ import { redirect, notFound } from 'next/navigation'
 import { PlanDetailView } from '@/components/plans/PlanDetailView'
 
 interface PlanDetailPageProps {
-  params: {
+  params: Promise<{
     planId: string
-  }
+  }>
 }
 
 export default async function PlanDetailPage({ params }: PlanDetailPageProps) {
@@ -16,7 +16,8 @@ export default async function PlanDetailPage({ params }: PlanDetailPageProps) {
     redirect('/auth/login')
   }
 
-  const plan = await getFinancialPlanWithDetails(params.planId)
+  const { planId } = await params
+  const plan = await getFinancialPlanWithDetails(planId)
   
   if (!plan || plan.user_id !== user.id) {
     notFound()

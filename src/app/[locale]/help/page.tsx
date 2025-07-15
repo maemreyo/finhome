@@ -180,6 +180,7 @@ export default function HelpPage() {
       {/* Onboarding Tour Modal */}
       {showOnboardingTour && (
         <OnboardingTour
+          isVisible={showOnboardingTour}
           onComplete={handleTourComplete}
           onSkip={() => setShowOnboardingTour(false)}
         />

@@ -7,9 +7,9 @@ import { cookies } from 'next/headers'
 import { Database } from '@/lib/supabase/types'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     propertyId: string
-  }
+  }>
 }
 
 export async function GET(
@@ -18,7 +18,7 @@ export async function GET(
 ) {
   try {
     const supabase = createRouteHandlerClient<Database>({ cookies })
-    const { propertyId } = params
+    const { propertyId } = await params
 
     if (!propertyId) {
       return NextResponse.json(
@@ -89,7 +89,7 @@ export async function PUT(
       )
     }
 
-    const { propertyId } = params
+    const { propertyId } = await params
     const body = await request.json()
 
     if (!propertyId) {
@@ -155,7 +155,7 @@ export async function DELETE(
       )
     }
 
-    const { propertyId } = params
+    const { propertyId } = await params
 
     if (!propertyId) {
       return NextResponse.json(

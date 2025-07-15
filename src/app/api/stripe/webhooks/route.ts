@@ -114,7 +114,7 @@ async function handleSubscriptionUpdate(
     .update({
       stripe_subscription_id: subscriptionId,
       stripe_price_id: priceId,
-      status: status as Database["public"]["Enums"]["subscription_status"],
+      status: status as Database["public"]["Tables"]["subscriptions"]["Row"]["status"],
       plan_name: plan?.name || "Unknown",
       current_period_start: subscription.current_period_start as number,
       current_period_end: subscription.current_period_end as number,
@@ -251,7 +251,7 @@ async function handleInvoicePaymentFailed(
       .from("subscriptions")
       .update({
         status:
-          "past_due" as Database["public"]["Enums"]["subscription_status"],
+          "past_due" as Database["public"]["Tables"]["subscriptions"]["Row"]["status"],
       })
       .eq("stripe_customer_id", customerId);
   }
