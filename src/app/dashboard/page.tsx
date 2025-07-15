@@ -39,6 +39,8 @@ import { formatCurrency } from '@/lib/utils'
 import { FinancialOverview } from '@/components/dashboard/FinancialOverview'
 import { RecentActivity } from '@/components/dashboard/RecentActivity'
 import { PropertyPortfolio } from '@/components/dashboard/PropertyPortfolio'
+import NotificationCenter from '@/components/notifications/NotificationCenter'
+import AchievementSystem from '@/components/achievements/AchievementSystem'
 
 // Import legacy components for fallback
 import { TimelineVisualization } from '@/components/timeline/TimelineVisualization'
@@ -479,10 +481,10 @@ export default function DashboardPage() {
     },
     {
       id: '4',
-      title: 'Xem Mục Tiêu',
-      description: 'Theo dõi tiến độ mục tiêu',
+      title: 'Danh Mục Đầu Tư',
+      description: 'Theo dõi hiệu suất đầu tư',
       icon: <Target className="w-5 h-5" />,
-      href: '/goals'
+      href: '/investments'
     }
   ]
 
@@ -528,6 +530,7 @@ export default function DashboardPage() {
                 <RefreshCw className="w-3 h-3 mr-1" />
                 Cập nhật: {lastUpdated.toLocaleTimeString('vi-VN')}
               </Badge>
+              <NotificationCenter />
               <Button variant="outline" size="sm" onClick={() => setSelectedView(selectedView === 'overview' ? 'legacy' : 'overview')}>
                 <Eye className="w-4 h-4 mr-1" />
                 {selectedView === 'overview' ? 'Xem Cũ' : 'Xem Mới'}
@@ -694,11 +697,20 @@ export default function DashboardPage() {
                 <MarketInsights />
               </motion.div>
 
-              {/* Quick Stats */}
+              {/* Achievements Widget */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.6 }}
+              >
+                <AchievementSystem compact={true} />
+              </motion.div>
+
+              {/* Quick Stats */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.7 }}
               >
                 <Card>
                   <CardHeader>
@@ -728,7 +740,7 @@ export default function DashboardPage() {
                     </div>
                     
                     <div className="mt-4 pt-4 border-t">
-                      <Button variant="outline" size="sm" className="w-full">
+                      <Button variant="outline" size="sm" className="w-full" onClick={() => window.location.href = '/achievements'}>
                         Xem Chi Tiết
                       </Button>
                     </div>

@@ -321,21 +321,21 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="justify-start" size="sm">
+              <Button variant="outline" className="justify-start" size="sm" onClick={() => window.location.href = '/properties'}>
                 <Home className="w-4 h-4 mr-2" />
                 Tìm Bất Động Sản
               </Button>
-              <Button variant="outline" className="justify-start" size="sm">
+              <Button variant="outline" className="justify-start" size="sm" onClick={() => window.location.href = '/plans/new'}>
                 <Calculator className="w-4 h-4 mr-2" />
                 Tạo Kế Hoạch Mới
               </Button>
-              <Button variant="outline" className="justify-start" size="sm">
+              <Button variant="outline" className="justify-start" size="sm" onClick={() => window.location.href = '/banks'}>
                 <TrendingUp className="w-4 h-4 mr-2" />
                 So Sánh Lãi Suất
               </Button>
-              <Button variant="outline" className="justify-start" size="sm">
+              <Button variant="outline" className="justify-start" size="sm" onClick={() => window.location.href = '/investments'}>
                 <Target className="w-4 h-4 mr-2" />
-                Xem Mục Tiêu
+                Xem Danh Mục
                 <ArrowRight className="w-3 h-3 ml-auto" />
               </Button>
             </div>
