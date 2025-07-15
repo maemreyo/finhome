@@ -48,7 +48,6 @@ interface UseScenariosReturn {
   calculateScenario: (params: ScenarioCalculationParams) => Omit<LoanScenario, 'id' | 'name' | 'createdAt'>
   getRecommendation: (scenario: LoanScenario) => LoanScenario['recommendation']
   compareScenarios: (scenarioIds: string[]) => LoanScenario[]
-  
 }
 
 // Vietnamese banking loan calculation with promotional rates
@@ -157,7 +156,14 @@ const assessRiskLevel = (
 }
 
 // Generate recommendation based on scenario characteristics
-const generateRecommendation = (scenario: Omit<LoanScenario, 'recommendation'>): LoanScenario['recommendation'] => {
+const generateRecommendation = (scenario: {
+  monthlyPayment: number
+  monthlyIncome: number
+  netCashFlow: number
+  downPaymentPercent: number
+  loanTermYears: number
+  riskLevel: 'low' | 'medium' | 'high'
+}): LoanScenario['recommendation'] => {
   const debtToIncomeRatio = (scenario.monthlyPayment / scenario.monthlyIncome) * 100
   
   // Optimal: Good balance of all factors
