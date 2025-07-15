@@ -54,7 +54,6 @@ export const AmortizationChart: React.FC<AmortizationChartProps> = ({
 
   // Get max values for scaling
   const maxBalance = Math.max(...chartData.map(d => d.balance))
-  const maxPayment = Math.max(...chartData.map(d => d.payment))
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -272,7 +271,6 @@ export const AmortizationChart: React.FC<AmortizationChartProps> = ({
                 const yearData = amortizationData[monthIndex]
                 const principalPaid = yearData.cumulativePrincipal
                 const interestPaid = yearData.cumulativeInterest
-                const totalPaid = principalPaid + interestPaid
                 
                 return (
                   <motion.div
