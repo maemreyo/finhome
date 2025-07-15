@@ -1,9 +1,10 @@
-// src/app/(dashboard)/dashboard/laboratory/page.tsx
-// Financial Laboratory page for what-if analysis
+// src/app/[locale]/dashboard/laboratory/page.tsx
+// Financial Laboratory page for what-if analysis with i18n support
 
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Header } from '@/components/dashboard/Header'
 import { FinancialLaboratory } from '@/components/laboratory/FinancialLaboratory'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'

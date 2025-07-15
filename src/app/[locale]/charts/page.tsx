@@ -1,5 +1,5 @@
-// src/app/charts/page.tsx
-// Comprehensive data visualization showcase page
+// src/app/[locale]/charts/page.tsx
+// Charts and data visualization page with i18n support
 
 'use client'
 
@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Zap
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -26,6 +27,7 @@ import { useToast, ToastHelpers } from '@/components/notifications/ToastNotifica
 import useGlobalState from '@/lib/hooks/useGlobalState'
 
 export default function ChartsPage() {
+  const t = useTranslations('ChartsPage')
   const { showToast } = useToast()
   const { addNotification, addExperience } = useGlobalState()
   const [activeDemo, setActiveDemo] = useState('loan')
@@ -68,9 +70,9 @@ export default function ChartsPage() {
     properties: [
       {
         id: '1',
-        name: 'Căn hộ Vinhomes Central Park',
+        name: t('portfolio.properties.apartment'),
         type: 'apartment' as const,
-        location: 'Quận 1, TP.HCM',
+        location: t('portfolio.locations.district1'),
         purchasePrice: 3200000000,
         currentValue: 3800000000,
         purchaseDate: new Date('2022-01-15'),
@@ -79,9 +81,9 @@ export default function ChartsPage() {
       },
       {
         id: '2',
-        name: 'Nhà phố Thảo Điền',
+        name: t('portfolio.properties.townhouse'),
         type: 'townhouse' as const,
-        location: 'Quận 2, TP.HCM',
+        location: t('portfolio.locations.district2'),
         purchasePrice: 8500000000,
         currentValue: 9200000000,
         purchaseDate: new Date('2021-06-10'),
@@ -90,9 +92,9 @@ export default function ChartsPage() {
       },
       {
         id: '3',
-        name: 'Biệt thự Đảo Kim Cương',
+        name: t('portfolio.properties.villa'),
         type: 'villa' as const,
-        location: 'Quận 2, TP.HCM',
+        location: t('portfolio.locations.diamond'),
         purchasePrice: 15000000000,
         currentValue: 16500000000,
         purchaseDate: new Date('2020-03-20'),
@@ -112,8 +114,8 @@ export default function ChartsPage() {
   const mockROIScenarios = [
     {
       id: 'property-hcm',
-      name: 'BĐS Trung tâm TP.HCM',
-      description: 'Căn hộ cao cấp khu trung tâm',
+      name: t('roi.scenarios.property.name'),
+      description: t('roi.scenarios.property.description'),
       initialInvestment: 3000000000,
       timeframe: 60,
       expectedReturns: Array.from({ length: 60 }, (_, i) => {
@@ -126,8 +128,8 @@ export default function ChartsPage() {
     },
     {
       id: 'stocks-vn30',
-      name: 'VN30 Index Fund',
-      description: 'Quỹ chỉ số cổ phiếu VN30',
+      name: t('roi.scenarios.stocks.name'),
+      description: t('roi.scenarios.stocks.description'),
       initialInvestment: 3000000000,
       timeframe: 60,
       expectedReturns: Array.from({ length: 60 }, (_, i) => {
@@ -139,8 +141,8 @@ export default function ChartsPage() {
     },
     {
       id: 'bonds-government',
-      name: 'Trái phiếu chính phủ',
-      description: 'Trái phiếu chính phủ 5 năm',
+      name: t('roi.scenarios.bonds.name'),
+      description: t('roi.scenarios.bonds.description'),
       initialInvestment: 3000000000,
       timeframe: 60,
       expectedReturns: Array.from({ length: 60 }, () => 15000000), // Stable 6% annual
@@ -149,8 +151,8 @@ export default function ChartsPage() {
     },
     {
       id: 'savings-bank',
-      name: 'Tiết kiệm ngân hàng',
-      description: 'Gửi tiết kiệm kỳ hạn 12 tháng',
+      name: t('roi.scenarios.savings.name'),
+      description: t('roi.scenarios.savings.description'),
       initialInvestment: 3000000000,
       timeframe: 60,
       expectedReturns: Array.from({ length: 60 }, () => 12500000), // 5% annual
@@ -160,13 +162,13 @@ export default function ChartsPage() {
   ]
 
   const handleDemoInteraction = (type: string) => {
-    showToast(ToastHelpers.success('Demo tương tác', `Bạn đã tương tác với biểu đồ ${type}`))
+    showToast(ToastHelpers.success(t('interactions.demo'), t('interactions.demoMessage', { type })))
     addExperience(10)
     
     addNotification({
       type: 'info',
-      title: 'Biểu đồ được xem',
-      message: `Dữ liệu ${type} đã được phân tích và hiển thị`,
+      title: t('notifications.chartViewed'),
+      message: t('notifications.chartAnalyzed', { type }),
       isRead: false
     })
   }
@@ -187,10 +189,10 @@ export default function ChartsPage() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  Biểu Đồ & Phân Tích Dữ Liệu
+                  {t('title')}
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  Trực quan hóa dữ liệu tài chính với các biểu đồ tương tác thông minh
+                  {t('description')}
                 </p>
               </div>
             </div>
@@ -198,19 +200,19 @@ export default function ChartsPage() {
             <div className="flex items-center gap-4">
               <Badge variant="outline" className="text-sm">
                 <TrendingUp className="w-4 h-4 mr-1" />
-                Phân tích xu hướng
+                {t('badges.trendAnalysis')}
               </Badge>
               <Badge variant="outline" className="text-sm">
                 <PieChart className="w-4 h-4 mr-1" />
-                Phân bổ danh mục
+                {t('badges.portfolioAllocation')}
               </Badge>
               <Badge variant="outline" className="text-sm">
                 <Calculator className="w-4 h-4 mr-1" />
-                Tính toán ROI
+                {t('badges.roiCalculation')}
               </Badge>
               <Badge variant="outline" className="text-sm">
                 <Zap className="w-4 h-4 mr-1" />
-                Tương tác thời gian thực
+                {t('badges.realTimeInteraction')}
               </Badge>
             </div>
           </motion.div>
@@ -223,15 +225,15 @@ export default function ChartsPage() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="loan" className="flex items-center gap-2">
               <Calculator className="w-4 h-4" />
-              Phân tích khoản vay
+              {t('tabs.loanAnalysis')}
             </TabsTrigger>
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <PieChart className="w-4 h-4" />
-              Danh mục đầu tư
+              {t('tabs.portfolio')}
             </TabsTrigger>
             <TabsTrigger value="roi" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
-              So sánh ROI
+              {t('tabs.roiComparison')}
             </TabsTrigger>
           </TabsList>
 
@@ -244,21 +246,20 @@ export default function ChartsPage() {
               <Card className="mb-6">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
-                    <span>Biểu Đồ Phân Tích Khoản Vay</span>
+                    <span>{t('loan.title')}</span>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDemoInteraction('khoản vay')}
+                      onClick={() => handleDemoInteraction(t('loan.interactionType'))}
                     >
-                      Tương tác
+                      {t('actions.interact')}
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600 mb-4">
-                    Phân tích chi tiết lịch trả nợ cho khoản vay mua nhà 3 tỷ VND, lãi suất 8.5%/năm, thời hạn 20 năm.
-                    Biểu đồ hiển thị sự thay đổi dư nợ và cơ cấu thanh toán theo thời gian.
+                    {t('loan.description')}
                   </p>
                   
                   <AmortizationChart
@@ -280,21 +281,20 @@ export default function ChartsPage() {
               <Card className="mb-6">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
-                    <span>Phân Tích Danh Mục Đầu Tư</span>
+                    <span>{t('portfolio.title')}</span>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDemoInteraction('danh mục đầu tư')}
+                      onClick={() => handleDemoInteraction(t('portfolio.interactionType'))}
                     >
-                      Tương tác
+                      {t('actions.interact')}
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600 mb-4">
-                    Tổng quan danh mục bất động sản với 3 tài sản trị giá 29.5 tỷ VND.
-                    Theo dõi hiệu suất, phân bổ theo loại tài sản và dòng tiền hàng tháng.
+                    {t('portfolio.description')}
                   </p>
                   
                   <PortfolioChart
@@ -315,21 +315,20 @@ export default function ChartsPage() {
               <Card className="mb-6">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
-                    <span>So Sánh ROI Các Kênh Đầu Tư</span>
+                    <span>{t('roi.title')}</span>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDemoInteraction('so sánh ROI')}
+                      onClick={() => handleDemoInteraction(t('roi.interactionType'))}
                     >
-                      Tương tác
+                      {t('actions.interact')}
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600 mb-4">
-                    So sánh hiệu suất đầu tư giữa bất động sản, cổ phiếu, trái phiếu và tiết kiệm ngân hàng.
-                    Phân tích rủi ro và lợi nhuận để đưa ra quyết định đầu tư thông minh.
+                    {t('roi.description')}
                   </p>
                   
                   <ROIComparisonChart
@@ -352,7 +351,7 @@ export default function ChartsPage() {
           <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
             <CardHeader>
               <CardTitle className="text-center text-xl text-blue-900">
-                Lợi Ích Hệ Thống Biểu Đồ Tích Hợp
+                {t('benefits.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -361,9 +360,9 @@ export default function ChartsPage() {
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <TrendingUp className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h4 className="font-semibold mb-2">Phân Tích Xu Hướng</h4>
+                  <h4 className="font-semibold mb-2">{t('benefits.trendAnalysis.title')}</h4>
                   <p className="text-sm text-gray-600">
-                    Theo dõi và dự báo xu hướng tài chính
+                    {t('benefits.trendAnalysis.description')}
                   </p>
                 </div>
 
@@ -371,9 +370,9 @@ export default function ChartsPage() {
                   <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <PieChart className="w-6 h-6 text-green-600" />
                   </div>
-                  <h4 className="font-semibold mb-2">Trực Quan Dữ Liệu</h4>
+                  <h4 className="font-semibold mb-2">{t('benefits.dataVisualization.title')}</h4>
                   <p className="text-sm text-gray-600">
-                    Hiển thị dữ liệu phức tạp một cách dễ hiểu
+                    {t('benefits.dataVisualization.description')}
                   </p>
                 </div>
 
@@ -381,9 +380,9 @@ export default function ChartsPage() {
                   <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <Calculator className="w-6 h-6 text-purple-600" />
                   </div>
-                  <h4 className="font-semibold mb-2">Tính Toán Chính Xác</h4>
+                  <h4 className="font-semibold mb-2">{t('benefits.accurateCalculation.title')}</h4>
                   <p className="text-sm text-gray-600">
-                    Công thức tài chính chính xác và đáng tin cậy
+                    {t('benefits.accurateCalculation.description')}
                   </p>
                 </div>
 
@@ -391,9 +390,9 @@ export default function ChartsPage() {
                   <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <Zap className="w-6 h-6 text-orange-600" />
                   </div>
-                  <h4 className="font-semibold mb-2">Tương Tác Thời Gian Thực</h4>
+                  <h4 className="font-semibold mb-2">{t('benefits.realTimeInteraction.title')}</h4>
                   <p className="text-sm text-gray-600">
-                    Thay đổi tham số và xem kết quả ngay lập tức
+                    {t('benefits.realTimeInteraction.description')}
                   </p>
                 </div>
               </div>

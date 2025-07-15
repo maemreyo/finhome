@@ -1,16 +1,20 @@
-// src/app/achievements/page.tsx
-// Achievements and gamification page
+// src/app/[locale]/investments/page.tsx
+// Investment portfolio tracking and ROI analysis page with i18n support
 
 'use client'
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Award, Trophy, Star, Target } from 'lucide-react'
+import { TrendingUp, BarChart3, PieChart, Calculator } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import AchievementSystem from '@/components/achievements/AchievementSystem'
+import InvestmentPortfolio from '@/components/investments/InvestmentPortfolio'
 
-export default function AchievementsPage() {
+export default function InvestmentsPage() {
+  const t = useTranslations('InvestmentsPage')
+  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -24,26 +28,26 @@ export default function AchievementsPage() {
           >
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Thành Tích & Hệ Thống Điểm
+                {t('title')}
               </h1>
-              <p className="text-gray-600 mt-2">
-                Theo dõi tiến độ học tập và nhận phần thưởng cho những thành công của bạn
+              <p className="text-gray-600 mt-2">{t('description')}
+                Theo dõi hiệu suất và phân tích ROI của các khoản đầu tư bất động sản
               </p>
             </div>
             
             <div className="flex items-center gap-4">
               <Badge variant="outline" className="text-sm">
-                <Award className="w-4 h-4 mr-1" />
-                Hệ thống gamification
+                <TrendingUp className="w-4 h-4 mr-1" />
+                Cập nhật thời gian thực
               </Badge>
               <Badge variant="outline" className="text-sm">
-                <Trophy className="w-4 h-4 mr-1" />
-                Phần thưởng thực tế
+                <BarChart3 className="w-4 h-4 mr-1" />
+                Phân tích chuyên sâu
               </Badge>
-              <Badge variant="outline" className="text-sm">
-                <Star className="w-4 h-4 mr-1" />
-                Xếp hạng cộng đồng
-              </Badge>
+              <Button variant="outline" size="sm">
+                <Calculator className="w-4 h-4 mr-1" />
+                Tính Toán ROI
+              </Button>
             </div>
           </motion.div>
         </div>
@@ -56,7 +60,7 @@ export default function AchievementsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <AchievementSystem />
+          <InvestmentPortfolio />
         </motion.div>
       </div>
     </div>

@@ -1,9 +1,10 @@
-// src/app/properties/page.tsx
-// Property search and listing page
+// src/app/[locale]/properties/page.tsx
+// Property search and listing page with i18n support
 
 'use client'
 
 import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { MapPin, Filter, Home, TrendingUp, Calculator, Heart } from 'lucide-react'
 

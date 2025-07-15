@@ -1,11 +1,12 @@
-// src/app/banks/page.tsx
-// Bank interest rates comparison page
+// src/app/[locale]/banks/page.tsx
+// Bank interest rates comparison page with i18n support
 
 'use client'
 
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Building, TrendingUp, Calculator, Percent, Star } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ import BankRateComparison from '@/components/banks/BankRateComparison'
 import { BankLoanProduct } from '@/lib/services/bankService'
 
 export default function BanksPage() {
+  const t = useTranslations('BanksPage')
   const [selectedBank, setSelectedBank] = useState<BankLoanProduct | null>(null)
 
   const handleBankSelect = (bank: BankLoanProduct) => {
@@ -30,21 +32,21 @@ export default function BanksPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                So Sánh Lãi Suất Ngân Hàng
+                {t('title')}
               </h1>
               <p className="text-gray-600 mt-2">
-                Tìm kiếm gói vay ưu đãi nhất từ các ngân hàng hàng đầu Việt Nam
+                {t('description')}
               </p>
             </div>
             
             <div className="flex items-center gap-4">
               <Badge variant="outline" className="text-sm">
                 <TrendingUp className="w-4 h-4 mr-1" />
-                Cập nhật hàng ngày
+                {t('badges.dailyUpdate')}
               </Badge>
               <Badge variant="secondary" className="text-sm">
                 <Building className="w-4 h-4 mr-1" />
-                8+ Ngân hàng
+                {t('badges.bankCount')}
               </Badge>
             </div>
           </div>
@@ -60,15 +62,15 @@ export default function BanksPage() {
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="comparison" className="flex items-center gap-2">
                   <Calculator className="w-4 h-4" />
-                  So Sánh Lãi Suất
+                  {t('tabs.comparison')}
                 </TabsTrigger>
                 <TabsTrigger value="trends" className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4" />
-                  Xu Hướng Thị Trường
+                  {t('tabs.trends')}
                 </TabsTrigger>
                 <TabsTrigger value="guide" className="flex items-center gap-2">
                   <Star className="w-4 h-4" />
-                  Hướng Dẫn Vay
+                  {t('tabs.guide')}
                 </TabsTrigger>
               </TabsList>
 
@@ -83,11 +85,11 @@ export default function BanksPage() {
               <TabsContent value="trends" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Xu Hướng Lãi Suất 12 Tháng Qua</CardTitle>
+                    <CardTitle>{t('trends.chartTitle')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <p className="text-muted-foreground">Biểu đồ xu hướng lãi suất sẽ hiển thị ở đây</p>
+                      <p className="text-muted-foreground">{t('trends.chartPlaceholder')}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -95,20 +97,20 @@ export default function BanksPage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Lãi Suất Trung Bình</CardTitle>
+                      <CardTitle className="text-lg">{t('trends.averageRates')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
                         <div className="flex justify-between">
-                          <span>Vay 15 năm:</span>
+                          <span>{t('trends.rates.15years')}:</span>
                           <span className="font-semibold">7.8%</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Vay 20 năm:</span>
+                          <span>{t('trends.rates.20years')}:</span>
                           <span className="font-semibold">8.2%</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Vay 25 năm:</span>
+                          <span>{t('trends.rates.25years')}:</span>
                           <span className="font-semibold">8.6%</span>
                         </div>
                       </div>
@@ -117,17 +119,17 @@ export default function BanksPage() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Dự Báo Thị Trường</CardTitle>
+                      <CardTitle className="text-lg">{t('trends.forecast')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3 text-sm">
                         <div className="p-3 bg-green-50 rounded-lg">
-                          <p className="font-medium text-green-900">Q1 2024</p>
-                          <p className="text-green-700">Lãi suất dự kiến ổn định</p>
+                          <p className="font-medium text-green-900">{t('trends.q1')}</p>
+                          <p className="text-green-700">{t('trends.q1desc')}</p>
                         </div>
                         <div className="p-3 bg-yellow-50 rounded-lg">
-                          <p className="font-medium text-yellow-900">Q2 2024</p>
-                          <p className="text-yellow-700">Có thể tăng nhẹ 0.1-0.2%</p>
+                          <p className="font-medium text-yellow-900">{t('trends.q2')}</p>
+                          <p className="text-yellow-700">{t('trends.q2desc')}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -138,40 +140,40 @@ export default function BanksPage() {
               <TabsContent value="guide" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Hướng Dẫn Vay Mua Nhà</CardTitle>
+                    <CardTitle>{t('guide.title')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
                       {/* Step-by-step guide */}
                       <div className="space-y-4">
-                        <h3 className="font-semibold">Quy Trình Vay Mua Nhà</h3>
+                        <h3 className="font-semibold">{t('guide.processTitle')}</h3>
                         
                         <div className="space-y-3">
                           {[
                             {
                               step: 1,
-                              title: "Chuẩn bị hồ sơ",
-                              content: "CMND, sổ hộ khẩu, chứng minh thu nhập, sao kê tài khoản"
+                              title: t('guide.steps.step1.title'),
+                              content: t('guide.steps.step1.content')
                             },
                             {
                               step: 2,
-                              title: "Thẩm định tài sản",
-                              content: "Ngân hàng thẩm định giá trị bất động sản làm tài sản đảm bảo"
+                              title: t('guide.steps.step2.title'),
+                              content: t('guide.steps.step2.content')
                             },
                             {
                               step: 3,
-                              title: "Duyệt hồ sơ vay",
-                              content: "Ngân hàng xem xét khả năng trả nợ và điều kiện vay"
+                              title: t('guide.steps.step3.title'),
+                              content: t('guide.steps.step3.content')
                             },
                             {
                               step: 4,
-                              title: "Ký hợp đồng",
-                              content: "Ký hợp đồng tín dụng và các giấy tờ pháp lý"
+                              title: t('guide.steps.step4.title'),
+                              content: t('guide.steps.step4.content')
                             },
                             {
                               step: 5,
-                              title: "Giải ngân",
-                              content: "Nhận tiền và bắt đầu trả nợ theo lịch trình"
+                              title: t('guide.steps.step5.title'),
+                              content: t('guide.steps.step5.content')
                             }
                           ].map((item) => (
                             <div key={item.step} className="flex gap-4">
@@ -189,26 +191,26 @@ export default function BanksPage() {
 
                       {/* Requirements */}
                       <div className="border-t pt-6">
-                        <h3 className="font-semibold mb-4">Điều Kiện Vay Chung</h3>
+                        <h3 className="font-semibold mb-4">{t('guide.requirements.title')}</h3>
                         
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <h4 className="font-medium mb-2">Về người vay:</h4>
+                            <h4 className="font-medium mb-2">{t('guide.requirements.borrower.title')}:</h4>
                             <ul className="text-sm space-y-1 text-muted-foreground">
-                              <li>• Tuổi từ 18-65 (nam) hoặc 18-60 (nữ)</li>
-                              <li>• Có thu nhập ổn định tối thiểu 6 tháng</li>
-                              <li>• Không có nợ xấu trong hệ thống ngân hàng</li>
-                              <li>• Có khả năng trả nợ (DTI ≤ 40%)</li>
+                              <li>• {t('guide.requirements.borrower.age')}</li>
+                              <li>• {t('guide.requirements.borrower.income')}</li>
+                              <li>• {t('guide.requirements.borrower.credit')}</li>
+                              <li>• {t('guide.requirements.borrower.dti')}</li>
                             </ul>
                           </div>
                           
                           <div>
-                            <h4 className="font-medium mb-2">Về tài sản:</h4>
+                            <h4 className="font-medium mb-2">{t('guide.requirements.property.title')}:</h4>
                             <ul className="text-sm space-y-1 text-muted-foreground">
-                              <li>• Có sổ đỏ/sổ hồng hợp lệ</li>
-                              <li>• Không trong tình trạng tranh chấp</li>
-                              <li>• Giá trị tài sản ≥ 150% số tiền vay</li>
-                              <li>• Được phép chuyển nhượng</li>
+                              <li>• {t('guide.requirements.property.title_deed')}</li>
+                              <li>• {t('guide.requirements.property.dispute')}</li>
+                              <li>• {t('guide.requirements.property.value')}</li>
+                              <li>• {t('guide.requirements.property.transfer')}</li>
                             </ul>
                           </div>
                         </div>
@@ -234,7 +236,7 @@ export default function BanksPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Building className="w-5 h-5 text-blue-600" />
-                      Ngân Hàng Đã Chọn
+                      {t('sidebar.selectedBank')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -244,26 +246,26 @@ export default function BanksPage() {
                       </h3>
                       <div className="flex items-center gap-2 mb-3">
                         <Badge variant={selectedBank.rateType === 'promotional' ? 'default' : 'secondary'}>
-                          {selectedBank.rateType === 'promotional' ? 'Khuyến mãi' : 'Tiêu chuẩn'}
+                          {selectedBank.rateType === 'promotional' ? t('sidebar.promotional') : t('sidebar.standard')}
                         </Badge>
                         <Badge variant="outline">
-                          {selectedBank.loanTermYears} năm
+                          {selectedBank.loanTermYears} {t('sidebar.years')}
                         </Badge>
                       </div>
                       
                       <div className="space-y-2">
                         <div className="flex justify-between">
-                          <span className="text-sm">Lãi suất:</span>
+                          <span className="text-sm">{t('sidebar.interestRate')}:</span>
                           <span className="text-sm font-medium">{selectedBank.interestRate}%</span>
                         </div>
                         
                         <div className="flex justify-between">
-                          <span className="text-sm">Phí xử lý:</span>
+                          <span className="text-sm">{t('sidebar.processingFee')}:</span>
                           <span className="text-sm font-medium">{selectedBank.processingFee}%</span>
                         </div>
                         
                         <div className="flex justify-between">
-                          <span className="text-sm">Vốn tối thiểu:</span>
+                          <span className="text-sm">{t('sidebar.minDownPayment')}:</span>
                           <span className="text-sm font-medium">{selectedBank.minimumDownPayment || 20}%</span>
                         </div>
                       </div>
@@ -272,10 +274,10 @@ export default function BanksPage() {
                     <div className="border-t pt-4 space-y-2">
                       <Button className="w-full">
                         <Calculator className="w-4 h-4 mr-2" />
-                        Tạo Kế Hoạch Với Ngân Hàng Này
+                        {t('sidebar.createPlan')}
                       </Button>
                       <Button variant="outline" className="w-full">
-                        Liên Hệ Ngân Hàng
+                        {t('sidebar.contactBank')}
                       </Button>
                     </div>
                   </CardContent>
@@ -288,27 +290,27 @@ export default function BanksPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Percent className="w-5 h-5 text-green-600" />
-                  Lãi Suất Hiện Tại
+                  {t('sidebar.currentRates')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-2 bg-green-50 rounded">
-                    <span className="text-sm font-medium">Thấp nhất:</span>
+                    <span className="text-sm font-medium">{t('sidebar.lowest')}:</span>
                     <span className="text-green-600 font-bold">7.3%</span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
-                    <span className="text-sm font-medium">Trung bình:</span>
+                    <span className="text-sm font-medium">{t('sidebar.average')}:</span>
                     <span className="text-blue-600 font-bold">8.1%</span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-orange-50 rounded">
-                    <span className="text-sm font-medium">Cao nhất:</span>
+                    <span className="text-sm font-medium">{t('sidebar.highest')}:</span>
                     <span className="text-orange-600 font-bold">9.2%</span>
                   </div>
                 </div>
                 
                 <div className="mt-4 text-xs text-muted-foreground">
-                  * Cập nhật lần cuối: Hôm nay
+                  * {t('sidebar.lastUpdate')}
                 </div>
               </CardContent>
             </Card>
@@ -318,29 +320,29 @@ export default function BanksPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calculator className="w-5 h-5 text-blue-600" />
-                  Tính Nhanh
+                  {t('sidebar.quickCalc')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 text-sm">
                   <div className="p-3 bg-blue-50 rounded-lg">
-                    <p className="font-medium text-blue-900 mb-1">💡 Mẹo tiết kiệm</p>
+                    <p className="font-medium text-blue-900 mb-1">💡 {t('sidebar.tips.saving.title')}</p>
                     <p className="text-blue-700">
-                      Tăng vốn tự có từ 20% lên 30% có thể tiết kiệm được ~0.2% lãi suất
+                      {t('sidebar.tips.saving.content')}
                     </p>
                   </div>
                   
                   <div className="p-3 bg-green-50 rounded-lg">
-                    <p className="font-medium text-green-900 mb-1">📊 Quy tắc 3-30-40</p>
+                    <p className="font-medium text-green-900 mb-1">📊 {t('sidebar.tips.rule.title')}</p>
                     <p className="text-green-700">
-                      Vốn tự có 30%, vay 30 năm, DTI dưới 40%
+                      {t('sidebar.tips.rule.content')}
                     </p>
                   </div>
                   
                   <div className="p-3 bg-orange-50 rounded-lg">
-                    <p className="font-medium text-orange-900 mb-1">🏦 So sánh nhiều ngân hàng</p>
+                    <p className="font-medium text-orange-900 mb-1">🏦 {t('sidebar.tips.compare.title')}</p>
                     <p className="text-orange-700">
-                      Mỗi ngân hàng có chính sách khác nhau, nên so sánh kỹ
+                      {t('sidebar.tips.compare.content')}
                     </p>
                   </div>
                 </div>

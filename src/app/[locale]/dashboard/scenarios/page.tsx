@@ -1,9 +1,10 @@
-// src/app/(dashboard)/dashboard/scenarios/page.tsx
-// Scenario comparison and management page
+// src/app/[locale]/dashboard/scenarios/page.tsx
+// Scenario comparison and management page with i18n support
 
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Header } from '@/components/dashboard/Header'
 import { ScenarioComparison } from '@/components/scenarios/ScenarioComparison'
 import { useScenarios, LoanScenario } from '@/hooks/useScenarios'

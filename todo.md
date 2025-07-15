@@ -16,6 +16,15 @@
 - [x] Identify state management patterns
 - [x] Research animation and interaction patterns
 
+## NEW RESEARCH PHASE: App Directory Structure & Route Consolidation
+
+### Research Objectives
+- [x] Analyze duplicate route files in app directory
+- [x] Compare page implementations for functional duplicates
+- [x] Check current [locale] directory structure
+- [x] Identify consolidation strategy preserving all functionality
+- [x] Create migration plan for route consolidation
+
 ## Current Status: DATABASE SCHEMA & TYPE RESEARCH COMPLETED ✅
 
 ## Key Findings Summary
