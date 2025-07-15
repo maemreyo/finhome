@@ -187,6 +187,7 @@ export interface VietnamesePropertyTypes {
   house: 'Nhà riêng'
   villa: 'Biệt thự'
   townhouse: 'Nhà phố'
+  land: 'Đất'
   commercial: 'Thương mại'
 }
 
@@ -238,6 +239,7 @@ export const PROPERTY_TYPE_LABELS: VietnamesePropertyTypes = {
   house: 'Nhà riêng',
   villa: 'Biệt thự',
   townhouse: 'Nhà phố',
+  land: 'Đất',
   commercial: 'Thương mại'
 }
 

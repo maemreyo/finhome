@@ -330,7 +330,7 @@ export const InvestmentPortfolio: React.FC<InvestmentPortfolioProps> = ({
         </div>
         
         <div className="flex items-center gap-3">
-          <Select value={filterType} onValueChange={setFilterType}>
+          <Select value={filterType} onValueChange={(value) => setFilterType(value as typeof filterType)}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -344,7 +344,7 @@ export const InvestmentPortfolio: React.FC<InvestmentPortfolioProps> = ({
             </SelectContent>
           </Select>
           
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <Select value={filterStatus} onValueChange={(value) => setFilterStatus(value as typeof filterStatus)}>
             <SelectTrigger className="w-36">
               <SelectValue />
             </SelectTrigger>

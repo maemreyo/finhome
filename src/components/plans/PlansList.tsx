@@ -9,9 +9,7 @@ import { Eye, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { Database } from '@/lib/supabase/types'
 
-type FinancialPlan = Database['public']['Tables']['financial_plans']['Row'] & {
-  loan_terms?: Database['public']['Tables']['loan_terms']['Row'][]
-}
+type FinancialPlan = Database['public']['Tables']['financial_plans']['Row']
 
 interface PlansListProps {
   plans: FinancialPlan[]
@@ -58,8 +56,8 @@ export function PlansList({ plans }: PlansListProps) {
                   {typeMap[plan.plan_type]} • {new Date(plan.created_at).toLocaleDateString('vi-VN')}
                 </CardDescription>
               </div>
-              <Badge variant={statusMap[plan.plan_status].variant}>
-                {statusMap[plan.plan_status].label}
+              <Badge variant={statusMap[plan.status as keyof typeof statusMap]?.variant || 'secondary'}>
+                {statusMap[plan.status as keyof typeof statusMap]?.label || 'Unknown'}
               </Badge>
             </div>
           </CardHeader>
@@ -67,15 +65,15 @@ export function PlansList({ plans }: PlansListProps) {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Giá mua:</span>
-                <span className="font-semibold">{formatCurrency(plan.purchase_price)}</span>
+                <span className="font-semibold">{formatCurrency(plan.purchase_price || 0)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Vốn tự có:</span>
-                <span className="font-semibold">{formatCurrency(plan.down_payment)}</span>
+                <span className="font-semibold">{formatCurrency(plan.down_payment || 0)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Thu nhập:</span>
-                <span className="font-semibold">{formatCurrency(plan.monthly_income)}/tháng</span>
+                <span className="font-semibold">{formatCurrency(plan.monthly_income || 0)}/tháng</span>
               </div>
             </div>
             

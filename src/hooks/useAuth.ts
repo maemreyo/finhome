@@ -4,11 +4,11 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { toast } from 'sonner'
 
-const supabase = createClient()
+// supabase is already imported from client
 
 export interface AuthState {
   user: User | null
@@ -52,7 +52,7 @@ export function useAuth() {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         setState(prev => ({
           ...prev,
           session,
@@ -265,7 +265,7 @@ export function useProfile() {
     const fetchProfile = async () => {
       try {
         const { data, error } = await supabase
-          .from('profiles')
+          .from('user_profiles')
           .select('*')
           .eq('id', user.id)
           .single()
@@ -297,7 +297,7 @@ export function useProfile() {
 
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('user_profiles')
         .update(updates)
         .eq('id', user.id)
         .select()
@@ -372,7 +372,7 @@ export function useSubscription() {
           table: 'subscriptions',
           filter: `user_id=eq.${user.id}`,
         },
-        (payload) => {
+        (payload: any) => {
           if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
             setSubscription(payload.new as Subscription)
           }

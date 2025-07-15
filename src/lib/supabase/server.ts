@@ -101,12 +101,7 @@ export async function getFinancialPlanWithDetails(planId: string) {
   const supabase = await createClient()
   const { data: plan, error: planError } = await supabase
     .from('financial_plans')
-    .select(`
-      *,
-      loan_terms (*),
-      scenarios (*),
-      properties (*)
-    `)
+    .select('*')
     .eq('id', planId)
     .single()
   
@@ -122,10 +117,10 @@ export async function getFinancialPlanWithDetails(planId: string) {
 export async function getCurrentInterestRates() {
   const supabase = await createClient()
   const { data: rates, error } = await supabase
-    .from('interest_rates')
+    .from('bank_interest_rates')
     .select('*')
-    .eq('is_current', true)
-    .order('bank_name', { ascending: true })
+    .eq('is_active', true)
+    .order('bank_id', { ascending: true })
   
   if (error) {
     console.error('Error getting interest rates:', error)

@@ -65,9 +65,9 @@ class BankService {
   // Get current interest rates
   async getCurrentRates(): Promise<BankLoanProduct[]> {
     const { data, error } = await this.supabase
-      .from('interest_rates')
+      .from('bank_interest_rates')
       .select('*')
-      .eq('is_current', true)
+      .eq('is_active', true)
       .order('interest_rate', { ascending: true })
 
     if (error) {
@@ -78,16 +78,16 @@ class BankService {
   }
 
   // Get rates by bank
-  async getRatesByBank(bankName: string): Promise<BankLoanProduct[]> {
+  async getRatesByBank(bankId: string): Promise<BankLoanProduct[]> {
     const { data, error } = await this.supabase
-      .from('interest_rates')
+      .from('bank_interest_rates')
       .select('*')
-      .eq('bank_name', bankName)
-      .eq('is_current', true)
-      .order('loan_term_years', { ascending: true })
+      .eq('bank_id', bankId)
+      .eq('is_active', true)
+      .order('min_term_months', { ascending: true })
 
     if (error) {
-      throw new Error(`Error fetching rates for ${bankName}: ${error.message}`)
+      throw new Error(`Error fetching rates for ${bankId}: ${error.message}`)
     }
 
     return (data || []).map(this.mapToLoanProduct)
@@ -95,15 +95,17 @@ class BankService {
 
   // Get rates by loan term
   async getRatesByTerm(loanTermYears: number): Promise<BankLoanProduct[]> {
+    const loanTermMonths = loanTermYears * 12
     const { data, error } = await this.supabase
-      .from('interest_rates')
+      .from('bank_interest_rates')
       .select('*')
-      .eq('loan_term_years', loanTermYears)
-      .eq('is_current', true)
+      .lte('min_term_months', loanTermMonths)
+      .gte('max_term_months', loanTermMonths)
+      .eq('is_active', true)
       .order('interest_rate', { ascending: true })
 
     if (error) {
-      throw new Error(`Error fetching rates for ${loanTermYears} years: ${error.message}`)
+      throw new Error(`Error fetching rates for ${loanTermMonths} months: ${error.message}`)
     }
 
     return (data || []).map(this.mapToLoanProduct)
@@ -135,7 +137,8 @@ class BankService {
           monthlyPayment,
           totalInterest,
           totalPayment,
-          effectiveRate
+          effectiveRate,
+          savings: 0 // Initialize savings field
         }
       })
       .sort((a, b) => a.monthlyPayment - b.monthlyPayment)
@@ -167,9 +170,9 @@ class BankService {
   // Get Vietnamese banks data
   async getVietnameseBanks(): Promise<Array<{ name: string; code: string; products: number }>> {
     const { data, error } = await this.supabase
-      .from('interest_rates')
-      .select('bank_name, bank_code')
-      .eq('is_current', true)
+      .from('bank_interest_rates')
+      .select('bank_id')
+      .eq('is_active', true)
 
     if (error) {
       throw new Error(`Error fetching banks: ${error.message}`)
@@ -178,11 +181,11 @@ class BankService {
     // Group by bank and count products
     const bankMap = new Map()
     data?.forEach(rate => {
-      const key = rate.bank_name
+      const key = rate.bank_id
       if (!bankMap.has(key)) {
         bankMap.set(key, {
-          name: rate.bank_name,
-          code: rate.bank_code || rate.bank_name.toUpperCase(),
+          name: rate.bank_id,
+          code: rate.bank_id || rate.bank_id.toUpperCase(),
           products: 0
         })
       }
@@ -195,187 +198,44 @@ class BankService {
   // Seed initial bank data
   async seedBankData(): Promise<void> {
     const vietnameseBankRates: InterestRateInsert[] = [
-      // Vietcombank
       {
         bank_id: 'vcb-001',
-        product_name: 'VCB Home Loan Promotional',
+        product_name: 'VCB Home Loan Standard',
         loan_type: 'home_purchase',
-        interest_rate: 7.5,
-        min_loan_amount: 500000000, // 500M VND
-        max_loan_amount: 50000000000, // 50B VND
+        interest_rate: 8.2,
+        min_loan_amount: 500000000,
+        max_loan_amount: 50000000000,
         max_ltv_ratio: 80,
+        min_term_months: 60,
+        max_term_months: 240,
         effective_date: '2024-01-01',
         is_active: true,
         processing_fee: 0.2,
-        early_payment_penalty_rate: 1.0,
-        late_payment_penalty_rate: 2.0,
-        mortgage_insurance_required: true,
-        property_insurance_required: true,
-        special_conditions: ['Lương qua VCB từ 3 tháng', 'Sổ đỏ chính chủ']
+        early_payment_fee: 1.0,
+        required_documents: {},
+        eligibility_criteria: {}
       },
       {
-        bank_name: 'Vietcombank',
-        bank_code: 'VCB',
-        rate_type: 'standard',
-        loan_term_years: 20,
-        interest_rate: 8.2,
-        minimum_loan_amount: 500000000,
-        maximum_loan_amount: 50000000000,
-        minimum_down_payment_percent: 20,
+        bank_id: 'bidv-001',
+        product_name: 'BIDV Home Loan',
+        loan_type: 'home_purchase',
+        interest_rate: 7.8,
+        min_loan_amount: 300000000,
+        max_loan_amount: 40000000000,
+        max_ltv_ratio: 85,
+        min_term_months: 60,
+        max_term_months: 300,
         effective_date: '2024-01-01',
-        is_current: true,
-        origination_fee: 0.8,
-        processing_fee: 0.2,
-        early_payment_penalty_rate: 1.0,
-        late_payment_penalty_rate: 2.0,
-        mortgage_insurance_required: true,
-        property_insurance_required: true
-      },
-      
-      // BIDV
-      {
-        bank_name: 'BIDV',
-        bank_code: 'BIDV',
-        rate_type: 'promotional',
-        loan_term_years: 15,
-        interest_rate: 7.3,
-        minimum_loan_amount: 300000000,
-        maximum_loan_amount: 40000000000,
-        minimum_down_payment_percent: 15,
-        effective_date: '2024-01-01',
-        is_current: true,
-        origination_fee: 0.7,
+        is_active: true,
         processing_fee: 0.15,
-        early_payment_penalty_rate: 0.8,
-        late_payment_penalty_rate: 1.8,
-        mortgage_insurance_required: false,
-        property_insurance_required: true,
-        special_conditions: ['Khách hàng VIP từ 1 năm', 'Thu nhập ổn định 6 tháng']
-      },
-      {
-        bank_name: 'BIDV',
-        bank_code: 'BIDV',
-        rate_type: 'standard',
-        loan_term_years: 20,
-        interest_rate: 8.0,
-        minimum_loan_amount: 300000000,
-        maximum_loan_amount: 40000000000,
-        minimum_down_payment_percent: 20,
-        effective_date: '2024-01-01',
-        is_current: true,
-        origination_fee: 0.7,
-        processing_fee: 0.15,
-        early_payment_penalty_rate: 0.8,
-        late_payment_penalty_rate: 1.8,
-        mortgage_insurance_required: false,
-        property_insurance_required: true
-      },
-
-      // Vietinbank
-      {
-        bank_name: 'Vietinbank',
-        bank_code: 'VTB',
-        rate_type: 'promotional',
-        loan_term_years: 15,
-        interest_rate: 7.7,
-        minimum_loan_amount: 400000000,
-        maximum_loan_amount: 45000000000,
-        minimum_down_payment_percent: 20,
-        effective_date: '2024-01-01',
-        is_current: true,
-        origination_fee: 0.9,
-        processing_fee: 0.25,
-        early_payment_penalty_rate: 1.2,
-        late_payment_penalty_rate: 2.2,
-        mortgage_insurance_required: true,
-        property_insurance_required: true,
-        special_conditions: ['Gửi tiết kiệm tối thiểu 100M trong 6 tháng']
-      },
-
-      // Techcombank
-      {
-        bank_name: 'Techcombank',
-        bank_code: 'TCB',
-        rate_type: 'promotional',
-        loan_term_years: 15,
-        interest_rate: 7.9,
-        minimum_loan_amount: 500000000,
-        maximum_loan_amount: 60000000000,
-        minimum_down_payment_percent: 20,
-        effective_date: '2024-01-01',
-        is_current: true,
-        origination_fee: 0.6,
-        processing_fee: 0.1,
-        early_payment_penalty_rate: 0.5,
-        late_payment_penalty_rate: 1.5,
-        mortgage_insurance_required: false,
-        property_insurance_required: true,
-        special_conditions: ['Khách hàng Priority từ 6 tháng', 'Mở thẻ tín dụng']
-      },
-      {
-        bank_name: 'Techcombank',
-        bank_code: 'TCB',
-        rate_type: 'standard',
-        loan_term_years: 20,
-        interest_rate: 8.4,
-        minimum_loan_amount: 500000000,
-        maximum_loan_amount: 60000000000,
-        minimum_down_payment_percent: 20,
-        effective_date: '2024-01-01',
-        is_current: true,
-        origination_fee: 0.6,
-        processing_fee: 0.1,
-        early_payment_penalty_rate: 0.5,
-        late_payment_penalty_rate: 1.5,
-        mortgage_insurance_required: false,
-        property_insurance_required: true
-      },
-
-      // VPBank
-      {
-        bank_name: 'VPBank',
-        bank_code: 'VPB',
-        rate_type: 'promotional',
-        loan_term_years: 15,
-        interest_rate: 8.1,
-        minimum_loan_amount: 300000000,
-        maximum_loan_amount: 35000000000,
-        minimum_down_payment_percent: 15,
-        effective_date: '2024-01-01',
-        is_current: true,
-        origination_fee: 0.5,
-        processing_fee: 0.1,
-        early_payment_penalty_rate: 0.3,
-        late_payment_penalty_rate: 1.2,
-        mortgage_insurance_required: false,
-        property_insurance_required: true,
-        special_conditions: ['Duyệt nhanh trong 24h', 'Giải ngân linh hoạt']
-      },
-
-      // Military Bank (MB)
-      {
-        bank_name: 'Military Bank',
-        bank_code: 'MB',
-        rate_type: 'promotional',
-        loan_term_years: 15,
-        interest_rate: 7.6,
-        minimum_loan_amount: 200000000,
-        maximum_loan_amount: 30000000000,
-        minimum_down_payment_percent: 20,
-        effective_date: '2024-01-01',
-        is_current: true,
-        origination_fee: 0.8,
-        processing_fee: 0.2,
-        early_payment_penalty_rate: 1.0,
-        late_payment_penalty_rate: 2.0,
-        mortgage_insurance_required: true,
-        property_insurance_required: true,
-        special_conditions: ['Ưu đãi cho quân nhân', 'Lãi suất cố định 3 năm đầu']
+        early_payment_fee: 0.8,
+        required_documents: {},
+        eligibility_criteria: {}
       }
     ]
 
     const { error } = await this.supabase
-      .from('interest_rates')
+      .from('bank_interest_rates')
       .insert(vietnameseBankRates)
 
     if (error) {
@@ -387,21 +247,21 @@ class BankService {
   private mapToLoanProduct(rate: InterestRateRow): BankLoanProduct {
     return {
       id: rate.id,
-      bankName: rate.bank_name,
-      bankCode: rate.bank_code || '',
-      productName: rate.loan_product_name || `${rate.rate_type} ${rate.loan_term_years} năm`,
-      rateType: rate.rate_type,
-      loanTermYears: rate.loan_term_years,
+      bankName: rate.bank_id, // Using bank_id as bank_name placeholder
+      bankCode: rate.bank_id || '',
+      productName: rate.product_name || `${rate.loan_type} loan`,
+      rateType: 'standard', // Default value since rate_type field doesn't exist
+      loanTermYears: Math.floor((rate.max_term_months || 240) / 12), // Convert months to years
       interestRate: rate.interest_rate,
-      promotionalRate: rate.promotional_rate || undefined,
-      promotionalPeriod: rate.promotional_period_months || undefined,
-      minimumLoanAmount: rate.minimum_loan_amount || undefined,
-      maximumLoanAmount: rate.maximum_loan_amount || undefined,
-      minimumDownPayment: rate.minimum_down_payment_percent || undefined,
+      promotionalRate: rate.min_rate || undefined,
+      promotionalPeriod: undefined, // Field doesn't exist in current schema
+      minimumLoanAmount: rate.min_loan_amount || undefined,
+      maximumLoanAmount: rate.max_loan_amount || undefined,
+      minimumDownPayment: undefined, // Field doesn't exist in current schema
       processingFee: rate.processing_fee || 0,
-      earlyPaymentPenalty: rate.early_payment_penalty_rate || 0,
-      specialConditions: rate.special_conditions || undefined,
-      isActive: rate.is_current,
+      earlyPaymentPenalty: rate.early_payment_fee || 0,
+      specialConditions: undefined, // Field doesn't exist in current schema
+      isActive: rate.is_active,
       lastUpdated: new Date(rate.updated_at)
     }
   }
@@ -438,7 +298,7 @@ class BankService {
   // Get interest rate trends
   async getInterestRateTrends(bankName?: string): Promise<InterestRateHistory[]> {
     let query = this.supabase
-      .from('interest_rates')
+      .from('bank_interest_rates')
       .select('*')
       .order('effective_date', { ascending: false })
 
@@ -455,7 +315,7 @@ class BankService {
     // Group by bank and product
     const groupedData = new Map<string, InterestRateRow[]>()
     data?.forEach(rate => {
-      const key = `${rate.bank_name}-${rate.loan_product_name || rate.rate_type}`
+      const key = `${rate.bank_id}-${rate.product_name || rate.loan_type}`
       if (!groupedData.has(key)) {
         groupedData.set(key, [])
       }
@@ -464,11 +324,11 @@ class BankService {
 
     // Convert to history format
     return Array.from(groupedData.entries()).map(([key, rates]) => {
-      const [bankName, productName] = key.split('-')
+      const [bankId, productName] = key.split('-')
       const history = rates.map(rate => ({
         date: rate.effective_date,
         rate: rate.interest_rate,
-        type: rate.rate_type as 'promotional' | 'standard'
+        type: 'standard' as const
       }))
 
       const averageRate = history.reduce((sum, h) => sum + h.rate, 0) / history.length
@@ -476,7 +336,7 @@ class BankService {
       const trend = this.determineTrend(history)
 
       return {
-        bankName,
+        bankName: bankId,
         productName,
         history,
         trend,

@@ -594,7 +594,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode, onSelec
               {/* Price and ROI */}
               <div className="space-y-1">
                 <div className="text-2xl font-bold text-blue-600">
-                  {formatCurrency(property.listed_price)}
+                  {formatCurrency(property.listed_price || 0)}
                 </div>
                 {property.price_per_sqm && (
                   <div className="text-sm text-muted-foreground">

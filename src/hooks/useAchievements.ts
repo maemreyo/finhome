@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { AchievementEngine, UserProgress } from '@/lib/gamification/achievements'
 import { FinancialPlan } from '@/components/financial-plans/PlansList'
 import { useAuth } from '@/hooks/useAuth'
+import { toast } from 'sonner'
 
 interface UseAchievementsReturn {
   userProgress: UserProgress | null

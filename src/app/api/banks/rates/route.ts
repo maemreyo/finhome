@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: rate, error } = await supabase
-      .from('interest_rates')
+      .from('bank_interest_rates')
       .insert([{
         ...otherData,
         bank_name,

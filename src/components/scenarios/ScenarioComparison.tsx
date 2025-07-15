@@ -23,26 +23,7 @@ import {
   XCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-// Type definitions
-interface LoanScenario {
-  id: string
-  name: string
-  downPaymentPercent: number
-  loanTermYears: number
-  interestRate: number
-  propertyPrice: number
-  downPayment: number
-  loanAmount: number
-  monthlyPayment: number
-  totalInterest: number
-  totalPayment: number
-  monthlyIncome: number
-  monthlyExpenses: number
-  netCashFlow: number
-  riskLevel: 'low' | 'medium' | 'high'
-  recommendation: 'optimal' | 'safe' | 'aggressive' | 'risky'
-}
+import { LoanScenario } from '@/hooks/useScenarios'
 
 interface ScenarioMetrics {
   affordability: number // 0-100

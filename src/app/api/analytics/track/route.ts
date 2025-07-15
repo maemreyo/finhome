@@ -17,15 +17,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { event, properties, user_id } = await request.json()
+    const { event_type, event_data, user_id } = await request.json()
 
     // Store analytics event
     const { error } = await supabase
       .from('analytics_events')
       .insert({
         user_id: user_id || user.id,
-        event,
-        properties,
+        event_type,
+        event_data,
         created_at: new Date().toISOString(),
       })
 

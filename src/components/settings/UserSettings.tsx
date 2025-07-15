@@ -1,16 +1,16 @@
 // src/components/settings/UserSettings.tsx
 // Comprehensive user settings and preferences management
 
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { 
-  User, 
-  Bell, 
-  Palette, 
-  Globe, 
-  Shield, 
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  User,
+  Bell,
+  Palette,
+  Globe,
+  Shield,
   CreditCard,
   Smartphone,
   Mail,
@@ -20,134 +20,147 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  Download
-} from 'lucide-react'
+  Download,
+} from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import useGlobalState from '@/lib/hooks/useGlobalState'
-import { useToast, ToastHelpers } from '@/components/notifications/ToastNotification'
-import { formatVietnamesePhone } from '@/lib/utils'
-import { cn } from '@/lib/utils'
+import useGlobalState from "@/lib/hooks/useGlobalState";
+import {
+  useToast,
+  ToastHelpers,
+} from "@/components/notifications/ToastNotification";
+import { formatVietnamesePhone } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface UserSettingsProps {
-  className?: string
+  className?: string;
 }
 
 export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
-  const { showToast } = useToast()
-  const { 
-    user, 
-    setUser, 
-    updatePreferences, 
-    currentTheme, 
+  const { showToast } = useToast();
+  const {
+    user,
+    setUser,
+    updatePreferences,
+    currentTheme,
     setTheme,
     addNotification,
-    addExperience
-  } = useGlobalState()
+    addExperience,
+  } = useGlobalState();
 
   // Form states
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: '',
-    bio: '',
-    avatar: user?.avatar || ''
-  })
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: "",
+    bio: "",
+    avatar: user?.avatar || "",
+  });
 
   const [preferences, setPreferences] = useState({
-    currency: user?.preferences?.currency || 'VND',
-    language: user?.preferences?.language || 'vi',
+    currency: user?.preferences?.currency || "VND",
+    language: user?.preferences?.language || "vi",
     notifications: {
       email: user?.preferences?.notifications?.email ?? true,
       push: user?.preferences?.notifications?.push ?? true,
       achievements: user?.preferences?.notifications?.achievements ?? true,
       marketUpdates: user?.preferences?.notifications?.marketUpdates ?? true,
-      paymentReminders: user?.preferences?.notifications?.paymentReminders ?? true
+      paymentReminders:
+        user?.preferences?.notifications?.paymentReminders ?? true,
     },
     dashboard: {
-      layout: user?.preferences?.dashboard?.layout || 'grid',
-      widgets: user?.preferences?.dashboard?.widgets || []
-    }
-  })
+      layout: user?.preferences?.dashboard?.layout || "grid",
+      widgets: user?.preferences?.dashboard?.widgets || [],
+    },
+  });
 
   const [security, setSecurity] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
     twoFactorEnabled: false,
-    showPassword: false
-  })
+    showPassword: false,
+  });
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasChanges, setHasChanges] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
   // Track changes
   useEffect(() => {
-    const hasFormChanges = 
-      formData.name !== (user?.name || '') ||
-      formData.email !== (user?.email || '') ||
-      formData.phone !== '' ||
-      formData.bio !== ''
+    const hasFormChanges =
+      formData.name !== (user?.name || "") ||
+      formData.email !== (user?.email || "") ||
+      formData.phone !== "" ||
+      formData.bio !== "";
 
-    const hasPreferenceChanges = 
-      preferences.currency !== (user?.preferences?.currency || 'VND') ||
-      preferences.language !== (user?.preferences?.language || 'vi') ||
-      JSON.stringify(preferences.notifications) !== JSON.stringify(user?.preferences?.notifications || {}) ||
-      JSON.stringify(preferences.dashboard) !== JSON.stringify(user?.preferences?.dashboard || {})
+    const hasPreferenceChanges =
+      preferences.currency !== (user?.preferences?.currency || "VND") ||
+      preferences.language !== (user?.preferences?.language || "vi") ||
+      JSON.stringify(preferences.notifications) !==
+        JSON.stringify(user?.preferences?.notifications || {}) ||
+      JSON.stringify(preferences.dashboard) !==
+        JSON.stringify(user?.preferences?.dashboard || {});
 
-    setHasChanges(hasFormChanges || hasPreferenceChanges)
-  }, [formData, preferences, user])
+    setHasChanges(hasFormChanges || hasPreferenceChanges);
+  }, [formData, preferences, user]);
 
   // Handle form updates
   const handleFormChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const handlePreferenceChange = (section: string, field: string, value: any) => {
-    setPreferences(prev => ({
+  const handlePreferenceChange = (
+    section: string,
+    field: string,
+    value: any
+  ) => {
+    setPreferences((prev) => ({
       ...prev,
       [section]: {
-        ...prev[section as keyof typeof prev],
-        [field]: value
-      }
-    }))
-  }
+        ...(typeof prev[section as keyof typeof prev] === "object" &&
+        prev[section as keyof typeof prev] !== null
+          ? (prev[section as keyof typeof prev] as Record<string, any>)
+          : {}),
+        [field]: value,
+      },
+    }));
+  };
 
   const handleNotificationChange = (field: string, value: boolean) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       notifications: {
         ...prev.notifications,
-        [field]: value
-      }
-    }))
-  }
+        [field]: value,
+      },
+    }));
+  };
 
   // Save settings
   const handleSaveSettings = async () => {
-    setIsLoading(true)
-    
+    setIsLoading(true);
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Update user profile
       if (user) {
@@ -155,63 +168,72 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
           ...user,
           name: formData.name,
           email: formData.email,
-          avatar: formData.avatar
-        }
-        setUser(updatedUser)
+          avatar: formData.avatar,
+        };
+        setUser(updatedUser);
       }
 
       // Update preferences
-      updatePreferences(preferences)
+      updatePreferences(preferences);
 
       // Show success notification
-      showToast(ToastHelpers.success('Cài đặt đã lưu', 'Thông tin của bạn đã được cập nhật thành công'))
-      
+      showToast(
+        ToastHelpers.success(
+          "Cài đặt đã lưu",
+          "Thông tin của bạn đã được cập nhật thành công"
+        )
+      );
+
       addNotification({
-        type: 'success',
-        title: 'Cài đặt cập nhật',
-        message: 'Thông tin cá nhân và tùy chọn đã được lưu',
-        isRead: false
-      })
+        type: "success",
+        title: "Cài đặt cập nhật",
+        message: "Thông tin cá nhân và tùy chọn đã được lưu",
+        isRead: false,
+      });
 
-      addExperience(20)
-      setHasChanges(false)
-
+      addExperience(20);
+      setHasChanges(false);
     } catch (error) {
-      showToast(ToastHelpers.error('Lỗi lưu cài đặt', 'Vui lòng thử lại sau'))
+      showToast(ToastHelpers.error("Lỗi lưu cài đặt", "Vui lòng thử lại sau"));
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   // Reset settings
   const handleResetSettings = () => {
     setFormData({
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: '',
-      bio: '',
-      avatar: user?.avatar || ''
-    })
-    
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: "",
+      bio: "",
+      avatar: user?.avatar || "",
+    });
+
     setPreferences({
-      currency: user?.preferences?.currency || 'VND',
-      language: user?.preferences?.language || 'vi',
+      currency: user?.preferences?.currency || "VND",
+      language: user?.preferences?.language || "vi",
       notifications: user?.preferences?.notifications || {
         email: true,
         push: true,
         achievements: true,
         marketUpdates: true,
-        paymentReminders: true
+        paymentReminders: true,
       },
       dashboard: user?.preferences?.dashboard || {
-        layout: 'grid',
-        widgets: []
-      }
-    })
+        layout: "grid",
+        widgets: [],
+      },
+    });
 
-    setHasChanges(false)
-    showToast(ToastHelpers.info('Đã khôi phục', 'Cài đặt đã được khôi phục về trạng thái ban đầu'))
-  }
+    setHasChanges(false);
+    showToast(
+      ToastHelpers.info(
+        "Đã khôi phục",
+        "Cài đặt đã được khôi phục về trạng thái ban đầu"
+      )
+    );
+  };
 
   // Export user data
   const handleExportData = () => {
@@ -219,45 +241,57 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
       profile: formData,
       preferences,
       exportDate: new Date().toISOString(),
-      version: '1.0'
-    }
+      version: "1.0",
+    };
 
-    const dataStr = JSON.stringify(exportData, null, 2)
-    const dataBlob = new Blob([dataStr], { type: 'application/json' })
-    
-    const url = URL.createObjectURL(dataBlob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `finhome-user-data-${new Date().toISOString().split('T')[0]}.json`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
 
-    showToast(ToastHelpers.success('Dữ liệu đã xuất', 'File dữ liệu cá nhân đã được tải xuống'))
-  }
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `finhome-user-data-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast(
+      ToastHelpers.success(
+        "Dữ liệu đã xuất",
+        "File dữ liệu cá nhân đã được tải xuống"
+      )
+    );
+  };
 
   const availableWidgets = [
-    { id: 'portfolio-summary', name: 'Tổng quan danh mục' },
-    { id: 'recent-transactions', name: 'Giao dịch gần đây' },
-    { id: 'market-news', name: 'Tin tức thị trường' },
-    { id: 'loan-calculator', name: 'Máy tính vay' },
-    { id: 'savings-progress', name: 'Tiến độ tiết kiệm' },
-    { id: 'achievements', name: 'Thành tích' }
-  ]
+    { id: "portfolio-summary", name: "Tổng quan danh mục" },
+    { id: "recent-transactions", name: "Giao dịch gần đây" },
+    { id: "market-news", name: "Tin tức thị trường" },
+    { id: "loan-calculator", name: "Máy tính vay" },
+    { id: "savings-progress", name: "Tiến độ tiết kiệm" },
+    { id: "achievements", name: "Thành tích" },
+  ];
 
   return (
     <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Cài Đặt Tài Khoản</h2>
-          <p className="text-gray-600">Quản lý thông tin cá nhân và tùy chọn hệ thống</p>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Cài Đặt Tài Khoản
+          </h2>
+          <p className="text-gray-600">
+            Quản lý thông tin cá nhân và tùy chọn hệ thống
+          </p>
         </div>
-        
+
         <div className="flex items-center gap-3">
           {hasChanges && (
-            <Badge variant="outline" className="text-orange-600 border-orange-200">
+            <Badge
+              variant="outline"
+              className="text-orange-600 border-orange-200"
+            >
               Có thay đổi chưa lưu
             </Badge>
           )}
@@ -289,7 +323,10 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
             <User className="w-4 h-4" />
             Hồ sơ
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
+          <TabsTrigger
+            value="notifications"
+            className="flex items-center gap-2"
+          >
             <Bell className="w-4 h-4" />
             Thông báo
           </TabsTrigger>
@@ -322,7 +359,11 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                 <Avatar className="w-20 h-20">
                   <AvatarImage src={formData.avatar} />
                   <AvatarFallback className="text-lg">
-                    {formData.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    {formData.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="space-y-2">
@@ -330,7 +371,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   <Input
                     id="avatar"
                     value={formData.avatar}
-                    onChange={(e) => handleFormChange('avatar', e.target.value)}
+                    onChange={(e) => handleFormChange("avatar", e.target.value)}
                     placeholder="https://example.com/avatar.jpg"
                   />
                   <p className="text-sm text-gray-500">
@@ -348,7 +389,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => handleFormChange('name', e.target.value)}
+                    onChange={(e) => handleFormChange("name", e.target.value)}
                     placeholder="Nguyễn Văn A"
                     required
                   />
@@ -360,7 +401,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => handleFormChange('email', e.target.value)}
+                    onChange={(e) => handleFormChange("email", e.target.value)}
                     placeholder="nguyen.vana@example.com"
                     required
                   />
@@ -371,7 +412,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   <Input
                     id="phone"
                     value={formData.phone}
-                    onChange={(e) => handleFormChange('phone', e.target.value)}
+                    onChange={(e) => handleFormChange("phone", e.target.value)}
                     placeholder="0912 345 678"
                   />
                   {formData.phone && (
@@ -385,7 +426,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   <Label htmlFor="language">Ngôn ngữ</Label>
                   <Select
                     value={preferences.language}
-                    onValueChange={(value) => handlePreferenceChange('language', '', value)}
+                    onValueChange={(value) =>
+                      handlePreferenceChange("language", "", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -401,7 +444,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   <Label htmlFor="currency">Đơn vị tiền tệ</Label>
                   <Select
                     value={preferences.currency}
-                    onValueChange={(value) => handlePreferenceChange('currency', '', value)}
+                    onValueChange={(value) =>
+                      handlePreferenceChange("currency", "", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -419,7 +464,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                 <Textarea
                   id="bio"
                   value={formData.bio}
-                  onChange={(e) => handleFormChange('bio', e.target.value)}
+                  onChange={(e) => handleFormChange("bio", e.target.value)}
                   placeholder="Chia sẻ một chút về bản thân và mục tiêu tài chính của bạn..."
                   rows={3}
                 />
@@ -454,7 +499,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   </div>
                   <Switch
                     checked={preferences.notifications.email}
-                    onCheckedChange={(checked) => handleNotificationChange('email', checked)}
+                    onCheckedChange={(checked) =>
+                      handleNotificationChange("email", checked)
+                    }
                   />
                 </div>
 
@@ -472,7 +519,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   </div>
                   <Switch
                     checked={preferences.notifications.push}
-                    onCheckedChange={(checked) => handleNotificationChange('push', checked)}
+                    onCheckedChange={(checked) =>
+                      handleNotificationChange("push", checked)
+                    }
                   />
                 </div>
 
@@ -490,7 +539,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   </div>
                   <Switch
                     checked={preferences.notifications.achievements}
-                    onCheckedChange={(checked) => handleNotificationChange('achievements', checked)}
+                    onCheckedChange={(checked) =>
+                      handleNotificationChange("achievements", checked)
+                    }
                   />
                 </div>
 
@@ -508,7 +559,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   </div>
                   <Switch
                     checked={preferences.notifications.marketUpdates}
-                    onCheckedChange={(checked) => handleNotificationChange('marketUpdates', checked)}
+                    onCheckedChange={(checked) =>
+                      handleNotificationChange("marketUpdates", checked)
+                    }
                   />
                 </div>
 
@@ -526,7 +579,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   </div>
                   <Switch
                     checked={preferences.notifications.paymentReminders}
-                    onCheckedChange={(checked) => handleNotificationChange('paymentReminders', checked)}
+                    onCheckedChange={(checked) =>
+                      handleNotificationChange("paymentReminders", checked)
+                    }
                   />
                 </div>
               </div>
@@ -551,9 +606,11 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   <div
                     className={cn(
                       "p-4 border rounded-lg cursor-pointer transition-colors",
-                      currentTheme === 'light' ? "border-blue-500 bg-blue-50" : "border-gray-200"
+                      currentTheme === "light"
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200"
                     )}
-                    onClick={() => setTheme('light')}
+                    onClick={() => setTheme("light")}
                   >
                     <div className="w-full h-20 bg-white border rounded mb-3 flex items-center justify-center">
                       <div className="text-xs text-gray-600">Sáng</div>
@@ -564,9 +621,11 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   <div
                     className={cn(
                       "p-4 border rounded-lg cursor-pointer transition-colors",
-                      currentTheme === 'dark' ? "border-blue-500 bg-blue-50" : "border-gray-200"
+                      currentTheme === "dark"
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200"
                     )}
-                    onClick={() => setTheme('dark')}
+                    onClick={() => setTheme("dark")}
                   >
                     <div className="w-full h-20 bg-gray-800 border rounded mb-3 flex items-center justify-center">
                       <div className="text-xs text-white">Tối</div>
@@ -583,7 +642,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                 <Label>Bố cục dashboard</Label>
                 <Select
                   value={preferences.dashboard.layout}
-                  onValueChange={(value) => handlePreferenceChange('dashboard', 'layout', value)}
+                  onValueChange={(value) =>
+                    handlePreferenceChange("dashboard", "layout", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -604,17 +665,28 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   Chọn các widget hiển thị trên trang chính
                 </p>
                 <div className="grid grid-cols-2 gap-3">
-                  {availableWidgets.map(widget => (
-                    <div key={widget.id} className="flex items-center space-x-2">
+                  {availableWidgets.map((widget) => (
+                    <div
+                      key={widget.id}
+                      className="flex items-center space-x-2"
+                    >
                       <input
                         type="checkbox"
                         id={widget.id}
-                        checked={preferences.dashboard.widgets.includes(widget.id)}
+                        checked={preferences.dashboard.widgets.includes(
+                          widget.id
+                        )}
                         onChange={(e) => {
                           const newWidgets = e.target.checked
                             ? [...preferences.dashboard.widgets, widget.id]
-                            : preferences.dashboard.widgets.filter(w => w !== widget.id)
-                          handlePreferenceChange('dashboard', 'widgets', newWidgets)
+                            : preferences.dashboard.widgets.filter(
+                                (w) => w !== widget.id
+                              );
+                          handlePreferenceChange(
+                            "dashboard",
+                            "widgets",
+                            newWidgets
+                          );
                         }}
                         className="rounded border-gray-300"
                       />
@@ -650,7 +722,12 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                         id="currentPassword"
                         type={security.showPassword ? "text" : "password"}
                         value={security.currentPassword}
-                        onChange={(e) => setSecurity(prev => ({ ...prev, currentPassword: e.target.value }))}
+                        onChange={(e) =>
+                          setSecurity((prev) => ({
+                            ...prev,
+                            currentPassword: e.target.value,
+                          }))
+                        }
                         placeholder="Nhập mật khẩu hiện tại"
                       />
                       <Button
@@ -658,9 +735,18 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                         variant="ghost"
                         size="sm"
                         className="absolute right-2 top-1/2 -translate-y-1/2"
-                        onClick={() => setSecurity(prev => ({ ...prev, showPassword: !prev.showPassword }))}
+                        onClick={() =>
+                          setSecurity((prev) => ({
+                            ...prev,
+                            showPassword: !prev.showPassword,
+                          }))
+                        }
                       >
-                        {security.showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {security.showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -671,46 +757,66 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                       id="newPassword"
                       type="password"
                       value={security.newPassword}
-                      onChange={(e) => setSecurity(prev => ({ ...prev, newPassword: e.target.value }))}
+                      onChange={(e) =>
+                        setSecurity((prev) => ({
+                          ...prev,
+                          newPassword: e.target.value,
+                        }))
+                      }
                       placeholder="Nhập mật khẩu mới"
                     />
                     {security.newPassword && (
                       <div className="space-y-1">
-                        <Progress value={Math.min(100, security.newPassword.length * 10)} className="h-2" />
+                        <Progress
+                          value={Math.min(
+                            100,
+                            security.newPassword.length * 10
+                          )}
+                          className="h-2"
+                        />
                         <p className="text-xs text-gray-500">
-                          Độ mạnh mật khẩu: {
-                            security.newPassword.length < 6 ? 'Yếu' :
-                            security.newPassword.length < 10 ? 'Trung bình' :
-                            'Mạnh'
-                          }
+                          Độ mạnh mật khẩu:{" "}
+                          {security.newPassword.length < 6
+                            ? "Yếu"
+                            : security.newPassword.length < 10
+                              ? "Trung bình"
+                              : "Mạnh"}
                         </p>
                       </div>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Xác nhận mật khẩu mới</Label>
+                    <Label htmlFor="confirmPassword">
+                      Xác nhận mật khẩu mới
+                    </Label>
                     <Input
                       id="confirmPassword"
                       type="password"
                       value={security.confirmPassword}
-                      onChange={(e) => setSecurity(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      onChange={(e) =>
+                        setSecurity((prev) => ({
+                          ...prev,
+                          confirmPassword: e.target.value,
+                        }))
+                      }
                       placeholder="Nhập lại mật khẩu mới"
                     />
-                    {security.confirmPassword && security.newPassword !== security.confirmPassword && (
-                      <p className="text-xs text-red-500 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        Mật khẩu không khớp
-                      </p>
-                    )}
+                    {security.confirmPassword &&
+                      security.newPassword !== security.confirmPassword && (
+                        <p className="text-xs text-red-500 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          Mật khẩu không khớp
+                        </p>
+                      )}
                   </div>
 
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-fit"
                     disabled={
-                      !security.currentPassword || 
-                      !security.newPassword || 
+                      !security.currentPassword ||
+                      !security.newPassword ||
                       security.newPassword !== security.confirmPassword
                     }
                   >
@@ -731,7 +837,12 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                 </div>
                 <Switch
                   checked={security.twoFactorEnabled}
-                  onCheckedChange={(checked) => setSecurity(prev => ({ ...prev, twoFactorEnabled: checked }))}
+                  onCheckedChange={(checked) =>
+                    setSecurity((prev) => ({
+                      ...prev,
+                      twoFactorEnabled: checked,
+                    }))
+                  }
                 />
               </div>
 
@@ -744,7 +855,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                   <div className="flex justify-between items-center p-3 border rounded">
                     <div>
                       <p className="font-medium">Thiết bị hiện tại</p>
-                      <p className="text-sm text-gray-500">Chrome trên Windows • Đang hoạt động</p>
+                      <p className="text-sm text-gray-500">
+                        Chrome trên Windows • Đang hoạt động
+                      </p>
                     </div>
                     <Badge variant="outline" className="text-green-600">
                       Hiện tại
@@ -774,7 +887,8 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                 <div>
                   <Label>Xuất dữ liệu cá nhân</Label>
                   <p className="text-sm text-gray-500 mt-1">
-                    Tải xuống tất cả dữ liệu cá nhân của bạn trong định dạng JSON
+                    Tải xuống tất cả dữ liệu cá nhân của bạn trong định dạng
+                    JSON
                   </p>
                 </div>
                 <Button
@@ -795,7 +909,9 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 border rounded">
                     <div className="text-lg font-bold">12</div>
-                    <div className="text-sm text-gray-500">Kế hoạch tài chính</div>
+                    <div className="text-sm text-gray-500">
+                      Kế hoạch tài chính
+                    </div>
                   </div>
                   <div className="p-3 border rounded">
                     <div className="text-lg font-bold">3</div>
@@ -819,13 +935,21 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
                 <div>
                   <Label className="text-red-600">Xóa tài khoản</Label>
                   <p className="text-sm text-gray-500 mt-1">
-                    Xóa vĩnh viễn tài khoản và tất cả dữ liệu liên quan. Hành động này không thể hoàn tác.
+                    Xóa vĩnh viễn tài khoản và tất cả dữ liệu liên quan. Hành
+                    động này không thể hoàn tác.
                   </p>
                 </div>
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => showToast(ToastHelpers.error('Chức năng chưa khả dụng', 'Vui lòng liên hệ hỗ trợ để xóa tài khoản'))}
+                  onClick={() =>
+                    showToast(
+                      ToastHelpers.error(
+                        "Chức năng chưa khả dụng",
+                        "Vui lòng liên hệ hỗ trợ để xóa tài khoản"
+                      )
+                    )
+                  }
                 >
                   <AlertCircle className="w-4 h-4 mr-2" />
                   Xóa tài khoản
@@ -836,7 +960,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ className }) => {
         </TabsContent>
       </Tabs>
     </div>
-  )
-}
+  );
+};
 
-export default UserSettings
+export default UserSettings;

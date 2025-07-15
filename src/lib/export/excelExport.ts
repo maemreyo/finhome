@@ -251,12 +251,12 @@ export class FinancialPlanExcelExporter {
       cumulativeCashFlow += netCashFlow
 
       projectionData.push([
-        year,
-        inflatedRental,
-        annualLoanPayment,
-        inflatedExpenses,
-        netCashFlow,
-        cumulativeCashFlow
+        year.toString(),
+        inflatedRental.toFixed(0),
+        annualLoanPayment.toFixed(0),
+        inflatedExpenses.toFixed(0),
+        netCashFlow.toFixed(0),
+        cumulativeCashFlow.toFixed(0)
       ])
     }
 
@@ -307,19 +307,19 @@ export class FinancialPlanExcelExporter {
 
       if (index === 0) {
         comparisonData.push(
-          ['Down Payment', scenario.downPayment, '', ''],
-          ['Loan Amount', loanAmount, '', ''],
-          ['Monthly Payment', monthlyPayment, '', ''],
-          ['Total Interest', totalInterest, '', ''],
-          ['Total Cost', totalCost, '', '']
+          ['Down Payment', scenario.downPayment.toFixed(0), '', ''],
+          ['Loan Amount', loanAmount.toFixed(0), '', ''],
+          ['Monthly Payment', monthlyPayment.toFixed(0), '', ''],
+          ['Total Interest', totalInterest.toFixed(0), '', ''],
+          ['Total Cost', totalCost.toFixed(0), '', '']
         )
       } else {
         // Update existing rows with data for this scenario
-        comparisonData[2][index + 1] = scenario.downPayment
-        comparisonData[3][index + 1] = loanAmount
-        comparisonData[4][index + 1] = monthlyPayment
-        comparisonData[5][index + 1] = totalInterest
-        comparisonData[6][index + 1] = totalCost
+        comparisonData[2][index + 1] = scenario.downPayment.toFixed(0)
+        comparisonData[3][index + 1] = loanAmount.toFixed(0)
+        comparisonData[4][index + 1] = monthlyPayment.toFixed(0)
+        comparisonData[5][index + 1] = totalInterest.toFixed(0)
+        comparisonData[6][index + 1] = totalCost.toFixed(0)
       }
     })
 

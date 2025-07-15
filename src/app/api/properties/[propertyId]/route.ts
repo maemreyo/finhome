@@ -191,7 +191,7 @@ export async function DELETE(
 
 // Helper calculation functions
 function calculateMonthlyMortgage(property: Database['public']['Tables']['properties']['Row']): number {
-  const loanAmount = property.listed_price * 0.8 // Assume 20% down payment
+  const loanAmount = (property.listed_price || 0) * 0.8 // Assume 20% down payment
   const monthlyRate = 0.085 / 12 // Assume 8.5% annual rate
   const termMonths = 20 * 12 // 20 years
 
@@ -200,20 +200,20 @@ function calculateMonthlyMortgage(property: Database['public']['Tables']['proper
 }
 
 function calculateTotalCost(property: Database['public']['Tables']['properties']['Row']): number {
-  return property.listed_price * 1.1 // Add 10% for fees and taxes
+  return (property.listed_price || 0) * 1.1 // Add 10% for fees and taxes
 }
 
 function calculateROI(property: Database['public']['Tables']['properties']['Row']): number {
   // Simplified ROI calculation for rental properties
-  const monthlyRent = property.listed_price * 0.006 // Assume 0.6% monthly rent
+  const monthlyRent = (property.listed_price || 0) * 0.006 // Assume 0.6% monthly rent
   const annualRent = monthlyRent * 12
-  return (annualRent / property.listed_price) * 100
+  return (annualRent / (property.listed_price || 1)) * 100
 }
 
 function calculateRentalYield(property: Database['public']['Tables']['properties']['Row']): number {
-  const monthlyRent = property.listed_price * 0.006
+  const monthlyRent = (property.listed_price || 0) * 0.006
   const annualRent = monthlyRent * 12
-  return (annualRent / property.listed_price) * 100
+  return (annualRent / (property.listed_price || 1)) * 100
 }
 
 function calculateAppreciationRate(property: Database['public']['Tables']['properties']['Row']): number {
@@ -248,7 +248,7 @@ function calculateRiskScore(property: Database['public']['Tables']['properties']
   if (property.legal_status === 'pending') risk += 20
 
   // Price risk (very high prices are riskier)
-  if (property.listed_price > 10000000000) risk += 20
+  if ((property.listed_price || 0) > 10000000000) risk += 20
 
   return Math.min(risk, 100)
 }
@@ -256,7 +256,7 @@ function calculateRiskScore(property: Database['public']['Tables']['properties']
 async function getNeighborhoodData(property: Database['public']['Tables']['properties']['Row']) {
   // In a real implementation, this would fetch from external APIs
   return {
-    averagePrice: property.listed_price * 0.95,
+    averagePrice: (property.listed_price || 0) * 0.95,
     pricePerSqm: property.price_per_sqm || 50000000,
     priceGrowth12m: 8.5,
     demographics: {
@@ -288,9 +288,9 @@ async function getMarketTrends(property: Database['public']['Tables']['propertie
   // Mock market trends data
   return {
     priceHistory: [
-      { date: '2024-01-01', averagePrice: property.listed_price * 0.9, volume: 25 },
-      { date: '2024-06-01', averagePrice: property.listed_price * 0.95, volume: 30 },
-      { date: '2024-12-01', averagePrice: property.listed_price, volume: 28 }
+      { date: '2024-01-01', averagePrice: (property.listed_price || 0) * 0.9, volume: 25 },
+      { date: '2024-06-01', averagePrice: (property.listed_price || 0) * 0.95, volume: 30 },
+      { date: '2024-12-01', averagePrice: property.listed_price || 0, volume: 28 }
     ],
     supplyDemand: {
       supply: 45,

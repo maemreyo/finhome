@@ -49,23 +49,14 @@ export async function GET(request: NextRequest) {
     // Build query
     let query = supabase
       .from('financial_plans')
-      .select(`
-        *,
-        loan_terms (*),
-        scenarios (
-          id,
-          scenario_name,
-          scenario_type,
-          calculated_results
-        )
-      `)
+      .select('*')
       .or(`user_id.eq.${user.id},and(is_public.eq.true)`)
       .order('updated_at', { ascending: false })
       .range(validatedQuery.offset, validatedQuery.offset + validatedQuery.limit - 1)
 
     // Apply filters
     if (validatedQuery.status) {
-      query = query.eq('plan_status', validatedQuery.status)
+      query = query.eq('status', validatedQuery.status)
     }
 
     if (validatedQuery.planType) {
@@ -92,13 +83,13 @@ export async function GET(request: NextRequest) {
 
     // Calculate financial metrics for each plan if not cached
     const plansWithMetrics = await Promise.all(
-      plans?.map(async (plan) => {
+      (plans || []).map(async (plan) => {
         try {
           let cachedCalculations = plan.cached_calculations
 
           // Recalculate if cache is stale or missing
-          if (!cachedCalculations || new Date(plan.calculations_last_updated) < new Date(Date.now() - 24 * 60 * 60 * 1000)) {
-            const loanAmount = plan.purchase_price - plan.down_payment
+          if (!cachedCalculations || (plan.calculations_last_updated && new Date(plan.calculations_last_updated) < new Date(Date.now() - 24 * 60 * 60 * 1000))) {
+            const loanAmount = (plan.purchase_price || 0) - (plan.down_payment || 0)
             const loanParams: LoanParameters = {
               principal: loanAmount,
               annualRate: 10.5, // Default rate - should come from loan_terms
@@ -108,15 +99,15 @@ export async function GET(request: NextRequest) {
             }
 
             const personalFinances = {
-              monthlyIncome: plan.monthly_income,
-              monthlyExpenses: plan.monthly_expenses
+              monthlyIncome: plan.monthly_income || 0,
+              monthlyExpenses: plan.monthly_expenses || 0
             }
 
             const investmentParams = plan.expected_rental_income ? {
               expectedRentalIncome: plan.expected_rental_income,
               propertyExpenses: plan.expected_rental_income * 0.1,
               appreciationRate: plan.expected_appreciation_rate || 8,
-              initialPropertyValue: plan.purchase_price
+              initialPropertyValue: plan.purchase_price || 0
             } : undefined
 
             const metrics = calculateFinancialMetrics(
@@ -245,7 +236,7 @@ export async function POST(request: NextRequest) {
         expected_appreciation_rate: validatedData.expectedAppreciationRate,
         investment_horizon_years: validatedData.investmentHorizonYears,
         is_public: validatedData.isPublic,
-        plan_status: 'draft',
+        status: 'draft',
         cached_calculations: cachedCalculations,
         calculations_last_updated: new Date().toISOString()
       })
@@ -260,59 +251,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create default loan terms
-    const { data: loanTerms, error: loanTermsError } = await supabase
-      .from('loan_terms')
-      .insert({
-        financial_plan_id: plan.id,
-        loan_amount: loanAmount,
-        loan_term_years: 20,
-        promotional_rate: 7.5,
-        promotional_period_months: 24,
-        regular_rate: 10.5,
-        rate_type: 'fixed',
-        bank_name: 'TBD',
-        monthly_payment_promotional: Math.round(loanAmount * 0.075 / 12 * Math.pow(1 + 0.075/12, 240) / (Math.pow(1 + 0.075/12, 240) - 1)),
-        monthly_payment_regular: metrics.monthlyPayment,
-        total_interest: metrics.totalInterest,
-        total_payments: loanAmount + metrics.totalInterest
-      })
-      .select()
-      .single()
+    // Skip loan terms creation as table doesn't exist
+    const loanTerms = null
 
-    if (loanTermsError) {
-      console.error('Failed to create loan terms:', loanTermsError)
-      // Clean up the plan if loan terms creation failed
-      await supabase.from('financial_plans').delete().eq('id', plan.id)
-      return NextResponse.json({ error: 'Failed to create loan terms' }, { status: 500 })
-    }
-
-    // Create baseline scenario
-    const { data: scenario, error: scenarioError } = await supabase
-      .from('scenarios')
-      .insert({
-        financial_plan_id: plan.id,
-        scenario_name: 'Kịch bản cơ bản',
-        scenario_type: 'baseline',
-        scenario_description: 'Kế hoạch tài chính ban đầu',
-        modified_parameters: {},
-        assumptions: {
-          economicGrowth: 5,
-          inflationRate: 4,
-          propertyMarketTrend: 'stable',
-          personalCareerGrowth: 5,
-          emergencyFundMonths: 6
-        },
-        calculated_results: cachedCalculations,
-        is_favorite: false
-      })
-      .select()
-      .single()
-
-    if (scenarioError) {
-      console.error('Error creating baseline scenario:', scenarioError)
-      // Don't fail the whole operation, just log the error
-    }
+    // Skip scenario creation as table doesn't exist
+    const scenario = null
 
     return NextResponse.json({
       data: {

@@ -158,7 +158,7 @@ export default function PropertiesPage() {
                       </div>
                       
                       <div className="text-2xl font-bold text-blue-600 mb-3">
-                        {formatCurrency(selectedProperty.listed_price)}
+                        {formatCurrency(selectedProperty.listed_price || 0)}
                       </div>
 
                       <div className="space-y-2">

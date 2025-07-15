@@ -296,7 +296,7 @@ export function useInteractiveTutorial(): UseTutorialReturn {
   const [tutorialPreferences, setTutorialPreferences] = useState<UserHelpPreferences | null>(null)
   const [canProceed, setCanProceed] = useState(false)
   
-  const stepTimeoutRef = useRef<NodeJS.Timeout>()
+  const stepTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Initialize tutorial preferences
   useEffect(() => {

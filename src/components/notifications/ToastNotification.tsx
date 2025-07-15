@@ -73,7 +73,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
     })
 
     // Auto remove toast after duration (unless persistent)
-    if (!toast.persistent && newToast.duration > 0) {
+    if (!toast.persistent && newToast.duration && newToast.duration > 0) {
       setTimeout(() => {
         removeToast(id)
       }, newToast.duration)
@@ -337,4 +337,4 @@ export const ToastHelpers = {
   })
 }
 
-export default ToastNotification
+export default ToastProvider

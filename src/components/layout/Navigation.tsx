@@ -163,7 +163,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               Tổng Quan
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {item.children.map((child) => (
+            {item.children?.map((child) => (
               <DropdownMenuItem 
                 key={child.id}
                 onClick={() => window.location.href = child.href}
@@ -300,7 +300,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                       <NavItem item={item} mobile />
                       {item.children && (
                         <div className="ml-6 space-y-1">
-                          {item.children.map((child) => (
+                          {item.children?.map((child) => (
                             <NavItem key={child.id} item={child} mobile />
                           ))}
                         </div>

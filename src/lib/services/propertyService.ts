@@ -242,7 +242,7 @@ export class PropertyService {
       methodology: 'automated',
       comparableProperties: comparable.map(p => ({
         id: p.id,
-        soldPrice: p.listed_price,
+        soldPrice: p.listed_price || 0,
         soldDate: new Date(p.created_at),
         similarity: this.calculateSimilarity(property, p)
       })),
@@ -286,6 +286,7 @@ export class PropertyService {
     const { data: priceData } = await this.supabase
       .from('properties')
       .select('listed_price')
+      .not('listed_price', 'is', null)
       .order('listed_price')
 
     // Get area range
@@ -322,9 +323,9 @@ export class PropertyService {
       max: areaData?.[areaData.length - 1]?.area_sqm || 0
     }
 
-    const propertyTypes = this.aggregateByField(typeData || [], 'property_type')
-    const cities = this.aggregateByField(cityData || [], 'city')
-    const districts = this.aggregateByField(districtData || [], 'district')
+    const propertyTypes = this.aggregateByField(typeData || [], 'property_type') as { type: string; count: number }[]
+    const cities = this.aggregateByField(cityData || [], 'city') as { city: string; count: number }[]
+    const districts = this.aggregateByField(districtData || [], 'district') as { district: string; count: number }[]
 
     return {
       priceRange,
@@ -335,7 +336,8 @@ export class PropertyService {
     }
   }
 
-  private aggregateByField(data: any[], field: string) {
+  private aggregateByField(data: any[], field: string): 
+    { type: string; count: number }[] | { city: string; count: number }[] | { district: string; count: number }[] {
     const counts = data.reduce((acc, item) => {
       const value = item[field]
       if (value) {
@@ -344,10 +346,22 @@ export class PropertyService {
       return acc
     }, {})
 
-    return Object.entries(counts).map(([key, count]) => ({
-      [field === 'property_type' ? 'type' : field === 'city' ? 'city' : 'district']: key,
-      count: count as number
-    }))
+    if (field === 'property_type') {
+      return Object.entries(counts).map(([key, count]) => ({
+        type: key,
+        count: count as number
+      }))
+    } else if (field === 'city') {
+      return Object.entries(counts).map(([key, count]) => ({
+        city: key,
+        count: count as number
+      }))
+    } else {
+      return Object.entries(counts).map(([key, count]) => ({
+        district: key,
+        count: count as number
+      }))
+    }
   }
 
   private getFavoritesFromStorage(userId: string): PropertyFavorite[] {
@@ -361,7 +375,7 @@ export class PropertyService {
 
   // Calculation methods
   private calculateMonthlyMortgage(property: Database['public']['Tables']['properties']['Row']): number {
-    const loanAmount = property.listed_price * 0.8 // Assume 20% down payment
+    const loanAmount = (property.listed_price || 0) * 0.8 // Assume 20% down payment
     const monthlyRate = 0.085 / 12 // Assume 8.5% annual rate
     const termMonths = 20 * 12 // 20 years
 
@@ -370,14 +384,14 @@ export class PropertyService {
   }
 
   private calculateTotalCost(property: Database['public']['Tables']['properties']['Row']): number {
-    return property.listed_price * 1.1 // Add 10% for fees and taxes
+    return (property.listed_price || 0) * 1.1 // Add 10% for fees and taxes
   }
 
   private calculateROI(property: Database['public']['Tables']['properties']['Row']): number {
     // Simplified ROI calculation for rental properties
-    const monthlyRent = property.listed_price * 0.006 // Assume 0.6% monthly rent
+    const monthlyRent = (property.listed_price || 0) * 0.006 // Assume 0.6% monthly rent
     const annualRent = monthlyRent * 12
-    return (annualRent / property.listed_price) * 100
+    return (annualRent / (property.listed_price || 1)) * 100
   }
 
   private calculateAffinityScore(property: Database['public']['Tables']['properties']['Row']): number {
@@ -385,8 +399,8 @@ export class PropertyService {
     let score = 50 // Base score
 
     // Price factor (lower price = higher score)
-    if (property.listed_price < 2000000000) score += 20
-    else if (property.listed_price < 5000000000) score += 10
+    if ((property.listed_price || 0) < 2000000000) score += 20
+    else if ((property.listed_price || 0) < 5000000000) score += 10
 
     // Area factor
     if (property.area_sqm && property.area_sqm > 80) score += 15
@@ -402,7 +416,7 @@ export class PropertyService {
   ): Promise<NeighborhoodData | undefined> {
     // In a real implementation, this would fetch from external APIs
     return {
-      averagePrice: property.listed_price * 0.95,
+      averagePrice: (property.listed_price || 0) * 0.95,
       pricePerSqm: property.price_per_sqm || 50000000,
       priceGrowth12m: 8.5,
       demographics: {
@@ -436,9 +450,9 @@ export class PropertyService {
     // Mock market trends data
     return {
       priceHistory: [
-        { date: '2024-01-01', averagePrice: property.listed_price * 0.9, volume: 25 },
-        { date: '2024-06-01', averagePrice: property.listed_price * 0.95, volume: 30 },
-        { date: '2024-12-01', averagePrice: property.listed_price, volume: 28 }
+        { date: '2024-01-01', averagePrice: (property.listed_price || 0) * 0.9, volume: 25 },
+        { date: '2024-06-01', averagePrice: (property.listed_price || 0) * 0.95, volume: 30 },
+        { date: '2024-12-01', averagePrice: property.listed_price || 0, volume: 28 }
       ],
       supplyDemand: {
         supply: 45,
@@ -454,9 +468,9 @@ export class PropertyService {
   }
 
   private calculateRentalYield(property: Database['public']['Tables']['properties']['Row']): number {
-    const monthlyRent = property.listed_price * 0.006
+    const monthlyRent = (property.listed_price || 0) * 0.006
     const annualRent = monthlyRent * 12
-    return (annualRent / property.listed_price) * 100
+    return (annualRent / (property.listed_price || 1)) * 100
   }
 
   private calculateAppreciationRate(property: Database['public']['Tables']['properties']['Row']): number {
@@ -491,7 +505,7 @@ export class PropertyService {
     if (property.legal_status === 'pending') risk += 20
 
     // Price risk (very high prices are riskier)
-    if (property.listed_price > 10000000000) risk += 20
+    if ((property.listed_price || 0) > 10000000000) risk += 20
 
     return Math.min(risk, 100)
   }
@@ -525,10 +539,10 @@ export class PropertyService {
     property: Database['public']['Tables']['properties']['Row'],
     comparables: Database['public']['Tables']['properties']['Row'][]
   ): number {
-    if (comparables.length === 0) return property.listed_price
+    if (comparables.length === 0) return property.listed_price || 0
 
-    const avgPrice = comparables.reduce((sum, comp) => sum + comp.listed_price, 0) / comparables.length
-    return (property.listed_price + avgPrice) / 2
+    const avgPrice = comparables.reduce((sum, comp) => sum + (comp.listed_price || 0), 0) / comparables.length
+    return ((property.listed_price || 0) + avgPrice) / 2
   }
 
   private calculateValuationConfidence(
@@ -560,7 +574,7 @@ export class PropertyService {
     }
 
     // Price similarity
-    const priceDiff = Math.abs(property1.listed_price - property2.listed_price) / property1.listed_price
+    const priceDiff = Math.abs((property1.listed_price || 0) - (property2.listed_price || 0)) / (property1.listed_price || 1)
     similarity += Math.max(0, 10 - priceDiff * 10)
 
     return Math.min(similarity, 100)
