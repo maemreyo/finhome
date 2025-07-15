@@ -3,7 +3,7 @@
 
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ArrowRight, 
@@ -59,7 +59,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
   const [isPlaying, setIsPlaying] = useState(false)
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
 
-  const tourSteps: TourStep[] = [
+  const tourSteps: TourStep[] = useMemo(() => [
     {
       id: 'welcome',
       title: 'Chào mừng đến với FinHome! 🎉',
@@ -124,7 +124,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
       position: 'center',
       highlight: true
     }
-  ]
+  ], [])
 
   // Auto-play tour
   useEffect(() => {

@@ -98,7 +98,7 @@ export function useAchievements(): UseAchievementsReturn {
           console.error('Error saving user progress:', err)
         })
     }
-  }, [achievementEngine, userProgress, toast])
+  }, [achievementEngine, userProgress])
 
   // Update progress data
   const updateProgress = useCallback((updates: Partial<UserProgress['progressData']>) => {

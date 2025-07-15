@@ -264,8 +264,9 @@ export function useContextualHelp(): UseContextualHelpReturn {
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
-      timeoutRef.current.forEach(timeout => clearTimeout(timeout))
-      timeoutRef.current.clear()
+      const timeouts = timeoutRef.current
+      timeouts.forEach(timeout => clearTimeout(timeout))
+      timeouts.clear()
     }
   }, [])
 

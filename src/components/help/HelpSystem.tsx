@@ -72,7 +72,7 @@ export const HelpSystem: React.FC<HelpSystemProps> = ({ className }) => {
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null)
 
   // Mock help content
-  const helpArticles: HelpArticle[] = [
+  const helpArticles: HelpArticle[] = useMemo(() => [
     {
       id: '1',
       title: 'Bắt đầu với FinHome: Hướng dẫn toàn diện',
@@ -133,9 +133,9 @@ export const HelpSystem: React.FC<HelpSystemProps> = ({ className }) => {
       views: 423,
       lastUpdated: new Date('2024-01-03')
     }
-  ]
+  ], [])
 
-  const faqs: FAQ[] = [
+  const faqs: FAQ[] = useMemo(() => [
     {
       id: '1',
       question: 'FinHome có miễn phí sử dụng không?',
@@ -176,7 +176,7 @@ export const HelpSystem: React.FC<HelpSystemProps> = ({ className }) => {
       helpful: 52,
       notHelpful: 4
     }
-  ]
+  ], [])
 
   const categories = [
     { id: 'all', name: 'Tất cả', icon: Book, color: 'bg-gray-500' },
@@ -199,7 +199,7 @@ export const HelpSystem: React.FC<HelpSystemProps> = ({ className }) => {
       
       return matchesSearch && matchesCategory
     })
-  }, [searchQuery, selectedCategory])
+  }, [searchQuery, selectedCategory, helpArticles])
 
   // Filter FAQs
   const filteredFAQs = useMemo(() => {
@@ -212,7 +212,7 @@ export const HelpSystem: React.FC<HelpSystemProps> = ({ className }) => {
       
       return matchesSearch && matchesCategory
     })
-  }, [searchQuery, selectedCategory])
+  }, [searchQuery, selectedCategory, faqs])
 
   const handleArticleClick = (article: HelpArticle) => {
     showToast(ToastHelpers.info('Đang mở bài viết', `"${article.title}"`))

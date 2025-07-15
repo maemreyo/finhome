@@ -439,7 +439,7 @@ export const PlansList: React.FC<PlansListProps> = ({
   
   // Filter and sort plans
   const filteredAndSortedPlans = React.useMemo(() => {
-    let filtered = plans.filter(plan => {
+    const filtered = plans.filter(plan => {
       const matchesSearch = plan.planName.toLowerCase().includes(searchQuery.toLowerCase())
       const matchesStatus = filterStatus === 'all' || plan.planStatus === filterStatus
       return matchesSearch && matchesStatus

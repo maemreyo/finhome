@@ -3,7 +3,7 @@
 
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Building, 
@@ -78,7 +78,7 @@ export const BankRateComparison: React.FC<BankRateComparisonProps> = ({
   }, [])
 
   // Perform comparison
-  const performComparison = async () => {
+  const performComparison = useCallback(async () => {
     setIsLoading(true)
     try {
       const result = await bankService.compareLoanOptions(
@@ -92,13 +92,13 @@ export const BankRateComparison: React.FC<BankRateComparisonProps> = ({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [loanAmount, loanTerm, downPayment])
 
   // Auto-compare when parameters change
   useEffect(() => {
     const timer = setTimeout(performComparison, 500)
     return () => clearTimeout(timer)
-  }, [loanAmount, loanTerm, downPayment])
+  }, [loanAmount, loanTerm, downPayment, performComparison])
 
   const actualLoanAmount = loanAmount * ((100 - downPayment[0]) / 100)
 

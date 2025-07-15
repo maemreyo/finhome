@@ -445,7 +445,7 @@ export function calculateTimelineCompression(
   return { compressedEvents, monthsSaved }
 }
 
-export default {
+const timelineUtils = {
   generateTimelineEvents,
   generateTimelineFromScenario,
   convertScenarioToTimeline,
@@ -453,3 +453,5 @@ export default {
   addPrepaymentEvent,
   calculateTimelineCompression
 }
+
+export default timelineUtils

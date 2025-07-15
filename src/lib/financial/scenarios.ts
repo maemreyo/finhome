@@ -359,7 +359,7 @@ export class ScenarioEngine {
     projections: CashFlowProjection[], 
     parameters: ScenarioParameters
   ): CashFlowProjection[] {
-    let modifiedProjections = [...projections]
+    const modifiedProjections = [...projections]
 
     // Apply prepayments
     if (parameters.prepayments) {

@@ -316,8 +316,8 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     const tutorial = INTERACTIVE_TUTORIALS.find(t => t.id === tutorialId)
     if (!tutorial) return
 
-    // Check if tutorial should be shown
-    if (!shouldShowTutorial(tutorialId)) return
+    // Check if tutorial should be shown based on preferences
+    if (!tutorialPreferences?.autoStartTutorials) return
 
     // Load existing progress or create new
     let tutorialProgress = getUserTutorialProgress(user.id, tutorialId)
@@ -341,7 +341,7 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     setIsPaused(false)
     
     saveTutorialProgress(tutorialProgress)
-  }, [user])
+  }, [user, tutorialPreferences])
 
   // Move to next step
   const nextStep = useCallback(() => {
@@ -366,6 +366,7 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     setCanProceed(false)
     
     saveTutorialProgress(updatedProgress)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTutorial, progress, currentStepIndex, user])
 
   // Move to previous step
@@ -565,8 +566,9 @@ export function useInteractiveTutorial(): UseTutorialReturn {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (stepTimeoutRef.current) {
-        clearTimeout(stepTimeoutRef.current)
+      const timeout = stepTimeoutRef.current
+      if (timeout) {
+        clearTimeout(timeout)
       }
     }
   }, [])
