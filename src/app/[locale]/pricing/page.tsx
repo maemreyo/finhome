@@ -6,7 +6,7 @@ import { Metadata } from 'next'
 import { useTranslations } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
 
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'PricingPage.metadata' })
 
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   }
 }
 
-export default async function PricingPage({ params }: { params: { locale: string } }) {
+export default async function PricingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'PricingPage' })
 

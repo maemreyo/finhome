@@ -137,13 +137,14 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { planId } = await params
     const supabase = await createClient()
 
     // First check if user owns the plan
     const { data: existingPlan, error: fetchError } = await supabase
       .from('financial_plans')
       .select('user_id')
-      .eq('id', params.planId)
+      .eq('id', planId)
       .single()
 
     if (fetchError || !existingPlan) {
@@ -158,7 +159,7 @@ export async function DELETE(
     const { error: deleteError } = await supabase
       .from('financial_plans')
       .delete()
-      .eq('id', params.planId)
+      .eq('id', planId)
 
     if (deleteError) {
       console.error('Error deleting plan:', deleteError)
