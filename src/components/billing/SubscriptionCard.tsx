@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useSubscription } from '@/hooks/useAuth'
-import { getPlanByStripePriceId } from '@/lib/stripe/config'
+import { getPlanByStripePriceId } from '@/lib/stripe/client-config'
 import { format } from 'date-fns'
 import { CreditCard, Calendar } from 'lucide-react'
 

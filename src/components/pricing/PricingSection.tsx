@@ -7,7 +7,7 @@ import { PricingCard } from './PricingCard'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { PRICING_PLANS } from '@/lib/stripe/config'
+import { PRICING_PLANS } from '@/lib/stripe/client-config'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 

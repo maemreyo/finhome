@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useAuth, useSubscription } from '@/hooks/useAuth'
-import { PricingPlan } from '@/lib/stripe/config'
+import { PricingPlan } from '@/lib/stripe/client-config'
 import { Check, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 

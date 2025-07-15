@@ -1,26 +1,12 @@
-// Stripe configuration and utilities
+// Server-side Stripe configuration and utilities
 
 import Stripe from 'stripe'
-import { loadStripe, type Stripe as StripeJS } from '@stripe/stripe-js'
 
 // Server-side Stripe instance
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-06-30.basil',
   typescript: true,
 })
-
-// Client-side Stripe instance
-let stripePromise: Promise<StripeJS | null>
-export const getStripe = () => {
-  if (!stripePromise) {
-    const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-    if (!publishableKey) {
-      throw new Error('Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY environment variable')
-    }
-    stripePromise = loadStripe(publishableKey)
-  }
-  return stripePromise
-}
 
 // Pricing plans configuration
 export interface PricingPlan {
@@ -61,7 +47,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 29,
     currency: 'usd',
     interval: 'month',
-    stripePriceId: process.env.STRIPE_PRO_PRICE_ID!,
+    stripePriceId: process.env.STRIPE_PRO_PRICE_ID || 'price_pro_monthly',
     features: [
       'Unlimited projects',
       'Advanced analytics',
@@ -81,7 +67,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 99,
     currency: 'usd',
     interval: 'month',
-    stripePriceId: process.env.STRIPE_ENTERPRISE_PRICE_ID!,
+    stripePriceId: process.env.STRIPE_ENTERPRISE_PRICE_ID || 'price_enterprise_monthly',
     features: [
       'Everything in Pro',
       'Dedicated support',
