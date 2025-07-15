@@ -464,7 +464,7 @@ export const TutorialPauseOverlay: React.FC<TutorialPauseOverlayProps> = ({
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600 mb-4">
-              "{tutorialName}" đã được tạm dừng. Bạn muốn tiếp tục hay thoát khỏi hướng dẫn?
+              &quot;{tutorialName}&quot; đã được tạm dừng. Bạn muốn tiếp tục hay thoát khỏi hướng dẫn?
             </p>
             <div className="flex gap-3">
               <Button onClick={onResume} className="flex-1">

@@ -589,7 +589,7 @@ export const HelpSystem: React.FC<HelpSystemProps> = ({ className }) => {
                 <div className="space-y-2">
                   <h4 className="font-semibold text-blue-900">🎯 Mẹo tìm kiếm:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Sử dụng từ khóa cụ thể như "ROI", "lãi suất"</li>
+                    <li>• Sử dụng từ khóa cụ thể như &quot;ROI&quot;, &quot;lãi suất&quot;</li>
                     <li>• Tìm theo danh mục để thu hẹp kết quả</li>
                     <li>• Đọc FAQ trước khi liên hệ hỗ trợ</li>
                   </ul>
@@ -597,7 +597,7 @@ export const HelpSystem: React.FC<HelpSystemProps> = ({ className }) => {
                 <div className="space-y-2">
                   <h4 className="font-semibold text-blue-900">💡 Mẹo học tập:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Bắt đầu với bài viết "Cơ bản"</li>
+                    <li>• Bắt đầu với bài viết &quot;Cơ bản&quot;</li>
                     <li>• Thực hành với dữ liệu thật</li>
                     <li>• Tham gia cộng đồng để chia sẻ kinh nghiệm</li>
                   </ul>
