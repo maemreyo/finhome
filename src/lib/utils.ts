@@ -7,7 +7,18 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Currency formatting for Vietnamese Dong
-export function formatCurrency(amount: number): string {
+export function formatCurrency(amount: number, options?: { compact?: boolean }): string {
+  if (options?.compact) {
+    if (amount >= 1000000000) {
+      return numeral(amount / 1000000000).format('0.0') + ' tỷ ₫'
+    }
+    if (amount >= 1000000) {
+      return numeral(amount / 1000000).format('0.0') + ' tr ₫'
+    }
+    if (amount >= 1000) {
+      return numeral(amount / 1000).format('0.0') + ' k ₫'
+    }
+  }
   return numeral(amount).format('0,0') + ' ₫'
 }
 
