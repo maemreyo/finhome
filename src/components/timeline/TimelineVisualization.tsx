@@ -48,10 +48,14 @@ export interface TimelineEvent {
 export interface TimelineScenario {
   id: string
   name: string
+  description?: string
   type: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test'
   events: TimelineEvent[]
   totalDuration: number // months
   totalInterest: number
+  totalCost: number
+  monthlyPayment: number
+  interestRate: number
   monthlySavings?: number
   riskLevel: 'low' | 'medium' | 'high'
 }

@@ -289,6 +289,9 @@ export function convertScenarioToTimeline(scenarioResult: ScenarioResults): Time
     events,
     totalDuration: Math.max(...events.map(e => e.month)),
     totalInterest: scenarioResult.metrics.totalInterest,
+    totalCost: scenarioResult.metrics.totalInterest + 3000000000, // Approximate total cost
+    monthlyPayment: scenarioResult.metrics.monthlyPayment,
+    interestRate: 10.5, // Default interest rate
     monthlySavings: scenarioResult.comparisonToBaseline?.monthlySavings,
     riskLevel
   }
