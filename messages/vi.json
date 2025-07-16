@@ -2,6 +2,81 @@
   "Index": {
     "title": "Chào thế giới!"
   },
+  "Admin": {
+    "metadata": {
+      "title": "Bảng Điều Khiển Quản Trị - FinHome",
+      "description": "Bảng điều khiển quản trị để quản lý ứng dụng FinHome"
+    },
+    "dashboard": {
+      "title": "Bảng Điều Khiển Quản Trị",
+      "description": "Quản lý ứng dụng FinHome từ trung tâm điều khiển này",
+      "systemOnline": "Hệ Thống Trực Tuyến",
+      "totalUsers": "Tổng Số Người Dùng",
+      "activeBanks": "Ngân Hàng Hoạt Động",
+      "achievements": "Thành Tích",
+      "interestRates": "Lãi Suất",
+      "recentActivities": "Hoạt Động Quản Trị Gần Đây",
+      "quickActions": "Hành Động Nhanh",
+      "systemStatus": "Trạng Thái Hệ Thống"
+    },
+    "banks": {
+      "title": "Quản Lý Ngân Hàng",
+      "description": "Quản lý các ngân hàng Việt Nam và sản phẩm vay của họ",
+      "activeBanks": "Ngân Hàng Hoạt Động",
+      "allBanks": "Tất Cả Ngân Hàng",
+      "export": "Xuất",
+      "import": "Nhập",
+      "addBank": "Thêm Ngân Hàng"
+    },
+    "rates": {
+      "title": "Quản Lý Lãi Suất",
+      "description": "Quản lý lãi suất ngân hàng và sản phẩm vay",
+      "currentRates": "Lãi Suất Hiện Tại",
+      "allRates": "Tất Cả Lãi Suất",
+      "export": "Xuất",
+      "import": "Nhập",
+      "addRate": "Thêm Lãi Suất"
+    },
+    "achievements": {
+      "title": "Quản Lý Thành Tích",
+      "description": "Quản lý thành tích và cột mốc của người dùng",
+      "activeAchievements": "Thành Tích Hoạt Động",
+      "allAchievements": "Tất Cả Thành Tích",
+      "export": "Xuất",
+      "import": "Nhập",
+      "addAchievement": "Thêm Thành Tích"
+    },
+    "notifications": {
+      "title": "Quản Lý Thông Báo",
+      "description": "Quản lý thông báo hệ thống và công bố",
+      "activeNotifications": "Thông Báo Hoạt Động",
+      "allNotifications": "Tất Cả Thông Báo",
+      "export": "Xuất",
+      "import": "Nhập",
+      "addNotification": "Thêm Thông Báo"
+    },
+    "users": {
+      "title": "Quản Lý Người Dùng",
+      "description": "Quản lý người dùng đã đăng ký và hồ sơ của họ",
+      "totalUsers": "Tổng Số Người Dùng",
+      "allUsers": "Tất Cả Người Dùng",
+      "export": "Xuất",
+      "import": "Nhập",
+      "addUser": "Thêm Người Dùng"
+    },
+    "navigation": {
+      "dashboard": "Bảng Điều Khiển",
+      "banks": "Ngân Hàng",
+      "rates": "Lãi Suất",
+      "achievements": "Thành Tích",
+      "notifications": "Thông Báo",
+      "users": "Người Dùng",
+      "analytics": "Phân Tích",
+      "content": "Nội Dung",
+      "system": "Hệ Thống",
+      "settings": "Cài Đặt"
+    }
+  },
   "LandingPage": {
     "HeroSection": {
       "badge": "🚀 Mới: Bảng điều khiển phân tích nâng cao",
