@@ -611,11 +611,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode, onSelec
 
               {/* Action Buttons */}
               <div className="flex gap-2">
-                <Button size="sm" className="flex-1">
+                <Button size="sm" className="flex-1" onClick={(e) => {
+                  e.stopPropagation()
+                  onSelect()
+                }}>
                   <Calculator className="w-3 h-3 mr-1" />
                   Tính Toán
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={(e) => {
+                  e.stopPropagation()
+                  onSelect()
+                }}>
                   Chi Tiết
                 </Button>
               </div>

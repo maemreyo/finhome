@@ -57,10 +57,9 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRealtimeBanks } from '@/lib/hooks/useRealtimeData'
-import { AdminQueries } from '@/lib/supabase/admin-queries'
 import { ExportImportUtils } from '@/lib/utils/export-import'
 import { useToast } from '@/hooks/use-toast'
-import { withAdminAction } from '@/lib/supabase/admin'
+import { AdminQueriesClient } from '@/lib/supabase/admin-queries-client'
 import type { Bank } from '@/lib/supabase/types'
 
 interface BankManagementTableConnectedProps {
@@ -82,17 +81,8 @@ export const BankManagementTableConnected: React.FC<BankManagementTableConnected
 
   const handleUpdateBank = async (id: string, updates: Partial<Bank>) => {
     try {
-      await withAdminAction(
-        'update_bank',
-        'banks',
-        async () => {
-          const updatedBank = await AdminQueries.updateBank(id, updates)
-          setData(prev => prev.map(bank => bank.id === id ? updatedBank : bank))
-          return updatedBank
-        },
-        id,
-        updates
-      )
+      const updatedBank = await AdminQueriesClient.updateBank(id, updates)
+      setData(prev => prev.map(bank => bank.id === id ? updatedBank : bank))
       
       toast({
         title: "Bank updated",
@@ -113,15 +103,8 @@ export const BankManagementTableConnected: React.FC<BankManagementTableConnected
     }
 
     try {
-      await withAdminAction(
-        'delete_bank',
-        'banks',
-        async () => {
-          await AdminQueries.deleteBank(id)
-          setData(prev => prev.filter(bank => bank.id !== id))
-        },
-        id
-      )
+      await AdminQueriesClient.deleteBank(id)
+      setData(prev => prev.filter(bank => bank.id !== id))
       
       toast({
         title: "Bank deleted",
@@ -138,7 +121,7 @@ export const BankManagementTableConnected: React.FC<BankManagementTableConnected
 
   const handleExportData = async () => {
     try {
-      const exportData = await AdminQueries.exportData('banks', 'csv')
+      const exportData = await AdminQueriesClient.exportData('banks', 'csv')
       ExportImportUtils.downloadCSV(exportData, `banks_export_${new Date().toISOString().split('T')[0]}.csv`)
       
       toast({
@@ -156,18 +139,10 @@ export const BankManagementTableConnected: React.FC<BankManagementTableConnected
 
   const handleBulkStatusUpdate = async (bankIds: string[], isActive: boolean) => {
     try {
-      await withAdminAction(
-        'bulk_update_bank_status',
-        'banks',
-        async () => {
-          await AdminQueries.bulkUpdateBankStatus(bankIds, isActive)
-          setData(prev => prev.map(bank => 
-            bankIds.includes(bank.id) ? { ...bank, is_active: isActive } : bank
-          ))
-        },
-        undefined,
-        { bankIds, isActive }
-      )
+      await AdminQueriesClient.bulkUpdateBankStatus(bankIds, isActive)
+      setData(prev => prev.map(bank => 
+        bankIds.includes(bank.id) ? { ...bank, is_active: isActive } : bank
+      ))
       
       toast({
         title: "Bulk update completed",

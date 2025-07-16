@@ -43,6 +43,8 @@ import { toast } from 'sonner'
 // Import our components
 import { TimelineVisualization, TimelineScenario } from '@/components/timeline/TimelineVisualization'
 import { FinancialPlan } from './PlansList'
+import PlanProgressTracker, { PlanProgress, PlanMilestone, PlanStatus } from '@/components/plans/PlanProgressTracker'
+import { UIFinancialPlan } from '@/lib/adapters/planAdapter'
 
 // Import export functions
 import { exportFinancialPlanToPDF } from '@/lib/export/pdfExport'
@@ -416,6 +418,119 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
   )
   const [isExporting, setIsExporting] = useState(false)
 
+  // Convert FinancialPlan to UIFinancialPlan for the progress tracker
+  const uiPlan: UIFinancialPlan = {
+    id: plan.id,
+    planName: plan.planName,
+    planDescription: plan.planDescription,
+    planType: plan.planType,
+    purchasePrice: plan.purchasePrice,
+    downPayment: plan.downPayment,
+    monthlyIncome: plan.monthlyIncome,
+    monthlyExpenses: plan.monthlyExpenses,
+    currentSavings: plan.currentSavings,
+    planStatus: plan.planStatus,
+    isPublic: plan.isPublic,
+    isFavorite: plan.isFavorite || false,
+    createdAt: plan.createdAt,
+    updatedAt: plan.updatedAt,
+    monthlyPayment: plan.monthlyPayment,
+    totalInterest: plan.totalInterest,
+    affordabilityScore: plan.affordabilityScore,
+    riskLevel: plan.riskLevel,
+    roi: plan.roi,
+    expectedRentalIncome: plan.expectedRentalIncome
+  }
+
+  // Mock progress data - in a real app, this would come from an API
+  const mockProgress: PlanProgress = {
+    totalProgress: 65,
+    financialProgress: 75,
+    savingsTarget: plan.downPayment,
+    currentSavings: plan.currentSavings,
+    monthlyContribution: 5000000, // 5M VND per month
+    estimatedCompletionDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+    milestones: [
+      {
+        id: 'financial-1',
+        title: 'Complete down payment savings',
+        description: 'Accumulate full down payment amount',
+        targetDate: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000),
+        status: 'in_progress',
+        category: 'financial',
+        requiredAmount: plan.downPayment,
+        currentAmount: plan.currentSavings,
+        priority: 'high'
+      },
+      {
+        id: 'legal-1',
+        title: 'Property legal verification',
+        description: 'Verify property ownership and legal status',
+        targetDate: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000),
+        status: 'pending',
+        category: 'legal',
+        priority: 'high'
+      },
+      {
+        id: 'financial-2',
+        title: 'Secure bank loan approval',
+        description: 'Get pre-approval from chosen bank',
+        targetDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
+        status: 'pending',
+        category: 'financial',
+        priority: 'high'
+      },
+      {
+        id: 'property-1',
+        title: 'Property inspection',
+        description: 'Professional property condition assessment',
+        targetDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
+        status: 'pending',
+        category: 'property',
+        priority: 'medium'
+      },
+      {
+        id: 'admin-1',
+        title: 'Insurance setup',
+        description: 'Property and mortgage insurance arrangement',
+        targetDate: new Date(Date.now() + 190 * 24 * 60 * 60 * 1000),
+        status: 'pending',
+        category: 'admin',
+        priority: 'medium'
+      }
+    ],
+    statusHistory: [
+      {
+        status: 'draft',
+        date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        note: 'Plan created'
+      },
+      {
+        status: 'active',
+        date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        note: 'Plan activated by user'
+      }
+    ]
+  }
+
+  const handleStatusChange = (status: PlanStatus, note?: string) => {
+    // In a real app, this would call an API to update the plan status
+    console.log('Status change:', status, note)
+    toast.success(`Plan status updated to ${status}`)
+  }
+
+  const handleMilestoneUpdate = (milestoneId: string, updates: Partial<PlanMilestone>) => {
+    // In a real app, this would call an API to update the milestone
+    console.log('Milestone update:', milestoneId, updates)
+    toast.success('Milestone updated successfully')
+  }
+
+  const handleContributionUpdate = (amount: number) => {
+    // In a real app, this would call an API to update the monthly contribution
+    console.log('Contribution update:', amount)
+    toast.success(`Monthly contribution updated to ${formatCurrency(amount)}`)
+  }
+
   const handleExportPDF = async () => {
     setIsExporting(true)
     try {
@@ -564,8 +679,9 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
       
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="progress">Progress</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="analysis">Analysis</TabsTrigger>
           <TabsTrigger value="scenarios">Scenarios</TabsTrigger>
@@ -577,6 +693,16 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
             <RiskAssessment plan={plan} />
             {plan.planType === 'investment' && <InvestmentMetrics plan={plan} />}
           </div>
+        </TabsContent>
+
+        <TabsContent value="progress" className="space-y-6">
+          <PlanProgressTracker
+            plan={uiPlan}
+            progress={mockProgress}
+            onStatusChange={handleStatusChange}
+            onMilestoneUpdate={handleMilestoneUpdate}
+            onContributionUpdate={handleContributionUpdate}
+          />
         </TabsContent>
         
         <TabsContent value="timeline" className="space-y-6">

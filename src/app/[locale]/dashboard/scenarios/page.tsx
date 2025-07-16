@@ -8,11 +8,21 @@ import { useTranslations } from 'next-intl'
 import { Header } from '@/components/dashboard/Header'
 import { ScenarioComparison } from '@/components/scenarios/ScenarioComparison'
 import { useScenarios, LoanScenario } from '@/hooks/useScenarios'
+import { useBankRates } from '@/hooks/useBankRates'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Plus, TrendingUp, Calculator, AlertCircle } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Slider } from '@/components/ui/slider'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Plus, TrendingUp, Calculator, AlertCircle, Sparkles, RefreshCw } from 'lucide-react'
+import { toast } from 'sonner'
+import { formatCurrency } from '@/lib/utils'
+import { calculateMonthlyPayment } from '@/lib/financial/calculations'
 
 // Mock data for demonstration
 const mockScenarios: LoanScenario[] = [
@@ -94,6 +104,13 @@ const mockScenarios: LoanScenario[] = [
   }
 ]
 
+interface ScenarioGeneratorForm {
+  propertyPrice: number
+  monthlyIncome: number
+  monthlyExpenses: number
+  loanType: 'home_purchase' | 'investment' | 'commercial'
+}
+
 export default function ScenariosPage() {
   const {
     scenarios,
@@ -105,8 +122,16 @@ export default function ScenariosPage() {
     duplicateScenario
   } = useScenarios(mockScenarios)
   
+  const { rates, isLoading: ratesLoading, getRates } = useBankRates()
   const [selectedScenario, setSelectedScenario] = useState<LoanScenario | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [generatorForm, setGeneratorForm] = useState<ScenarioGeneratorForm>({
+    propertyPrice: 2500000000,
+    monthlyIncome: 45000000,
+    monthlyExpenses: 18000000,
+    loanType: 'home_purchase'
+  })
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const handleScenarioSelect = (scenario: LoanScenario) => {
     setSelectedScenario(scenario)
@@ -116,9 +141,122 @@ export default function ScenariosPage() {
 
   const handleCreateNewScenario = () => {
     setShowCreateModal(true)
-    // In a real app, this would open a scenario creation modal/form
-    console.log('Create new scenario')
+    // Load latest bank rates when opening the modal
+    getRates({ loanType: generatorForm.loanType, isActive: true })
   }
+
+  const generateSmartScenarios = async () => {
+    setIsGenerating(true)
+    try {
+      // Get current bank rates for the loan type
+      await getRates({ 
+        loanType: generatorForm.loanType, 
+        isActive: true,
+        minAmount: generatorForm.propertyPrice * 0.7, // Assume 70% loan amount
+        maxAmount: generatorForm.propertyPrice * 0.9  // Max 90% loan amount
+      })
+
+      // Create scenarios with different down payment percentages
+      const downPaymentOptions = [10, 15, 20, 25, 30]
+      const loanTermOptions = [15, 20, 25, 30]
+      
+      const generatedScenarios: LoanScenario[] = []
+      let scenarioId = 1
+
+      for (const downPaymentPercent of downPaymentOptions) {
+        for (const loanTermYears of loanTermOptions) {
+          if (generatedScenarios.length >= 6) break // Limit to 6 scenarios
+
+          const downPayment = Math.round(generatorForm.propertyPrice * (downPaymentPercent / 100))
+          const loanAmount = generatorForm.propertyPrice - downPayment
+
+          // Use rates from bank data or fallback to market average
+          const applicableRates = rates.filter(rate => 
+            (rate.min_amount || 0) <= loanAmount && 
+            (rate.max_amount || Infinity) >= loanAmount &&
+            (rate.min_term_months || 0) <= loanTermYears * 12 &&
+            (rate.max_term_months || Infinity) >= loanTermYears * 12
+          )
+
+          const bestRate = applicableRates.length > 0 ? 
+            Math.min(...applicableRates.map(r => r.promotional_rate || r.base_rate)) :
+            8.5 + (loanTermYears > 20 ? 1.0 : 0) + (downPaymentPercent < 20 ? 0.5 : 0)
+
+          const monthlyPayment = calculateMonthlyPayment({
+            principal: loanAmount,
+            annualRate: bestRate,
+            termMonths: loanTermYears * 12
+          })
+
+          const totalPayment = monthlyPayment * loanTermYears * 12
+          const totalInterest = totalPayment - loanAmount
+          const netCashFlow = generatorForm.monthlyIncome - generatorForm.monthlyExpenses - monthlyPayment
+
+          // Determine risk level and recommendation
+          const debtToIncomeRatio = (monthlyPayment / generatorForm.monthlyIncome) * 100
+          let riskLevel: 'low' | 'medium' | 'high' = 'low'
+          let recommendation: 'optimal' | 'safe' | 'aggressive' | 'risky' = 'safe'
+
+          if (debtToIncomeRatio > 45 || netCashFlow < 0 || downPaymentPercent < 15) {
+            riskLevel = 'high'
+            recommendation = 'risky'
+          } else if (debtToIncomeRatio > 35 || downPaymentPercent < 20) {
+            riskLevel = 'medium'
+            recommendation = 'aggressive'
+          } else if (debtToIncomeRatio <= 30 && downPaymentPercent >= 20 && netCashFlow > 5000000) {
+            recommendation = 'optimal'
+          }
+
+          const scenario: LoanScenario = {
+            id: `generated-${scenarioId++}`,
+            name: `${downPaymentPercent}% vốn tự có - ${loanTermYears} năm`,
+            downPaymentPercent,
+            loanTermYears,
+            interestRate: bestRate,
+            propertyPrice: generatorForm.propertyPrice,
+            downPayment,
+            loanAmount,
+            monthlyPayment: Math.round(monthlyPayment),
+            totalInterest: Math.round(totalInterest),
+            totalPayment: Math.round(totalPayment),
+            monthlyIncome: generatorForm.monthlyIncome,
+            monthlyExpenses: generatorForm.monthlyExpenses,
+            netCashFlow: Math.round(netCashFlow),
+            riskLevel,
+            recommendation,
+            createdAt: new Date()
+          }
+
+          generatedScenarios.push(scenario)
+        }
+        if (generatedScenarios.length >= 6) break
+      }
+
+      // Sort by recommendation priority and add to scenarios
+      const sortedScenarios = generatedScenarios.sort((a, b) => {
+        const priority = { optimal: 4, safe: 3, aggressive: 2, risky: 1 }
+        return priority[b.recommendation] - priority[a.recommendation]
+      })
+
+      // Clear existing scenarios and add new ones
+      scenarios.forEach(scenario => deleteScenario(scenario.id))
+      sortedScenarios.forEach(scenario => createScenario(scenario))
+
+      setShowCreateModal(false)
+      toast.success(`Generated ${sortedScenarios.length} scenarios based on current market rates!`)
+      
+    } catch (error) {
+      console.error('Error generating scenarios:', error)
+      toast.error('Failed to generate scenarios. Please try again.')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  // Load bank rates on component mount
+  useEffect(() => {
+    getRates({ loanType: 'home_purchase', isActive: true })
+  }, [])
 
   const optimalScenarios = scenarios.filter(s => s.recommendation === 'optimal')
   const totalScenarios = scenarios.length
@@ -221,15 +359,143 @@ export default function ScenariosPage() {
               <CardTitle className="text-sm font-medium">Hành Động</CardTitle>
               <Plus className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={handleCreateNewScenario}
-                className="w-full"
-                size="sm"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Tạo Mới
-              </Button>
+            <CardContent className="space-y-2">
+              <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+                <DialogTrigger asChild>
+                  <Button 
+                    onClick={handleCreateNewScenario}
+                    className="w-full"
+                    size="sm"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Tạo Thông Minh
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-blue-600" />
+                      Tạo Kịch Bản Thông Minh
+                    </DialogTitle>
+                    <DialogDescription>
+                      Sử dụng lãi suất thị trường thực tế để tạo các kịch bản tối ưu
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="propertyPrice">Giá bất động sản (VNĐ)</Label>
+                      <Input
+                        id="propertyPrice"
+                        type="number"
+                        value={generatorForm.propertyPrice}
+                        onChange={(e) => setGeneratorForm(prev => ({ 
+                          ...prev, 
+                          propertyPrice: Number(e.target.value) 
+                        }))}
+                        placeholder="2,500,000,000"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="monthlyIncome">Thu nhập hàng tháng (VNĐ)</Label>
+                      <Input
+                        id="monthlyIncome"
+                        type="number"
+                        value={generatorForm.monthlyIncome}
+                        onChange={(e) => setGeneratorForm(prev => ({ 
+                          ...prev, 
+                          monthlyIncome: Number(e.target.value) 
+                        }))}
+                        placeholder="45,000,000"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="monthlyExpenses">Chi phí hàng tháng (VNĐ)</Label>
+                      <Input
+                        id="monthlyExpenses"
+                        type="number"
+                        value={generatorForm.monthlyExpenses}
+                        onChange={(e) => setGeneratorForm(prev => ({ 
+                          ...prev, 
+                          monthlyExpenses: Number(e.target.value) 
+                        }))}
+                        placeholder="18,000,000"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="loanType">Loại vay</Label>
+                      <Select
+                        value={generatorForm.loanType}
+                        onValueChange={(value: any) => setGeneratorForm(prev => ({ 
+                          ...prev, 
+                          loanType: value 
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="home_purchase">Mua nhà ở</SelectItem>
+                          <SelectItem value="investment">Đầu tư</SelectItem>
+                          <SelectItem value="commercial">Thương mại</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {ratesLoading && (
+                      <Alert>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        <AlertDescription>
+                          Đang tải lãi suất thị trường...
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {rates.length > 0 && (
+                      <Alert>
+                        <TrendingUp className="h-4 w-4" />
+                        <AlertDescription>
+                          Tìm thấy {rates.length} lãi suất áp dụng cho kịch bản của bạn
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={() => setShowCreateModal(false)}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      Hủy
+                    </Button>
+                    <Button
+                      onClick={generateSmartScenarios}
+                      disabled={isGenerating || ratesLoading}
+                      className="flex-1"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          Đang tạo...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Tạo Kịch Bản
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <Badge variant="outline" className="w-full justify-center text-xs">
+                {rates.length} lãi suất có sẵn
+              </Badge>
             </CardContent>
           </Card>
         </div>

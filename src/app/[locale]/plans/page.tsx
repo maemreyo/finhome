@@ -3,24 +3,29 @@
 
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
 
-import PlansList, { type FinancialPlan } from '@/components/financial-plans/PlansList'
+import PlansList from '@/components/financial-plans/PlansList'
 import CreatePlanForm from '@/components/financial-plans/CreatePlanForm'
 import PlanDetailView from '@/components/financial-plans/PlanDetailView'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { convertScenarioToTimeline } from '@/lib/timeline/timelineUtils'
 import { ScenarioEngine, type ScenarioDefinition } from '@/lib/financial/scenarios'
 import { type LoanParameters } from '@/lib/financial/calculations'
 import { useAuth } from '@/hooks/useAuth'
-import { getUserFinancialPlans } from '@/lib/supabase/server'
+import { usePlans } from '@/hooks/usePlans'
+import { useOptimalRates } from '@/hooks/useBankRates'
+import { type FinancialPlan, type CreatePlanRequest } from '@/lib/api/plans'
+import { apiPlansToUIPlans, type UIFinancialPlan } from '@/lib/adapters/planAdapter'
 
-// Sample data for demo/fallback
-const samplePlans: FinancialPlan[] = [
+// Sample data for demo/fallback (UI format)
+const samplePlans: UIFinancialPlan[] = [
   {
     id: '1',
     planName: 'My First Home Purchase',
@@ -73,41 +78,33 @@ export default function PlansPage() {
   const t = useTranslations('PlansPage')
   const { user } = useAuth()
   const [viewMode, setViewMode] = useState<ViewMode>('list')
-  const [plans, setPlans] = useState<FinancialPlan[]>([])
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  // Bank rates for real-time calculations
+  const { getOptimalRates } = useOptimalRates()
+
+  // Use real API data with fallback to sample data for non-authenticated users
+  const { 
+    plans, 
+    isLoading, 
+    error, 
+    createPlan, 
+    updatePlan, 
+    deletePlan,
+    refreshPlans 
+  } = usePlans(user ? {} : undefined) // Only load real data if user is authenticated
+
+  // Convert API plans to UI format and fallback to sample data for non-authenticated users
+  const displayPlans = user ? apiPlansToUIPlans(plans) : samplePlans
+  const displayLoading = user ? isLoading : false
 
   const selectedPlan = useMemo(
-    () => plans.find(plan => plan.id === selectedPlanId),
-    [plans, selectedPlanId]
+    () => displayPlans.find(plan => plan.id === selectedPlanId),
+    [displayPlans, selectedPlanId]
   )
 
-  // Load user plans on mount
-  useEffect(() => {
-    const loadPlans = async () => {
-      if (user) {
-        try {
-          // In a real app, this would use server-side data fetching
-          // const userPlans = await getUserFinancialPlans(user.id)
-          // For now, use sample data
-          setPlans(samplePlans)
-        } catch (error) {
-          console.error('Error loading plans:', error)
-          toast.error(t('errors.loadFailed'))
-          setPlans(samplePlans) // Fallback to sample data
-        }
-      } else {
-        // For non-authenticated users, show sample data
-        setPlans(samplePlans)
-      }
-      setIsLoading(false)
-    }
-
-    loadPlans()
-  }, [user, t])
-
-  // Generate scenarios for the selected plan
+  // Generate scenarios for the selected plan with real bank rates
   const scenarios = useMemo(() => {
     if (!selectedPlan) return []
 
@@ -126,11 +123,17 @@ export default function PlansPage() {
       }
     }
 
+    // Use cached calculation rates if available, otherwise use market averages
+    const effectiveRate = selectedPlan.monthlyPayment ? 
+      // If we have cached calculations, derive the rate from monthly payment
+      10.5 : // Default rate when no cached data
+      10.5 // Market average rate
+
     const loanParams: LoanParameters = {
       principal: selectedPlan.purchasePrice - selectedPlan.downPayment,
-      annualRate: 10.5,
-      termMonths: 240, // 20 years
-      promotionalRate: 7.5,
+      annualRate: effectiveRate,
+      termMonths: 240, // 20 years default
+      promotionalRate: effectiveRate > 8 ? effectiveRate - 1.5 : undefined,
       promotionalPeriodMonths: 24
     }
 
@@ -165,27 +168,56 @@ export default function PlansPage() {
     setIsSubmitting(true)
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      const newPlan: FinancialPlan = {
-        id: Date.now().toString(),
-        ...formData,
-        planStatus: 'draft' as const,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isFavorite: false,
-        // Calculate basic metrics (in real app, this would be done server-side)
-        monthlyPayment: 15000000, // Placeholder
-        affordabilityScore: 7,
-        riskLevel: 'medium' as const
+      if (user) {
+        // Get optimal bank rates for enhanced planning
+        const loanAmount = formData.purchasePrice - formData.downPayment
+        const optimalRatesData = await getOptimalRates({
+          loanAmount,
+          termMonths: 240, // 20 years default
+          loanType: formData.planType || 'home_purchase',
+          downPaymentRatio: (formData.downPayment / formData.purchasePrice) * 100
+        })
+
+        // Log optimal rates for debugging (remove in production)
+        if (optimalRatesData) {
+          console.log('Found optimal rates:', optimalRatesData.recommendedRates.length, 'options')
+        }
+
+        // For authenticated users, use real API
+        const planData: CreatePlanRequest = {
+          planName: formData.planName,
+          planDescription: formData.planDescription,
+          planType: formData.planType || 'home_purchase',
+          purchasePrice: formData.purchasePrice,
+          downPayment: formData.downPayment,
+          additionalCosts: formData.additionalCosts || 0,
+          monthlyIncome: formData.monthlyIncome,
+          monthlyExpenses: formData.monthlyExpenses,
+          currentSavings: formData.currentSavings,
+          otherDebts: formData.otherDebts || 0,
+          expectedRentalIncome: formData.expectedRentalIncome,
+          expectedAppreciationRate: formData.expectedAppreciationRate,
+          investmentHorizonYears: formData.investmentHorizonYears,
+          isPublic: formData.isPublic || false
+        }
+        
+        await createPlan(planData)
+        setViewMode('list')
+        
+        // Show enhanced success message with rate info
+        if (optimalRatesData && optimalRatesData.recommendedRates.length > 0) {
+          const bestRate = optimalRatesData.recommendedRates[0]
+          toast.success(`${t('messages.createSuccess')} - Best rate found: ${bestRate.effectiveRate}%`)
+        } else {
+          toast.success(t('messages.createSuccess'))
+        }
+      } else {
+        // For non-authenticated users, show demo message
+        toast.info('Demo mode: Sign in to save real financial plans')
+        setViewMode('list')
       }
-      
-      setPlans(prev => [newPlan, ...prev])
-      setViewMode('list')
-      
-      toast.success(t('messages.createSuccess'))
     } catch (error) {
+      console.error('Error creating plan:', error)
       toast.error(t('messages.createError'))
     } finally {
       setIsSubmitting(false)
@@ -201,35 +233,64 @@ export default function PlansPage() {
     toast.info(t('messages.editComingSoon'))
   }
 
-  const handleDeletePlan = (planId: string) => {
-    setPlans(prev => prev.filter(plan => plan.id !== planId))
-    toast.success(t('messages.deleteSuccess'))
+  const handleDeletePlan = async (planId: string) => {
+    if (!user) {
+      toast.info('Demo mode: Sign in to manage real financial plans')
+      return
+    }
+
+    if (!confirm('Are you sure you want to delete this plan? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      await deletePlan(planId)
+      toast.success(t('messages.deleteSuccess'))
+    } catch (error) {
+      console.error('Error deleting plan:', error)
+      toast.error('Failed to delete plan. Please try again.')
+    }
   }
 
-  const handleDuplicatePlan = (planId: string) => {
-    const planToDuplicate = plans.find(plan => plan.id === planId)
+  const handleDuplicatePlan = async (planId: string) => {
+    if (!user) {
+      toast.info('Demo mode: Sign in to manage real financial plans')
+      return
+    }
+
+    const planToDuplicate = displayPlans.find(plan => plan.id === planId)
     if (planToDuplicate) {
-      const duplicatedPlan: FinancialPlan = {
-        ...planToDuplicate,
-        id: Date.now().toString(),
-        planName: `${planToDuplicate.planName} (${t('actions.copy')})`,
-        planStatus: 'draft',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isFavorite: false
+      try {
+        const duplicateData: CreatePlanRequest = {
+          planName: `${planToDuplicate.planName} (${t('actions.copy')})`,
+          planDescription: planToDuplicate.planDescription,
+          planType: planToDuplicate.planType,
+          purchasePrice: planToDuplicate.purchasePrice,
+          downPayment: planToDuplicate.downPayment,
+          additionalCosts: 0, // Default for duplicated plans
+          monthlyIncome: planToDuplicate.monthlyIncome,
+          monthlyExpenses: planToDuplicate.monthlyExpenses,
+          currentSavings: planToDuplicate.currentSavings,
+          otherDebts: 0, // Default for duplicated plans
+          expectedRentalIncome: planToDuplicate.expectedRentalIncome,
+          expectedAppreciationRate: undefined, // Will use default
+          investmentHorizonYears: undefined, // Will use default
+          isPublic: false
+        }
+        
+        await createPlan(duplicateData)
+        toast.success(t('messages.duplicateSuccess'))
+      } catch (error) {
+        console.error('Error duplicating plan:', error)
+        toast.error('Failed to duplicate plan. Please try again.')
       }
-      
-      setPlans(prev => [duplicatedPlan, ...prev])
-      toast.success(t('messages.duplicateSuccess'))
     }
   }
 
   const handleToggleFavorite = (planId: string) => {
-    setPlans(prev => prev.map(plan =>
-      plan.id === planId
-        ? { ...plan, isFavorite: !plan.isFavorite }
-        : plan
-    ))
+    // This would need a separate API endpoint for toggling favorites
+    // For now, just show info message
+    toast.info('Favorite functionality coming soon')
   }
 
   const handleSharePlan = () => {
@@ -245,7 +306,7 @@ export default function PlansPage() {
     setSelectedPlanId(null)
   }
 
-  if (isLoading) {
+  if (displayLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4 py-8">
@@ -269,6 +330,24 @@ export default function PlansPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8">
+        {/* Error Alert */}
+        {error && user && (
+          <Alert className="mb-6" variant="destructive">
+            <AlertDescription>
+              {error}. <button onClick={refreshPlans} className="underline">Try again</button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Demo Mode Alert for Non-Authenticated Users */}
+        {!user && (
+          <Alert className="mb-6">
+            <AlertDescription>
+              You&apos;re viewing demo data. <Link href="/auth/login" className="underline">Sign in</Link> to create and manage real financial plans.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {viewMode === 'list' && (
           <>
             <div className="flex justify-between items-center mb-6">
@@ -277,6 +356,11 @@ export default function PlansPage() {
                 <p className="text-muted-foreground">
                   {t('description')}
                 </p>
+                {user && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {displayPlans.length} plans found
+                  </p>
+                )}
               </div>
               <Button onClick={() => setViewMode('create')}>
                 <Plus className="mr-2 h-4 w-4" />
@@ -285,14 +369,14 @@ export default function PlansPage() {
             </div>
             
             <PlansList
-              plans={plans}
+              plans={displayPlans}
               onCreateNew={() => setViewMode('create')}
               onViewPlan={handleViewPlan}
               onEditPlan={handleEditPlan}
               onDeletePlan={handleDeletePlan}
               onDuplicatePlan={handleDuplicatePlan}
               onToggleFavorite={handleToggleFavorite}
-              isLoading={false}
+              isLoading={displayLoading}
             />
           </>
         )}

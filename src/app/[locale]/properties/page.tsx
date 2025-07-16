@@ -5,8 +5,10 @@
 
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { MapPin, Filter, Home, TrendingUp, Calculator, Heart } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -20,8 +22,12 @@ import {
   PROPERTY_TYPE_LABELS 
 } from '@/types/property'
 import { formatCurrency } from '@/lib/utils'
+import { useAuth } from '@/hooks/useAuth'
+import { propertyService } from '@/lib/services/propertyService'
 
 export default function PropertiesPage() {
+  const { user } = useAuth()
+  const router = useRouter()
   const [searchResults, setSearchResults] = useState<PropertySearchResults | null>(null)
   const [selectedProperty, setSelectedProperty] = useState<ExtendedProperty | null>(null)
 
@@ -32,6 +38,64 @@ export default function PropertiesPage() {
 
   const handlePropertySelect = (property: ExtendedProperty) => {
     setSelectedProperty(property)
+  }
+
+  const handleCreateFinancialPlan = () => {
+    if (!user) {
+      toast.error('Please sign in to create financial plans')
+      router.push('/auth/login')
+      return
+    }
+
+    if (!selectedProperty) {
+      toast.error('Please select a property first')
+      return
+    }
+
+    // Store the selected property in session storage for plan creation
+    sessionStorage.setItem('selectedProperty', JSON.stringify({
+      propertyId: selectedProperty.id,
+      propertyName: selectedProperty.property_name,
+      purchasePrice: selectedProperty.listed_price || 0,
+      propertyType: selectedProperty.property_type,
+      address: selectedProperty.address || `${selectedProperty.district}, ${selectedProperty.city}`,
+      area: selectedProperty.area_sqm,
+      bedrooms: selectedProperty.bedrooms,
+      bathrooms: selectedProperty.bathrooms,
+      monthlyMortgageEstimate: selectedProperty.monthlyMortgageEstimate,
+      roiProjection: selectedProperty.roiProjection
+    }))
+
+    // Navigate to plan creation with property context
+    router.push('/plans/new?source=property')
+    toast.success('Redirecting to plan creation with property details')
+  }
+
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      toast.error('Please sign in to save favorites')
+      return
+    }
+
+    if (!selectedProperty) return
+
+    try {
+      const isFavorited = await propertyService.isFavorited(selectedProperty.id)
+      
+      if (isFavorited) {
+        await propertyService.removeFromFavorites(selectedProperty.id)
+        toast.success('Removed from favorites')
+      } else {
+        await propertyService.addToFavorites(selectedProperty.id, 'Added from property search')
+        toast.success('Added to favorites')
+      }
+
+      // Update the local state
+      setSelectedProperty(prev => prev ? { ...prev, isFavorited: !isFavorited } : null)
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+      toast.error('Failed to update favorites')
+    }
   }
 
   return (
@@ -234,13 +298,17 @@ export default function PropertiesPage() {
 
                     {/* Action Buttons */}
                     <div className="border-t pt-4 space-y-2">
-                      <Button className="w-full">
+                      <Button className="w-full" onClick={handleCreateFinancialPlan}>
                         <Calculator className="w-4 h-4 mr-2" />
                         Tạo Kế Hoạch Tài Chính
                       </Button>
-                      <Button variant="outline" className="w-full">
-                        <Heart className="w-4 h-4 mr-2" />
-                        Thêm Vào Yêu Thích
+                      <Button 
+                        variant="outline" 
+                        className="w-full" 
+                        onClick={handleToggleFavorite}
+                      >
+                        <Heart className={`w-4 h-4 mr-2 ${selectedProperty.isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+                        {selectedProperty.isFavorited ? 'Bỏ Yêu Thích' : 'Thêm Vào Yêu Thích'}
                       </Button>
                     </div>
                   </CardContent>

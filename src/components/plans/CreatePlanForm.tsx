@@ -1,8 +1,8 @@
 // src/components/plans/CreatePlanForm.tsx
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -33,8 +33,11 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "react-hot-toast";
 import { formatCurrency, parseCurrency } from "@/lib/utils";
+import { Home, MapPin, Info } from "lucide-react";
 
 const createPlanSchema = z.object({
   plan_name: z.string().min(1, "Tên kế hoạch không được để trống"),
@@ -58,9 +61,24 @@ interface CreatePlanFormProps {
   userId: string;
 }
 
+interface PropertyData {
+  propertyId: string;
+  propertyName: string;
+  purchasePrice: number;
+  propertyType: string;
+  address: string;
+  area?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  monthlyMortgageEstimate?: number;
+  roiProjection?: number;
+}
+
 export function CreatePlanForm({ userId }: CreatePlanFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [propertyData, setPropertyData] = useState<PropertyData | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const form = useForm<CreatePlanFormData>({
     // @ts-ignore
@@ -78,6 +96,42 @@ export function CreatePlanForm({ userId }: CreatePlanFormProps) {
       plan_description: "",
     },
   });
+
+  // Load property data from session storage if coming from property search
+  useEffect(() => {
+    const source = searchParams.get('source');
+    if (source === 'property') {
+      try {
+        const storedProperty = sessionStorage.getItem('selectedProperty');
+        if (storedProperty) {
+          const property: PropertyData = JSON.parse(storedProperty);
+          setPropertyData(property);
+          
+          // Auto-populate form with property data
+          form.setValue('plan_name', `Plan for ${property.propertyName}`);
+          form.setValue('purchase_price', property.purchasePrice);
+          form.setValue('plan_type', property.propertyType as any);
+          form.setValue('plan_description', `Financial plan for property: ${property.propertyName} at ${property.address}`);
+          
+          // Suggest a down payment (20% of purchase price)
+          const suggestedDownPayment = Math.round(property.purchasePrice * 0.2);
+          form.setValue('down_payment', suggestedDownPayment);
+          
+          // Set additional costs based on property price (typically 5-10%)
+          const suggestedAdditionalCosts = Math.round(property.purchasePrice * 0.07);
+          form.setValue('additional_costs', suggestedAdditionalCosts);
+          
+          // Clear the session storage after loading
+          sessionStorage.removeItem('selectedProperty');
+          
+          toast.success('Property details loaded successfully!');
+        }
+      } catch (error) {
+        console.error('Error loading property data:', error);
+        toast.error('Failed to load property details');
+      }
+    }
+  }, [searchParams, form]);
 
   async function onSubmit(data: CreatePlanFormData) {
     setIsLoading(true);
@@ -110,6 +164,33 @@ export function CreatePlanForm({ userId }: CreatePlanFormProps) {
     <Form {...form}>
       {/* @ts-ignore */}
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Property Information Display */}
+        {propertyData && (
+          <Alert className="border-blue-200 bg-blue-50">
+            <Home className="h-4 w-4 text-blue-600" />
+            <AlertDescription>
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <h4 className="font-semibold text-blue-900">Creating plan for selected property:</h4>
+                  <p className="text-blue-800 font-medium">{propertyData.propertyName}</p>
+                  <div className="flex items-center gap-1 text-sm text-blue-700">
+                    <MapPin className="w-3 h-3" />
+                    <span>{propertyData.address}</span>
+                  </div>
+                  <div className="flex gap-4 text-sm text-blue-700">
+                    <span>Price: {formatCurrency(propertyData.purchasePrice)}</span>
+                    {propertyData.area && <span>Area: {propertyData.area}m²</span>}
+                    {propertyData.bedrooms && <span>Bedrooms: {propertyData.bedrooms}</span>}
+                  </div>
+                </div>
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  From Property Search
+                </Badge>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Tabs defaultValue="basic" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="basic">Thông tin cơ bản</TabsTrigger>
