@@ -1,7 +1,7 @@
 // src/lib/gamification/achievements.ts
 // Achievement system for FinHome gamification
 
-import { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 
 export interface Achievement {
   id: string
@@ -222,7 +222,7 @@ export class AchievementEngine {
   }
 
   // Check if user has unlocked any new achievements
-  checkAchievements(plans: FinancialPlan[]): Achievement[] {
+  checkAchievements(plans: FinancialPlanWithMetrics[]): Achievement[] {
     const newAchievements: Achievement[] = []
     
     // Update progress data based on current plans
@@ -244,7 +244,7 @@ export class AchievementEngine {
     return newAchievements
   }
 
-  private updateProgressData(plans: FinancialPlan[]): void {
+  private updateProgressData(plans: FinancialPlanWithMetrics[]): void {
     this.userProgress.progressData.plansCreated = plans.length
     this.userProgress.progressData.plansCompleted = plans.filter(p => p.planStatus === 'completed').length
     

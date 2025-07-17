@@ -3,7 +3,7 @@
 
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
-import { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 import { formatCurrency } from '@/lib/utils'
 import { calculateFinancialMetrics, type LoanParameters } from '@/lib/financial/calculations'
 
@@ -21,7 +21,7 @@ interface PDFExportOptions {
   logoUrl?: string
 }
 
-export class FinancialPlanPDFExporter {
+export class FinancialPlanWithMetricsPDFExporter {
   private doc: jsPDF
   private currentY: number = 20
   private pageWidth: number
@@ -35,7 +35,7 @@ export class FinancialPlanPDFExporter {
   }
 
   async exportPlan(
-    plan: FinancialPlan, 
+    plan: FinancialPlanWithMetrics, 
     options: PDFExportOptions = {}
   ): Promise<Blob> {
     try {
@@ -76,7 +76,7 @@ export class FinancialPlanPDFExporter {
     }
   }
 
-  private addHeader(plan: FinancialPlan, logoUrl?: string): void {
+  private addHeader(plan: FinancialPlanWithMetrics, logoUrl?: string): void {
     // Company logo if provided
     if (logoUrl) {
       // this.doc.addImage(logoUrl, 'PNG', this.margin, 10, 30, 15)
@@ -107,7 +107,7 @@ export class FinancialPlanPDFExporter {
     this.currentY = 55
   }
 
-  private addPlanOverview(plan: FinancialPlan): void {
+  private addPlanOverview(plan: FinancialPlanWithMetrics): void {
     this.addSectionTitle('Plan Overview')
     
     const overviewData = [
@@ -150,7 +150,7 @@ export class FinancialPlanPDFExporter {
     this.currentY = (this.doc as any).lastAutoTable.finalY + 15
   }
 
-  private addFinancialSummary(plan: FinancialPlan): void {
+  private addFinancialSummary(plan: FinancialPlanWithMetrics): void {
     this.checkPageBreak(60)
     this.addSectionTitle('Financial Summary')
     
@@ -223,7 +223,7 @@ export class FinancialPlanPDFExporter {
     this.currentY = (this.doc as any).lastAutoTable.finalY + 15
   }
 
-  private addDetailedBreakdown(plan: FinancialPlan): void {
+  private addDetailedBreakdown(plan: FinancialPlanWithMetrics): void {
     this.checkPageBreak(80)
     this.addSectionTitle('Detailed Financial Breakdown')
     
@@ -287,7 +287,7 @@ export class FinancialPlanPDFExporter {
     this.currentY = (this.doc as any).lastAutoTable.finalY + 15
   }
 
-  private addRiskAnalysis(plan: FinancialPlan): void {
+  private addRiskAnalysis(plan: FinancialPlanWithMetrics): void {
     this.checkPageBreak(60)
     this.addSectionTitle('Risk Analysis')
     
@@ -333,7 +333,7 @@ export class FinancialPlanPDFExporter {
     this.currentY = (this.doc as any).lastAutoTable.finalY + 15
   }
 
-  private addTimelineSection(plan: FinancialPlan): void {
+  private addTimelineSection(plan: FinancialPlanWithMetrics): void {
     this.checkPageBreak(40)
     this.addSectionTitle('Key Milestones Timeline')
     
@@ -365,7 +365,7 @@ export class FinancialPlanPDFExporter {
     this.currentY = (this.doc as any).lastAutoTable.finalY + 15
   }
 
-  private addRecommendations(plan: FinancialPlan): void {
+  private addRecommendations(plan: FinancialPlanWithMetrics): void {
     this.checkPageBreak(60)
     this.addSectionTitle('Recommendations')
     
@@ -447,7 +447,7 @@ export class FinancialPlanPDFExporter {
     return types[type as keyof typeof types] || type
   }
 
-  private analyzeRisks(plan: FinancialPlan): Array<{factor: string, level: string, description: string}> {
+  private analyzeRisks(plan: FinancialPlanWithMetrics): Array<{factor: string, level: string, description: string}> {
     const risks = []
     
     // Debt-to-income ratio risk
@@ -505,7 +505,7 @@ export class FinancialPlanPDFExporter {
     return risks
   }
 
-  private generateRecommendations(plan: FinancialPlan): Array<{title: string, description: string}> {
+  private generateRecommendations(plan: FinancialPlanWithMetrics): Array<{title: string, description: string}> {
     const recommendations = []
     
     // Affordability recommendations
@@ -562,11 +562,11 @@ export class FinancialPlanPDFExporter {
 
 // Export utility function
 export async function exportFinancialPlanToPDF(
-  plan: FinancialPlan,
+  plan: FinancialPlanWithMetrics,
   options: PDFExportOptions = {}
 ): Promise<void> {
   try {
-    const exporter = new FinancialPlanPDFExporter()
+    const exporter = new FinancialPlanWithMetricsPDFExporter()
     const pdfBlob = await exporter.exportPlan(plan, {
       includeTimeline: true,
       includeAnalysis: true,

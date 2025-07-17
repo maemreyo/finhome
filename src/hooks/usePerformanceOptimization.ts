@@ -10,7 +10,7 @@ import {
   performanceMonitor
 } from '@/lib/performance/optimization'
 import type { TimelineScenario } from '@/components/timeline/TimelineVisualization'
-import type { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 
 // Optimized financial calculations hook
 export function useOptimizedFinancialCalculations(
@@ -103,7 +103,7 @@ export function useOptimizedScenarioComparison(scenarios: TimelineScenario[]) {
 
 // Optimized plan filtering hook
 export function useOptimizedPlanFiltering(
-  plans: FinancialPlan[],
+  plans: FinancialPlanWithMetrics[],
   filters: {
     search?: string
     status?: string
@@ -126,25 +126,25 @@ export function useOptimizedPlanFiltering(
     if (filters.search) {
       const searchLower = filters.search.toLowerCase()
       filtered = filtered.filter(plan => 
-        plan.planName.toLowerCase().includes(searchLower) ||
-        plan.planDescription?.toLowerCase().includes(searchLower)
+        plan.plan_name.toLowerCase().includes(searchLower) ||
+        plan.description?.toLowerCase().includes(searchLower)
       )
     }
     
     if (filters.status) {
-      filtered = filtered.filter(plan => plan.planStatus === filters.status)
+      filtered = filtered.filter(plan => plan.status === filters.status)
     }
     
     if (filters.planType) {
-      filtered = filtered.filter(plan => plan.planType === filters.planType)
+      filtered = filtered.filter(plan => plan.plan_type === filters.planType)
     }
     
     if (filters.minAmount !== undefined) {
-      filtered = filtered.filter(plan => plan.purchasePrice >= filters.minAmount!)
+      filtered = filtered.filter(plan => (plan.purchase_price || 0) >= filters.minAmount!)
     }
     
     if (filters.maxAmount !== undefined) {
-      filtered = filtered.filter(plan => plan.purchasePrice <= filters.maxAmount!)
+      filtered = filtered.filter(plan => (plan.purchase_price || 0) <= filters.maxAmount!)
     }
     
     dataCache.set(cacheKey, filtered)

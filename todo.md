@@ -180,6 +180,7 @@ CREATE TABLE admin_users (
   - [x] Ensure all events use valid ScenarioTimelineEvent properties
 
 ### 🔄 **In Progress**
+- [x] Research property management implementation status
 - [ ] Set up Supabase database and connect real data
 - [ ] Create admin dashboard architecture
 - [ ] Migrate mock data to admin-managed system

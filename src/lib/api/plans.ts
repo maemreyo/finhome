@@ -130,6 +130,24 @@ class PlansAPI {
       throw new Error(error.error || `HTTP ${response.status}`)
     }
   }
+
+  async updatePlanStatus(planId: string, status: 'draft' | 'active' | 'completed' | 'archived'): Promise<FinancialPlanWithMetrics> {
+    const response = await fetch(`${this.baseUrl}/${planId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Network error' }))
+      throw new Error(error.error || `HTTP ${response.status}`)
+    }
+
+    const result = await response.json()
+    return result.data
+  }
 }
 
 export const plansAPI = new PlansAPI()

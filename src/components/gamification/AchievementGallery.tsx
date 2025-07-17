@@ -24,11 +24,11 @@ import {
   formatPoints
 } from '@/lib/gamification/achievements'
 import { AchievementBadge } from './AchievementBadge'
-import { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 
 interface AchievementGalleryProps {
   userProgress: UserProgress
-  plans: FinancialPlan[]
+  plans: FinancialPlanWithMetrics[]
   onAchievementUnlock?: (achievement: Achievement) => void
   className?: string
 }

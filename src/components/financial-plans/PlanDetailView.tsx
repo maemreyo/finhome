@@ -44,8 +44,10 @@ import { toast } from 'sonner'
 import { TimelineVisualization, TimelineScenario } from '@/components/timeline/TimelineVisualization'
 import { FinancialScenario } from '@/types/scenario'
 import PlanProgressTracker, { PlanProgress, PlanMilestone } from '@/components/plans/PlanProgressTracker'
+import { PlanStatusManager } from '@/components/financial-plans/PlanStatusManager'
 import { UIFinancialPlan } from '@/lib/adapters/planAdapter'
 import type { PlanStatus } from '@/lib/supabase/types'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 
 // Import export functions
 import { exportFinancialPlanToPDF } from '@/lib/export/pdfExport'
@@ -58,6 +60,7 @@ interface PlanDetailViewProps {
   onEdit: () => void
   onShare: () => void
   onDownload: () => void
+  onStatusChange?: (planId: string, newStatus: 'draft' | 'active' | 'completed' | 'archived') => Promise<void>
   className?: string
 }
 
@@ -412,6 +415,7 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
   onEdit,
   onShare,
   onDownload,
+  onStatusChange,
   className
 }) => {
   const [selectedScenarioId, setSelectedScenarioId] = useState(
@@ -514,10 +518,68 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
     ]
   }
 
-  const handleStatusChange = (status: PlanStatus, note?: string) => {
-    // In a real app, this would call an API to update the plan status
-    console.log('Status change:', status, note)
-    toast.success(`Plan status updated to ${status}`)
+  const handleStatusChange = async (status: PlanStatus, note?: string) => {
+    if (onStatusChange) {
+      try {
+        await onStatusChange(plan.id, status)
+        toast.success(`Plan status updated to ${status}`)
+      } catch (error) {
+        console.error('Error updating plan status:', error)
+        toast.error('Failed to update plan status')
+      }
+    } else {
+      // Fallback for when no status change handler is provided
+      console.log('Status change:', status, note)
+      toast.success(`Plan status updated to ${status}`)
+    }
+  }
+
+  // Convert FinancialScenario to FinancialPlanWithMetrics for status manager
+  const planWithMetrics = {
+    id: plan.id,
+    user_id: plan.user_id,
+    plan_name: plan.plan_name,
+    description: plan.description,
+    plan_type: plan.plan_type,
+    purchase_price: plan.purchase_price,
+    down_payment: plan.down_payment,
+    loan_amount: ((plan.purchase_price || 0) - (plan.down_payment || 0)),
+    loan_term_months: 240,
+    interest_rate: 10.5,
+    monthly_income: plan.monthly_income,
+    monthly_expenses: plan.monthly_expenses,
+    current_savings: plan.current_savings,
+    expected_rental_income: plan.expected_rental_income,
+    property_taxes: null,
+    insurance_costs: null,
+    maintenance_costs: null,
+    target_completion_date: null,
+    is_public: plan.is_public,
+    tags: null,
+    risk_level: 'medium',
+    status: plan.status || 'draft',
+    completed_at: plan.completed_at || null,
+    created_at: plan.created_at,
+    updated_at: plan.updated_at,
+    // Convert calculated metrics to match interface
+    calculatedMetrics: plan.calculatedMetrics ? {
+      monthlyPayment: plan.calculatedMetrics.monthlyPayment,
+      totalInterest: plan.calculatedMetrics.totalInterest,
+      debtToIncomeRatio: plan.calculatedMetrics.dtiRatio || 0,
+      affordabilityScore: plan.calculatedMetrics.affordabilityScore,
+      roi: 0,
+      paybackPeriod: plan.calculatedMetrics.payoffTimeMonths || 0
+    } : undefined,
+    // Add missing fields with defaults
+    additional_costs: 0,
+    other_debts: 0,
+    expected_appreciation_rate: 0,
+    investment_horizon_months: 0,
+    risk_factors: '',
+    notes: '',
+    shared_with: null,
+    cached_calculations: null,
+    calculations_last_updated: null
   }
 
   const handleMilestoneUpdate = (milestoneId: string, updates: Partial<PlanMilestone>) => {
@@ -535,7 +597,7 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
   const handleExportPDF = async () => {
     setIsExporting(true)
     try {
-      await exportFinancialPlanToPDF(uiPlan, {
+      await exportFinancialPlanToPDF(uiPlan as any, {
         includeTimeline: true,
         includeAnalysis: true,
         includeRecommendations: true
@@ -551,7 +613,7 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
   const handleExportExcel = async () => {
     setIsExporting(true)
     try {
-      await exportFinancialPlanToExcel(uiPlan, {
+      await exportFinancialPlanToExcel(uiPlan as any, {
         includeAmortizationSchedule: true,
         includeCashFlowProjection: true,
         includeScenarioComparison: true,
@@ -689,13 +751,24 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
         </TabsContent>
 
         <TabsContent value="progress" className="space-y-6">
-          <PlanProgressTracker
-            plan={uiPlan}
-            progress={mockProgress}
-            onStatusChange={handleStatusChange}
-            onMilestoneUpdate={handleMilestoneUpdate}
-            onContributionUpdate={handleContributionUpdate}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Plan Status Manager */}
+            <PlanStatusManager
+              plan={planWithMetrics as any}
+              onStatusChange={async (planId: string, newStatus: 'draft' | 'active' | 'completed' | 'archived') => {
+                await handleStatusChange(newStatus)
+              }}
+            />
+            
+            {/* Traditional Progress Tracker */}
+            <PlanProgressTracker
+              plan={uiPlan}
+              progress={mockProgress}
+              onStatusChange={handleStatusChange}
+              onMilestoneUpdate={handleMilestoneUpdate}
+              onContributionUpdate={handleContributionUpdate}
+            />
+          </div>
         </TabsContent>
         
         <TabsContent value="timeline" className="space-y-6">

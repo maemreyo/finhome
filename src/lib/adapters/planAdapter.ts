@@ -1,7 +1,7 @@
 // src/lib/adapters/planAdapter.ts
 // Adapter to convert between API data structure and UI component structure
 
-import { FinancialPlan as APIPlan } from '@/lib/api/plans'
+import { type FinancialPlanWithMetrics as APIPlan } from '@/lib/api/plans'
 
 // Legacy UI component interface
 export interface UIFinancialPlan {
@@ -35,13 +35,13 @@ export function apiPlanToUIplan(apiPlan: APIPlan): UIFinancialPlan {
   return {
     id: apiPlan.id,
     planName: apiPlan.plan_name,
-    planDescription: apiPlan.plan_description,
+    planDescription: apiPlan.description || undefined,
     planType: apiPlan.plan_type,
-    purchasePrice: apiPlan.purchase_price,
-    downPayment: apiPlan.down_payment,
-    monthlyIncome: apiPlan.monthly_income,
-    monthlyExpenses: apiPlan.monthly_expenses,
-    currentSavings: apiPlan.current_savings,
+    purchasePrice: apiPlan.purchase_price || 0,
+    downPayment: apiPlan.down_payment || 0,
+    monthlyIncome: apiPlan.monthly_income || 0,
+    monthlyExpenses: apiPlan.monthly_expenses || 0,
+    currentSavings: apiPlan.current_savings || 0,
     planStatus: apiPlan.status,
     isPublic: apiPlan.is_public,
     isFavorite: false, // TODO: Add favorites functionality

@@ -98,12 +98,21 @@ class BankRatesAPI {
   }
 
   async getOptimalRates(request: OptimalRateRequest): Promise<OptimalRateResponse> {
-    const response = await fetch(this.baseUrl, {
-      method: 'POST',
+    const params = new URLSearchParams({
+      loanAmount: request.loanAmount.toString(),
+      termMonths: request.termMonths.toString(),
+      loanType: request.loanType,
+    })
+
+    if (request.downPaymentRatio) {
+      params.set('downPaymentRatio', request.downPaymentRatio.toString())
+    }
+
+    const response = await fetch(`/api/bank-rates?${params}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(request),
     })
 
     if (!response.ok) {

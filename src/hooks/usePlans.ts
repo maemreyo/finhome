@@ -14,6 +14,7 @@ interface UsePlansReturn {
   totalCount: number
   createPlan: (planData: CreatePlanRequest) => Promise<FinancialPlanWithMetrics>
   updatePlan: (planId: string, updates: Partial<CreatePlanRequest>) => Promise<FinancialPlanWithMetrics>
+  updatePlanStatus: (planId: string, status: 'draft' | 'active' | 'completed' | 'archived') => Promise<FinancialPlanWithMetrics>
   deletePlan: (planId: string) => Promise<void>
   refreshPlans: () => Promise<void>
   loadMore: () => Promise<void>
@@ -106,6 +107,21 @@ export function usePlans(filters?: PlanFilters): UsePlansReturn {
     }
   }, [])
 
+  const updatePlanStatus = useCallback(async (planId: string, status: 'draft' | 'active' | 'completed' | 'archived'): Promise<FinancialPlanWithMetrics> => {
+    try {
+      setError(null)
+      const updatedPlan = await plansAPI.updatePlanStatus(planId, status)
+      setPlans(prev => prev.map(plan => 
+        plan.id === planId ? updatedPlan : plan
+      ))
+      return updatedPlan
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update plan status'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    }
+  }, [])
+
   const deletePlan = useCallback(async (planId: string): Promise<void> => {
     const result = await withErrorHandling(async () => {
       await plansAPI.deletePlan(planId)
@@ -134,6 +150,7 @@ export function usePlans(filters?: PlanFilters): UsePlansReturn {
     totalCount,
     createPlan,
     updatePlan,
+    updatePlanStatus,
     deletePlan,
     refreshPlans,
     loadMore,

@@ -5,7 +5,7 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Zap, TrendingUp, Calculator, Target, ArrowLeft } from 'lucide-react'
+import { Zap, TrendingUp, Calculator, ArrowLeft } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 

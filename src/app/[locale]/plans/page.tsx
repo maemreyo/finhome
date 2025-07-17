@@ -24,6 +24,53 @@ import { useOptimalRates } from '@/hooks/useBankRates'
 import { type FinancialPlanWithMetrics, type CreatePlanRequest } from '@/lib/api/plans'
 import { type FinancialScenario } from '@/types/scenario'
 
+// Default rates for different loan types
+function getDefaultRates(loanType: string): LoanParameters {
+  const defaultRates = {
+    home_purchase: { regular: 10.5, promotional: 7.5 },
+    investment: { regular: 11.0, promotional: 8.0 },
+    upgrade: { regular: 10.0, promotional: 7.0 },
+    refinance: { regular: 9.5, promotional: 6.5 }
+  }
+
+  const rates = defaultRates[loanType as keyof typeof defaultRates] || defaultRates.home_purchase
+
+  return {
+    principal: 0, // Will be set by caller
+    annualRate: rates.regular,
+    termMonths: 240, // 20 years default
+    promotionalRate: rates.promotional,
+    promotionalPeriodMonths: 24 // 2 years promotional period
+  }
+}
+
+// Utility function to estimate interest rate from monthly payment (reverse calculation)
+function estimateRateFromPayment(principal: number, monthlyPayment: number, termMonths: number): number | null {
+  if (!principal || !monthlyPayment || !termMonths) return null
+  
+  // Simple iterative method to find the rate
+  let low = 0.01, high = 0.30 // 1% to 30% annual rate range
+  
+  for (let i = 0; i < 100; i++) { // Max 100 iterations
+    const testRate = (low + high) / 2
+    const monthlyRate = testRate / 12
+    const calculatedPayment = principal * monthlyRate * Math.pow(1 + monthlyRate, termMonths) / 
+                             (Math.pow(1 + monthlyRate, termMonths) - 1)
+    
+    if (Math.abs(calculatedPayment - monthlyPayment) < 1000) { // Within 1000 VND
+      return testRate * 100 // Return as percentage
+    }
+    
+    if (calculatedPayment < monthlyPayment) {
+      low = testRate
+    } else {
+      high = testRate
+    }
+  }
+  
+  return null // Couldn't find a reasonable rate
+}
+
 // Convert database FinancialPlan to FinancialScenario for detail view
 function dbPlanToScenario(plan: FinancialPlanWithMetrics): FinancialScenario {
   return {
@@ -120,19 +167,25 @@ export default function PlansPage() {
   // Bank rates for real-time calculations
   const { getOptimalRates } = useOptimalRates()
 
-  // Always load real API data, with demo data for non-authenticated users
+  // Always load real API data for all users
   const { 
     plans, 
     isLoading, 
     error, 
     createPlan, 
     updatePlan, 
+    updatePlanStatus,
     deletePlan,
     refreshPlans 
-  } = usePlans(user ? {} : undefined) // Only load real data if user is authenticated
+  } = usePlans({}) // Load data for all users
 
-  // Use database plans directly or demo data for non-authenticated users
-  const displayPlans = user ? plans : createDemoPlans()
+  // Use database plans directly, with demo data fallback for non-authenticated users when no data
+  const displayPlans = useMemo(() => {
+    return user 
+      ? plans.length > 0 ? plans : [] // Show real data for authenticated users
+      : createDemoPlans() // Show demo data for non-authenticated users
+  }, [user, plans])
+  
   const displayLoading = user ? isLoading : false
 
   const selectedPlan = useMemo(
@@ -159,18 +212,24 @@ export default function PlansPage() {
       }
     }
 
-    // Use cached calculation rates if available, otherwise use market averages
+    // Use cached calculation rates if available, otherwise use default rates
+    const loanAmount = (selectedPlan.purchase_price || 0) - (selectedPlan.down_payment || 0)
+    const planType = selectedPlan.plan_type || 'home_purchase'
+    
+    // If we have cached calculations, try to derive the effective rate from monthly payment
+    // Otherwise use default rates for the plan type
+    const defaultRateParams = getDefaultRates(planType)
     const effectiveRate = selectedPlan.calculatedMetrics?.monthlyPayment ? 
-      // If we have cached calculations, derive the rate from monthly payment
-      10.5 : // Default rate when no cached data
-      10.5 // Market average rate
+      // Estimate rate from cached monthly payment (reverse calculation approximation)
+      estimateRateFromPayment(loanAmount, selectedPlan.calculatedMetrics.monthlyPayment, 240) || defaultRateParams.annualRate
+      : defaultRateParams.annualRate
 
     const loanParams: LoanParameters = {
-      principal: (selectedPlan.purchase_price || 0) - (selectedPlan.down_payment || 0),
+      principal: loanAmount,
       annualRate: effectiveRate,
       termMonths: 240, // 20 years default
-      promotionalRate: effectiveRate > 8 ? effectiveRate - 1.5 : undefined,
-      promotionalPeriodMonths: 24
+      promotionalRate: defaultRateParams.promotionalRate,
+      promotionalPeriodMonths: defaultRateParams.promotionalPeriodMonths
     }
 
     const personalFinances = {
@@ -337,6 +396,23 @@ export default function PlansPage() {
     toast.info(t('messages.downloadComingSoon'))
   }
 
+  const handlePlanStatusChange = async (planId: string, newStatus: 'draft' | 'active' | 'completed' | 'archived') => {
+    if (!user) {
+      toast.info('Demo mode: Sign in to manage real financial plans')
+      return
+    }
+    
+    try {
+      await updatePlanStatus(planId, newStatus)
+      // No need to manually update selectedPlan as it's derived from plans state
+      // The updatePlanStatus function will update the plans array automatically
+      toast.success(`Plan status updated to ${newStatus}`)
+    } catch (error) {
+      console.error('Error updating plan status:', error)
+      toast.error('Failed to update plan status')
+    }
+  }
+
   const handleBackToList = () => {
     setViewMode('list')
     setSelectedPlanId(null)
@@ -355,7 +431,32 @@ export default function PlansPage() {
           </div>
           <div className="grid gap-6">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-48" />
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <Skeleton className="h-6 w-48 mb-2" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <Skeleton className="h-4 w-24 mb-1" />
+                    <Skeleton className="h-6 w-32" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-4 w-24 mb-1" />
+                    <Skeleton className="h-6 w-32" />
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <Skeleton className="h-8 w-24" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-16" />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -370,7 +471,23 @@ export default function PlansPage() {
         {error && user && (
           <Alert className="mb-6" variant="destructive">
             <AlertDescription>
-              {error}. <button onClick={refreshPlans} className="underline">Try again</button>
+              <div className="flex items-center justify-between">
+                <span>{error}</span>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={refreshPlans} 
+                    className="underline hover:no-underline"
+                  >
+                    Try again
+                  </button>
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="underline hover:no-underline"
+                  >
+                    Refresh page
+                  </button>
+                </div>
+              </div>
             </AlertDescription>
           </Alert>
         )}
@@ -404,16 +521,38 @@ export default function PlansPage() {
               </Button>
             </div>
             
-            <PlansList
-              plans={displayPlans}
-              onCreateNew={() => setViewMode('create')}
-              onViewPlan={handleViewPlan}
-              onEditPlan={handleEditPlan}
-              onDeletePlan={handleDeletePlan}
-              onDuplicatePlan={handleDuplicatePlan}
-              onToggleFavorite={handleToggleFavorite}
-              isLoading={displayLoading}
-            />
+            {user && displayPlans.length === 0 && !displayLoading && (
+              <div className="text-center py-12">
+                <div className="max-w-md mx-auto">
+                  <div className="rounded-full bg-gray-100 dark:bg-gray-800 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                    <Plus className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    No financial plans yet
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 mb-6">
+                    Create your first financial plan to get started with your investment journey.
+                  </p>
+                  <Button onClick={() => setViewMode('create')}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Your First Plan
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {(displayPlans.length > 0 || !user) && (
+              <PlansList
+                plans={displayPlans}
+                onCreateNew={() => setViewMode('create')}
+                onViewPlan={handleViewPlan}
+                onEditPlan={handleEditPlan}
+                onDeletePlan={handleDeletePlan}
+                onDuplicatePlan={handleDuplicatePlan}
+                onToggleFavorite={handleToggleFavorite}
+                isLoading={displayLoading}
+              />
+            )}
           </>
         )}
 
@@ -433,6 +572,7 @@ export default function PlansPage() {
             onEdit={() => handleEditPlan(selectedPlan.id)}
             onShare={handleSharePlan}
             onDownload={handleDownloadPlan}
+            onStatusChange={handlePlanStatusChange}
           />
         )}
       </div>

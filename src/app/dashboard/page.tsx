@@ -55,45 +55,121 @@ import { type LoanParameters } from '@/lib/financial/calculations'
 const samplePlans: FinancialPlanWithMetrics[] = [
   {
     id: '1',
-    planName: 'My First Home Purchase',
-    planDescription: 'Buying a 2-bedroom apartment in District 7',
-    planType: 'home_purchase',
-    purchasePrice: 3000000000,
-    downPayment: 600000000,
-    monthlyIncome: 50000000,
-    monthlyExpenses: 25000000,
-    currentSavings: 800000000,
-    planStatus: 'active',
-    isPublic: false,
-    isFavorite: true,
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20'),
-    monthlyPayment: 17400000,
-    totalInterest: 1200000000,
-    affordabilityScore: 7,
-    riskLevel: 'medium'
+    user_id: 'sample-user',
+    plan_name: 'My First Home Purchase',
+    description: 'Buying a 2-bedroom apartment in District 7',
+    plan_type: 'home_purchase',
+    status: 'active',
+    property_id: null,
+    custom_property_data: null,
+    target_age: null,
+    current_monthly_income: null,
+    monthly_income: 50000000,
+    current_monthly_expenses: null,
+    monthly_expenses: 25000000,
+    current_savings: 800000000,
+    dependents: 0,
+    purchase_price: 3000000000,
+    down_payment: 600000000,
+    additional_costs: 0,
+    other_debts: 0,
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    target_timeframe_months: null,
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    risk_tolerance: 'moderate',
+    investment_horizon_months: null,
+    expected_roi: null,
+    preferred_banks: null,
+    expected_rental_income: null,
+    expected_appreciation_rate: null,
+    emergency_fund_target: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    feasibility_score: null,
+    recommended_adjustments: {},
+    is_public: false,
+    view_count: 0,
+    cached_calculations: {
+      monthlyPayment: 17400000,
+      totalInterest: 1200000000,
+      debtToIncomeRatio: 34.8,
+      affordabilityScore: 7
+    },
+    calculations_last_updated: null,
+    created_at: '2024-01-15T00:00:00Z',
+    updated_at: '2024-01-20T00:00:00Z',
+    completed_at: null,
+    calculatedMetrics: {
+      monthlyPayment: 17400000,
+      totalInterest: 1200000000,
+      debtToIncomeRatio: 34.8,
+      affordabilityScore: 7
+    }
   },
   {
     id: '2',
-    planName: 'Investment Property - Vinhomes',
-    planDescription: 'Investment apartment for rental income',
-    planType: 'investment',
-    purchasePrice: 2500000000,
-    downPayment: 500000000,
-    monthlyIncome: 50000000,
-    monthlyExpenses: 25000000,
-    currentSavings: 800000000,
-    expectedRentalIncome: 18000000,
-    planStatus: 'draft',
-    isPublic: true,
-    isFavorite: false,
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-05'),
-    monthlyPayment: 14500000,
-    totalInterest: 980000000,
-    affordabilityScore: 8,
-    riskLevel: 'low',
-    roi: 9.2
+    user_id: 'sample-user',
+    plan_name: 'Investment Property - Vinhomes',
+    description: 'Investment apartment for rental income',
+    plan_type: 'investment',
+    status: 'draft',
+    property_id: null,
+    custom_property_data: null,
+    target_age: null,
+    current_monthly_income: null,
+    monthly_income: 50000000,
+    current_monthly_expenses: null,
+    monthly_expenses: 25000000,
+    current_savings: 800000000,
+    dependents: 0,
+    purchase_price: 2500000000,
+    down_payment: 500000000,
+    additional_costs: 0,
+    other_debts: 0,
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    target_timeframe_months: null,
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    risk_tolerance: 'moderate',
+    investment_horizon_months: null,
+    expected_roi: null,
+    preferred_banks: null,
+    expected_rental_income: 18000000,
+    expected_appreciation_rate: null,
+    emergency_fund_target: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    feasibility_score: null,
+    recommended_adjustments: {},
+    is_public: true,
+    view_count: 0,
+    cached_calculations: {
+      monthlyPayment: 14500000,
+      totalInterest: 980000000,
+      debtToIncomeRatio: 29.0,
+      affordabilityScore: 8,
+      roi: 9.2
+    },
+    calculations_last_updated: null,
+    created_at: '2024-02-01T00:00:00Z',
+    updated_at: '2024-02-05T00:00:00Z',
+    completed_at: null,
+    calculatedMetrics: {
+      monthlyPayment: 14500000,
+      totalInterest: 980000000,
+      debtToIncomeRatio: 29.0,
+      affordabilityScore: 8,
+      roi: 9.2
+    }
   }
 ]
 
@@ -192,7 +268,7 @@ const PlanSummaryCard: React.FC<{
       upgrade: TrendingUp,
       refinance: DollarSign
     }
-    return icons[plan.planType] || Home
+    return icons[plan.plan_type] || Home
   }
 
   const IconComponent = getPlanTypeIcon()
@@ -207,15 +283,13 @@ const PlanSummaryCard: React.FC<{
             </div>
             <div className="min-w-0 flex-1">
               <h4 className="font-medium text-gray-900 dark:text-gray-100 truncate">
-                {plan.planName}
+                {plan.plan_name}
               </h4>
               <div className="flex items-center space-x-2 mt-1">
                 <Badge variant="outline" className="text-xs">
-                  {plan.planType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  {plan.plan_type.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                 </Badge>
-                {plan.isFavorite && (
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                )}
+                {/* Favorites feature not implemented yet */}
               </div>
             </div>
           </div>
@@ -233,26 +307,26 @@ const PlanSummaryCard: React.FC<{
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-500">Purchase Price</span>
-            <span className="font-medium">{formatCurrency(plan.purchasePrice)}</span>
+            <span className="font-medium">{formatCurrency(plan.purchase_price || 0)}</span>
           </div>
-          {plan.monthlyPayment && (
+          {plan.calculatedMetrics?.monthlyPayment && (
             <div className="flex justify-between">
               <span className="text-gray-500">Monthly Payment</span>
               <span className="font-medium text-blue-600">
-                {formatCurrency(plan.monthlyPayment)}
+                {formatCurrency(plan.calculatedMetrics.monthlyPayment)}
               </span>
             </div>
           )}
-          {plan.affordabilityScore && (
+          {plan.calculatedMetrics?.affordabilityScore && (
             <div className="flex items-center justify-between">
               <span className="text-gray-500">Affordability</span>
               <div className="flex items-center space-x-2">
                 <Progress 
-                  value={plan.affordabilityScore * 10} 
+                  value={plan.calculatedMetrics.affordabilityScore * 10} 
                   className="w-16 h-2" 
                 />
                 <span className="text-xs font-medium">
-                  {plan.affordabilityScore}/10
+                  {plan.calculatedMetrics.affordabilityScore}/10
                 </span>
               </div>
             </div>
@@ -379,20 +453,20 @@ export default function DashboardPage() {
 
   // Calculate portfolio summary (legacy support)
   const portfolioSummary = useMemo(() => {
-    const totalValue = samplePlans.reduce((sum, plan) => sum + plan.purchasePrice, 0)
-    const totalDownPayment = samplePlans.reduce((sum, plan) => sum + plan.downPayment, 0)
-    const totalMonthlyPayment = samplePlans.reduce((sum, plan) => sum + (plan.monthlyPayment || 0), 0)
+    const totalValue = samplePlans.reduce((sum, plan) => sum + (plan.purchase_price || 0), 0)
+    const totalDownPayment = samplePlans.reduce((sum, plan) => sum + (plan.down_payment || 0), 0)
+    const totalMonthlyPayment = samplePlans.reduce((sum, plan) => sum + (plan.calculatedMetrics?.monthlyPayment || 0), 0)
     const totalExpectedROI = samplePlans
-      .filter(plan => plan.roi)
-      .reduce((sum, plan) => sum + plan.roi!, 0) / samplePlans.filter(plan => plan.roi).length
+      .filter(plan => plan.calculatedMetrics?.roi)
+      .reduce((sum, plan) => sum + plan.calculatedMetrics!.roi!, 0) / samplePlans.filter(plan => plan.calculatedMetrics?.roi).length
 
     return {
       totalValue,
       totalDownPayment,
       totalMonthlyPayment,
       totalExpectedROI: isNaN(totalExpectedROI) ? 0 : totalExpectedROI,
-      activePlans: samplePlans.filter(plan => plan.planStatus === 'active').length,
-      draftPlans: samplePlans.filter(plan => plan.planStatus === 'draft').length
+      activePlans: samplePlans.filter(plan => plan.status === 'active').length,
+      draftPlans: samplePlans.filter(plan => plan.status === 'draft').length
     }
   }, [])
 
@@ -400,7 +474,7 @@ export default function DashboardPage() {
   const timelineScenarios = useMemo(() => {
     if (samplePlans.length === 0) return []
 
-    const activePlan = samplePlans.find(plan => plan.planStatus === 'active') || samplePlans[0]
+    const activePlan = samplePlans.find(plan => plan.status === 'active') || samplePlans[0]
     
     const baselineScenario: ScenarioDefinition = {
       id: 'dashboard-overview',
@@ -418,7 +492,7 @@ export default function DashboardPage() {
     }
 
     const loanParams: LoanParameters = {
-      principal: activePlan.purchasePrice - activePlan.downPayment,
+      principal: (activePlan.purchase_price || 0) - (activePlan.down_payment || 0),
       annualRate: 10.5,
       termMonths: 240,
       promotionalRate: 7.5,
@@ -426,8 +500,8 @@ export default function DashboardPage() {
     }
 
     const personalFinances = {
-      monthlyIncome: activePlan.monthlyIncome,
-      monthlyExpenses: activePlan.monthlyExpenses
+      monthlyIncome: activePlan.monthly_income || 0,
+      monthlyExpenses: activePlan.monthly_expenses || 0
     }
 
     const scenarioEngine = new ScenarioEngine(
@@ -885,7 +959,7 @@ export default function DashboardPage() {
                     {upcomingEvents.length > 0 ? (
                       <div className="space-y-3">
                         {upcomingEvents.map((event) => {
-                          const planName = samplePlans.find(p => p.id === event.planId)?.planName
+                          const planName = samplePlans.find(p => p.id === event.planId)?.plan_name
                           return (
                             <UpcomingEventCard
                               key={event.id}

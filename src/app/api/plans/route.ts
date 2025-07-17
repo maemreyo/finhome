@@ -4,6 +4,7 @@ import { getUser } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { calculateFinancialMetrics, type LoanParameters } from '@/lib/financial/calculations'
+import { getOptimalBankRate, getDefaultRates, bankRateToLoanParams } from '@/lib/financial/bankRateUtils'
 
 const createPlanSchema = z.object({
   planName: z.string().min(1, 'Plan name is required').max(255),
@@ -90,13 +91,19 @@ export async function GET(request: NextRequest) {
           // Recalculate if cache is stale or missing
           if (!cachedCalculations || (plan.calculations_last_updated && new Date(plan.calculations_last_updated) < new Date(Date.now() - 24 * 60 * 60 * 1000))) {
             const loanAmount = (plan.purchase_price || 0) - (plan.down_payment || 0)
-            const loanParams: LoanParameters = {
-              principal: loanAmount,
-              annualRate: 10.5, // Default rate - should come from loan_terms
-              termMonths: 240,
-              promotionalRate: 7.5,
-              promotionalPeriodMonths: 24
-            }
+            
+            // Get optimal bank rate for this plan
+            const optimalRate = await getOptimalBankRate(
+              loanAmount,
+              240, // 20 years default
+              plan.plan_type || 'home_purchase',
+              plan.down_payment && plan.purchase_price ? (plan.down_payment / plan.purchase_price) * 100 : undefined
+            )
+
+            // Use optimal rate or fallback to defaults
+            const loanParams: LoanParameters = optimalRate 
+              ? bankRateToLoanParams(optimalRate.bestRate, loanAmount, 240)
+              : { ...getDefaultRates(plan.plan_type || 'home_purchase'), principal: loanAmount }
 
             const personalFinances = {
               monthlyIncome: plan.monthly_income || 0,
@@ -178,15 +185,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = createPlanSchema.parse(body)
 
-    // Calculate financial metrics
+    // Calculate financial metrics with real bank rates
     const loanAmount = validatedData.purchasePrice - validatedData.downPayment
-    const loanParams: LoanParameters = {
-      principal: loanAmount,
-      annualRate: 10.5, // Default rate
-      termMonths: 240, // 20 years
-      promotionalRate: 7.5,
-      promotionalPeriodMonths: 24
-    }
+    
+    // Get optimal bank rate for this loan scenario
+    const optimalRate = await getOptimalBankRate(
+      loanAmount,
+      240, // 20 years default
+      validatedData.planType || 'home_purchase',
+      (validatedData.downPayment / validatedData.purchasePrice) * 100
+    )
+
+    // Use optimal rate or fallback to defaults
+    const loanParams: LoanParameters = optimalRate 
+      ? bankRateToLoanParams(optimalRate.bestRate, loanAmount, 240)
+      : { ...getDefaultRates(validatedData.planType || 'home_purchase'), principal: loanAmount }
 
     const personalFinances = {
       monthlyIncome: validatedData.monthlyIncome,

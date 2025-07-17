@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { AchievementEngine, UserProgress } from '@/lib/gamification/achievements'
-import { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'sonner'
 
@@ -12,7 +12,7 @@ interface UseAchievementsReturn {
   achievementEngine: AchievementEngine | null
   loading: boolean
   error: string | null
-  checkAchievements: (plans: FinancialPlan[]) => void
+  checkAchievements: (plans: FinancialPlanWithMetrics[]) => void
   updateProgress: (updates: Partial<UserProgress['progressData']>) => void
   markAchievementSeen: (achievementId: string) => void
 }
@@ -73,7 +73,7 @@ export function useAchievements(): UseAchievementsReturn {
   }, [user])
 
   // Check for new achievements
-  const checkAchievements = useCallback((plans: FinancialPlan[]) => {
+  const checkAchievements = useCallback((plans: FinancialPlanWithMetrics[]) => {
     if (!achievementEngine || !userProgress) return
 
     const newAchievements = achievementEngine.checkAchievements(plans)
@@ -146,12 +146,12 @@ export function useAchievements(): UseAchievementsReturn {
 export function usePlanAchievements() {
   const { checkAchievements } = useAchievements()
 
-  const onPlanCreated = useCallback((_plan: FinancialPlan) => {
+  const onPlanCreated = useCallback((_plan: FinancialPlanWithMetrics) => {
     // This would increment the plan count in a real implementation
     console.log('Plan created - updating progress')
   }, [])
 
-  const onPlanCompleted = useCallback((_plan: FinancialPlan) => {
+  const onPlanCompleted = useCallback((_plan: FinancialPlanWithMetrics) => {
     // This would increment the completed plan count in a real implementation
     console.log('Plan completed - updating progress')
   }, [])

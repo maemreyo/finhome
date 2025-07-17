@@ -2,7 +2,7 @@
 // Excel export functionality for financial plans
 
 import * as XLSX from 'xlsx'
-import { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 import { formatCurrency } from '@/lib/utils'
 import { calculateFinancialMetrics, type LoanParameters } from '@/lib/financial/calculations'
 
@@ -21,7 +21,7 @@ export class FinancialPlanExcelExporter {
   }
 
   async exportPlan(
-    plan: FinancialPlan,
+    plan: FinancialPlanWithMetrics,
     options: ExcelExportOptions = {}
   ): Promise<Blob> {
     try {
@@ -58,7 +58,7 @@ export class FinancialPlanExcelExporter {
     }
   }
 
-  private addSummarySheet(plan: FinancialPlan): void {
+  private addSummarySheet(plan: FinancialPlanWithMetrics): void {
     const summaryData = [
       ['FinHome Financial Plan Summary', ''],
       ['Generated on', new Date().toLocaleDateString('vi-VN')],
@@ -155,7 +155,7 @@ export class FinancialPlanExcelExporter {
     XLSX.utils.book_append_sheet(this.workbook, worksheet, 'Summary')
   }
 
-  private addBreakdownSheet(plan: FinancialPlan): void {
+  private addBreakdownSheet(plan: FinancialPlanWithMetrics): void {
     const breakdownData = [
       ['Financial Plan Detailed Breakdown', ''],
       [''],
@@ -208,7 +208,7 @@ export class FinancialPlanExcelExporter {
     XLSX.utils.book_append_sheet(this.workbook, worksheet, 'Detailed Breakdown')
   }
 
-  private addAmortizationSchedule(plan: FinancialPlan): void {
+  private addAmortizationSchedule(plan: FinancialPlanWithMetrics): void {
     const loanAmount = plan.purchasePrice - plan.downPayment
     const schedule = this.generateAmortizationSchedule(loanAmount, 7.5, 10.5, 240, 24)
     
@@ -231,7 +231,7 @@ export class FinancialPlanExcelExporter {
     XLSX.utils.book_append_sheet(this.workbook, worksheet, 'Amortization Schedule')
   }
 
-  private addCashFlowProjection(plan: FinancialPlan, years: number): void {
+  private addCashFlowProjection(plan: FinancialPlanWithMetrics, years: number): void {
     const projectionData = [
       ['Cash Flow Projection', '', '', '', '', ''],
       ['Year', 'Rental Income', 'Loan Payments', 'Property Expenses', 'Net Cash Flow', 'Cumulative Cash Flow']
@@ -266,7 +266,7 @@ export class FinancialPlanExcelExporter {
     XLSX.utils.book_append_sheet(this.workbook, worksheet, 'Cash Flow Projection')
   }
 
-  private addScenarioComparison(plan: FinancialPlan): void {
+  private addScenarioComparison(plan: FinancialPlanWithMetrics): void {
     const scenarios = [
       {
         name: 'Conservative (80% LTV, 25 years)',
@@ -464,7 +464,7 @@ export class FinancialPlanExcelExporter {
 
 // Export utility function
 export async function exportFinancialPlanToExcel(
-  plan: FinancialPlan,
+  plan: FinancialPlanWithMetrics,
   options: ExcelExportOptions = {}
 ): Promise<void> {
   try {
@@ -494,7 +494,7 @@ export async function exportFinancialPlanToExcel(
 
 // Utility function to export multiple plans comparison
 export async function exportPlansComparison(
-  plans: FinancialPlan[],
+  plans: FinancialPlanWithMetrics[],
   fileName: string = 'financial_plans_comparison'
 ): Promise<void> {
   try {
