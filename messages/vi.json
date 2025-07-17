@@ -77,6 +77,111 @@
       "settings": "Cài Đặt"
     }
   },
+  "Auth": {
+    "Login": {
+      "metadata": {
+        "title": "Đăng nhập",
+        "description": "Đăng nhập vào tài khoản của bạn"
+      },
+      "appName": "FinHome",
+      "testimonial": {
+        "quote": "Ứng dụng này đã giúp tôi tiết kiệm vô số giờ làm việc và giúp tôi xây dựng các sản phẩm tuyệt vời nhanh hơn bao giờ hết.",
+        "author": "Sofia Davis"
+      }
+    },
+    "SignUp": {
+      "metadata": {
+        "title": "Đăng ký",
+        "description": "Tạo tài khoản mới"
+      },
+      "appName": "FinHome",
+      "testimonial": {
+        "quote": "Tham gia cùng hàng ngàn người dùng tin tưởng nền tảng của chúng tôi để xây dựng và mở rộng quy mô kinh doanh thành công.",
+        "author": "Ruthless Code - Matthew Ngo"
+      }
+    },
+    "ForgotPassword": {
+      "success": {
+        "title": "Kiểm tra email của bạn",
+        "description": "Chúng tôi đã gửi một liên kết đặt lại mật khẩu đến địa chỉ email của bạn.",
+        "spamCheck": "Nếu bạn không thấy email, hãy kiểm tra thư mục spam của bạn."
+      },
+      "backToLogin": "Quay lại đăng nhập",
+      "form": {
+        "title": "Quên mật khẩu?",
+        "description": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn một liên kết đặt lại.",
+        "emailLabel": "Email",
+        "emailPlaceholder": "Nhập email của bạn",
+        "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
+        "sendResetLink": "Gửi liên kết đặt lại"
+      }
+    },
+    "LoginForm": {
+      "title": "Chào mừng trở lại",
+      "description": "Đăng nhập vào tài khoản của bạn để tiếp tục",
+      "orContinueWith": "Hoặc tiếp tục với",
+      "form": {
+        "emailLabel": "Email",
+        "emailPlaceholder": "Nhập email của bạn",
+        "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
+        "passwordLabel": "Mật khẩu",
+        "passwordPlaceholder": "Nhập mật khẩu của bạn",
+        "passwordRequired": "Mật khẩu là bắt buộc",
+        "forgotPassword": "Quên mật khẩu?",
+        "signIn": "Đăng nhập"
+      },
+      "noAccount": "Không có tài khoản?",
+      "signUp": "Đăng ký"
+    },
+    "SignUpForm": {
+      "title": "Tạo tài khoản",
+      "description": "Đăng ký để bắt đầu với tài khoản miễn phí của bạn",
+      "orContinueWith": "Hoặc tiếp tục với",
+      "form": {
+        "fullNameLabel": "Họ và tên",
+        "fullNamePlaceholder": "Nhập họ và tên của bạn",
+        "fullNameMinLength": "Họ và tên phải có ít nhất 2 ký tự",
+        "emailLabel": "Email",
+        "emailPlaceholder": "Nhập email của bạn",
+        "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
+        "passwordLabel": "Mật khẩu",
+        "passwordPlaceholder": "Tạo mật khẩu",
+        "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+        "confirmPasswordLabel": "Xác nhận mật khẩu",
+        "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
+        "passwordMismatch": "Mật khẩu không khớp",
+        "agreeTo": "Tôi đồng ý với",
+        "termsOfService": "Điều khoản dịch vụ",
+        "and": "và",
+        "privacyPolicy": "Chính sách bảo mật",
+        "acceptTermsRequired": "Bạn phải chấp nhận các điều khoản và điều kiện",
+        "createAccount": "Tạo tài khoản"
+      },
+      "alreadyHaveAccount": "Đã có tài khoản?",
+      "signIn": "Đăng nhập"
+    },
+    "ResetPassword": {
+      "metadata": {
+        "title": "Đặt lại mật khẩu",
+        "description": "Đặt lại mật khẩu của bạn"
+      },
+      "form": {
+        "title": "Đặt lại mật khẩu",
+        "description": "Nhập mật khẩu mới của bạn bên dưới",
+        "newPasswordLabel": "Mật khẩu mới",
+        "newPasswordPlaceholder": "Nhập mật khẩu mới",
+        "confirmPasswordLabel": "Xác nhận mật khẩu mới",
+        "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
+        "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+        "passwordMismatch": "Mật khẩu không khớp",
+        "updatePassword": "Cập nhật mật khẩu"
+      },
+      "invalidLink": "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn",
+      "invalidLinkTitle": "Liên kết đặt lại không hợp lệ",
+      "invalidLinkDescription": "Liên kết đặt lại mật khẩu này không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu liên kết mới.",
+      "requestNewLink": "Yêu cầu liên kết đặt lại mới"
+    }
+  },
   "LandingPage": {
     "HeroSection": {
       "badge": "🚀 Mới: Bảng điều khiển phân tích nâng cao",
@@ -131,123 +236,18 @@
         "twitterTitle": "FinHome",
         "twitterDescription": "Nền tảng hoạch định tài chính bất động sản Việt Nam"
       }
-    },
-    "Auth": {
-      "Login": {
-        "metadata": {
-          "title": "Đăng nhập",
-          "description": "Đăng nhập vào tài khoản của bạn"
-        },
-        "appName": "FinHome",
-        "testimonial": {
-          "quote": "Ứng dụng này đã giúp tôi tiết kiệm vô số giờ làm việc và giúp tôi xây dựng các sản phẩm tuyệt vời nhanh hơn bao giờ hết.",
-          "author": "Sofia Davis"
-        }
-      },
-      "SignUp": {
-        "metadata": {
-          "title": "Đăng ký",
-          "description": "Tạo tài khoản mới"
-        },
-        "appName": "FinHome",
-        "testimonial": {
-          "quote": "Tham gia cùng hàng ngàn người dùng tin tưởng nền tảng của chúng tôi để xây dựng và mở rộng quy mô kinh doanh thành công.",
-          "author": "Ruthless Code - Matthew Ngo"
-        }
-      },
-      "ForgotPassword": {
-        "success": {
-          "title": "Kiểm tra email của bạn",
-          "description": "Chúng tôi đã gửi một liên kết đặt lại mật khẩu đến địa chỉ email của bạn.",
-          "spamCheck": "Nếu bạn không thấy email, hãy kiểm tra thư mục spam của bạn."
-        },
-        "backToLogin": "Quay lại đăng nhập",
-        "form": {
-          "title": "Quên mật khẩu?",
-          "description": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn một liên kết đặt lại.",
-          "emailLabel": "Email",
-          "emailPlaceholder": "Nhập email của bạn",
-          "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
-          "sendResetLink": "Gửi liên kết đặt lại"
-        }
-      },
-      "ResetPassword": {
-        "invalidLink": "Liên kết đặt lại không hợp lệ. Vui lòng yêu cầu đặt lại mật khẩu mới.",
-        "invalidLinkTitle": "Liên kết đặt lại không hợp lệ",
-        "invalidLinkDescription": "Liên kết đặt lại mật khẩu này không hợp lệ hoặc đã hết hạn.",
-        "requestNewLink": "Yêu cầu liên kết đặt lại mới",
-        "form": {
-          "title": "Đặt lại mật khẩu",
-          "description": "Nhập mật khẩu mới của bạn bên dưới.",
-          "newPasswordLabel": "Mật khẩu mới",
-          "newPasswordPlaceholder": "Nhập mật khẩu mới",
-          "confirmPasswordLabel": "Xác nhận mật khẩu",
-          "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
-          "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
-          "passwordMismatch": "Mật khẩu không khớp",
-          "updatePassword": "Cập nhật mật khẩu"
-        }
-      },
-      "SignUpForm": {
-        "title": "Tạo tài khoản",
-        "description": "Đăng ký để bắt đầu với tài khoản miễn phí của bạn",
-        "orContinueWith": "Hoặc tiếp tục với",
-        "form": {
-          "fullNameLabel": "Họ và tên",
-          "fullNamePlaceholder": "Nhập họ và tên của bạn",
-          "fullNameMinLength": "Họ và tên phải có ít nhất 2 ký tự",
-          "emailLabel": "Email",
-          "emailPlaceholder": "Nhập email của bạn",
-          "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
-          "passwordLabel": "Mật khẩu",
-          "passwordPlaceholder": "Tạo mật khẩu",
-          "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
-          "confirmPasswordLabel": "Xác nhận mật khẩu",
-          "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
-          "passwordMismatch": "Mật khẩu không khớp",
-          "agreeTo": "Tôi đồng ý với",
-          "termsOfService": "Điều khoản dịch vụ",
-          "and": "và",
-          "privacyPolicy": "Chính sách bảo mật",
-          "acceptTermsRequired": "Bạn phải chấp nhận các điều khoản và điều kiện",
-          "createAccount": "Tạo tài khoản"
-        },
-        "alreadyHaveAccount": "Đã có tài khoản?",
-        "signIn": "Đăng nhập"
-      }
-    },
-    "Marketing": {
-      "success": {
-        "title": "Kiểm tra email của bạn",
-        "description": "Chúng tôi đã gửi một liên kết đặt lại mật khẩu đến địa chỉ email của bạn.",
-        "spamCheck": "Nếu bạn không thấy email, hãy kiểm tra thư mục spam của bạn."
-      },
-      "backToLogin": "Quay lại đăng nhập",
-      "form": {
-        "title": "Quên mật khẩu?",
-        "description": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn một liên kết đặt lại.",
-        "emailLabel": "Email",
-        "emailPlaceholder": "Nhập email của bạn",
-        "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
-        "sendResetLink": "Gửi liên kết đặt lại"
-      }
-    },
-    "ResetPassword": {
-      "invalidLink": "Liên kết đặt lại không hợp lệ. Vui lòng yêu cầu đặt lại mật khẩu mới.",
-      "invalidLinkTitle": "Liên kết đặt lại không hợp lệ",
-      "invalidLinkDescription": "Liên kết đặt lại mật khẩu này không hợp lệ hoặc đã hết hạn.",
-      "requestNewLink": "Yêu cầu liên kết đặt lại mới",
-      "form": {
-        "title": "Đặt lại mật khẩu",
-        "description": "Nhập mật khẩu mới của bạn bên dưới.",
-        "newPasswordLabel": "Mật khẩu mới",
-        "newPasswordPlaceholder": "Nhập mật khẩu mới",
-        "confirmPasswordLabel": "Xác nhận mật khẩu",
-        "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
-        "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
-        "passwordMismatch": "Mật khẩu không khớp",
-        "updatePassword": "Cập nhật mật khẩu"
-      }
+    }
+  },
+  "Layout": {
+    "metadata": {
+      "titleDefault": "FinHome",
+      "titleTemplate": "%s | FinHome",
+      "description": "Nền tảng hoạch định tài chính bất động sản Việt Nam",
+      "openGraphTitle": "FinHome",
+      "openGraphDescription": "Nền tảng hoạch định tài chính bất động sản Việt Nam",
+      "openGraphSiteName": "FinHome",
+      "twitterTitle": "FinHome",
+      "twitterDescription": "Nền tảng hoạch định tài chính bất động sản Việt Nam"
     }
   },
   "Marketing": {
