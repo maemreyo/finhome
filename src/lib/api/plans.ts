@@ -1,25 +1,11 @@
 // src/lib/api/plans.ts
-// API client for financial plans
+// API client for financial plans - using database types directly
 
-export interface FinancialPlan {
-  id: string
-  user_id: string
-  plan_name: string
-  plan_description?: string
-  plan_type: 'home_purchase' | 'investment' | 'upgrade' | 'refinance'
-  purchase_price: number
-  down_payment: number
-  additional_costs: number
-  monthly_income: number
-  monthly_expenses: number
-  current_savings: number
-  other_debts: number
-  expected_rental_income?: number
-  expected_appreciation_rate?: number
-  investment_horizon_years?: number
-  is_public: boolean
-  status: 'draft' | 'active' | 'completed' | 'archived'
-  cached_calculations?: {
+import { type FinancialPlan, type FinancialPlanInsert } from '@/lib/supabase/types'
+
+// Extend database plan with calculated metrics for API responses
+export interface FinancialPlanWithMetrics extends FinancialPlan {
+  calculatedMetrics?: {
     monthlyPayment: number
     totalInterest: number
     debtToIncomeRatio: number
@@ -27,30 +13,13 @@ export interface FinancialPlan {
     roi?: number
     paybackPeriod?: number
   }
-  created_at: string
-  updated_at: string
-  calculations_last_updated?: string
 }
 
-export interface CreatePlanRequest {
-  planName: string
-  planDescription?: string
-  planType: 'home_purchase' | 'investment' | 'upgrade' | 'refinance'
-  purchasePrice: number
-  downPayment: number
-  additionalCosts?: number
-  monthlyIncome: number
-  monthlyExpenses: number
-  currentSavings: number
-  otherDebts?: number
-  expectedRentalIncome?: number
-  expectedAppreciationRate?: number
-  investmentHorizonYears?: number
-  isPublic?: boolean
-}
+// Request type for creating plans - maps to database insert
+export type CreatePlanRequest = Omit<FinancialPlanInsert, 'id' | 'user_id' | 'created_at' | 'updated_at'>
 
 export interface PlansResponse {
-  data: FinancialPlan[]
+  data: FinancialPlanWithMetrics[]
   count: number
   pagination: {
     limit: number
@@ -98,7 +67,7 @@ class PlansAPI {
     return response.json()
   }
 
-  async createPlan(planData: CreatePlanRequest): Promise<FinancialPlan> {
+  async createPlan(planData: CreatePlanRequest): Promise<FinancialPlanWithMetrics> {
     const response = await fetch(this.baseUrl, {
       method: 'POST',
       headers: {
@@ -116,7 +85,7 @@ class PlansAPI {
     return result.data
   }
 
-  async getPlan(planId: string): Promise<FinancialPlan> {
+  async getPlan(planId: string): Promise<FinancialPlanWithMetrics> {
     const response = await fetch(`${this.baseUrl}/${planId}`, {
       method: 'GET',
       headers: {
@@ -133,7 +102,7 @@ class PlansAPI {
     return result.data
   }
 
-  async updatePlan(planId: string, updates: Partial<CreatePlanRequest>): Promise<FinancialPlan> {
+  async updatePlan(planId: string, updates: Partial<CreatePlanRequest>): Promise<FinancialPlanWithMetrics> {
     const response = await fetch(`${this.baseUrl}/${planId}`, {
       method: 'PATCH',
       headers: {

@@ -21,40 +21,51 @@ import { type LoanParameters } from '@/lib/financial/calculations'
 import { useAuth } from '@/hooks/useAuth'
 import { usePlans } from '@/hooks/usePlans'
 import { useOptimalRates } from '@/hooks/useBankRates'
-import { type FinancialPlan, type CreatePlanRequest } from '@/lib/api/plans'
-import { apiPlansToUIPlans, type UIFinancialPlan } from '@/lib/adapters/planAdapter'
+import { type FinancialPlanWithMetrics, type CreatePlanRequest } from '@/lib/api/plans'
 import { type FinancialScenario } from '@/types/scenario'
 
-// Convert UIFinancialPlan to FinancialScenario for detail view
-function uiPlanToScenario(plan: UIFinancialPlan): FinancialScenario {
+// Convert database FinancialPlan to FinancialScenario for detail view
+function dbPlanToScenario(plan: FinancialPlanWithMetrics): FinancialScenario {
   return {
-    id: plan.id,
-    user_id: 'current-user', // This would come from auth context
-    plan_name: plan.planName,
-    description: plan.planDescription || '',
-    plan_type: plan.planType,
-    status: 'active',
-    created_at: plan.createdAt.toISOString(),
-    updated_at: plan.updatedAt.toISOString(),
+    ...plan,
+    // Scenario-specific properties
+    scenarioType: 'baseline',
+    riskLevel: 'medium',
     
-    // Property details
+    // Calculated metrics from API response or cached calculations
+    calculatedMetrics: plan.calculatedMetrics || (plan.cached_calculations as any) || {
+      monthlyPayment: 0,
+      totalInterest: 0,
+      debtToIncomeRatio: 0,
+      affordabilityScore: 0,
+      roi: 0,
+      paybackPeriod: 240
+    }
+  }
+}
+
+// Create demo data for non-authenticated users - using database format
+const createDemoPlans = (): FinancialPlanWithMetrics[] => [
+  {
+    id: 'demo-1',
+    user_id: 'demo-user',
+    plan_name: 'My First Home Purchase',
+    description: 'Buying a 2-bedroom apartment in District 7',
+    plan_type: 'home_purchase',
+    status: 'draft',
     property_id: null,
     custom_property_data: null,
-    purchase_price: plan.purchasePrice,
-    down_payment: plan.downPayment,
-    additional_costs: 0,
-    other_debts: 0,
-    
-    // Personal finances
     target_age: null,
     current_monthly_income: null,
-    monthly_income: plan.monthlyIncome,
+    monthly_income: 50000000,
     current_monthly_expenses: null,
-    monthly_expenses: plan.monthlyExpenses,
-    current_savings: plan.currentSavings,
+    monthly_expenses: 25000000,
+    current_savings: 800000000,
     dependents: 0,
-    
-    // Investment specifics
+    purchase_price: 3000000000,
+    down_payment: 600000000,
+    additional_costs: 0,
+    other_debts: 0,
     target_property_type: null,
     target_location: null,
     target_budget: null,
@@ -64,90 +75,36 @@ function uiPlanToScenario(plan: UIFinancialPlan): FinancialScenario {
     down_payment_target: null,
     risk_tolerance: 'moderate',
     investment_horizon_months: null,
-    expected_roi: plan.roi || null,
+    expected_roi: null,
     preferred_banks: null,
-    expected_rental_income: plan.expectedRentalIncome || null,
+    expected_rental_income: null,
     expected_appreciation_rate: null,
-    
-    // Targets
     emergency_fund_target: null,
     education_fund_target: null,
     retirement_fund_target: null,
     other_goals: {},
-    
-    // Metadata
-    feasibility_score: plan.affordabilityScore || null,
+    feasibility_score: null,
     recommended_adjustments: {},
-    is_public: plan.isPublic,
+    is_public: false,
     view_count: 0,
-    cached_calculations: null,
+    cached_calculations: {
+      monthlyPayment: 17400000,
+      totalInterest: 1200000000,
+      debtToIncomeRatio: 34.8,
+      affordabilityScore: 7
+    },
     calculations_last_updated: null,
+    created_at: '2024-01-15T00:00:00Z',
+    updated_at: '2024-01-20T00:00:00Z',
     completed_at: null,
-    
-    // Scenario-specific properties
-    scenarioType: 'baseline',
-    riskLevel: 'medium',
-    
-    // Calculated metrics
     calculatedMetrics: {
-      monthlyPayment: plan.monthlyPayment || 0,
-      totalInterest: plan.totalInterest || 0,
-      totalCost: (plan.monthlyPayment || 0) * 240, // Default to 20 years
-      dtiRatio: plan.monthlyPayment && plan.monthlyIncome ? (plan.monthlyPayment / plan.monthlyIncome) * 100 : 0,
-      ltvRatio: (plan.downPayment / plan.purchasePrice) * 100,
-      affordabilityScore: plan.affordabilityScore || 0,
-      payoffTimeMonths: 240, // Default to 20 years
-      monthlySavings: plan.monthlyIncome && plan.monthlyExpenses && plan.monthlyPayment ? 
-        plan.monthlyIncome - plan.monthlyExpenses - plan.monthlyPayment : 0
+      monthlyPayment: 17400000,
+      totalInterest: 1200000000,
+      debtToIncomeRatio: 34.8,
+      affordabilityScore: 7,
+      roi: 8.0,
+      paybackPeriod: 240
     }
-  }
-}
-
-// Sample data for demo/fallback (UI format)
-const samplePlans: UIFinancialPlan[] = [
-  {
-    id: '1',
-    planName: 'My First Home Purchase',
-    planDescription: 'Buying a 2-bedroom apartment in District 7',
-    planType: 'home_purchase',
-    purchasePrice: 3000000000, // 3B VND
-    downPayment: 600000000, // 600M VND
-    monthlyIncome: 50000000, // 50M VND
-    monthlyExpenses: 25000000, // 25M VND
-    currentSavings: 800000000, // 800M VND
-    planStatus: 'active',
-    isPublic: false,
-    isFavorite: true,
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20'),
-    // Calculated metrics
-    monthlyPayment: 17400000, // 17.4M VND
-    totalInterest: 1200000000, // 1.2B VND
-    affordabilityScore: 7,
-    riskLevel: 'medium'
-  },
-  {
-    id: '2',
-    planName: 'Investment Property - Vinhomes',
-    planDescription: 'Investment apartment for rental income',
-    planType: 'investment',
-    purchasePrice: 2500000000, // 2.5B VND
-    downPayment: 500000000, // 500M VND
-    monthlyIncome: 50000000, // 50M VND
-    monthlyExpenses: 25000000, // 25M VND
-    currentSavings: 800000000, // 800M VND
-    expectedRentalIncome: 18000000, // 18M VND
-    planStatus: 'draft',
-    isPublic: true,
-    isFavorite: false,
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-05'),
-    // Calculated metrics
-    monthlyPayment: 14500000, // 14.5M VND
-    totalInterest: 980000000, // 980M VND
-    affordabilityScore: 8,
-    riskLevel: 'low',
-    roi: 9.2
   }
 ]
 
@@ -163,7 +120,7 @@ export default function PlansPage() {
   // Bank rates for real-time calculations
   const { getOptimalRates } = useOptimalRates()
 
-  // Use real API data with fallback to sample data for non-authenticated users
+  // Always load real API data, with demo data for non-authenticated users
   const { 
     plans, 
     isLoading, 
@@ -174,8 +131,8 @@ export default function PlansPage() {
     refreshPlans 
   } = usePlans(user ? {} : undefined) // Only load real data if user is authenticated
 
-  // Convert API plans to UI format and fallback to sample data for non-authenticated users
-  const displayPlans = user ? apiPlansToUIPlans(plans) : samplePlans
+  // Use database plans directly or demo data for non-authenticated users
+  const displayPlans = user ? plans : createDemoPlans()
   const displayLoading = user ? isLoading : false
 
   const selectedPlan = useMemo(
@@ -203,13 +160,13 @@ export default function PlansPage() {
     }
 
     // Use cached calculation rates if available, otherwise use market averages
-    const effectiveRate = selectedPlan.monthlyPayment ? 
+    const effectiveRate = selectedPlan.calculatedMetrics?.monthlyPayment ? 
       // If we have cached calculations, derive the rate from monthly payment
       10.5 : // Default rate when no cached data
       10.5 // Market average rate
 
     const loanParams: LoanParameters = {
-      principal: selectedPlan.purchasePrice - selectedPlan.downPayment,
+      principal: (selectedPlan.purchase_price || 0) - (selectedPlan.down_payment || 0),
       annualRate: effectiveRate,
       termMonths: 240, // 20 years default
       promotionalRate: effectiveRate > 8 ? effectiveRate - 1.5 : undefined,
@@ -217,15 +174,15 @@ export default function PlansPage() {
     }
 
     const personalFinances = {
-      monthlyIncome: selectedPlan.monthlyIncome,
-      monthlyExpenses: selectedPlan.monthlyExpenses
+      monthlyIncome: selectedPlan.monthly_income || 0,
+      monthlyExpenses: selectedPlan.monthly_expenses || 0
     }
 
-    const investmentParams = selectedPlan.expectedRentalIncome ? {
-      expectedRentalIncome: selectedPlan.expectedRentalIncome,
-      propertyExpenses: selectedPlan.expectedRentalIncome * 0.1,
-      appreciationRate: 8,
-      initialPropertyValue: selectedPlan.purchasePrice
+    const investmentParams = selectedPlan.expected_rental_income ? {
+      expectedRentalIncome: selectedPlan.expected_rental_income,
+      propertyExpenses: selectedPlan.expected_rental_income * 0.1,
+      appreciationRate: selectedPlan.expected_appreciation_rate || 8,
+      initialPropertyValue: selectedPlan.purchase_price || 0
     } : undefined
 
     const scenarioEngine = new ScenarioEngine(
@@ -262,22 +219,22 @@ export default function PlansPage() {
           console.log('Found optimal rates:', optimalRatesData.recommendedRates.length, 'options')
         }
 
-        // For authenticated users, use real API
+        // For authenticated users, use real API with database field names
         const planData: CreatePlanRequest = {
-          planName: formData.planName,
-          planDescription: formData.planDescription,
-          planType: formData.planType || 'home_purchase',
-          purchasePrice: formData.purchasePrice,
-          downPayment: formData.downPayment,
-          additionalCosts: formData.additionalCosts || 0,
-          monthlyIncome: formData.monthlyIncome,
-          monthlyExpenses: formData.monthlyExpenses,
-          currentSavings: formData.currentSavings,
-          otherDebts: formData.otherDebts || 0,
-          expectedRentalIncome: formData.expectedRentalIncome,
-          expectedAppreciationRate: formData.expectedAppreciationRate,
-          investmentHorizonYears: formData.investmentHorizonYears,
-          isPublic: formData.isPublic || false
+          plan_name: formData.planName,
+          description: formData.planDescription,
+          plan_type: formData.planType || 'home_purchase',
+          purchase_price: formData.purchasePrice,
+          down_payment: formData.downPayment,
+          additional_costs: formData.additionalCosts || 0,
+          monthly_income: formData.monthlyIncome,
+          monthly_expenses: formData.monthlyExpenses,
+          current_savings: formData.currentSavings,
+          other_debts: formData.otherDebts || 0,
+          expected_rental_income: formData.expectedRentalIncome,
+          expected_appreciation_rate: formData.expectedAppreciationRate,
+          investment_horizon_months: formData.investmentHorizonYears ? formData.investmentHorizonYears * 12 : undefined,
+          is_public: formData.isPublic || false
         }
         
         await createPlan(planData)
@@ -341,20 +298,20 @@ export default function PlansPage() {
     if (planToDuplicate) {
       try {
         const duplicateData: CreatePlanRequest = {
-          planName: `${planToDuplicate.planName} (${t('actions.copy')})`,
-          planDescription: planToDuplicate.planDescription,
-          planType: planToDuplicate.planType,
-          purchasePrice: planToDuplicate.purchasePrice,
-          downPayment: planToDuplicate.downPayment,
-          additionalCosts: 0, // Default for duplicated plans
-          monthlyIncome: planToDuplicate.monthlyIncome,
-          monthlyExpenses: planToDuplicate.monthlyExpenses,
-          currentSavings: planToDuplicate.currentSavings,
-          otherDebts: 0, // Default for duplicated plans
-          expectedRentalIncome: planToDuplicate.expectedRentalIncome,
-          expectedAppreciationRate: undefined, // Will use default
-          investmentHorizonYears: undefined, // Will use default
-          isPublic: false
+          plan_name: `${planToDuplicate.plan_name} (${t('actions.copy')})`,
+          description: planToDuplicate.description,
+          plan_type: planToDuplicate.plan_type,
+          purchase_price: planToDuplicate.purchase_price,
+          down_payment: planToDuplicate.down_payment,
+          additional_costs: 0, // Default for duplicated plans
+          monthly_income: planToDuplicate.monthly_income,
+          monthly_expenses: planToDuplicate.monthly_expenses,
+          current_savings: planToDuplicate.current_savings,
+          other_debts: 0, // Default for duplicated plans
+          expected_rental_income: planToDuplicate.expected_rental_income,
+          expected_appreciation_rate: planToDuplicate.expected_appreciation_rate,
+          investment_horizon_months: planToDuplicate.investment_horizon_months,
+          is_public: false
         }
         
         await createPlan(duplicateData)
@@ -470,7 +427,7 @@ export default function PlansPage() {
 
         {viewMode === 'detail' && selectedPlan && (
           <PlanDetailView
-            plan={uiPlanToScenario(selectedPlan)}
+            plan={dbPlanToScenario(selectedPlan)}
             scenarios={scenarios}
             onBack={handleBackToList}
             onEdit={() => handleEditPlan(selectedPlan.id)}

@@ -16,7 +16,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import AchievementSystem from '@/components/achievements/AchievementSystem'
 import { AchievementGallery } from '@/components/gamification/AchievementGallery'
 import { UserProgress } from '@/lib/gamification/achievements'
-import { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 import { useAuth } from '@/hooks/useAuth'
 
 // Mock user progress data - would be fetched from backend
@@ -37,36 +37,114 @@ const getMockUserProgress = (userId: string): UserProgress => ({
 })
 
 // Mock plans data - would be fetched from backend
-const getMockPlans = (): FinancialPlan[] => ([
+const getMockPlans = (): FinancialPlanWithMetrics[] => ([
   {
     id: '1',
-    planName: 'Mua nhà đầu tiên',
-    planType: 'home_purchase',
-    purchasePrice: 2500000000,
-    downPayment: 500000000,
-    monthlyIncome: 50000000,
-    monthlyExpenses: 30000000,
-    currentSavings: 600000000,
-    isPublic: false,
-    planStatus: 'active',
-    roi: 12.5,
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20')
+    user_id: 'demo-user',
+    plan_name: 'Mua nhà đầu tiên',
+    description: null,
+    plan_type: 'home_purchase',
+    status: 'active',
+    property_id: null,
+    custom_property_data: null,
+    target_age: null,
+    current_monthly_income: null,
+    monthly_income: 50000000,
+    current_monthly_expenses: null,
+    monthly_expenses: 30000000,
+    current_savings: 600000000,
+    dependents: 0,
+    purchase_price: 2500000000,
+    down_payment: 500000000,
+    additional_costs: 0,
+    other_debts: 0,
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    target_timeframe_months: null,
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    risk_tolerance: null,
+    investment_horizon_months: null,
+    expected_roi: null,
+    preferred_banks: null,
+    expected_rental_income: null,
+    expected_appreciation_rate: null,
+    emergency_fund_target: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    feasibility_score: null,
+    recommended_adjustments: {},
+    is_public: false,
+    view_count: 0,
+    cached_calculations: null,
+    calculations_last_updated: null,
+    created_at: '2024-01-15T00:00:00Z',
+    updated_at: '2024-01-20T00:00:00Z',
+    completed_at: null,
+    calculatedMetrics: {
+      monthlyPayment: 0,
+      totalInterest: 0,
+      debtToIncomeRatio: 0,
+      affordabilityScore: 8,
+      roi: 12.5
+    }
   },
   {
     id: '2',
-    planName: 'Đầu tư căn hộ cho thuê',
-    planType: 'investment',
-    purchasePrice: 1800000000,
-    downPayment: 400000000,
-    monthlyIncome: 45000000,
-    monthlyExpenses: 25000000,
-    currentSavings: 500000000,
-    isPublic: false,
-    planStatus: 'completed',
-    roi: 8.3,
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-15')
+    user_id: 'demo-user',
+    plan_name: 'Đầu tư căn hộ cho thuê',
+    description: null,
+    plan_type: 'investment',
+    status: 'completed',
+    property_id: null,
+    custom_property_data: null,
+    target_age: null,
+    current_monthly_income: null,
+    monthly_income: 45000000,
+    current_monthly_expenses: null,
+    monthly_expenses: 25000000,
+    current_savings: 500000000,
+    dependents: 0,
+    purchase_price: 1800000000,
+    down_payment: 400000000,
+    additional_costs: 0,
+    other_debts: 0,
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    target_timeframe_months: null,
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    risk_tolerance: null,
+    investment_horizon_months: null,
+    expected_roi: null,
+    preferred_banks: null,
+    expected_rental_income: null,
+    expected_appreciation_rate: null,
+    emergency_fund_target: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    feasibility_score: null,
+    recommended_adjustments: {},
+    is_public: false,
+    view_count: 0,
+    cached_calculations: null,
+    calculations_last_updated: null,
+    created_at: '2024-02-01T00:00:00Z',
+    updated_at: '2024-02-15T00:00:00Z',
+    completed_at: null,
+    calculatedMetrics: {
+      monthlyPayment: 0,
+      totalInterest: 0,
+      debtToIncomeRatio: 0,
+      affordabilityScore: 7,
+      roi: 8.3
+    }
   }
 ])
 
@@ -74,7 +152,7 @@ export default function AchievementsPage() {
   const t = useTranslations('AchievementsPage')
   const { user } = useAuth()
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null)
-  const [plans, setPlans] = useState<FinancialPlan[]>([])
+  const [plans, setPlans] = useState<FinancialPlanWithMetrics[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'gallery' | 'system'>('system')

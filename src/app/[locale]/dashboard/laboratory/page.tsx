@@ -13,45 +13,123 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Calculator, TrendingUp, AlertCircle, Plus, Beaker } from 'lucide-react'
-import { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 
 // Mock financial plans data
-const mockPlans: FinancialPlan[] = [
+const mockPlans: FinancialPlanWithMetrics[] = [
   {
     id: '1',
-    planName: 'Mua nhà đầu tiên',
-    planType: 'home_purchase',
-    purchasePrice: 2500000000,
-    downPayment: 500000000,
-    monthlyIncome: 45000000,
-    monthlyExpenses: 18000000,
-    currentSavings: 600000000,
-    isPublic: false,
-    planStatus: 'active',
-    roi: 8.5,
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20')
+    user_id: 'demo-user',
+    plan_name: 'Mua nhà đầu tiên',
+    description: null,
+    plan_type: 'home_purchase',
+    status: 'active',
+    property_id: null,
+    custom_property_data: null,
+    target_age: null,
+    current_monthly_income: null,
+    monthly_income: 45000000,
+    current_monthly_expenses: null,
+    monthly_expenses: 18000000,
+    current_savings: 600000000,
+    dependents: 0,
+    purchase_price: 2500000000,
+    down_payment: 500000000,
+    additional_costs: 0,
+    other_debts: 0,
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    target_timeframe_months: null,
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    risk_tolerance: null,
+    investment_horizon_months: null,
+    expected_roi: null,
+    preferred_banks: null,
+    expected_rental_income: null,
+    expected_appreciation_rate: null,
+    emergency_fund_target: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    feasibility_score: null,
+    recommended_adjustments: {},
+    is_public: false,
+    view_count: 0,
+    cached_calculations: null,
+    calculations_last_updated: null,
+    created_at: '2024-01-15T00:00:00Z',
+    updated_at: '2024-01-20T00:00:00Z',
+    completed_at: null,
+    calculatedMetrics: {
+      monthlyPayment: 0,
+      totalInterest: 0,
+      debtToIncomeRatio: 0,
+      affordabilityScore: 8,
+      roi: 8.5
+    }
   },
   {
     id: '2',
-    planName: 'Đầu tư căn hộ cho thuê',
-    planType: 'investment',
-    purchasePrice: 1800000000,
-    downPayment: 400000000,
-    monthlyIncome: 45000000,
-    monthlyExpenses: 18000000,
-    currentSavings: 500000000,
-    isPublic: false,
-    planStatus: 'completed',
-    roi: 12.3,
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-15')
+    user_id: 'demo-user',
+    plan_name: 'Đầu tư căn hộ cho thuê',
+    description: null,
+    plan_type: 'investment',
+    status: 'completed',
+    property_id: null,
+    custom_property_data: null,
+    target_age: null,
+    current_monthly_income: null,
+    monthly_income: 45000000,
+    current_monthly_expenses: null,
+    monthly_expenses: 18000000,
+    current_savings: 500000000,
+    dependents: 0,
+    purchase_price: 1800000000,
+    down_payment: 400000000,
+    additional_costs: 0,
+    other_debts: 0,
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    target_timeframe_months: null,
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    risk_tolerance: null,
+    investment_horizon_months: null,
+    expected_roi: null,
+    preferred_banks: null,
+    expected_rental_income: null,
+    expected_appreciation_rate: null,
+    emergency_fund_target: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    feasibility_score: null,
+    recommended_adjustments: {},
+    is_public: false,
+    view_count: 0,
+    cached_calculations: null,
+    calculations_last_updated: null,
+    created_at: '2024-02-01T00:00:00Z',
+    updated_at: '2024-02-15T00:00:00Z',
+    completed_at: null,
+    calculatedMetrics: {
+      monthlyPayment: 0,
+      totalInterest: 0,
+      debtToIncomeRatio: 0,
+      affordabilityScore: 7,
+      roi: 12.3
+    }
   }
 ]
 
 // Calculate loan details from plan
-const calculateLoanDetails = (plan: FinancialPlan) => {
-  const principal = plan.purchasePrice - plan.downPayment
+const calculateLoanDetails = (plan: FinancialPlanWithMetrics) => {
+  const principal = (plan.purchase_price || 0) - (plan.down_payment || 0)
   const interestRate = 8.5 // Default rate
   const termYears = 20 // Default term
   
@@ -151,13 +229,13 @@ export default function LaboratoryPage() {
                     {mockPlans.map((plan) => (
                       <SelectItem key={plan.id} value={plan.id}>
                         <div className="flex items-center justify-between w-full">
-                          <span>{plan.planName}</span>
+                          <span>{plan.plan_name}</span>
                           <span className="text-sm text-gray-500 ml-4">
                             {new Intl.NumberFormat('vi-VN', {
                               style: 'currency',
                               currency: 'VND',
                               notation: 'compact'
-                            }).format(plan.purchasePrice)}
+                            }).format(plan.purchase_price || 0)}
                           </span>
                         </div>
                       </SelectItem>
@@ -182,10 +260,10 @@ export default function LaboratoryPage() {
                   <Beaker className="w-4 h-4 text-blue-500" />
                   <div className="text-sm font-medium">Kế Hoạch</div>
                 </div>
-                <div className="text-xl font-bold mt-1">{selectedPlan.planName}</div>
+                <div className="text-xl font-bold mt-1">{selectedPlan.plan_name}</div>
                 <div className="text-sm text-gray-600">
-                  {selectedPlan.planType === 'home_purchase' ? 'Mua nhà ở' : 
-                   selectedPlan.planType === 'investment' ? 'Đầu tư' : 'Khác'}
+                  {selectedPlan.plan_type === 'home_purchase' ? 'Mua nhà ở' : 
+                   selectedPlan.plan_type === 'investment' ? 'Đầu tư' : 'Khác'}
                 </div>
               </CardContent>
             </Card>
@@ -221,7 +299,7 @@ export default function LaboratoryPage() {
                   }).format(loanDetails.monthlyPayment)}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {((loanDetails.monthlyPayment / selectedPlan.monthlyIncome) * 100).toFixed(1)}% thu nhập
+                  {((loanDetails.monthlyPayment / (selectedPlan.monthly_income || 1)) * 100).toFixed(1)}% thu nhập
                 </div>
               </CardContent>
             </Card>
@@ -237,10 +315,10 @@ export default function LaboratoryPage() {
                     style: 'currency',
                     currency: 'VND',
                     notation: 'compact'
-                  }).format(selectedPlan.monthlyIncome - selectedPlan.monthlyExpenses - loanDetails.monthlyPayment)}
+                  }).format((selectedPlan.monthly_income || 0) - (selectedPlan.monthly_expenses || 0) - loanDetails.monthlyPayment)}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {selectedPlan.monthlyIncome - selectedPlan.monthlyExpenses - loanDetails.monthlyPayment >= 0 ? 
+                  {(selectedPlan.monthly_income || 0) - (selectedPlan.monthly_expenses || 0) - loanDetails.monthlyPayment >= 0 ? 
                     'Dương tính' : 'Âm tính'}
                 </div>
               </CardContent>
@@ -252,8 +330,8 @@ export default function LaboratoryPage() {
         {selectedPlan && loanDetails ? (
           <FinancialLaboratory
             initialLoan={loanDetails}
-            monthlyIncome={selectedPlan.monthlyIncome}
-            monthlyExpenses={selectedPlan.monthlyExpenses}
+            monthlyIncome={selectedPlan.monthly_income || 0}
+            monthlyExpenses={selectedPlan.monthly_expenses || 0}
           />
         ) : (
           <Card>

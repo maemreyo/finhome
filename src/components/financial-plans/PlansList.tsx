@@ -43,34 +43,11 @@ import { toast } from 'sonner'
 import { exportFinancialPlanToPDF } from '@/lib/export/pdfExport'
 import { exportFinancialPlanToExcel, exportPlansComparison } from '@/lib/export/excelExport'
 
-// Types for financial plans
-export interface FinancialPlan {
-  id: string
-  planName: string
-  planDescription?: string
-  planType: 'home_purchase' | 'investment' | 'upgrade' | 'refinance'
-  purchasePrice: number
-  downPayment: number
-  monthlyIncome: number
-  monthlyExpenses: number
-  currentSavings: number
-  expectedRentalIncome?: number
-  planStatus: 'draft' | 'active' | 'completed' | 'archived'
-  isPublic: boolean
-  isFavorite?: boolean
-  createdAt: Date
-  updatedAt: Date
-  
-  // Calculated metrics (cached)
-  monthlyPayment?: number
-  totalInterest?: number
-  affordabilityScore?: number
-  riskLevel?: 'low' | 'medium' | 'high'
-  roi?: number
-}
+// Import database types
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 
 interface PlansListProps {
-  plans: FinancialPlan[]
+  plans: FinancialPlanWithMetrics[]
   onCreateNew: () => void
   onViewPlan: (planId: string) => void
   onEditPlan: (planId: string) => void
@@ -123,14 +100,14 @@ const getRiskLevelColor = (riskLevel?: string) => {
 }
 
 const PlanCard: React.FC<{
-  plan: FinancialPlan
+  plan: FinancialPlanWithMetrics
   onView: () => void
   onEdit: () => void
   onDelete: () => void
   onDuplicate: () => void
   onToggleFavorite: () => void
 }> = ({ plan, onView, onEdit, onDelete, onDuplicate, onToggleFavorite }) => {
-  const IconComponent = getPlanTypeIcon(plan.planType)
+  const IconComponent = getPlanTypeIcon(plan.plan_type)
   const [isExporting, setIsExporting] = useState(false)
 
   const handleExportPDF = async (e: React.MouseEvent) => {
@@ -189,21 +166,21 @@ const PlanCard: React.FC<{
                   className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate cursor-pointer hover:text-blue-600"
                   onClick={onView}
                 >
-                  {plan.planName}
+                  {plan.plan_name}
                 </CardTitle>
                 
                 <div className="flex items-center space-x-2 mt-1">
                   <Badge variant="outline" className="text-xs">
-                    {getPlanTypeLabel(plan.planType)}
+                    {getPlanTypeLabel(plan.plan_type)}
                   </Badge>
                   
-                  <Badge className={cn("text-xs", getPlanStatusColor(plan.planStatus))}>
-                    {plan.planStatus.charAt(0).toUpperCase() + plan.planStatus.slice(1)}
+                  <Badge className={cn("text-xs", getPlanStatusColor(plan.status))}>
+                    {plan.status.charAt(0).toUpperCase() + plan.status.slice(1)}
                   </Badge>
                   
-                  {plan.riskLevel && (
-                    <Badge className={cn("text-xs", getRiskLevelColor(plan.riskLevel))}>
-                      {plan.riskLevel.toUpperCase()}
+                  {plan.risk_tolerance && (
+                    <Badge className={cn("text-xs", getRiskLevelColor(plan.risk_tolerance))}>
+                      {plan.risk_tolerance.toUpperCase()}
                     </Badge>
                   )}
                 </div>
@@ -217,11 +194,8 @@ const PlanCard: React.FC<{
                 className="opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={onToggleFavorite}
               >
-                {plan.isFavorite ? (
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                ) : (
-                  <StarOff className="w-4 h-4 text-gray-400" />
-                )}
+                {/* TODO: Implement favorites functionality in database */}
+                <StarOff className="w-4 h-4 text-gray-400" />
               </Button>
               
               <DropdownMenu>
@@ -274,28 +248,28 @@ const PlanCard: React.FC<{
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Purchase Price</p>
               <p className="font-semibold text-gray-900 dark:text-gray-100">
-                {formatCurrency(plan.purchasePrice)}
+                {formatCurrency(plan.purchase_price || 0)}
               </p>
             </div>
             
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Down Payment</p>
               <p className="font-semibold text-gray-900 dark:text-gray-100">
-                {formatCurrency(plan.downPayment)}
+                {formatCurrency(plan.down_payment || 0)}
                 <span className="text-xs text-gray-500 ml-1">
-                  ({((plan.downPayment / plan.purchasePrice) * 100).toFixed(0)}%)
+                  ({plan.purchase_price && plan.down_payment ? ((plan.down_payment / plan.purchase_price) * 100).toFixed(0) : 0}%)
                 </span>
               </p>
             </div>
           </div>
           
           {/* Monthly Metrics */}
-          {plan.monthlyPayment && (
+          {plan.calculatedMetrics?.monthlyPayment && (
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Monthly Payment</p>
                 <p className="font-semibold text-blue-600">
-                  {formatCurrency(plan.monthlyPayment)}
+                  {formatCurrency(plan.calculatedMetrics.monthlyPayment)}
                 </p>
               </div>
               
@@ -305,11 +279,11 @@ const PlanCard: React.FC<{
                   <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div 
                       className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min((plan.affordabilityScore || 0) * 10, 100)}%` }}
+                      style={{ width: `${Math.min((plan.calculatedMetrics?.affordabilityScore || 0) * 10, 100)}%` }}
                     />
                   </div>
                   <span className="text-sm font-medium">
-                    {plan.affordabilityScore || 0}/10
+                    {plan.calculatedMetrics?.affordabilityScore || 0}/10
                   </span>
                 </div>
               </div>
@@ -317,7 +291,7 @@ const PlanCard: React.FC<{
           )}
           
           {/* ROI for Investment Properties */}
-          {plan.planType === 'investment' && plan.roi && (
+          {plan.plan_type === 'investment' && plan.calculatedMetrics?.roi && (
             <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-4 h-4 text-green-600" />
@@ -326,7 +300,7 @@ const PlanCard: React.FC<{
                 </span>
               </div>
               <span className="font-bold text-green-600">
-                {plan.roi.toFixed(1)}%
+                {plan.calculatedMetrics.roi.toFixed(1)}%
               </span>
             </div>
           )}
@@ -335,10 +309,10 @@ const PlanCard: React.FC<{
           <div className="flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center space-x-1">
               <Calendar className="w-3 h-3" />
-              <span>Created {plan.createdAt.toLocaleDateString('vi-VN')}</span>
+              <span>Created {new Date(plan.created_at).toLocaleDateString('vi-VN')}</span>
             </div>
             
-            {plan.isPublic && (
+            {plan.is_public && (
               <Badge variant="outline" className="text-xs">
                 Public
               </Badge>
@@ -440,8 +414,8 @@ export const PlansList: React.FC<PlansListProps> = ({
   // Filter and sort plans
   const filteredAndSortedPlans = React.useMemo(() => {
     const filtered = plans.filter(plan => {
-      const matchesSearch = plan.planName.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesStatus = filterStatus === 'all' || plan.planStatus === filterStatus
+      const matchesSearch = plan.plan_name.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesStatus = filterStatus === 'all' || plan.status === filterStatus
       return matchesSearch && matchesStatus
     })
     
@@ -449,24 +423,20 @@ export const PlansList: React.FC<PlansListProps> = ({
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'name':
-          return a.planName.localeCompare(b.planName)
+          return a.plan_name.localeCompare(b.plan_name)
         case 'created':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         case 'updated':
-          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
         case 'price':
-          return b.purchasePrice - a.purchasePrice
+          return (b.purchase_price || 0) - (a.purchase_price || 0)
         default:
           return 0
       }
     })
     
-    // Favorites first
-    return filtered.sort((a, b) => {
-      if (a.isFavorite && !b.isFavorite) return -1
-      if (!a.isFavorite && b.isFavorite) return 1
-      return 0
-    })
+    // TODO: Implement favorites functionality in database
+    return filtered
   }, [plans, searchQuery, filterStatus, sortBy])
   
   if (isLoading) {

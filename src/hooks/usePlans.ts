@@ -4,16 +4,16 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { plansAPI, type FinancialPlan, type CreatePlanRequest, type PlanFilters } from '@/lib/api/plans'
+import { plansAPI, type FinancialPlanWithMetrics, type CreatePlanRequest, type PlanFilters } from '@/lib/api/plans'
 import { useErrorHandler } from './useErrorHandler'
 
 interface UsePlansReturn {
-  plans: FinancialPlan[]
+  plans: FinancialPlanWithMetrics[]
   isLoading: boolean
   error: string | null
   totalCount: number
-  createPlan: (planData: CreatePlanRequest) => Promise<FinancialPlan>
-  updatePlan: (planId: string, updates: Partial<CreatePlanRequest>) => Promise<FinancialPlan>
+  createPlan: (planData: CreatePlanRequest) => Promise<FinancialPlanWithMetrics>
+  updatePlan: (planId: string, updates: Partial<CreatePlanRequest>) => Promise<FinancialPlanWithMetrics>
   deletePlan: (planId: string) => Promise<void>
   refreshPlans: () => Promise<void>
   loadMore: () => Promise<void>
@@ -21,7 +21,7 @@ interface UsePlansReturn {
 }
 
 export function usePlans(filters?: PlanFilters): UsePlansReturn {
-  const [plans, setPlans] = useState<FinancialPlan[]>([])
+  const [plans, setPlans] = useState<FinancialPlanWithMetrics[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [totalCount, setTotalCount] = useState(0)
@@ -72,7 +72,7 @@ export function usePlans(filters?: PlanFilters): UsePlansReturn {
     }
   }, [loadPlans, plans.length, totalCount])
 
-  const createPlan = useCallback(async (planData: CreatePlanRequest): Promise<FinancialPlan> => {
+  const createPlan = useCallback(async (planData: CreatePlanRequest): Promise<FinancialPlanWithMetrics> => {
     const result = await withErrorHandling(async () => {
       const newPlan = await plansAPI.createPlan(planData)
       setPlans(prev => [newPlan, ...prev])
@@ -91,7 +91,7 @@ export function usePlans(filters?: PlanFilters): UsePlansReturn {
     return result
   }, [withErrorHandling, handlePlanError])
 
-  const updatePlan = useCallback(async (planId: string, updates: Partial<CreatePlanRequest>): Promise<FinancialPlan> => {
+  const updatePlan = useCallback(async (planId: string, updates: Partial<CreatePlanRequest>): Promise<FinancialPlanWithMetrics> => {
     try {
       setError(null)
       const updatedPlan = await plansAPI.updatePlan(planId, updates)

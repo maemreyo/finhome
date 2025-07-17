@@ -44,7 +44,7 @@ import AchievementSystem from '@/components/achievements/AchievementSystem'
 
 // Import legacy components for fallback
 import { TimelineVisualization } from '@/components/timeline/TimelineVisualization'
-import { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 import { convertScenarioToTimeline } from '@/lib/timeline/timelineUtils'
 import { ScenarioEngine, type ScenarioDefinition } from '@/lib/financial/scenarios'
 import { type LoanParameters } from '@/lib/financial/calculations'
@@ -52,7 +52,7 @@ import { type LoanParameters } from '@/lib/financial/calculations'
 // Note: metadata cannot be exported from client components
 
 // Sample data for dashboard
-const samplePlans: FinancialPlan[] = [
+const samplePlans: FinancialPlanWithMetrics[] = [
   {
     id: '1',
     planName: 'My First Home Purchase',
@@ -181,7 +181,7 @@ const StatCard: React.FC<{
 )
 
 const PlanSummaryCard: React.FC<{
-  plan: FinancialPlan
+  plan: FinancialPlanWithMetrics
   onView: () => void
   onEdit: () => void
 }> = ({ plan, onView, onEdit }) => {
