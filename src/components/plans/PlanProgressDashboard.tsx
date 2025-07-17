@@ -26,7 +26,8 @@ import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
 
 // Import our components
-import PlanStatusManager, { type PlanStatus, type PlanStatusInfo } from './PlanStatusManager'
+import PlanStatusManager, { type PlanStatusInfo } from './PlanStatusManager'
+import type { PlanStatus } from '@/lib/supabase/types'
 import PlanProgressTracker, { type PlanProgress, type PlanMilestone } from './PlanProgressTracker'
 import { UIFinancialPlan } from '@/lib/adapters/planAdapter'
 
@@ -55,15 +56,15 @@ const mockStatusInfo: PlanStatusInfo = {
     {
       id: 'status-2',
       previousStatus: 'active',
-      newStatus: 'paused',
+      newStatus: 'archived',
       changedBy: 'User',
       changedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      reason: 'Waiting for loan approval',
-      notes: 'Bank requested additional documents'
+      reason: 'Archived for review',
+      notes: 'Plan needs updates before reactivation'
     },
     {
       id: 'status-3',
-      previousStatus: 'paused',
+      previousStatus: 'archived',
       newStatus: 'active',
       changedBy: 'User',
       changedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
@@ -71,10 +72,9 @@ const mockStatusInfo: PlanStatusInfo = {
       notes: 'All requirements met, proceeding with property purchase'
     }
   ],
-  canTransitionTo: ['paused', 'completed', 'cancelled'],
+  canTransitionTo: ['archived', 'completed'],
   estimatedCompletionDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-  pausedReason: undefined,
-  cancelledReason: undefined
+  archiveReason: undefined
 }
 
 // Mock progress data
@@ -188,8 +188,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
       ...prev,
       status: newStatus,
       statusHistory: [newStatusHistory, ...prev.statusHistory],
-      pausedReason: newStatus === 'paused' ? reason : undefined,
-      cancelledReason: newStatus === 'cancelled' ? reason : undefined,
+      archiveReason: newStatus === 'archived' ? reason : undefined,
       actualCompletionDate: newStatus === 'completed' ? new Date() : undefined
     }))
     
@@ -200,9 +199,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
     switch (status) {
       case 'draft': return 'bg-gray-100 text-gray-800'
       case 'active': return 'bg-blue-100 text-blue-800'
-      case 'paused': return 'bg-yellow-100 text-yellow-800'
       case 'completed': return 'bg-green-100 text-green-800'
-      case 'cancelled': return 'bg-red-100 text-red-800'
       case 'archived': return 'bg-gray-100 text-gray-600'
       default: return 'bg-gray-100 text-gray-800'
     }
@@ -217,11 +214,8 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
     // Deduct points for low savings progress
     if (keyMetrics.savingsProgress < 50) score -= 10
     
-    // Deduct points for paused status
-    if (statusInfo.status === 'paused') score -= 20
-    
-    // Deduct points for cancelled status
-    if (statusInfo.status === 'cancelled') score -= 50
+    // Deduct points for archived status
+    if (statusInfo.status === 'archived') score -= 15
     
     return Math.max(0, Math.min(100, score))
   }

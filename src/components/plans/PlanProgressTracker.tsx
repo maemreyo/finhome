@@ -30,8 +30,7 @@ import {
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
 import { UIFinancialPlan } from '@/lib/adapters/planAdapter'
-
-export type PlanStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived'
+import type { PlanStatus } from '@/lib/supabase/types'
 
 export interface PlanMilestone {
   id: string
@@ -65,7 +64,7 @@ export interface PlanProgress {
 interface PlanProgressTrackerProps {
   plan: UIFinancialPlan
   progress: PlanProgress
-  onStatusChange: (status: PlanStatus, note?: string) => void
+  onStatusChange: (newStatus: PlanStatus, reason?: string, notes?: string) => void
   onMilestoneUpdate: (milestoneId: string, updates: Partial<PlanMilestone>) => void
   onContributionUpdate: (amount: number) => void
   className?: string
@@ -117,11 +116,11 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
           color: 'bg-green-100 text-green-800 border-green-300',
           label: 'Đang thực hiện'
         }
-      case 'paused':
+      case 'archived':
         return { 
           icon: Pause, 
           color: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-          label: 'Tạm dừng'
+          label: 'Lưu trữ'
         }
       case 'completed':
         return { 
@@ -302,7 +301,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                 </Button>
                 
                 <Button
-                  onClick={() => onStatusChange('paused', 'Plan paused by user')}
+                  onClick={() => onStatusChange('archived', 'Plan archived by user')}
                   disabled={plan.planStatus !== 'active'}
                   variant="outline"
                   className="w-full justify-start"

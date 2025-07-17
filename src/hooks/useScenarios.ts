@@ -1,442 +1,295 @@
 // src/hooks/useScenarios.ts
-// Hook for managing financial scenarios and comparisons
+// React hooks for scenario management
 
-import { useState, useCallback, useMemo } from 'react'
-import { FinancialPlan } from '@/components/financial-plans/PlansList'
+import { useState, useEffect, useCallback } from 'react'
+import { scenarioService, type ScenarioFilters, type ScenarioStats } from '@/lib/services/scenarioService'
+import type {
+  FinancialScenario,
+  ScenarioParameters,
+  ScenarioComparison,
+  ScenarioAnalysisResult,
+  CreateScenarioRequest
+} from '@/types/scenario'
+import { toast } from 'sonner'
 
-// Enhanced scenario type with additional calculation fields
-export interface LoanScenario {
-  id: string
-  name: string
-  downPaymentPercent: number
-  loanTermYears: number
-  interestRate: number
-  propertyPrice: number
-  downPayment: number
-  loanAmount: number
-  monthlyPayment: number
-  totalInterest: number
-  totalPayment: number
-  monthlyIncome: number
-  monthlyExpenses: number
-  netCashFlow: number
-  riskLevel: 'low' | 'medium' | 'high'
-  recommendation: 'optimal' | 'safe' | 'aggressive' | 'risky'
-  createdAt: Date
-  planId?: string
-}
-
-export interface ScenarioCalculationParams {
-  propertyPrice: number
-  downPaymentPercent: number
-  loanTermYears: number
-  interestRate: number
-  monthlyIncome: number
-  monthlyExpenses: number
-  promotionalRate?: number
-  promotionalMonths?: number
-}
-
-interface UseScenariosReturn {
-  scenarios: LoanScenario[]
+export interface UseScenarios {
+  scenarios: FinancialScenario[]
   loading: boolean
   error: string | null
-  createScenario: (params: ScenarioCalculationParams, name?: string) => LoanScenario
-  updateScenario: (id: string, updates: Partial<ScenarioCalculationParams>) => void
-  deleteScenario: (id: string) => void
-  duplicateScenario: (id: string, newName?: string) => LoanScenario
-  calculateScenario: (params: ScenarioCalculationParams) => Omit<LoanScenario, 'id' | 'name' | 'createdAt'>
-  getRecommendation: (scenario: LoanScenario) => LoanScenario['recommendation']
-  compareScenarios: (scenarioIds: string[]) => LoanScenario[]
+  refreshScenarios: () => Promise<void>
+  createScenario: (request: CreateScenarioRequest) => Promise<FinancialScenario>
+  updateScenario: (id: string, parameters: Partial<ScenarioParameters>) => Promise<FinancialScenario>
+  deleteScenario: (id: string) => Promise<void>
+  generatePredefinedScenarios: (baseScenarioId: string) => Promise<FinancialScenario[]>
 }
 
-// Vietnamese banking loan calculation with promotional rates
-const calculateMonthlyPayment = (
-  principal: number,
-  annualRate: number,
-  termYears: number,
-  promotionalRate?: number,
-  promotionalMonths?: number
-): { monthlyPayment: number; totalInterest: number; totalPayment: number } => {
-  const monthlyRate = annualRate / 100 / 12
-  const totalMonths = termYears * 12
-  
-  if (promotionalRate && promotionalMonths) {
-    // Calculate with promotional rate for initial period
-    const promoMonthlyRate = promotionalRate / 100 / 12
-    const promoPayment = (principal * promoMonthlyRate * Math.pow(1 + promoMonthlyRate, totalMonths)) / 
-                        (Math.pow(1 + promoMonthlyRate, totalMonths) - 1)
-    
-    // Calculate remaining balance after promotional period
-    let remainingBalance = principal
-    let totalInterest = 0
-    
-    // Promotional period payments
-    for (let month = 1; month <= promotionalMonths; month++) {
-      const interestPayment = remainingBalance * promoMonthlyRate
-      const principalPayment = promoPayment - interestPayment
-      remainingBalance -= principalPayment
-      totalInterest += interestPayment
-    }
-    
-    // Regular period payments
-    const remainingMonths = totalMonths - promotionalMonths
-    if (remainingMonths > 0) {
-      const regularPayment = (remainingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths)) / 
-                            (Math.pow(1 + monthlyRate, remainingMonths) - 1)
-      
-      for (let month = 1; month <= remainingMonths; month++) {
-        const interestPayment = remainingBalance * monthlyRate
-        const principalPayment = regularPayment - interestPayment
-        remainingBalance -= principalPayment
-        totalInterest += interestPayment
-      }
-      
-      // Return weighted average payment for UI display
-      const avgPayment = (promoPayment * promotionalMonths + regularPayment * remainingMonths) / totalMonths
-      return {
-        monthlyPayment: avgPayment,
-        totalInterest,
-        totalPayment: principal + totalInterest
-      }
-    }
-    
-    return {
-      monthlyPayment: promoPayment,
-      totalInterest,
-      totalPayment: principal + totalInterest
-    }
-  }
-  
-  // Standard loan calculation
-  const monthlyPayment = (principal * monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / 
-                        (Math.pow(1 + monthlyRate, totalMonths) - 1)
-  const totalPayment = monthlyPayment * totalMonths
-  const totalInterest = totalPayment - principal
-  
-  return {
-    monthlyPayment,
-    totalInterest,
-    totalPayment
-  }
+export interface UseScenarioComparison {
+  comparison: ScenarioComparison | null
+  loading: boolean
+  error: string | null
+  compareScenarios: (scenarioIds: string[]) => Promise<void>
+  clearComparison: () => void
 }
 
-// Risk assessment based on financial ratios
-const assessRiskLevel = (
-  monthlyPayment: number,
-  monthlyIncome: number,
-  netCashFlow: number,
-  downPaymentPercent: number,
-  loanTermYears: number
-): 'low' | 'medium' | 'high' => {
-  const debtToIncomeRatio = (monthlyPayment / monthlyIncome) * 100
-  
-  let riskScore = 0
-  
-  // Debt-to-income ratio scoring
-  if (debtToIncomeRatio > 50) riskScore += 40
-  else if (debtToIncomeRatio > 40) riskScore += 25
-  else if (debtToIncomeRatio > 30) riskScore += 10
-  
-  // Cash flow scoring
-  if (netCashFlow < -2000000) riskScore += 30 // -2M VND
-  else if (netCashFlow < 0) riskScore += 15
-  
-  // Down payment scoring
-  if (downPaymentPercent < 10) riskScore += 25
-  else if (downPaymentPercent < 20) riskScore += 15
-  
-  // Loan term scoring
-  if (loanTermYears > 25) riskScore += 10
-  else if (loanTermYears > 20) riskScore += 5
-  
-  if (riskScore >= 50) return 'high'
-  if (riskScore >= 25) return 'medium'
-  return 'low'
+export interface UseScenarioAnalysis {
+  analysis: ScenarioAnalysisResult | null
+  loading: boolean
+  error: string | null
+  analyzeScenario: (scenarioId: string) => Promise<void>
+  clearAnalysis: () => void
 }
 
-// Generate recommendation based on scenario characteristics
-const generateRecommendation = (scenario: {
-  monthlyPayment: number
-  monthlyIncome: number
-  netCashFlow: number
-  downPaymentPercent: number
-  loanTermYears: number
-  riskLevel: 'low' | 'medium' | 'high'
-}): LoanScenario['recommendation'] => {
-  const debtToIncomeRatio = (scenario.monthlyPayment / scenario.monthlyIncome) * 100
-  
-  // Optimal: Good balance of all factors
-  if (
-    debtToIncomeRatio <= 35 &&
-    scenario.netCashFlow >= 0 &&
-    scenario.downPaymentPercent >= 20 &&
-    scenario.loanTermYears <= 25 &&
-    scenario.riskLevel === 'low'
-  ) {
-    return 'optimal'
-  }
-  
-  // Safe: Conservative approach
-  if (
-    debtToIncomeRatio <= 30 &&
-    scenario.netCashFlow >= 1000000 && // 1M VND buffer
-    scenario.downPaymentPercent >= 25 &&
-    scenario.riskLevel === 'low'
-  ) {
-    return 'safe'
-  }
-  
-  // Aggressive: Higher risk but potentially higher returns
-  if (
-    debtToIncomeRatio <= 45 &&
-    scenario.netCashFlow >= -500000 && // -500K VND acceptable
-    scenario.downPaymentPercent >= 15 &&
-    scenario.riskLevel === 'medium'
-  ) {
-    return 'aggressive'
-  }
-  
-  // Risky: High risk factors present
-  return 'risky'
+export interface UseScenarioStats {
+  stats: ScenarioStats | null
+  loading: boolean
+  error: string | null
+  refreshStats: () => Promise<void>
 }
 
-export function useScenarios(initialScenarios: LoanScenario[] = []): UseScenariosReturn {
-  const [scenarios, setScenarios] = useState<LoanScenario[]>(initialScenarios)
-  const [loading, setLoading] = useState(false)
+/**
+ * Hook for managing user scenarios
+ */
+export function useScenarios(userId: string, filters?: ScenarioFilters): UseScenarios {
+  const [scenarios, setScenarios] = useState<FinancialScenario[]>([])
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Calculate all loan metrics for a scenario
-  const calculateScenario = useCallback((params: ScenarioCalculationParams): Omit<LoanScenario, 'id' | 'name' | 'createdAt'> => {
+  const refreshScenarios = useCallback(async () => {
     try {
-      const downPayment = params.propertyPrice * (params.downPaymentPercent / 100)
-      const loanAmount = params.propertyPrice - downPayment
-      
-      const { monthlyPayment, totalInterest, totalPayment } = calculateMonthlyPayment(
-        loanAmount,
-        params.interestRate,
-        params.loanTermYears,
-        params.promotionalRate,
-        params.promotionalMonths
-      )
-      
-      const netCashFlow = params.monthlyIncome - params.monthlyExpenses - monthlyPayment
-      const riskLevel = assessRiskLevel(
-        monthlyPayment,
-        params.monthlyIncome,
-        netCashFlow,
-        params.downPaymentPercent,
-        params.loanTermYears
-      )
-      
-      const scenarioData = {
-        downPaymentPercent: params.downPaymentPercent,
-        loanTermYears: params.loanTermYears,
-        interestRate: params.interestRate,
-        propertyPrice: params.propertyPrice,
-        downPayment,
-        loanAmount,
-        monthlyPayment,
-        totalInterest,
-        totalPayment,
-        monthlyIncome: params.monthlyIncome,
-        monthlyExpenses: params.monthlyExpenses,
-        netCashFlow,
-        riskLevel
-      }
-      
-      const recommendation = generateRecommendation(scenarioData)
-      
-      return {
-        ...scenarioData,
-        recommendation
-      }
-    } catch (err) {
-      console.error('Error calculating scenario:', err)
-      throw new Error('Failed to calculate scenario')
-    }
-  }, [])
-
-  // Create a new scenario
-  const createScenario = useCallback((params: ScenarioCalculationParams, name?: string): LoanScenario => {
-    try {
-      const calculatedScenario = calculateScenario(params)
-      const newScenario: LoanScenario = {
-        id: `scenario-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: name || `Kịch bản ${scenarios.length + 1}`,
-        ...calculatedScenario,
-        createdAt: new Date()
-      }
-      
-      setScenarios(prev => [...prev, newScenario])
+      setLoading(true)
       setError(null)
-      
-      return newScenario
+      const result = await scenarioService.getUserScenarios(userId, filters)
+      setScenarios(result)
     } catch (err) {
-      setError('Failed to create scenario')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load scenarios'
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [userId, filters])
+
+  const createScenario = useCallback(async (request: CreateScenarioRequest): Promise<FinancialScenario> => {
+    try {
+      setError(null)
+      const result = await scenarioService.createScenario(request)
+      await refreshScenarios()
+      toast.success('Scenario created successfully')
+      return result
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create scenario'
+      setError(errorMessage)
+      toast.error(errorMessage)
       throw err
     }
-  }, [scenarios.length, calculateScenario])
+  }, [refreshScenarios])
 
-  // Update existing scenario
-  const updateScenario = useCallback((id: string, updates: Partial<ScenarioCalculationParams>) => {
+  const updateScenario = useCallback(async (id: string, parameters: Partial<ScenarioParameters>): Promise<FinancialScenario> => {
     try {
-      setScenarios(prev => prev.map(scenario => {
-        if (scenario.id === id) {
-          const updatedParams = {
-            propertyPrice: updates.propertyPrice ?? scenario.propertyPrice,
-            downPaymentPercent: updates.downPaymentPercent ?? scenario.downPaymentPercent,
-            loanTermYears: updates.loanTermYears ?? scenario.loanTermYears,
-            interestRate: updates.interestRate ?? scenario.interestRate,
-            monthlyIncome: updates.monthlyIncome ?? scenario.monthlyIncome,
-            monthlyExpenses: updates.monthlyExpenses ?? scenario.monthlyExpenses,
-            promotionalRate: updates.promotionalRate,
-            promotionalMonths: updates.promotionalMonths
-          }
-          
-          const recalculated = calculateScenario(updatedParams)
-          
-          return {
-            ...scenario,
-            ...recalculated
-          }
-        }
-        return scenario
-      }))
       setError(null)
+      const result = await scenarioService.updateScenario(id, parameters)
+      await refreshScenarios()
+      toast.success('Scenario updated successfully')
+      return result
     } catch (err) {
-      setError('Failed to update scenario')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update scenario'
+      setError(errorMessage)
+      toast.error(errorMessage)
+      throw err
     }
-  }, [calculateScenario])
+  }, [refreshScenarios])
 
-  // Delete scenario
-  const deleteScenario = useCallback((id: string) => {
-    setScenarios(prev => prev.filter(scenario => scenario.id !== id))
-  }, [])
-
-  // Duplicate scenario
-  const duplicateScenario = useCallback((id: string, newName?: string): LoanScenario => {
-    const originalScenario = scenarios.find(s => s.id === id)
-    if (!originalScenario) {
-      throw new Error('Scenario not found')
+  const deleteScenario = useCallback(async (id: string): Promise<void> => {
+    try {
+      setError(null)
+      await scenarioService.deleteScenario(id)
+      await refreshScenarios()
+      toast.success('Scenario deleted successfully')
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete scenario'
+      setError(errorMessage)
+      toast.error(errorMessage)
+      throw err
     }
-    
-    const duplicatedScenario: LoanScenario = {
-      ...originalScenario,
-      id: `scenario-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name: newName || `${originalScenario.name} (Copy)`,
-      createdAt: new Date()
+  }, [refreshScenarios])
+
+  const generatePredefinedScenarios = useCallback(async (baseScenarioId: string): Promise<FinancialScenario[]> => {
+    try {
+      setError(null)
+      const result = await scenarioService.generatePredefinedScenarios(baseScenarioId, userId)
+      await refreshScenarios()
+      toast.success(`Generated ${result.length} scenarios successfully`)
+      return result
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate scenarios'
+      setError(errorMessage)
+      toast.error(errorMessage)
+      throw err
     }
-    
-    setScenarios(prev => [...prev, duplicatedScenario])
-    return duplicatedScenario
-  }, [scenarios])
+  }, [userId, refreshScenarios])
 
-  // Get recommendation for a scenario
-  const getRecommendation = useCallback((scenario: LoanScenario): LoanScenario['recommendation'] => {
-    return generateRecommendation(scenario)
-  }, [])
-
-  // Compare selected scenarios
-  const compareScenarios = useCallback((scenarioIds: string[]): LoanScenario[] => {
-    return scenarios.filter(scenario => scenarioIds.includes(scenario.id))
-  }, [scenarios])
+  useEffect(() => {
+    if (userId) {
+      refreshScenarios()
+    }
+  }, [userId, refreshScenarios])
 
   return {
     scenarios,
     loading,
     error,
+    refreshScenarios,
     createScenario,
     updateScenario,
     deleteScenario,
-    duplicateScenario,
-    calculateScenario,
-    getRecommendation,
-    compareScenarios
+    generatePredefinedScenarios
   }
 }
 
-// Helper function to create scenarios from a financial plan
-export function createScenariosFromPlan(plan: FinancialPlan): LoanScenario[] {
-  const baseParams = {
-    propertyPrice: plan.purchasePrice,
-    downPaymentPercent: (plan.downPayment / plan.purchasePrice) * 100,
-    loanTermYears: 20, // Default term
-    interestRate: 8.5, // Default rate
-    monthlyIncome: plan.monthlyIncome,
-    monthlyExpenses: plan.monthlyExpenses
+/**
+ * Hook for scenario comparison
+ */
+export function useScenarioComparison(): UseScenarioComparison {
+  const [comparison, setComparison] = useState<ScenarioComparison | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const compareScenarios = useCallback(async (scenarioIds: string[]) => {
+    try {
+      setLoading(true)
+      setError(null)
+      const result = await scenarioService.compareScenarios(scenarioIds)
+      setComparison(result)
+      toast.success('Scenarios compared successfully')
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to compare scenarios'
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const clearComparison = useCallback(() => {
+    setComparison(null)
+    setError(null)
+  }, [])
+
+  return {
+    comparison,
+    loading,
+    error,
+    compareScenarios,
+    clearComparison
   }
-  
-  const scenarios: ScenarioCalculationParams[] = [
-    // Conservative scenario
-    {
-      ...baseParams,
-      downPaymentPercent: 30,
-      loanTermYears: 15,
-      interestRate: 8.0
-    },
-    // Balanced scenario
-    {
-      ...baseParams,
-      downPaymentPercent: 20,
-      loanTermYears: 20,
-      interestRate: 8.5
-    },
-    // Aggressive scenario
-    {
-      ...baseParams,
-      downPaymentPercent: 15,
-      loanTermYears: 25,
-      interestRate: 9.0
+}
+
+/**
+ * Hook for scenario analysis
+ */
+export function useScenarioAnalysis(): UseScenarioAnalysis {
+  const [analysis, setAnalysis] = useState<ScenarioAnalysisResult | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const analyzeScenario = useCallback(async (scenarioId: string) => {
+    try {
+      setLoading(true)
+      setError(null)
+      const result = await scenarioService.analyzeScenario(scenarioId)
+      setAnalysis(result)
+      toast.success('Scenario analysis completed')
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze scenario'
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
     }
-  ]
-  
-  return scenarios.map((params, index) => {
-    // Create a temporary calculation instance to avoid circular dependency
-    const downPayment = params.propertyPrice * (params.downPaymentPercent / 100)
-    const loanAmount = params.propertyPrice - downPayment
-    
-    const { monthlyPayment, totalInterest, totalPayment } = calculateMonthlyPayment(
-      loanAmount,
-      params.interestRate,
-      params.loanTermYears,
-      params.promotionalRate,
-      params.promotionalMonths
-    )
-    
-    const netCashFlow = params.monthlyIncome - params.monthlyExpenses - monthlyPayment
-    const riskLevel = assessRiskLevel(
-      monthlyPayment,
-      params.monthlyIncome,
-      netCashFlow,
-      params.downPaymentPercent,
-      params.loanTermYears
-    )
-    
-    const scenarioData = {
-      downPaymentPercent: params.downPaymentPercent,
-      loanTermYears: params.loanTermYears,
-      interestRate: params.interestRate,
-      propertyPrice: params.propertyPrice,
-      downPayment,
-      loanAmount,
-      monthlyPayment,
-      totalInterest,
-      totalPayment,
-      monthlyIncome: params.monthlyIncome,
-      monthlyExpenses: params.monthlyExpenses,
-      netCashFlow,
-      riskLevel
+  }, [])
+
+  const clearAnalysis = useCallback(() => {
+    setAnalysis(null)
+    setError(null)
+  }, [])
+
+  return {
+    analysis,
+    loading,
+    error,
+    analyzeScenario,
+    clearAnalysis
+  }
+}
+
+/**
+ * Hook for scenario statistics
+ */
+export function useScenarioStats(userId: string): UseScenarioStats {
+  const [stats, setStats] = useState<ScenarioStats | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const refreshStats = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const result = await scenarioService.getScenarioStats(userId)
+      setStats(result)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load scenario statistics'
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
     }
-    
-    const recommendation = generateRecommendation(scenarioData)
-    
-    return {
-      id: `scenario-${index + 1}`,
-      name: ['Bảo Thủ', 'Cân Bằng', 'Tích Cực'][index],
-      ...scenarioData,
-      recommendation,
-      createdAt: new Date()
+  }, [userId])
+
+  useEffect(() => {
+    if (userId) {
+      refreshStats()
     }
-  })
+  }, [userId, refreshStats])
+
+  return {
+    stats,
+    loading,
+    error,
+    refreshStats
+  }
+}
+
+/**
+ * Hook for getting a single scenario by ID
+ */
+export function useScenario(scenarioId: string | null) {
+  const [scenario, setScenario] = useState<FinancialScenario | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!scenarioId) {
+      setScenario(null)
+      return
+    }
+
+    const fetchScenario = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const result = await scenarioService.getScenarioById(scenarioId)
+        setScenario(result)
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load scenario'
+        setError(errorMessage)
+        toast.error(errorMessage)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchScenario()
+  }, [scenarioId])
+
+  return { scenario, loading, error }
 }

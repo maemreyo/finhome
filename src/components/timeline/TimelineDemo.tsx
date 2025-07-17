@@ -307,17 +307,17 @@ export const TimelineDemo: React.FC = () => {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Total Interest:</span>
-                <span className="font-medium">{(currentScenario.totalInterest / 1000000).toFixed(1)}M VND</span>
+                <span className="font-medium">{((currentScenario.calculatedMetrics?.totalInterest || 0) / 1000000).toFixed(1)}M VND</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Duration:</span>
-                <span className="font-medium">{currentScenario.totalDuration} months</span>
+                <span className="font-medium">{currentScenario.calculatedMetrics?.payoffTimeMonths || 0} months</span>
               </div>
-              {currentScenario.monthlySavings && (
+              {currentScenario.calculatedMetrics?.monthlySavings && (
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Monthly Savings:</span>
                   <span className="font-medium text-green-600">
-                    {(currentScenario.monthlySavings / 1000000).toFixed(1)}M VND
+                    {((currentScenario.calculatedMetrics?.monthlySavings || 0) / 1000000).toFixed(1)}M VND
                   </span>
                 </div>
               )}
@@ -340,7 +340,7 @@ export const TimelineDemo: React.FC = () => {
                   <p className="text-blue-600">💡 Consider additional investments</p>
                 </>
               )}
-              {currentScenario.type === 'optimistic' && (
+              {currentScenario.scenarioType === 'optimistic' && (
                 <p className="text-green-600">📈 Great growth potential</p>
               )}
               <p className="text-gray-600">🎯 Prepayment opportunities available</p>
@@ -360,7 +360,7 @@ export const TimelineDemo: React.FC = () => {
               {currentScenario.riskLevel === 'high' && (
                 <p className="text-red-600">⚠️ High debt-to-income ratio</p>
               )}
-              {currentScenario.type === 'pessimistic' && (
+              {currentScenario.scenarioType === 'pessimistic' && (
                 <p className="text-red-600">📉 Economic downturn impact</p>
               )}
               <p className="text-amber-600">💡 Monitor cash flow regularly</p>

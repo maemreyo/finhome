@@ -23,7 +23,7 @@ import {
   XCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { LoanScenario } from '@/hooks/useScenarios'
+import type { FinancialScenario } from '@/types/scenario'
 
 interface ScenarioMetrics {
   affordability: number // 0-100
@@ -34,8 +34,8 @@ interface ScenarioMetrics {
 }
 
 interface ScenarioComparisonProps {
-  scenarios: LoanScenario[]
-  onScenarioSelect?: (scenario: LoanScenario) => void
+  scenarios: FinancialScenario[]
+  onScenarioSelect?: (scenario: FinancialScenario) => void
   onCreateNewScenario?: () => void
   className?: string
 }
@@ -57,27 +57,33 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
     
     scenarios.forEach(scenario => {
       // Calculate affordability (higher is better)
-      const debtToIncome = (scenario.monthlyPayment / scenario.monthlyIncome) * 100
+      const monthlyPayment = scenario.calculatedMetrics?.monthlyPayment || 0
+      const monthlyIncome = scenario.monthly_income || 0
+      const debtToIncome = monthlyIncome > 0 ? (monthlyPayment / monthlyIncome) * 100 : 0
       const affordability = Math.max(0, 100 - (debtToIncome - 30) * 2) // 30% DTI is ideal
       
       // Calculate risk level (lower is better, but we'll invert for display)
       const riskFactors = [
         debtToIncome > 40 ? 30 : 0,
-        scenario.netCashFlow < 0 ? 25 : 0,
-        scenario.downPaymentPercent < 20 ? 20 : 0,
-        scenario.loanTermYears > 25 ? 15 : 0,
-        scenario.interestRate > 10 ? 10 : 0
+        (monthlyIncome - (scenario.monthly_expenses || 0) - monthlyPayment) < 0 ? 25 : 0,
+        ((scenario.down_payment || 0) / (scenario.purchase_price || 1)) * 100 < 20 ? 20 : 0,
+        Math.round((scenario.loanCalculations?.[0]?.loan_term_months || 240) / 12) > 25 ? 15 : 0,
+        (scenario.loanCalculations?.[0]?.interest_rate || 8) > 10 ? 10 : 0
       ]
       const riskLevel = Math.max(0, 100 - riskFactors.reduce((a, b) => a + b, 0))
       
       // Calculate equity building speed (higher is better)
-      const equityBuildingSpeed = Math.max(0, 100 - (scenario.loanTermYears - 15) * 3)
+      const loanTermYears = Math.round((scenario.loanCalculations?.[0]?.loan_term_months || 240) / 12)
+      const equityBuildingSpeed = Math.max(0, 100 - (loanTermYears - 15) * 3)
       
       // Calculate flexibility (higher down payment = more flexibility)
-      const flexibility = Math.min(100, scenario.downPaymentPercent * 2)
+      const downPaymentPercent = ((scenario.down_payment || 0) / (scenario.purchase_price || 1)) * 100
+      const flexibility = Math.min(100, downPaymentPercent * 2)
       
       // Calculate total cost (inverted - lower total cost is better)
-      const costRatio = scenario.totalInterest / scenario.loanAmount
+      const totalInterest = scenario.calculatedMetrics?.totalInterest || 0
+      const loanAmount = (scenario.purchase_price || 0) - (scenario.down_payment || 0)
+      const costRatio = loanAmount > 0 ? totalInterest / loanAmount : 0
       const totalCost = Math.max(0, 100 - costRatio * 50)
       
       metrics[scenario.id] = {
@@ -104,7 +110,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
     }).format(amount)
   }
 
-  const getRecommendationConfig = (recommendation: LoanScenario['recommendation']) => {
+  const getRecommendationConfig = (recommendation: 'optimal' | 'safe' | 'aggressive' | 'risky') => {
     switch (recommendation) {
       case 'optimal':
         return {
@@ -137,7 +143,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
     }
   }
 
-  const getRiskLevelColor = (riskLevel: LoanScenario['riskLevel']) => {
+  const getRiskLevelColor = (riskLevel: 'low' | 'medium' | 'high') => {
     switch (riskLevel) {
       case 'low':
         return 'text-green-600'
@@ -187,7 +193,11 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {comparisonScenarios.map((scenario) => {
-                  const recommendation = getRecommendationConfig(scenario.recommendation)
+                  // Determine recommendation based on scenario properties
+                  const recommendationType = scenario.scenarioType === 'baseline' ? 'optimal' :
+                                           scenario.riskLevel === 'low' ? 'safe' :
+                                           scenario.riskLevel === 'medium' ? 'aggressive' : 'risky'
+                  const recommendation = getRecommendationConfig(recommendationType)
                   const RecommendationIcon = recommendation.icon
                   
                   return (
@@ -199,16 +209,16 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                     >
                       {/* Scenario Header */}
                       <div className="text-center">
-                        <h3 className="font-semibold text-lg">{scenario.name}</h3>
+                        <h3 className="font-semibold text-lg">{scenario.plan_name}</h3>
                         <p className="text-sm text-gray-600">
-                          {scenario.downPaymentPercent}% - {scenario.loanTermYears} năm
+                          {Math.round(((scenario.down_payment || 0) / (scenario.purchase_price || 1)) * 100)}% - {Math.round((scenario.loanCalculations?.[0]?.loan_term_months || 240) / 12)} năm
                         </p>
                       </div>
 
                       {/* Monthly Payment */}
                       <div className="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">
-                          {formatCurrency(scenario.monthlyPayment)}
+                          {formatCurrency(scenario.calculatedMetrics?.monthlyPayment || 0)}
                         </div>
                         <p className="text-sm text-gray-600">Trả hàng tháng</p>
                       </div>
@@ -217,10 +227,10 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                       <div className="text-center">
                         <div className={cn(
                           "text-lg font-semibold",
-                          scenario.netCashFlow >= 0 ? "text-green-600" : "text-red-600"
+                          ((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0)) >= 0 ? "text-green-600" : "text-red-600"
                         )}>
-                          {scenario.netCashFlow >= 0 ? '+' : ''}
-                          {formatCurrency(scenario.netCashFlow)}
+                          {((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0)) >= 0 ? '+' : ''}
+                          {formatCurrency((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0))}
                         </div>
                         <p className="text-sm text-gray-600">Dòng tiền ròng</p>
                       </div>
@@ -240,7 +250,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span>Tổng lãi vay:</span>
-                          <span className="font-medium">{formatCurrency(scenario.totalInterest)}</span>
+                          <span className="font-medium">{formatCurrency(scenario.calculatedMetrics?.totalInterest || 0)}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Mức rủi ro:</span>
@@ -255,9 +265,9 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                       <Button
                         onClick={() => onScenarioSelect?.(scenario)}
                         className="w-full"
-                        variant={scenario.recommendation === 'optimal' ? 'default' : 'outline'}
+                        variant={scenario.scenarioType === 'baseline' ? 'default' : 'outline'}
                       >
-                        {scenario.recommendation === 'optimal' ? 'Chọn Tối Ưu' : 'Chọn Kịch Bản'}
+                        {scenario.scenarioType === 'baseline' ? 'Chọn Tối Ưu' : 'Chọn Kịch Bản'}
                       </Button>
                     </motion.div>
                   )
@@ -327,7 +337,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                     
                     return (
                       <div key={scenario.id} className="space-y-3">
-                        <h4 className="font-semibold">{scenario.name}</h4>
+                        <h4 className="font-semibold">{scenario.plan_name}</h4>
                         <div className="space-y-2">
                           <div className="flex items-center gap-3">
                             <div className="w-20 text-sm">Khả năng chi trả</div>
@@ -368,7 +378,10 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
         <TabsContent value="detailed" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {comparisonScenarios.map((scenario) => {
-              const recommendation = getRecommendationConfig(scenario.recommendation)
+              const recommendationType = scenario.scenarioType === 'baseline' ? 'optimal' :
+                                       scenario.riskLevel === 'low' ? 'safe' :
+                                       scenario.riskLevel === 'medium' ? 'aggressive' : 'risky'
+              const recommendation = getRecommendationConfig(recommendationType)
               const RecommendationIcon = recommendation.icon
               const metrics = scenarioMetrics[scenario.id]
               
@@ -376,7 +389,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                 <Card key={scenario.id}>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                      {scenario.name}
+                      {scenario.plan_name}
                       <Badge 
                         variant="outline"
                         className={cn("flex items-center gap-1", recommendation.color)}
@@ -394,23 +407,23 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span className="text-sm font-medium">Giá nhà:</span>
-                        <span className="text-sm">{formatCurrency(scenario.propertyPrice)}</span>
+                        <span className="text-sm">{formatCurrency(scenario.purchase_price || 0)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm font-medium">Vốn tự có:</span>
-                        <span className="text-sm">{formatCurrency(scenario.downPayment)} ({scenario.downPaymentPercent}%)</span>
+                        <span className="text-sm">{formatCurrency(scenario.down_payment || 0)} ({Math.round(((scenario.down_payment || 0) / (scenario.purchase_price || 1)) * 100)}%)</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm font-medium">Số tiền vay:</span>
-                        <span className="text-sm">{formatCurrency(scenario.loanAmount)}</span>
+                        <span className="text-sm">{formatCurrency((scenario.purchase_price || 0) - (scenario.down_payment || 0))}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm font-medium">Lãi suất:</span>
-                        <span className="text-sm">{scenario.interestRate}%/năm</span>
+                        <span className="text-sm">{scenario.loanCalculations?.[0]?.interest_rate || 0}%/năm</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm font-medium">Thời gian vay:</span>
-                        <span className="text-sm">{scenario.loanTermYears} năm</span>
+                        <span className="text-sm">{Math.round((scenario.loanCalculations?.[0]?.loan_term_months || 240) / 12)} năm</span>
                       </div>
                     </div>
 
@@ -418,16 +431,16 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">Trả hàng tháng:</span>
                         <span className="text-lg font-bold text-blue-600">
-                          {formatCurrency(scenario.monthlyPayment)}
+                          {formatCurrency(scenario.calculatedMetrics?.monthlyPayment || 0)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">Dòng tiền ròng:</span>
                         <span className={cn(
                           "text-lg font-bold",
-                          scenario.netCashFlow >= 0 ? "text-green-600" : "text-red-600"
+                          ((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0)) >= 0 ? "text-green-600" : "text-red-600"
                         )}>
-                          {scenario.netCashFlow >= 0 ? '+' : ''}{formatCurrency(scenario.netCashFlow)}
+                          {((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0)) >= 0 ? '+' : ''}{formatCurrency((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0))}
                         </span>
                       </div>
                     </div>
@@ -435,11 +448,11 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                     <div className="border-t pt-3">
                       <div className="flex justify-between">
                         <span className="text-sm font-medium">Tổng lãi vay:</span>
-                        <span className="text-sm">{formatCurrency(scenario.totalInterest)}</span>
+                        <span className="text-sm">{formatCurrency(scenario.calculatedMetrics?.totalInterest || 0)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm font-medium">Tổng thanh toán:</span>
-                        <span className="text-sm">{formatCurrency(scenario.totalPayment)}</span>
+                        <span className="text-sm">{formatCurrency(scenario.calculatedMetrics?.totalCost || 0)}</span>
                       </div>
                     </div>
 
@@ -455,33 +468,33 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                       
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                          {(scenario.monthlyPayment / scenario.monthlyIncome) <= 0.4 ? (
+                          {((scenario.calculatedMetrics?.monthlyPayment || 0) / (scenario.monthly_income || 1)) <= 0.4 ? (
                             <CheckCircle className="w-4 h-4 text-green-500" />
                           ) : (
                             <XCircle className="w-4 h-4 text-red-500" />
                           )}
                           <span className="text-xs">
-                            DTI: {Math.round((scenario.monthlyPayment / scenario.monthlyIncome) * 100)}%
+                            DTI: {Math.round(((scenario.calculatedMetrics?.monthlyPayment || 0) / (scenario.monthly_income || 1)) * 100)}%
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          {scenario.netCashFlow >= 0 ? (
+                          {((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0)) >= 0 ? (
                             <CheckCircle className="w-4 h-4 text-green-500" />
                           ) : (
                             <XCircle className="w-4 h-4 text-red-500" />
                           )}
                           <span className="text-xs">
-                            Dòng tiền {scenario.netCashFlow >= 0 ? 'dương' : 'âm'}
+                            Dòng tiền {((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0)) >= 0 ? 'dương' : 'âm'}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          {scenario.downPaymentPercent >= 20 ? (
+                          {((scenario.down_payment || 0) / (scenario.purchase_price || 1)) * 100 >= 20 ? (
                             <CheckCircle className="w-4 h-4 text-green-500" />
                           ) : (
                             <XCircle className="w-4 h-4 text-red-500" />
                           )}
                           <span className="text-xs">
-                            Vốn tự có {scenario.downPaymentPercent >= 20 ? 'đủ' : 'thấp'}
+                            Vốn tự có {((scenario.down_payment || 0) / (scenario.purchase_price || 1)) * 100 >= 20 ? 'đủ' : 'thấp'}
                           </span>
                         </div>
                       </div>
@@ -491,9 +504,9 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                     <Button
                       onClick={() => onScenarioSelect?.(scenario)}
                       className="w-full mt-4"
-                      variant={scenario.recommendation === 'optimal' ? 'default' : 'outline'}
+                      variant={scenario.scenarioType === 'baseline' ? 'default' : 'outline'}
                     >
-                      {scenario.recommendation === 'optimal' ? 'Chọn Tối Ưu' : 'Chọn Kịch Bản'}
+                      {scenario.scenarioType === 'baseline' ? 'Chọn Tối Ưu' : 'Chọn Kịch Bản'}
                     </Button>
                   </CardContent>
                 </Card>

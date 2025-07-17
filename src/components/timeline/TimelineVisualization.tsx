@@ -25,40 +25,13 @@ import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
+import type { FinancialScenario, ScenarioTimelineEvent, ScenarioType, RiskLevel } from '@/types/scenario'
 
-// Types for timeline functionality
-export interface TimelineEvent {
-  id: string
-  type: 'loan_signing' | 'property_handover' | 'first_payment' | 'rate_change' | 'prepayment' | 'loan_completion' | 'crisis_event' | 'opportunity' | 'milestone'
-  name: string
-  description: string
-  scheduledDate: Date
-  actualDate?: Date
-  month: number // Months from loan start
-  financialImpact?: number
-  balanceAfterEvent?: number
-  paymentChange?: number
-  status: 'scheduled' | 'completed' | 'modified' | 'cancelled'
-  iconName: string
-  colorCode: string
-  priority: number // 1-10
-  eventData?: Record<string, any>
-}
+// Re-export timeline event type for compatibility
+export type TimelineEvent = ScenarioTimelineEvent
 
-export interface TimelineScenario {
-  id: string
-  name: string
-  description?: string
-  type: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test'
-  events: TimelineEvent[]
-  totalDuration: number // months
-  totalInterest: number
-  totalCost: number
-  monthlyPayment: number
-  interestRate: number
-  monthlySavings?: number
-  riskLevel: 'low' | 'medium' | 'high'
-}
+// Re-export scenario type for compatibility
+export type TimelineScenario = FinancialScenario
 
 export interface TimelineVisualizationProps {
   scenarios: TimelineScenario[]
@@ -73,20 +46,23 @@ export interface TimelineVisualizationProps {
   className?: string
 }
 
-const getEventIcon = (iconName: string) => {
-  const icons: Record<string, React.ComponentType<any>> = {
-    home: Home,
-    key: Key,
-    alert: AlertTriangle,
-    target: Target,
-    dollar: DollarSign,
-    trend_up: TrendingUp,
-    trend_down: TrendingDown,
-    help: HelpCircle,
-    settings: Settings,
+const getEventIcon = (eventType: ScenarioTimelineEvent['type']) => {
+  const icons: Record<ScenarioTimelineEvent['type'], React.ComponentType<any>> = {
+    loan_start: Home,
+    payment: DollarSign,
+    rate_change: TrendingUp,
+    prepayment: Target,
+    completion: Key,
+    milestone: AlertTriangle,
+    crisis_event: AlertTriangle,
+    opportunity: TrendingUp,
+    loan_signing: Home,
+    property_handover: Key,
+    first_payment: DollarSign,
+    loan_completion: Target,
   }
   
-  return icons[iconName] || HelpCircle
+  return icons[eventType] || HelpCircle
 }
 
 const getEventColor = (event: TimelineEvent, isGhost: boolean = false): string => {
@@ -121,7 +97,7 @@ const TimelineEventComponent: React.FC<{
   isGhost?: boolean
   onClick?: () => void
 }> = ({ event, position, totalEvents, isGhost = false, onClick }) => {
-  const IconComponent = getEventIcon(event.iconName)
+  const IconComponent = getEventIcon(event.type)
   const colorClasses = getEventColor(event, isGhost)
   
   return (
@@ -212,13 +188,13 @@ const ScenarioSelector: React.FC<{
           )}
         >
           <span className="mr-2">
-            {scenario.type === 'baseline' && '📊'}
-            {scenario.type === 'optimistic' && '📈'}
-            {scenario.type === 'pessimistic' && '📉'}
-            {scenario.type === 'alternative' && '🔄'}
-            {scenario.type === 'stress_test' && '🚨'}
+            {scenario.scenarioType === 'baseline' && '📊'}
+            {scenario.scenarioType === 'optimistic' && '📈'}
+            {scenario.scenarioType === 'pessimistic' && '📉'}
+            {scenario.scenarioType === 'alternative' && '🔄'}
+            {scenario.scenarioType === 'stress_test' && '🚨'}
           </span>
-          {scenario.name}
+          {scenario.plan_name}
           {scenario.riskLevel === 'high' && (
             <Badge variant="destructive" className="ml-2 w-3 h-3 p-0" />
           )}
@@ -275,7 +251,7 @@ export const TimelineVisualization: React.FC<TimelineVisualizationProps> = ({
   )
   
   const baselineScenario = useMemo(() => 
-    scenarios.find(s => s.type === 'baseline') || scenarios[0],
+    scenarios.find(s => s.scenarioType === 'baseline') || scenarios[0],
     [scenarios]
   )
   
@@ -315,9 +291,9 @@ export const TimelineVisualization: React.FC<TimelineVisualizationProps> = ({
             <CalendarDays className="w-5 h-5" />
             Financial Timeline
           </span>
-          {currentScenario.monthlySavings && (
+          {currentScenario.calculatedMetrics?.monthlySavings && (
             <Badge variant="secondary" className="bg-green-100 text-green-800">
-              Saves {formatCurrency(currentScenario.monthlySavings)}/month
+              Saves {formatCurrency(currentScenario.calculatedMetrics.monthlySavings)}/month
             </Badge>
           )}
         </CardTitle>
@@ -350,12 +326,12 @@ export const TimelineVisualization: React.FC<TimelineVisualizationProps> = ({
             
             {/* Current Scenario Events */}
             <div className="absolute top-1/2 left-4 right-4 transform -translate-y-1/2">
-              {currentScenario.events.map((event, index) => (
+              {(currentScenario.events || []).map((event, index) => (
                 <TimelineEventComponent
                   key={event.id}
                   event={event}
                   position={index}
-                  totalEvents={currentScenario.events.length}
+                  totalEvents={currentScenario.events?.length || 0}
                   onClick={() => handleEventClick(event)}
                 />
               ))}
@@ -364,12 +340,12 @@ export const TimelineVisualization: React.FC<TimelineVisualizationProps> = ({
             {/* Ghost Timeline (Baseline for comparison) */}
             {showGhostTimeline && baselineScenario && baselineScenario.id !== currentScenarioId && (
               <div className="absolute top-1/2 left-4 right-4 transform -translate-y-1/2">
-                {baselineScenario.events.map((event, index) => (
+                {(baselineScenario.events || []).map((event, index) => (
                   <TimelineEventComponent
                     key={`ghost-${event.id}`}
                     event={event}
                     position={index}
-                    totalEvents={baselineScenario.events.length}
+                    totalEvents={baselineScenario.events?.length || 0}
                     isGhost={true}
                     onClick={() => handleEventClick(event)}
                   />
@@ -383,14 +359,14 @@ export const TimelineVisualization: React.FC<TimelineVisualizationProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {currentScenario.totalDuration}
+              {currentScenario.calculatedMetrics?.payoffTimeMonths || 0}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Months Total</div>
           </div>
           
           <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {formatCurrency(currentScenario.totalInterest)}
+              {formatCurrency(currentScenario.calculatedMetrics?.totalInterest || 0)}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Total Interest</div>
           </div>

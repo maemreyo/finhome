@@ -1,9 +1,13 @@
 // src/lib/timeline/timelineUtils.ts
 // Timeline utility functions and data generators
 
-import { TimelineEvent, TimelineScenario } from '@/components/timeline/TimelineVisualization'
+import type { ScenarioTimelineEvent, FinancialScenario } from '@/types/scenario'
 import { ScenarioResults, ScenarioDefinition } from '@/lib/financial/scenarios'
 import { CashFlowProjection } from '@/lib/financial/calculations'
+
+// Type aliases for backward compatibility
+export type TimelineEvent = ScenarioTimelineEvent
+export type TimelineScenario = FinancialScenario
 
 export interface TimelineGeneratorParams {
   loanAmount: number
@@ -15,10 +19,10 @@ export interface TimelineGeneratorParams {
 /**
  * Generate timeline events from loan parameters
  */
-export function generateTimelineEvents(params: TimelineGeneratorParams): TimelineEvent[] {
+export function generateTimelineEvents(params: TimelineGeneratorParams): ScenarioTimelineEvent[] {
   const { loanAmount, loanTermMonths, promotionalPeriodMonths = 0, startDate = new Date() } = params
   
-  const events: TimelineEvent[] = []
+  const events: ScenarioTimelineEvent[] = []
   
   // 1. Loan Signing Event
   events.push({
@@ -30,13 +34,7 @@ export function generateTimelineEvents(params: TimelineGeneratorParams): Timelin
     month: 0,
     financialImpact: -loanAmount,
     status: 'scheduled',
-    iconName: 'home',
-    colorCode: '#10B981',
-    priority: 9,
-    eventData: {
-      loanAmount,
-      contractSigned: true
-    }
+    priority: 9
   })
   
   // 2. Property Handover (typically 1 month after signing)
@@ -51,12 +49,7 @@ export function generateTimelineEvents(params: TimelineGeneratorParams): Timelin
     scheduledDate: handoverDate,
     month: 1,
     status: 'scheduled',
-    iconName: 'key',
-    colorCode: '#F59E0B',
-    priority: 8,
-    eventData: {
-      firstPaymentDue: true
-    }
+    priority: 8
   })
   
   // 3. First Payment
@@ -71,8 +64,6 @@ export function generateTimelineEvents(params: TimelineGeneratorParams): Timelin
     scheduledDate: firstPaymentDate,
     month: 1,
     status: 'scheduled',
-    iconName: 'dollar',
-    colorCode: '#3B82F6',
     priority: 7
   })
   
@@ -89,13 +80,7 @@ export function generateTimelineEvents(params: TimelineGeneratorParams): Timelin
       scheduledDate: promotionalEndDate,
       month: promotionalPeriodMonths,
       status: 'scheduled',
-      iconName: 'alert',
-      colorCode: '#EF4444',
-      priority: 8,
-      eventData: {
-        rateChange: true,
-        newRateType: 'regular'
-      }
+      priority: 8
     })
   }
   
@@ -112,8 +97,6 @@ export function generateTimelineEvents(params: TimelineGeneratorParams): Timelin
     scheduledDate: midtermDate,
     month: midtermMonth,
     status: 'scheduled',
-    iconName: 'trend_up',
-    colorCode: '#8B5CF6',
     priority: 5
   })
   
@@ -130,13 +113,7 @@ export function generateTimelineEvents(params: TimelineGeneratorParams): Timelin
     month: loanTermMonths,
     balanceAfterEvent: 0,
     status: 'scheduled',
-    iconName: 'target',
-    colorCode: '#10B981',
-    priority: 10,
-    eventData: {
-      loanCompleted: true,
-      celebrationEvent: true
-    }
+    priority: 10
   })
   
   return events.sort((a, b) => a.month - b.month)
@@ -145,8 +122,8 @@ export function generateTimelineEvents(params: TimelineGeneratorParams): Timelin
 /**
  * Generate timeline events from scenario results
  */
-export function generateTimelineFromScenario(scenarioResult: ScenarioResults): TimelineEvent[] {
-  const events: TimelineEvent[] = []
+export function generateTimelineFromScenario(scenarioResult: ScenarioResults): ScenarioTimelineEvent[] {
+  const events: ScenarioTimelineEvent[] = []
   const { scenario, cashFlowProjections, metrics } = scenarioResult
   
   // Extract key milestones from cash flow projections
@@ -161,8 +138,6 @@ export function generateTimelineFromScenario(scenarioResult: ScenarioResults): T
     scheduledDate: startDate,
     month: 0,
     status: 'scheduled',
-    iconName: 'home',
-    colorCode: '#10B981',
     priority: 9
   })
   
@@ -182,11 +157,9 @@ export function generateTimelineFromScenario(scenarioResult: ScenarioResults): T
         description: `Thay đổi từ ${previousProjection.totalPayment.toLocaleString()} thành ${projection.totalPayment.toLocaleString()}`,
         scheduledDate: eventDate,
         month: projection.month,
-        paymentChange: projection.totalPayment - previousProjection.totalPayment,
+        financialImpact: projection.totalPayment - previousProjection.totalPayment,
         balanceAfterEvent: projection.remainingBalance,
         status: 'scheduled',
-        iconName: projection.totalPayment > previousProjection.totalPayment ? 'alert' : 'dollar',
-        colorCode: projection.totalPayment > previousProjection.totalPayment ? '#EF4444' : '#10B981',
         priority: 7
       })
     }
@@ -205,8 +178,6 @@ export function generateTimelineFromScenario(scenarioResult: ScenarioResults): T
         month: projection.month,
         balanceAfterEvent: 0,
         status: 'scheduled',
-        iconName: 'target',
-        colorCode: '#10B981',
         priority: 10
       })
     }
@@ -227,13 +198,7 @@ export function generateTimelineFromScenario(scenarioResult: ScenarioResults): T
       scheduledDate: crisisDate,
       month: crisisMonth,
       status: 'scheduled',
-      iconName: 'alert',
-      colorCode: '#EF4444',
-      priority: 9,
-      eventData: {
-        crisisType: scenario.type,
-        needsAction: true
-      }
+      priority: 9
     })
   }
   
@@ -251,8 +216,6 @@ export function generateTimelineFromScenario(scenarioResult: ScenarioResults): T
       scheduledDate: opportunityDate,
       month: opportunityMonth,
       status: 'scheduled',
-      iconName: 'trend_up',
-      colorCode: '#3B82F6',
       priority: 6
     })
   }
@@ -263,7 +226,7 @@ export function generateTimelineFromScenario(scenarioResult: ScenarioResults): T
 /**
  * Convert scenario results to timeline scenario
  */
-export function convertScenarioToTimeline(scenarioResult: ScenarioResults): TimelineScenario {
+export function convertScenarioToTimeline(scenarioResult: ScenarioResults): FinancialScenario {
   const events = generateTimelineFromScenario(scenarioResult)
   
   // Determine risk level based on scenario metrics
@@ -282,29 +245,93 @@ export function convertScenarioToTimeline(scenarioResult: ScenarioResults): Time
     riskLevel = 'low'
   }
   
-  return {
+  // Create a basic FinancialScenario object
+  const scenario: FinancialScenario = {
     id: scenarioResult.scenario.id,
-    name: scenarioResult.scenario.name,
-    type: scenarioResult.scenario.type,
+    user_id: 'timeline-generated',
+    plan_name: scenarioResult.scenario.name,
+    description: scenarioResult.scenario.description,
+    plan_type: 'home_purchase',
+    status: 'draft',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    
+    // Property details
+    property_id: null,
+    custom_property_data: null,
+    purchase_price: 3000000000,
+    down_payment: 600000000,
+    additional_costs: 0,
+    other_debts: 0,
+    
+    // Personal finances
+    target_age: null,
+    current_monthly_income: null,
+    monthly_income: 50000000,
+    current_monthly_expenses: null,
+    monthly_expenses: 30000000,
+    current_savings: null,
+    dependents: 0,
+    
+    // Investment specifics
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    target_timeframe_months: Math.max(...events.map(e => e.month)),
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    risk_tolerance: 'moderate',
+    investment_horizon_months: null,
+    expected_roi: 10.5,
+    preferred_banks: null,
+    expected_rental_income: null,
+    expected_appreciation_rate: null,
+    
+    // Targets
+    emergency_fund_target: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    
+    // Metadata
+    feasibility_score: null,
+    recommended_adjustments: {},
+    is_public: false,
+    view_count: 0,
+    cached_calculations: null,
+    calculations_last_updated: null,
+    completed_at: null,
+    
+    // Scenario-specific properties
+    scenarioType: scenarioResult.scenario.type,
+    riskLevel,
     events,
-    totalDuration: Math.max(...events.map(e => e.month)),
-    totalInterest: scenarioResult.metrics.totalInterest,
-    totalCost: scenarioResult.metrics.totalInterest + 3000000000, // Approximate total cost
-    monthlyPayment: scenarioResult.metrics.monthlyPayment,
-    interestRate: 10.5, // Default interest rate
-    monthlySavings: scenarioResult.comparisonToBaseline?.monthlySavings,
-    riskLevel
+    
+    // Calculated metrics
+    calculatedMetrics: {
+      monthlyPayment: scenarioResult.metrics.monthlyPayment,
+      totalInterest: scenarioResult.metrics.totalInterest,
+      totalCost: scenarioResult.metrics.totalInterest + 3000000000,
+      dtiRatio: (scenarioResult.metrics.monthlyPayment / 50000000) * 100,
+      ltvRatio: 80,
+      affordabilityScore: 7,
+      payoffTimeMonths: Math.max(...events.map(e => e.month)),
+      monthlySavings: scenarioResult.comparisonToBaseline?.monthlySavings
+    }
   }
+  
+  return scenario
 }
 
 /**
  * Generate crisis timeline events
  */
 export function generateCrisisTimeline(
-  baseEvents: TimelineEvent[],
+  baseEvents: ScenarioTimelineEvent[],
   crisisMonth: number,
   crisisType: 'payment_delay' | 'restructure' | 'default'
-): TimelineEvent[] {
+): ScenarioTimelineEvent[] {
   const crisisEvents = [...baseEvents]
   const startDate = new Date()
   
@@ -324,13 +351,7 @@ export function generateCrisisTimeline(
           scheduledDate: missedDate,
           month: missedMonth,
           status: 'scheduled',
-          iconName: 'alert',
-          colorCode: '#EF4444',
-          priority: 9,
-          eventData: {
-            missedPayment: true,
-            penaltyApplied: true
-          }
+          priority: 9
         })
       }
       break
@@ -347,13 +368,7 @@ export function generateCrisisTimeline(
         scheduledDate: restructureDate,
         month: crisisMonth + 3,
         status: 'scheduled',
-        iconName: 'settings',
-        colorCode: '#F59E0B',
-        priority: 8,
-        eventData: {
-          restructured: true,
-          newTerms: true
-        }
+        priority: 8
       })
       break
       
@@ -369,13 +384,7 @@ export function generateCrisisTimeline(
         scheduledDate: defaultDate,
         month: crisisMonth + 6,
         status: 'scheduled',
-        iconName: 'alert',
-        colorCode: '#DC2626',
-        priority: 10,
-        eventData: {
-          defaulted: true,
-          foreclosureRisk: true
-        }
+        priority: 10
       })
       break
   }
@@ -387,10 +396,10 @@ export function generateCrisisTimeline(
  * Add prepayment event to timeline
  */
 export function addPrepaymentEvent(
-  events: TimelineEvent[],
+  events: ScenarioTimelineEvent[],
   month: number,
   amount: number
-): TimelineEvent[] {
+): ScenarioTimelineEvent[] {
   const newEvents = [...events]
   const startDate = new Date()
   const prepaymentDate = new Date(startDate)
@@ -411,12 +420,7 @@ export function addPrepaymentEvent(
     month,
     financialImpact: -amount,
     status: 'scheduled',
-    iconName: 'dollar',
-    colorCode: '#10B981',
-    priority: 6,
-    eventData: {
-      prepaymentAmount: amount
-    }
+    priority: 6
   })
   
   return newEvents.sort((a, b) => a.month - b.month)
@@ -426,11 +430,11 @@ export function addPrepaymentEvent(
  * Calculate timeline compression after prepayment
  */
 export function calculateTimelineCompression(
-  originalEvents: TimelineEvent[],
+  originalEvents: ScenarioTimelineEvent[],
   prepaymentMonth: number,
   prepaymentAmount: number,
   remainingBalance: number
-): { compressedEvents: TimelineEvent[]; monthsSaved: number } {
+): { compressedEvents: ScenarioTimelineEvent[]; monthsSaved: number } {
   // This is a simplified calculation - in practice you'd use the financial calculation engine
   const interestSaved = prepaymentAmount * 0.8 // Rough estimate
   const monthsSaved = Math.floor(interestSaved / 10000000) // Rough estimate: 10M VND = 1 month

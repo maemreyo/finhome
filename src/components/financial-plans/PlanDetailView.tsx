@@ -42,16 +42,17 @@ import { toast } from 'sonner'
 
 // Import our components
 import { TimelineVisualization, TimelineScenario } from '@/components/timeline/TimelineVisualization'
-import { FinancialPlan } from './PlansList'
-import PlanProgressTracker, { PlanProgress, PlanMilestone, PlanStatus } from '@/components/plans/PlanProgressTracker'
+import { FinancialScenario } from '@/types/scenario'
+import PlanProgressTracker, { PlanProgress, PlanMilestone } from '@/components/plans/PlanProgressTracker'
 import { UIFinancialPlan } from '@/lib/adapters/planAdapter'
+import type { PlanStatus } from '@/lib/supabase/types'
 
 // Import export functions
 import { exportFinancialPlanToPDF } from '@/lib/export/pdfExport'
 import { exportFinancialPlanToExcel } from '@/lib/export/excelExport'
 
 interface PlanDetailViewProps {
-  plan: FinancialPlan
+  plan: FinancialScenario
   scenarios: TimelineScenario[]
   onBack: () => void
   onEdit: () => void
@@ -109,12 +110,12 @@ const MetricCard: React.FC<{
 )
 
 const RiskAssessment: React.FC<{
-  plan: FinancialPlan
+  plan: FinancialScenario
 }> = ({ plan }) => {
   const riskFactors = useMemo(() => {
     const factors = []
     
-    if (plan.affordabilityScore && plan.affordabilityScore < 5) {
+    if (plan.calculatedMetrics?.affordabilityScore && plan.calculatedMetrics.affordabilityScore < 5) {
       factors.push({
         type: 'high',
         message: 'Low affordability score indicates high payment burden',
@@ -122,8 +123,8 @@ const RiskAssessment: React.FC<{
       })
     }
     
-    const debtRatio = plan.monthlyPayment ? 
-      (plan.monthlyPayment / plan.monthlyIncome) * 100 : 0
+    const debtRatio = plan.calculatedMetrics?.monthlyPayment ? 
+      (plan.calculatedMetrics.monthlyPayment / (plan.monthly_income || 1)) * 100 : 0
     
     if (debtRatio > 40) {
       factors.push({
@@ -139,7 +140,7 @@ const RiskAssessment: React.FC<{
       })
     }
     
-    const downPaymentRatio = (plan.downPayment / plan.purchasePrice) * 100
+    const downPaymentRatio = ((plan.down_payment || 0) / (plan.purchase_price || 1)) * 100
     if (downPaymentRatio < 20) {
       factors.push({
         type: 'medium',
@@ -195,24 +196,24 @@ const RiskAssessment: React.FC<{
 }
 
 const CashFlowBreakdown: React.FC<{
-  plan: FinancialPlan
+  plan: FinancialScenario
 }> = ({ plan }) => {
   const breakdown = useMemo(() => {
-    const monthlyPayment = plan.monthlyPayment || 0
-    const rentalIncome = plan.expectedRentalIncome || 0
-    const netIncome = plan.monthlyIncome - plan.monthlyExpenses
+    const monthlyPayment = plan.calculatedMetrics?.monthlyPayment || 0
+    const rentalIncome = plan.expected_rental_income || 0
+    const netIncome = (plan.monthly_income || 0) - (plan.monthly_expenses || 0)
     const netCashFlow = netIncome - monthlyPayment + rentalIncome
     
     return {
       income: {
-        salary: plan.monthlyIncome,
+        salary: plan.monthly_income || 0,
         rental: rentalIncome,
-        total: plan.monthlyIncome + rentalIncome
+        total: (plan.monthly_income || 0) + rentalIncome
       },
       expenses: {
-        living: plan.monthlyExpenses,
+        living: plan.monthly_expenses || 0,
         loanPayment: monthlyPayment,
-        total: plan.monthlyExpenses + monthlyPayment
+        total: (plan.monthly_expenses || 0) + monthlyPayment
       },
       netCashFlow,
       surplus: netCashFlow > 0 ? netCashFlow : 0,
@@ -309,15 +310,15 @@ const CashFlowBreakdown: React.FC<{
 }
 
 const InvestmentMetrics: React.FC<{
-  plan: FinancialPlan
+  plan: FinancialScenario
 }> = ({ plan }) => {
   const metrics = useMemo(() => {
-    if (plan.planType !== 'investment' || !plan.expectedRentalIncome) {
+    if (plan.plan_type !== 'investment' || !plan.expected_rental_income) {
       return null
     }
     
-    const annualRental = plan.expectedRentalIncome! * 12
-    const purchasePrice = plan.purchasePrice
+    const annualRental = plan.expected_rental_income! * 12
+    const purchasePrice = plan.purchase_price || 0
     const grossYield = (annualRental / purchasePrice) * 100
     
     // Estimate property expenses (10% of rental income)
@@ -326,8 +327,8 @@ const InvestmentMetrics: React.FC<{
     const netYield = (netAnnualIncome / purchasePrice) * 100
     
     // Cash-on-cash return (return on actual cash invested)
-    const cashInvested = plan.downPayment
-    const annualCashFlow = netAnnualIncome - (plan.monthlyPayment || 0) * 12
+    const cashInvested = plan.down_payment || 0
+    const annualCashFlow = netAnnualIncome - (plan.calculatedMetrics?.monthlyPayment || 0) * 12
     const cashOnCashReturn = (annualCashFlow / cashInvested) * 100
     
     return {
@@ -335,7 +336,7 @@ const InvestmentMetrics: React.FC<{
       netYield,
       cashOnCashReturn,
       annualCashFlow,
-      breakEvenRent: ((plan.monthlyPayment || 0) + (annualExpenses / 12))
+      breakEvenRent: ((plan.calculatedMetrics?.monthlyPayment || 0) + (annualExpenses / 12))
     }
   }, [plan])
   
@@ -414,40 +415,40 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
   className
 }) => {
   const [selectedScenarioId, setSelectedScenarioId] = useState(
-    scenarios.find(s => s.type === 'baseline')?.id || scenarios[0]?.id || ''
+    scenarios.find(s => s.scenarioType === 'baseline')?.id || scenarios[0]?.id || ''
   )
   const [isExporting, setIsExporting] = useState(false)
 
   // Convert FinancialPlan to UIFinancialPlan for the progress tracker
   const uiPlan: UIFinancialPlan = {
     id: plan.id,
-    planName: plan.planName,
-    planDescription: plan.planDescription,
-    planType: plan.planType,
-    purchasePrice: plan.purchasePrice,
-    downPayment: plan.downPayment,
-    monthlyIncome: plan.monthlyIncome,
-    monthlyExpenses: plan.monthlyExpenses,
-    currentSavings: plan.currentSavings,
-    planStatus: plan.planStatus,
-    isPublic: plan.isPublic,
-    isFavorite: plan.isFavorite || false,
-    createdAt: plan.createdAt,
-    updatedAt: plan.updatedAt,
-    monthlyPayment: plan.monthlyPayment,
-    totalInterest: plan.totalInterest,
-    affordabilityScore: plan.affordabilityScore,
+    planName: plan.plan_name,
+    planDescription: plan.description || '',
+    planType: plan.plan_type,
+    purchasePrice: plan.purchase_price || 0,
+    downPayment: plan.down_payment || 0,
+    monthlyIncome: plan.monthly_income || 0,
+    monthlyExpenses: plan.monthly_expenses || 0,
+    currentSavings: plan.current_savings || 0,
+    planStatus: 'active', // Default status since not in schema
+    isPublic: plan.is_public,
+    isFavorite: false, // Default value since not in schema
+    createdAt: new Date(plan.created_at),
+    updatedAt: new Date(plan.updated_at),
+    monthlyPayment: plan.calculatedMetrics?.monthlyPayment,
+    totalInterest: plan.calculatedMetrics?.totalInterest,
+    affordabilityScore: plan.calculatedMetrics?.affordabilityScore,
     riskLevel: plan.riskLevel,
-    roi: plan.roi,
-    expectedRentalIncome: plan.expectedRentalIncome
+    roi: undefined, // ROI not in schema
+    expectedRentalIncome: plan.expected_rental_income || undefined
   }
 
   // Mock progress data - in a real app, this would come from an API
   const mockProgress: PlanProgress = {
     totalProgress: 65,
     financialProgress: 75,
-    savingsTarget: plan.downPayment,
-    currentSavings: plan.currentSavings,
+    savingsTarget: plan.down_payment || 0,
+    currentSavings: plan.current_savings || 0,
     monthlyContribution: 5000000, // 5M VND per month
     estimatedCompletionDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
     milestones: [
@@ -458,8 +459,8 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
         targetDate: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000),
         status: 'in_progress',
         category: 'financial',
-        requiredAmount: plan.downPayment,
-        currentAmount: plan.currentSavings,
+        requiredAmount: plan.down_payment || 0,
+        currentAmount: plan.current_savings || 0,
         priority: 'high'
       },
       {
@@ -534,7 +535,7 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
   const handleExportPDF = async () => {
     setIsExporting(true)
     try {
-      await exportFinancialPlanToPDF(plan, {
+      await exportFinancialPlanToPDF(uiPlan, {
         includeTimeline: true,
         includeAnalysis: true,
         includeRecommendations: true
@@ -550,7 +551,7 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
   const handleExportExcel = async () => {
     setIsExporting(true)
     try {
-      await exportFinancialPlanToExcel(plan, {
+      await exportFinancialPlanToExcel(uiPlan, {
         includeAmortizationSchedule: true,
         includeCashFlowProjection: true,
         includeScenarioComparison: true,
@@ -571,7 +572,7 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
       upgrade: TrendingUp,
       refinance: DollarSign
     }
-    return icons[plan.planType] || Home
+    return icons[plan.plan_type] || Home
   }
   
   const IconComponent = getPlanTypeIcon()
@@ -593,11 +594,11 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
             
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {plan.planName}
+                {plan.plan_name}
               </h1>
               <div className="flex items-center space-x-2 mt-1">
                 <Badge variant="outline">
-                  {plan.planType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  {plan.plan_type.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                 </Badge>
                 <Badge className={cn(
                   plan.riskLevel === 'low' ? 'bg-green-100 text-green-800' :
@@ -646,14 +647,14 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Purchase Price"
-          value={plan.purchasePrice}
+          value={plan.purchase_price || 0}
           icon={Home}
           color="text-blue-600"
         />
         
         <MetricCard
           title="Monthly Payment"
-          value={plan.monthlyPayment || 0}
+          value={plan.calculatedMetrics?.monthlyPayment || 0}
           subtitle="Estimated"
           icon={Calculator}
           color="text-green-600"
@@ -661,20 +662,12 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
         
         <MetricCard
           title="Affordability Score"
-          value={`${plan.affordabilityScore || 0}/10`}
+          value={`${plan.calculatedMetrics?.affordabilityScore || 0}/10`}
           icon={Target}
           color="text-purple-600"
         />
         
-        {plan.roi && (
-          <MetricCard
-            title="Expected ROI"
-            value={`${plan.roi.toFixed(1)}%`}
-            subtitle="Annual"
-            icon={TrendingUp}
-            color="text-amber-600"
-          />
-        )}
+        {/* ROI not available in new schema */}
       </div>
       
       {/* Main Content Tabs */}
@@ -691,7 +684,7 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <CashFlowBreakdown plan={plan} />
             <RiskAssessment plan={plan} />
-            {plan.planType === 'investment' && <InvestmentMetrics plan={plan} />}
+            {plan.plan_type === 'investment' && <InvestmentMetrics plan={plan} />}
           </div>
         </TabsContent>
 
@@ -743,29 +736,29 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-500">Created</p>
-                    <p className="font-medium">{plan.createdAt.toLocaleDateString('vi-VN')}</p>
+                    <p className="font-medium">{new Date(plan.created_at).toLocaleDateString('vi-VN')}</p>
                   </div>
                   <div>
                     <p className="text-gray-500">Last Updated</p>
-                    <p className="font-medium">{plan.updatedAt.toLocaleDateString('vi-VN')}</p>
+                    <p className="font-medium">{new Date(plan.updated_at).toLocaleDateString('vi-VN')}</p>
                   </div>
                   <div>
                     <p className="text-gray-500">Down Payment</p>
                     <p className="font-medium">
-                      {formatCurrency(plan.downPayment)} 
-                      ({((plan.downPayment / plan.purchasePrice) * 100).toFixed(1)}%)
+                      {formatCurrency(plan.down_payment || 0)} 
+                      ({(((plan.down_payment || 0) / (plan.purchase_price || 1)) * 100).toFixed(1)}%)
                     </p>
                   </div>
                   <div>
                     <p className="text-gray-500">Current Savings</p>
-                    <p className="font-medium">{formatCurrency(plan.currentSavings)}</p>
+                    <p className="font-medium">{formatCurrency(plan.current_savings || 0)}</p>
                   </div>
                 </div>
                 
-                {plan.planDescription && (
+                {plan.description && (
                   <div>
                     <p className="text-gray-500 text-sm">Description</p>
-                    <p className="mt-1">{plan.planDescription}</p>
+                    <p className="mt-1">{plan.description}</p>
                   </div>
                 )}
               </CardContent>
@@ -777,21 +770,21 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {plan.affordabilityScore && plan.affordabilityScore >= 8 && (
+                  {plan.calculatedMetrics?.affordabilityScore && plan.calculatedMetrics.affordabilityScore >= 8 && (
                     <div className="flex items-start space-x-2 text-green-600">
                       <CheckCircle className="w-4 h-4 mt-1" />
                       <p className="text-sm">Excellent affordability - consider prepayments to save on interest</p>
                     </div>
                   )}
                   
-                  {plan.monthlyPayment && (plan.monthlyPayment / plan.monthlyIncome) > 0.3 && (
+                  {plan.calculatedMetrics?.monthlyPayment && (plan.calculatedMetrics.monthlyPayment / (plan.monthly_income || 1)) > 0.3 && (
                     <div className="flex items-start space-x-2 text-amber-600">
                       <Info className="w-4 h-4 mt-1" />
                       <p className="text-sm">Consider increasing down payment to reduce monthly burden</p>
                     </div>
                   )}
                   
-                  {plan.planType === 'investment' && plan.roi && plan.roi < 5 && (
+                  {plan.plan_type === 'investment' && false && ( // ROI not available in new schema
                     <div className="flex items-start space-x-2 text-red-600">
                       <AlertTriangle className="w-4 h-4 mt-1" />
                       <p className="text-sm">Low ROI - consider alternative investment strategies</p>
@@ -829,9 +822,9 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-medium">{scenario.name}</h4>
+                          <h4 className="font-medium">{scenario.plan_name}</h4>
                           <p className="text-sm text-gray-600">
-                            {scenario.totalDuration} months • {formatCurrency(scenario.totalInterest)} interest
+                            {scenario.calculatedMetrics?.payoffTimeMonths || 0} months • {formatCurrency(scenario.calculatedMetrics?.totalInterest || 0)} interest
                           </p>
                         </div>
                         

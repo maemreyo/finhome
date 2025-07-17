@@ -47,50 +47,113 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import LoadingStates from '@/components/common/LoadingStates'
 import type { TimelineScenario } from '@/components/timeline/TimelineVisualization'
 
+// Create a helper function to generate mock scenarios
+const createMockScenario = (
+  id: string,
+  name: string,
+  type: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test',
+  description: string,
+  monthlyPayment: number,
+  totalInterest: number,
+  totalCost: number,
+  duration: number,
+  riskLevel: 'low' | 'medium' | 'high'
+): TimelineScenario => ({
+  id,
+  plan_name: name,
+  scenarioType: type,
+  description,
+  riskLevel,
+  events: [],
+  user_id: 'mock-user-id',
+  plan_type: 'home_purchase',
+  status: 'draft',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  property_id: null,
+  custom_property_data: null,
+  target_age: null,
+  current_monthly_income: null,
+  purchase_price: 3000000000,
+  down_payment: 600000000,
+  additional_costs: 0,
+  other_debts: 0,
+  monthly_income: 50000000,
+  current_monthly_expenses: null,
+  monthly_expenses: 30000000,
+  current_savings: null,
+  target_timeframe_months: duration,
+  expected_roi: 10.5,
+  risk_tolerance: 'moderate',
+  expected_rental_income: null,
+  expected_appreciation_rate: null,
+  emergency_fund_target: null,
+  dependents: 0,
+  target_property_type: null,
+  target_location: null,
+  target_budget: null,
+  investment_purpose: null,
+  desired_features: {},
+  down_payment_target: null,
+  investment_horizon_months: null,
+  preferred_banks: null,
+  education_fund_target: null,
+  retirement_fund_target: null,
+  other_goals: {},
+  feasibility_score: null,
+  recommended_adjustments: {},
+  is_public: false,
+  view_count: 0,
+  cached_calculations: null,
+  calculations_last_updated: null,
+  completed_at: null,
+  calculatedMetrics: {
+    monthlyPayment,
+    totalInterest,
+    totalCost,
+    dtiRatio: 35,
+    ltvRatio: 80,
+    affordabilityScore: 7,
+    payoffTimeMonths: duration,
+    monthlySavings: 0
+  }
+})
+
 // Mock scenarios data
 const mockScenarios: TimelineScenario[] = [
-  {
-    id: 'scenario-baseline',
-    name: 'Baseline Scenario',
-    type: 'baseline',
-    description: 'Standard 20% down payment with current market rates',
-    interestRate: 10.5,
-    monthlyPayment: 24500000,
-    totalInterest: 2880000000,
-    totalCost: 5880000000,
-    totalDuration: 240,
-    riskLevel: 'medium',
-    events: [],
-    monthlySavings: 0
-  },
-  {
-    id: 'scenario-optimistic',
-    name: 'Optimistic Scenario',
-    type: 'optimistic',
-    description: 'Lower interest rates with favorable market conditions',
-    interestRate: 8.5,
-    monthlyPayment: 21200000,
-    totalInterest: 2188000000,
-    totalCost: 5188000000,
-    totalDuration: 240,
-    riskLevel: 'low',
-    events: [],
-    monthlySavings: 3300000
-  },
-  {
-    id: 'scenario-pessimistic',
-    name: 'Pessimistic Scenario',
-    type: 'pessimistic',
-    description: 'Higher interest rates with conservative market outlook',
-    interestRate: 12.5,
-    monthlyPayment: 28100000,
-    totalInterest: 3744000000,
-    totalCost: 6744000000,
-    totalDuration: 240,
-    riskLevel: 'high',
-    events: [],
-    monthlySavings: -3600000
-  }
+  createMockScenario(
+    'scenario-baseline',
+    'Baseline Scenario',
+    'baseline',
+    'Standard 20% down payment with current market rates',
+    24500000,
+    2880000000,
+    5880000000,
+    240,
+    'medium'
+  ),
+  createMockScenario(
+    'scenario-optimistic',
+    'Optimistic Scenario',
+    'optimistic',
+    'Lower interest rates with favorable market conditions',
+    21200000,
+    2188000000,
+    5188000000,
+    240,
+    'low'
+  ),
+  createMockScenario(
+    'scenario-pessimistic',
+    'Pessimistic Scenario',
+    'pessimistic',
+    'Higher interest rates with conservative market outlook',
+    28100000,
+    3744000000,
+    6744000000,
+    240,
+    'high'
+  )
 ]
 
 const EnhancedScenariosPage: React.FC = () => {
@@ -109,7 +172,7 @@ const EnhancedScenariosPage: React.FC = () => {
   const filteredScenarios = useMemo(() => {
     return scenarios.filter(scenario => {
       const matchesRisk = filterRiskLevel === 'all' || scenario.riskLevel === filterRiskLevel
-      const matchesType = filterType === 'all' || scenario.type === filterType
+      const matchesType = filterType === 'all' || scenario.scenarioType === filterType
       return matchesRisk && matchesType
     })
   }, [scenarios, filterRiskLevel, filterType])
@@ -159,20 +222,17 @@ const EnhancedScenariosPage: React.FC = () => {
       
       // Add some smart scenarios
       const smartScenarios: TimelineScenario[] = [
-        {
-          id: `smart-scenario-${Date.now()}`,
-          name: 'AI Recommended - Conservative',
-          type: 'alternative',
-          description: 'AI-generated scenario based on your financial profile',
-          interestRate: 9.8,
-          monthlyPayment: 22800000,
-          totalInterest: 2472000000,
-          totalCost: 5472000000,
-          totalDuration: 240,
-          riskLevel: 'low',
-          events: [],
-          monthlySavings: 1700000
-        }
+        createMockScenario(
+          `smart-scenario-${Date.now()}`,
+          'AI Recommended - Conservative',
+          'alternative',
+          'AI-generated scenario based on your financial profile',
+          22800000,
+          2472000000,
+          5472000000,
+          240,
+          'low'
+        )
       ]
       
       setScenarios(prev => [...prev, ...smartScenarios])
@@ -188,11 +248,11 @@ const EnhancedScenariosPage: React.FC = () => {
     // Export selected scenarios to CSV or PDF
     const selectedScenarios = scenarios.filter(s => selectedScenarioIds.includes(s.id))
     const csvData = selectedScenarios.map(s => ({
-      name: s.name,
-      type: s.type,
-      monthlyPayment: s.monthlyPayment,
-      totalInterest: s.totalInterest,
-      totalCost: s.totalCost,
+      name: s.plan_name,
+      type: s.scenarioType,
+      monthlyPayment: s.calculatedMetrics?.monthlyPayment || 0,
+      totalInterest: s.calculatedMetrics?.totalInterest || 0,
+      totalCost: s.calculatedMetrics?.totalCost || 0,
       riskLevel: s.riskLevel
     }))
     
@@ -234,8 +294,10 @@ const EnhancedScenariosPage: React.FC = () => {
         return 'bg-green-100 text-green-800'
       case 'pessimistic':
         return 'bg-red-100 text-red-800'
-      case 'custom':
+      case 'alternative':
         return 'bg-purple-100 text-purple-800'
+      case 'stress_test':
+        return 'bg-orange-100 text-orange-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -337,7 +399,8 @@ const EnhancedScenariosPage: React.FC = () => {
                   <SelectItem value="baseline">Baseline</SelectItem>
                   <SelectItem value="optimistic">Optimistic</SelectItem>
                   <SelectItem value="pessimistic">Pessimistic</SelectItem>
-                  <SelectItem value="custom">Custom</SelectItem>
+                  <SelectItem value="alternative">Alternative</SelectItem>
+                  <SelectItem value="stress_test">Stress Test</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -387,11 +450,11 @@ const EnhancedScenariosPage: React.FC = () => {
                     </Button>
                   </div>
                 </div>
-                <h3 className="font-medium text-sm">{scenario.name}</h3>
+                <h3 className="font-medium text-sm">{scenario.plan_name}</h3>
                 <p className="text-xs text-gray-600 mb-2">{scenario.description}</p>
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline" className={cn('text-xs', getTypeColor(scenario.type))}>
-                    {scenario.type}
+                  <Badge variant="outline" className={cn('text-xs', getTypeColor(scenario.scenarioType))}>
+                    {scenario.scenarioType}
                   </Badge>
                   <Badge variant="outline" className={cn('text-xs', getRiskLevelColor(scenario.riskLevel))}>
                     {scenario.riskLevel}
@@ -400,11 +463,11 @@ const EnhancedScenariosPage: React.FC = () => {
                 <div className="text-sm space-y-1">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Monthly:</span>
-                    <span className="font-medium">{formatCurrency(scenario.monthlyPayment)}</span>
+                    <span className="font-medium">{formatCurrency(scenario.calculatedMetrics?.monthlyPayment || 0)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Cost:</span>
-                    <span className="font-medium">{formatCurrency(scenario.totalCost)}</span>
+                    <span className="font-medium">{formatCurrency(scenario.calculatedMetrics?.totalCost || 0)}</span>
                   </div>
                 </div>
               </motion.div>
@@ -455,22 +518,22 @@ const EnhancedScenariosPage: React.FC = () => {
                 <div className="space-y-4">
                   {scenarios.filter(s => selectedScenarioIds.includes(s.id)).map((scenario) => (
                     <div key={scenario.id} className="p-4 border rounded-lg">
-                      <h4 className="font-medium mb-2">{scenario.name}</h4>
+                      <h4 className="font-medium mb-2">{scenario.plan_name}</h4>
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-gray-600">Duration:</span>
                           <div className="font-medium">
-                            {scenario.totalDuration} months
+                            {scenario.calculatedMetrics?.payoffTimeMonths || 0} months
                           </div>
                         </div>
                         <div>
                           <span className="text-gray-600">Monthly Savings:</span>
                           <div className={cn(
                             'font-medium',
-                            scenario.monthlySavings && scenario.monthlySavings > 0 ? 'text-green-600' : 
-                            scenario.monthlySavings && scenario.monthlySavings < 0 ? 'text-red-600' : 'text-gray-600'
+                            scenario.calculatedMetrics?.monthlySavings && scenario.calculatedMetrics.monthlySavings > 0 ? 'text-green-600' : 
+                            scenario.calculatedMetrics?.monthlySavings && scenario.calculatedMetrics.monthlySavings < 0 ? 'text-red-600' : 'text-gray-600'
                           )}>
-                            {scenario.monthlySavings ? formatCurrency(scenario.monthlySavings) : 'None'}
+                            {scenario.calculatedMetrics?.monthlySavings ? formatCurrency(scenario.calculatedMetrics.monthlySavings) : 'None'}
                           </div>
                         </div>
                       </div>
@@ -497,7 +560,7 @@ const EnhancedScenariosPage: React.FC = () => {
                     <div className="space-y-3">
                       {scenarios
                         .filter(s => selectedScenarioIds.includes(s.id))
-                        .sort((a, b) => a.totalCost - b.totalCost)
+                        .sort((a, b) => (a.calculatedMetrics?.totalCost || 0) - (b.calculatedMetrics?.totalCost || 0))
                         .map((scenario, index) => (
                           <div
                             key={scenario.id}
@@ -507,7 +570,7 @@ const EnhancedScenariosPage: React.FC = () => {
                             )}
                           >
                             <div className="flex items-center justify-between mb-2">
-                              <span className="font-medium">{scenario.name}</span>
+                              <span className="font-medium">{scenario.plan_name}</span>
                               {index === 0 && (
                                 <Badge className="bg-green-600 text-white">
                                   <CheckCircle className="w-3 h-3 mr-1" />
@@ -519,7 +582,7 @@ const EnhancedScenariosPage: React.FC = () => {
                               {index === 0 ? (
                                 'Lowest total cost with acceptable risk level'
                               ) : (
-                                `${formatCurrency(scenario.totalCost - scenarios.filter(s => selectedScenarioIds.includes(s.id)).sort((a, b) => a.totalCost - b.totalCost)[0].totalCost)} more expensive`
+                                `${formatCurrency((scenario.calculatedMetrics?.totalCost || 0) - (scenarios.filter(s => selectedScenarioIds.includes(s.id)).sort((a, b) => (a.calculatedMetrics?.totalCost || 0) - (b.calculatedMetrics?.totalCost || 0))[0].calculatedMetrics?.totalCost || 0))} more expensive`
                               )}
                             </div>
                           </div>

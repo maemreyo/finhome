@@ -1,4 +1,5 @@
 // src/hooks/usePerformanceOptimization.ts
+// UPDATED: 2025-07-16 - Updated property references to use new FinancialScenario interface with calculatedMetrics
 // React hooks for performance optimization in financial planning components
 
 import { useMemo, useCallback, useRef, useEffect, useState } from 'react'
@@ -63,18 +64,18 @@ export function useOptimizedScenarioComparison(scenarios: TimelineScenario[]) {
 
     performanceMonitor.markStart('scenario-comparison')
     
-    const sortedByTotalCost = [...scenarios].sort((a, b) => a.totalCost - b.totalCost)
-    const sortedByMonthlyPayment = [...scenarios].sort((a, b) => a.monthlyPayment - b.monthlyPayment)
-    const sortedByDuration = [...scenarios].sort((a, b) => a.totalDuration - b.totalDuration)
+    const sortedByTotalCost = [...scenarios].sort((a, b) => (a.calculatedMetrics?.totalCost || 0) - (b.calculatedMetrics?.totalCost || 0))
+    const sortedByMonthlyPayment = [...scenarios].sort((a, b) => (a.calculatedMetrics?.monthlyPayment || 0) - (b.calculatedMetrics?.monthlyPayment || 0))
+    const sortedByDuration = [...scenarios].sort((a, b) => (a.calculatedMetrics?.payoffTimeMonths || 0) - (b.calculatedMetrics?.payoffTimeMonths || 0))
     
     const bestScenario = sortedByTotalCost[0]
     const worstScenario = sortedByTotalCost[sortedByTotalCost.length - 1]
     
     const averageMetrics = {
-      totalCost: scenarios.reduce((sum, s) => sum + s.totalCost, 0) / scenarios.length,
-      monthlyPayment: scenarios.reduce((sum, s) => sum + s.monthlyPayment, 0) / scenarios.length,
-      totalDuration: scenarios.reduce((sum, s) => sum + s.totalDuration, 0) / scenarios.length,
-      interestRate: scenarios.reduce((sum, s) => sum + s.interestRate, 0) / scenarios.length
+      totalCost: scenarios.reduce((sum, s) => sum + (s.calculatedMetrics?.totalCost || 0), 0) / scenarios.length,
+      monthlyPayment: scenarios.reduce((sum, s) => sum + (s.calculatedMetrics?.monthlyPayment || 0), 0) / scenarios.length,
+      totalDuration: scenarios.reduce((sum, s) => sum + (s.calculatedMetrics?.payoffTimeMonths || 0), 0) / scenarios.length,
+      totalInterest: scenarios.reduce((sum, s) => sum + (s.calculatedMetrics?.totalInterest || 0), 0) / scenarios.length
     }
     
     const riskDistribution = scenarios.reduce((acc, scenario) => {

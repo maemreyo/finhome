@@ -34,12 +34,12 @@ import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
 import { ScenarioEngine, type ScenarioDefinition } from '@/lib/financial/scenarios'
 import { calculateMonthlyPayment, type LoanParameters } from '@/lib/financial/calculations'
-import type { TimelineScenario } from '@/components/timeline/TimelineVisualization'
+import type { FinancialScenario, ScenarioParameters as ScenarioParams } from '@/types/scenario'
 
 interface ScenarioParameterEditorProps {
-  initialScenario?: TimelineScenario
-  onScenarioChange: (scenario: TimelineScenario) => void
-  onSaveScenario: (scenario: TimelineScenario) => void
+  initialScenario?: FinancialScenario
+  onScenarioChange: (scenario: FinancialScenario) => void
+  onSaveScenario: (scenario: FinancialScenario) => void
   onDeleteScenario?: (scenarioId: string) => void
   className?: string
 }
@@ -96,21 +96,21 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
   const [parameters, setParameters] = useState<ScenarioParameters>(() => {
     if (initialScenario) {
       return {
-        name: initialScenario.name,
-        type: initialScenario.type as any,
-        purchasePrice: defaultParameters.purchasePrice,
-        downPayment: defaultParameters.downPayment,
-        loanAmount: defaultParameters.purchasePrice - defaultParameters.downPayment,
-        interestRate: initialScenario.interestRate,
-        loanTermYears: Math.round(initialScenario.totalDuration / 12),
-        monthlyIncome: defaultParameters.monthlyIncome,
-        monthlyExpenses: defaultParameters.monthlyExpenses,
+        name: initialScenario.plan_name,
+        type: initialScenario.scenarioType,
+        purchasePrice: initialScenario.purchase_price || defaultParameters.purchasePrice,
+        downPayment: initialScenario.down_payment || defaultParameters.downPayment,
+        loanAmount: (initialScenario.purchase_price || defaultParameters.purchasePrice) - (initialScenario.down_payment || defaultParameters.downPayment),
+        interestRate: initialScenario.expected_roi || defaultParameters.interestRate,
+        loanTermYears: Math.round((initialScenario.target_timeframe_months || 240) / 12),
+        monthlyIncome: initialScenario.monthly_income || defaultParameters.monthlyIncome,
+        monthlyExpenses: initialScenario.monthly_expenses || defaultParameters.monthlyExpenses,
         propertyTax: defaultParameters.propertyTax,
         insurance: defaultParameters.insurance,
         maintenanceReserve: defaultParameters.maintenanceReserve,
-        expectedRentalIncome: defaultParameters.expectedRentalIncome,
+        expectedRentalIncome: initialScenario.expected_rental_income || defaultParameters.expectedRentalIncome,
         rentGrowthRate: defaultParameters.rentGrowthRate,
-        propertyAppreciationRate: defaultParameters.propertyAppreciationRate,
+        propertyAppreciationRate: initialScenario.expected_appreciation_rate || defaultParameters.propertyAppreciationRate,
         vacancyRate: defaultParameters.vacancyRate,
         capEx: defaultParameters.capEx,
         description: initialScenario.description || ''
@@ -151,20 +151,42 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
       riskLevel = 'medium'
     }
 
-    const scenario: TimelineScenario = {
+    const scenario: FinancialScenario = {
+      // Copy all base FinancialPlan properties
+      ...(initialScenario || {}),
+      
+      // Update with calculated values
       id: initialScenario?.id || `scenario-${Date.now()}`,
-      name: parameters.name,
-      type: parameters.type,
+      plan_name: parameters.name,
       description: parameters.description,
-      interestRate: parameters.interestRate,
-      monthlyPayment,
-      totalInterest,
-      totalCost,
-      totalDuration: parameters.loanTermYears * 12,
+      scenarioType: parameters.type,
       riskLevel,
-      events: [],
-      monthlySavings: netCashFlow > 0 ? netCashFlow : undefined
-    }
+      user_id: initialScenario?.user_id || '',
+      plan_type: initialScenario?.plan_type || 'home_purchase',
+      status: initialScenario?.status || 'draft',
+      purchase_price: parameters.purchasePrice,
+      down_payment: parameters.downPayment,
+      monthly_income: parameters.monthlyIncome,
+      monthly_expenses: parameters.monthlyExpenses,
+      target_timeframe_months: parameters.loanTermYears * 12,
+      expected_roi: parameters.interestRate,
+      expected_rental_income: parameters.expectedRentalIncome,
+      expected_appreciation_rate: parameters.propertyAppreciationRate,
+      created_at: initialScenario?.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      
+      // Calculated metrics
+      calculatedMetrics: {
+        monthlyPayment,
+        totalInterest,
+        totalCost,
+        dtiRatio,
+        ltvRatio,
+        affordabilityScore: netCashFlow > 0 ? 8 : 5,
+        payoffTimeMonths: parameters.loanTermYears * 12,
+        monthlySavings: netCashFlow > 0 ? netCashFlow : undefined
+      }
+    } as FinancialScenario
 
     return scenario
   }, [parameters, initialScenario?.id])
@@ -189,7 +211,7 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
       errors.push('Loan term must be between 1 and 30 years')
     }
 
-    const dtiRatio = (calculatedScenario.monthlyPayment / parameters.monthlyIncome) * 100
+    const dtiRatio = (calculatedScenario.calculatedMetrics?.monthlyPayment || 0) / parameters.monthlyIncome * 100
     if (dtiRatio > 50) {
       errors.push('Debt-to-income ratio exceeds 50% - this may not be feasible')
     }
@@ -332,15 +354,15 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Monthly Payment</Label>
-                  <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.monthlyPayment)}</div>
+                  <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}</div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Total Interest</Label>
-                  <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.totalInterest)}</div>
+                  <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}</div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Total Cost</Label>
-                  <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.totalCost)}</div>
+                  <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.calculatedMetrics?.totalCost || 0)}</div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Risk Level</Label>
@@ -354,13 +376,13 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                 <h4 className="font-medium mb-2">Key Metrics</h4>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600">Monthly Payment:</span> {formatCurrency(calculatedScenario.monthlyPayment)}
+                    <span className="text-gray-600">Monthly Payment:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}
                   </div>
                   <div>
-                    <span className="text-gray-600">Total Interest:</span> {formatCurrency(calculatedScenario.totalInterest)}
+                    <span className="text-gray-600">Total Interest:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}
                   </div>
                   <div>
-                    <span className="text-gray-600">Total Cost:</span> {formatCurrency(calculatedScenario.totalCost)}
+                    <span className="text-gray-600">Total Cost:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalCost || 0)}
                   </div>
                 </div>
               </div>
@@ -401,7 +423,8 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                           <SelectItem value="baseline">Baseline</SelectItem>
                           <SelectItem value="optimistic">Optimistic</SelectItem>
                           <SelectItem value="pessimistic">Pessimistic</SelectItem>
-                          <SelectItem value="custom">Custom</SelectItem>
+                          <SelectItem value="alternative">Alternative</SelectItem>
+                          <SelectItem value="stress_test">Stress Test</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -638,15 +661,15 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
                 <span className="text-gray-600">Monthly Payment:</span>
-                <div className="font-medium">{formatCurrency(calculatedScenario.monthlyPayment)}</div>
+                <div className="font-medium">{formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}</div>
               </div>
               <div>
                 <span className="text-gray-600">Total Interest:</span>
-                <div className="font-medium">{formatCurrency(calculatedScenario.totalInterest)}</div>
+                <div className="font-medium">{formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}</div>
               </div>
               <div>
                 <span className="text-gray-600">Duration:</span>
-                <div className="font-medium">{calculatedScenario.totalDuration} months</div>
+                <div className="font-medium">{calculatedScenario.calculatedMetrics?.payoffTimeMonths || 0} months</div>
               </div>
               <div>
                 <span className="text-gray-600">Risk Level:</span>

@@ -7,7 +7,8 @@ import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Header } from '@/components/dashboard/Header'
 import { ScenarioComparison } from '@/components/scenarios/ScenarioComparison'
-import { useScenarios, LoanScenario } from '@/hooks/useScenarios'
+import { useScenarios } from '@/hooks/useScenarios'
+import type { FinancialScenario } from '@/types/scenario'
 import { useBankRates } from '@/hooks/useBankRates'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -24,84 +25,149 @@ import { toast } from 'sonner'
 import { formatCurrency } from '@/lib/utils'
 import { calculateMonthlyPayment } from '@/lib/financial/calculations'
 
+// Helper function to create mock financial scenarios
+const createMockScenario = (params: {
+  id: string
+  name: string
+  scenarioType: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test'
+  purchasePrice: number
+  downPayment: number
+  loanAmount: number
+  interestRate: number
+  loanTermYears: number
+  monthlyIncome: number
+  monthlyExpenses: number
+  riskLevel: 'low' | 'medium' | 'high'
+}): FinancialScenario => {
+  const monthlyPayment = calculateMonthlyPayment({
+    principal: params.loanAmount,
+    annualRate: params.interestRate,
+    termMonths: params.loanTermYears * 12
+  })
+  const totalInterest = (monthlyPayment * params.loanTermYears * 12) - params.loanAmount
+  const totalCost = params.purchasePrice + totalInterest
+  const dtiRatio = (monthlyPayment / params.monthlyIncome) * 100
+  const ltvRatio = (params.loanAmount / params.purchasePrice) * 100
+
+  return {
+    // Base FinancialPlan fields
+    id: params.id,
+    user_id: 'mock-user',
+    plan_name: params.name,
+    description: `Mock ${params.scenarioType} scenario`,
+    plan_type: 'home_purchase',
+    status: 'draft',
+    property_id: null,
+    custom_property_data: null,
+    target_age: null,
+    current_monthly_income: params.monthlyIncome,
+    monthly_income: params.monthlyIncome,
+    current_monthly_expenses: params.monthlyExpenses,
+    monthly_expenses: params.monthlyExpenses,
+    current_savings: null,
+    dependents: 0,
+    purchase_price: params.purchasePrice,
+    down_payment: params.downPayment,
+    additional_costs: 0,
+    other_debts: 0,
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    target_timeframe_months: params.loanTermYears * 12,
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    risk_tolerance: 'moderate',
+    investment_horizon_months: null,
+    expected_roi: 10.5,
+    preferred_banks: null,
+    expected_rental_income: null,
+    expected_appreciation_rate: null,
+    emergency_fund_target: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    feasibility_score: null,
+    recommended_adjustments: {},
+    is_public: false,
+    view_count: 0,
+    cached_calculations: null,
+    calculations_last_updated: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    completed_at: null,
+    
+    // Scenario-specific properties
+    scenarioType: params.scenarioType,
+    riskLevel: params.riskLevel,
+    
+    // Calculated metrics
+    calculatedMetrics: {
+      monthlyPayment,
+      totalInterest,
+      totalCost,
+      dtiRatio,
+      ltvRatio,
+      affordabilityScore: 7,
+      payoffTimeMonths: params.loanTermYears * 12
+    }
+  }
+}
+
 // Mock data for demonstration
-const mockScenarios: LoanScenario[] = [
-  {
+const mockScenarios: FinancialScenario[] = [
+  createMockScenario({
     id: 'scenario-1',
     name: 'Bảo Thủ - 30% vốn tự có',
-    downPaymentPercent: 30,
-    loanTermYears: 15,
-    interestRate: 8.0,
-    propertyPrice: 2500000000,
+    scenarioType: 'baseline',
+    purchasePrice: 2500000000,
     downPayment: 750000000,
     loanAmount: 1750000000,
-    monthlyPayment: 16729000,
-    totalInterest: 1261220000,
-    totalPayment: 3011220000,
+    interestRate: 8.0,
+    loanTermYears: 15,
     monthlyIncome: 45000000,
     monthlyExpenses: 18000000,
-    netCashFlow: 10271000,
-    riskLevel: 'low',
-    recommendation: 'safe',
-    createdAt: new Date('2024-01-15')
-  },
-  {
+    riskLevel: 'low'
+  }),
+  createMockScenario({
     id: 'scenario-2',
     name: 'Cân Bằng - 20% vốn tự có',
-    downPaymentPercent: 20,
-    loanTermYears: 20,
-    interestRate: 8.5,
-    propertyPrice: 2500000000,
+    scenarioType: 'alternative',
+    purchasePrice: 2500000000,
     downPayment: 500000000,
     loanAmount: 2000000000,
-    monthlyPayment: 17234000,
-    totalInterest: 2136160000,
-    totalPayment: 4136160000,
+    interestRate: 8.5,
+    loanTermYears: 20,
     monthlyIncome: 45000000,
     monthlyExpenses: 18000000,
-    netCashFlow: 9766000,
-    riskLevel: 'low',
-    recommendation: 'optimal',
-    createdAt: new Date('2024-01-16')
-  },
-  {
+    riskLevel: 'medium'
+  }),
+  createMockScenario({
     id: 'scenario-3',
     name: 'Tích Cực - 15% vốn tự có',
-    downPaymentPercent: 15,
-    loanTermYears: 25,
-    interestRate: 9.0,
-    propertyPrice: 2500000000,
+    scenarioType: 'optimistic',
+    purchasePrice: 2500000000,
     downPayment: 375000000,
     loanAmount: 2125000000,
-    monthlyPayment: 17820000,
-    totalInterest: 3221000000,
-    totalPayment: 5346000000,
+    interestRate: 9.0,
+    loanTermYears: 25,
     monthlyIncome: 45000000,
     monthlyExpenses: 18000000,
-    netCashFlow: 9180000,
-    riskLevel: 'medium',
-    recommendation: 'aggressive',
-    createdAt: new Date('2024-01-17')
-  },
-  {
+    riskLevel: 'medium'
+  }),
+  createMockScenario({
     id: 'scenario-4',
     name: 'Rủi Ro Cao - 10% vốn tự có',
-    downPaymentPercent: 10,
-    loanTermYears: 30,
-    interestRate: 10.0,
-    propertyPrice: 2500000000,
+    scenarioType: 'stress_test',
+    purchasePrice: 2500000000,
     downPayment: 250000000,
     loanAmount: 2250000000,
-    monthlyPayment: 19747000,
-    totalInterest: 4908920000,
-    totalPayment: 7158920000,
+    interestRate: 10.0,
+    loanTermYears: 30,
     monthlyIncome: 45000000,
     monthlyExpenses: 18000000,
-    netCashFlow: 7253000,
-    riskLevel: 'high',
-    recommendation: 'risky',
-    createdAt: new Date('2024-01-18')
-  }
+    riskLevel: 'high'
+  })
 ]
 
 interface ScenarioGeneratorForm {
@@ -118,12 +184,11 @@ export default function ScenariosPage() {
     error,
     createScenario,
     updateScenario,
-    deleteScenario,
-    duplicateScenario
-  } = useScenarios(mockScenarios)
+    deleteScenario
+  } = useScenarios('mock-user') // Use mock user ID
   
   const { rates, isLoading: ratesLoading, getRates } = useBankRates()
-  const [selectedScenario, setSelectedScenario] = useState<LoanScenario | null>(null)
+  const [selectedScenario, setSelectedScenario] = useState<FinancialScenario | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [generatorForm, setGeneratorForm] = useState<ScenarioGeneratorForm>({
     propertyPrice: 2500000000,
@@ -132,8 +197,9 @@ export default function ScenariosPage() {
     loanType: 'home_purchase'
   })
   const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedScenarios, setGeneratedScenarios] = useState<FinancialScenario[]>([])
 
-  const handleScenarioSelect = (scenario: LoanScenario) => {
+  const handleScenarioSelect = (scenario: FinancialScenario) => {
     setSelectedScenario(scenario)
     // In a real app, this would navigate to a detailed view or apply the scenario
     console.log('Selected scenario:', scenario)
@@ -160,7 +226,7 @@ export default function ScenariosPage() {
       const downPaymentOptions = [10, 15, 20, 25, 30]
       const loanTermOptions = [15, 20, 25, 30]
       
-      const generatedScenarios: LoanScenario[] = []
+      const generatedScenarios: FinancialScenario[] = []
       let scenarioId = 1
 
       for (const downPaymentPercent of downPaymentOptions) {
@@ -207,40 +273,34 @@ export default function ScenariosPage() {
             recommendation = 'optimal'
           }
 
-          const scenario: LoanScenario = {
+          const scenario: FinancialScenario = createMockScenario({
             id: `generated-${scenarioId++}`,
             name: `${downPaymentPercent}% vốn tự có - ${loanTermYears} năm`,
-            downPaymentPercent,
-            loanTermYears,
-            interestRate: bestRate,
-            propertyPrice: generatorForm.propertyPrice,
+            scenarioType: riskLevel === 'low' ? 'baseline' : riskLevel === 'medium' ? 'alternative' : 'stress_test',
+            purchasePrice: generatorForm.propertyPrice,
             downPayment,
             loanAmount,
-            monthlyPayment: Math.round(monthlyPayment),
-            totalInterest: Math.round(totalInterest),
-            totalPayment: Math.round(totalPayment),
+            interestRate: bestRate,
+            loanTermYears,
             monthlyIncome: generatorForm.monthlyIncome,
             monthlyExpenses: generatorForm.monthlyExpenses,
-            netCashFlow: Math.round(netCashFlow),
-            riskLevel,
-            recommendation,
-            createdAt: new Date()
-          }
+            riskLevel
+          })
 
           generatedScenarios.push(scenario)
         }
         if (generatedScenarios.length >= 6) break
       }
 
-      // Sort by recommendation priority and add to scenarios
+      // Sort by risk level priority and add to scenarios
       const sortedScenarios = generatedScenarios.sort((a, b) => {
-        const priority = { optimal: 4, safe: 3, aggressive: 2, risky: 1 }
-        return priority[b.recommendation] - priority[a.recommendation]
+        const priority = { low: 3, medium: 2, high: 1 }
+        return priority[b.riskLevel] - priority[a.riskLevel]
       })
 
-      // Clear existing scenarios and add new ones
-      scenarios.forEach(scenario => deleteScenario(scenario.id))
-      sortedScenarios.forEach(scenario => createScenario(scenario))
+      // Note: In a real implementation, you would use the createScenario function
+      // from the useScenarios hook to save these to the database
+      setGeneratedScenarios(sortedScenarios)
 
       setShowCreateModal(false)
       toast.success(`Generated ${sortedScenarios.length} scenarios based on current market rates!`)
@@ -258,9 +318,9 @@ export default function ScenariosPage() {
     getRates({ loanType: 'home_purchase', isActive: true })
   }, [])
 
-  const optimalScenarios = scenarios.filter(s => s.recommendation === 'optimal')
+  const lowRiskScenarios = scenarios.filter(s => s.riskLevel === 'low')
   const totalScenarios = scenarios.length
-  const avgMonthlyPayment = scenarios.reduce((sum, s) => sum + s.monthlyPayment, 0) / totalScenarios
+  const avgMonthlyPayment = scenarios.reduce((sum, s) => sum + (s.calculatedMetrics?.monthlyPayment || 0), 0) / totalScenarios
 
   if (loading) {
     return (
@@ -327,7 +387,7 @@ export default function ScenariosPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{optimalScenarios.length}</div>
+              <div className="text-2xl font-bold text-green-600">{lowRiskScenarios.length}</div>
               <p className="text-xs text-muted-foreground">
                 Được đánh giá tốt nhất
               </p>
@@ -530,7 +590,7 @@ export default function ScenariosPage() {
             <CardHeader>
               <CardTitle>Kịch Bản Đã Chọn</CardTitle>
               <CardDescription>
-                Chi tiết về kịch bản: {selectedScenario.name}
+                Chi tiết về kịch bản: {selectedScenario.plan_name}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -545,7 +605,7 @@ export default function ScenariosPage() {
                           style: 'currency',
                           currency: 'VND',
                           notation: 'compact'
-                        }).format(selectedScenario.propertyPrice)}
+                        }).format(selectedScenario.purchase_price || 0)}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -555,7 +615,7 @@ export default function ScenariosPage() {
                           style: 'currency',
                           currency: 'VND',
                           notation: 'compact'
-                        }).format(selectedScenario.downPayment)} ({selectedScenario.downPaymentPercent}%)
+                        }).format(selectedScenario.down_payment || 0)} ({Math.round(((selectedScenario.down_payment || 0) / (selectedScenario.purchase_price || 1)) * 100)}%)
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -565,16 +625,16 @@ export default function ScenariosPage() {
                           style: 'currency',
                           currency: 'VND',
                           notation: 'compact'
-                        }).format(selectedScenario.loanAmount)}
+                        }).format((selectedScenario.purchase_price || 0) - (selectedScenario.down_payment || 0))}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Thời gian vay:</span>
-                      <span className="font-medium">{selectedScenario.loanTermYears} năm</span>
+                      <span className="font-medium">{Math.round((selectedScenario.loanCalculations?.[0]?.loan_term_months || 0) / 12)} năm</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Lãi suất:</span>
-                      <span className="font-medium">{selectedScenario.interestRate}%/năm</span>
+                      <span className="font-medium">{selectedScenario.loanCalculations?.[0]?.interest_rate || 0}%/năm</span>
                     </div>
                   </div>
                 </div>
@@ -589,7 +649,7 @@ export default function ScenariosPage() {
                           style: 'currency',
                           currency: 'VND',
                           notation: 'compact'
-                        }).format(selectedScenario.monthlyIncome)}
+                        }).format(selectedScenario.monthly_income || 0)}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -599,7 +659,7 @@ export default function ScenariosPage() {
                           style: 'currency',
                           currency: 'VND',
                           notation: 'compact'
-                        }).format(selectedScenario.monthlyExpenses)}
+                        }).format(selectedScenario.monthly_expenses || 0)}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -609,18 +669,18 @@ export default function ScenariosPage() {
                           style: 'currency',
                           currency: 'VND',
                           notation: 'compact'
-                        }).format(selectedScenario.monthlyPayment)}
+                        }).format(selectedScenario.calculatedMetrics?.monthlyPayment || 0)}
                       </span>
                     </div>
                     <div className="flex justify-between border-t pt-2">
                       <span className="font-medium">Dòng tiền ròng:</span>
-                      <span className={`font-bold ${selectedScenario.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {selectedScenario.netCashFlow >= 0 ? '+' : ''}
+                      <span className={`font-bold ${(selectedScenario.monthly_income || 0) - (selectedScenario.monthly_expenses || 0) - (selectedScenario.calculatedMetrics?.monthlyPayment || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {(selectedScenario.monthly_income || 0) - (selectedScenario.monthly_expenses || 0) - (selectedScenario.calculatedMetrics?.monthlyPayment || 0) >= 0 ? '+' : ''}
                         {new Intl.NumberFormat('vi-VN', {
                           style: 'currency',
                           currency: 'VND',
                           notation: 'compact'
-                        }).format(selectedScenario.netCashFlow)}
+                        }).format((selectedScenario.monthly_income || 0) - (selectedScenario.monthly_expenses || 0) - (selectedScenario.calculatedMetrics?.monthlyPayment || 0))}
                       </span>
                     </div>
                   </div>

@@ -23,6 +23,85 @@ import { usePlans } from '@/hooks/usePlans'
 import { useOptimalRates } from '@/hooks/useBankRates'
 import { type FinancialPlan, type CreatePlanRequest } from '@/lib/api/plans'
 import { apiPlansToUIPlans, type UIFinancialPlan } from '@/lib/adapters/planAdapter'
+import { type FinancialScenario } from '@/types/scenario'
+
+// Convert UIFinancialPlan to FinancialScenario for detail view
+function uiPlanToScenario(plan: UIFinancialPlan): FinancialScenario {
+  return {
+    id: plan.id,
+    user_id: 'current-user', // This would come from auth context
+    plan_name: plan.planName,
+    description: plan.planDescription || '',
+    plan_type: plan.planType,
+    status: 'active',
+    created_at: plan.createdAt.toISOString(),
+    updated_at: plan.updatedAt.toISOString(),
+    
+    // Property details
+    property_id: null,
+    custom_property_data: null,
+    purchase_price: plan.purchasePrice,
+    down_payment: plan.downPayment,
+    additional_costs: 0,
+    other_debts: 0,
+    
+    // Personal finances
+    target_age: null,
+    current_monthly_income: null,
+    monthly_income: plan.monthlyIncome,
+    current_monthly_expenses: null,
+    monthly_expenses: plan.monthlyExpenses,
+    current_savings: plan.currentSavings,
+    dependents: 0,
+    
+    // Investment specifics
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    target_timeframe_months: null,
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    risk_tolerance: 'moderate',
+    investment_horizon_months: null,
+    expected_roi: plan.roi || null,
+    preferred_banks: null,
+    expected_rental_income: plan.expectedRentalIncome || null,
+    expected_appreciation_rate: null,
+    
+    // Targets
+    emergency_fund_target: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    
+    // Metadata
+    feasibility_score: plan.affordabilityScore || null,
+    recommended_adjustments: {},
+    is_public: plan.isPublic,
+    view_count: 0,
+    cached_calculations: null,
+    calculations_last_updated: null,
+    completed_at: null,
+    
+    // Scenario-specific properties
+    scenarioType: 'baseline',
+    riskLevel: 'medium',
+    
+    // Calculated metrics
+    calculatedMetrics: {
+      monthlyPayment: plan.monthlyPayment || 0,
+      totalInterest: plan.totalInterest || 0,
+      totalCost: (plan.monthlyPayment || 0) * 240, // Default to 20 years
+      dtiRatio: plan.monthlyPayment && plan.monthlyIncome ? (plan.monthlyPayment / plan.monthlyIncome) * 100 : 0,
+      ltvRatio: (plan.downPayment / plan.purchasePrice) * 100,
+      affordabilityScore: plan.affordabilityScore || 0,
+      payoffTimeMonths: 240, // Default to 20 years
+      monthlySavings: plan.monthlyIncome && plan.monthlyExpenses && plan.monthlyPayment ? 
+        plan.monthlyIncome - plan.monthlyExpenses - plan.monthlyPayment : 0
+    }
+  }
+}
 
 // Sample data for demo/fallback (UI format)
 const samplePlans: UIFinancialPlan[] = [
@@ -391,7 +470,7 @@ export default function PlansPage() {
 
         {viewMode === 'detail' && selectedPlan && (
           <PlanDetailView
-            plan={selectedPlan}
+            plan={uiPlanToScenario(selectedPlan)}
             scenarios={scenarios}
             onBack={handleBackToList}
             onEdit={() => handleEditPlan(selectedPlan.id)}

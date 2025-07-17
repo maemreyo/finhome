@@ -18,10 +18,8 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
   Area,
-  AreaChart,
-  ReferenceLine
+  AreaChart
 } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -35,7 +33,6 @@ import {
   Download,
   Maximize2
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
 import type { TimelineScenario } from '@/components/timeline/TimelineVisualization'
 
@@ -68,31 +65,33 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
   // Prepare data for different chart types
   const barChartData = useMemo(() => {
     return selectedScenarios.map(scenario => ({
-      name: scenario.name,
-      monthlyPayment: scenario.monthlyPayment,
-      totalInterest: scenario.totalInterest,
-      totalCost: scenario.totalCost,
-      duration: scenario.totalDuration,
-      type: scenario.type,
-      color: COLORS[scenario.type as keyof typeof COLORS] || COLORS.custom
+      name: scenario.plan_name,
+      monthlyPayment: scenario.calculatedMetrics?.monthlyPayment || 0,
+      totalInterest: scenario.calculatedMetrics?.totalInterest || 0,
+      totalCost: scenario.calculatedMetrics?.totalCost || 0,
+      duration: scenario.calculatedMetrics?.payoffTimeMonths || 0,
+      type: scenario.scenarioType,
+      color: COLORS[scenario.scenarioType as keyof typeof COLORS] || COLORS.custom
     }))
   }, [selectedScenarios])
 
   const timelineData = useMemo(() => {
     if (selectedScenarios.length === 0) return []
     
-    const maxDuration = Math.max(...selectedScenarios.map(s => s.totalDuration))
+    const maxDuration = Math.max(...selectedScenarios.map(s => s.calculatedMetrics?.payoffTimeMonths || 0))
     const timelinePoints = []
     
     for (let month = 0; month <= maxDuration; month += 12) {
       const dataPoint: any = { month }
       
       selectedScenarios.forEach(scenario => {
-        if (month <= scenario.totalDuration) {
+        const totalDuration = scenario.calculatedMetrics?.payoffTimeMonths || 0
+        const totalInterest = scenario.calculatedMetrics?.totalInterest || 0
+        if (month <= totalDuration && totalDuration > 0) {
           // Calculate cumulative interest paid up to this point
-          const monthlyInterest = scenario.totalInterest / scenario.totalDuration
+          const monthlyInterest = totalInterest / totalDuration
           const cumulativeInterest = monthlyInterest * month
-          dataPoint[scenario.name] = cumulativeInterest
+          dataPoint[scenario.plan_name] = cumulativeInterest
         }
       })
       
@@ -104,9 +103,9 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
 
   const pieChartData = useMemo(() => {
     return selectedScenarios.map(scenario => ({
-      name: scenario.name,
-      value: scenario.totalCost,
-      color: COLORS[scenario.type as keyof typeof COLORS] || COLORS.custom
+      name: scenario.plan_name,
+      value: scenario.calculatedMetrics?.totalCost || 0,
+      color: COLORS[scenario.scenarioType as keyof typeof COLORS] || COLORS.custom
     }))
   }, [selectedScenarios])
 
@@ -160,10 +159,10 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
           <Line
             key={scenario.id}
             type="monotone"
-            dataKey={scenario.name}
-            stroke={COLORS[scenario.type as keyof typeof COLORS] || COLORS.custom}
+            dataKey={scenario.plan_name}
+            stroke={COLORS[scenario.scenarioType as keyof typeof COLORS] || COLORS.custom}
             strokeWidth={2}
-            dot={{ fill: COLORS[scenario.type as keyof typeof COLORS] || COLORS.custom }}
+            dot={{ fill: COLORS[scenario.scenarioType as keyof typeof COLORS] || COLORS.custom }}
           />
         ))}
       </LineChart>
@@ -199,14 +198,14 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
         <XAxis dataKey="month" label={{ value: 'Months', position: 'insideBottom', offset: -5 }} />
         <YAxis tickFormatter={(value) => formatCurrency(value)} />
         <Tooltip content={<CustomTooltip />} />
-        {selectedScenarios.map((scenario, index) => (
+        {selectedScenarios.map((scenario) => (
           <Area
             key={scenario.id}
             type="monotone"
-            dataKey={scenario.name}
+            dataKey={scenario.plan_name}
             stackId="1"
-            stroke={COLORS[scenario.type as keyof typeof COLORS] || COLORS.custom}
-            fill={COLORS[scenario.type as keyof typeof COLORS] || COLORS.custom}
+            stroke={COLORS[scenario.scenarioType as keyof typeof COLORS] || COLORS.custom}
+            fill={COLORS[scenario.scenarioType as keyof typeof COLORS] || COLORS.custom}
             fillOpacity={0.7}
           />
         ))}
@@ -328,11 +327,11 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
             <div key={scenario.id} className="flex items-center gap-2">
               <div 
                 className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: COLORS[scenario.type as keyof typeof COLORS] || COLORS.custom }}
+                style={{ backgroundColor: COLORS[scenario.scenarioType as keyof typeof COLORS] || COLORS.custom }}
               />
-              <span className="text-sm font-medium">{scenario.name}</span>
+              <span className="text-sm font-medium">{scenario.plan_name}</span>
               <Badge variant="outline" className="text-xs">
-                {scenario.type}
+                {scenario.scenarioType}
               </Badge>
             </div>
           ))}
@@ -349,8 +348,8 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
               </div>
               <div className="text-sm text-blue-700">
                 {selectedScenarios.reduce((min, scenario) => 
-                  scenario.totalCost < min.totalCost ? scenario : min
-                ).name}
+                  (scenario.calculatedMetrics?.totalCost || 0) < (min.calculatedMetrics?.totalCost || 0) ? scenario : min
+                ).plan_name}
               </div>
             </div>
             
@@ -361,8 +360,8 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
               </div>
               <div className="text-sm text-green-700">
                 {selectedScenarios.reduce((min, scenario) => 
-                  scenario.totalDuration < min.totalDuration ? scenario : min
-                ).name}
+                  (scenario.calculatedMetrics?.payoffTimeMonths || 0) < (min.calculatedMetrics?.payoffTimeMonths || 0) ? scenario : min
+                ).plan_name}
               </div>
             </div>
             
@@ -372,9 +371,9 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
                 <span className="text-sm font-medium text-purple-900">Lowest Risk</span>
               </div>
               <div className="text-sm text-purple-700">
-                {selectedScenarios.find(s => s.riskLevel === 'low')?.name || 
-                 selectedScenarios.find(s => s.riskLevel === 'medium')?.name ||
-                 selectedScenarios[0]?.name}
+                {selectedScenarios.find(s => s.riskLevel === 'low')?.plan_name || 
+                 selectedScenarios.find(s => s.riskLevel === 'medium')?.plan_name ||
+                 selectedScenarios[0]?.plan_name}
               </div>
             </div>
           </div>

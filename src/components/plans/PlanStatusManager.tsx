@@ -15,9 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { 
   FileText, 
   Play, 
-  Pause, 
   CheckCircle, 
-  XCircle, 
   Clock, 
   AlertTriangle,
   MessageSquare,
@@ -30,8 +28,7 @@ import {
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
 import { toast } from 'sonner'
-
-export type PlanStatus = 'draft' | 'active' | 'paused' | 'completed' | 'cancelled' | 'archived'
+import type { PlanStatus } from '@/lib/supabase/types'
 
 export interface PlanStatusHistory {
   id: string
@@ -50,8 +47,7 @@ export interface PlanStatusInfo {
   canTransitionTo: PlanStatus[]
   estimatedCompletionDate?: Date
   actualCompletionDate?: Date
-  pausedReason?: string
-  cancelledReason?: string
+  archiveReason?: string
 }
 
 interface PlanStatusManagerProps {
@@ -76,23 +72,11 @@ const STATUS_CONFIG = {
     icon: Play,
     description: 'Plan is currently being executed'
   },
-  paused: {
-    label: 'Paused',
-    color: 'bg-yellow-100 text-yellow-800',
-    icon: Pause,
-    description: 'Plan execution is temporarily stopped'
-  },
   completed: {
     label: 'Completed',
     color: 'bg-green-100 text-green-800',
     icon: CheckCircle,
     description: 'Plan has been successfully completed'
-  },
-  cancelled: {
-    label: 'Cancelled',
-    color: 'bg-red-100 text-red-800',
-    icon: XCircle,
-    description: 'Plan was cancelled before completion'
   },
   archived: {
     label: 'Archived',
@@ -103,11 +87,9 @@ const STATUS_CONFIG = {
 }
 
 const TRANSITION_RULES: Record<PlanStatus, PlanStatus[]> = {
-  draft: ['active', 'cancelled'],
-  active: ['paused', 'completed', 'cancelled'],
-  paused: ['active', 'cancelled'],
+  draft: ['active', 'archived'],
+  active: ['completed', 'archived'],
   completed: ['archived'],
-  cancelled: ['draft', 'archived'],
   archived: []
 }
 
@@ -140,8 +122,8 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
     if (!selectedTransition) return
 
     // Validate required fields based on transition
-    if ((selectedTransition === 'paused' || selectedTransition === 'cancelled') && !transitionReason.trim()) {
-      toast.error('Please provide a reason for this status change')
+    if (selectedTransition === 'archived' && !transitionReason.trim()) {
+      toast.error('Please provide a reason for archiving this plan')
       return
     }
 
@@ -157,10 +139,8 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
   const getStatusProgress = () => {
     const progressMap = {
       draft: 0,
-      active: statusInfo.progress || 25,
-      paused: statusInfo.progress || 25,
+      active: statusInfo.progress || 50,
       completed: 100,
-      cancelled: 0,
       archived: 100
     }
     return progressMap[currentStatus] || 0
@@ -183,8 +163,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
 
   const getEstimatedCompletion = () => {
     if (currentStatus === 'completed') return 'Completed'
-    if (currentStatus === 'cancelled') return 'Cancelled'
-    if (currentStatus === 'paused') return 'Paused'
+    if (currentStatus === 'archived') return 'Archived'
     if (!statusInfo.estimatedCompletionDate) return 'Not set'
     
     const isOverdue = statusInfo.estimatedCompletionDate < new Date()
@@ -261,20 +240,11 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
         </div>
 
         {/* Status-specific Information */}
-        {currentStatus === 'paused' && statusInfo.pausedReason && (
+        {currentStatus === 'archived' && statusInfo.archiveReason && (
           <Alert>
-            <Pause className="h-4 w-4" />
+            <Archive className="h-4 w-4" />
             <AlertDescription>
-              <strong>Paused Reason:</strong> {statusInfo.pausedReason}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {currentStatus === 'cancelled' && statusInfo.cancelledReason && (
-          <Alert>
-            <XCircle className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Cancelled Reason:</strong> {statusInfo.cancelledReason}
+              <strong>Archive Reason:</strong> {statusInfo.archiveReason}
             </AlertDescription>
           </Alert>
         )}
@@ -339,7 +309,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
                 </div>
               </div>
 
-              {(selectedTransition === 'paused' || selectedTransition === 'cancelled') && (
+              {selectedTransition === 'archived' && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
                     Reason <span className="text-red-500">*</span>

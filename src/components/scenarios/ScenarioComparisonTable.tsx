@@ -29,10 +29,10 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
-import type { TimelineScenario } from '@/components/timeline/TimelineVisualization'
+import type { FinancialScenario } from '@/types/scenario'
 
 interface ScenarioComparisonTableProps {
-  scenarios: TimelineScenario[]
+  scenarios: FinancialScenario[]
   selectedScenarioIds: string[]
   onScenarioSelect: (scenarioId: string) => void
   className?: string
@@ -43,7 +43,7 @@ interface ComparisonMetric {
   label: string
   icon: React.ComponentType<any>
   format: (value: any) => string
-  accessor: (scenario: TimelineScenario) => any
+  accessor: (scenario: FinancialScenario) => any
   type: 'currency' | 'percentage' | 'number' | 'months' | 'text'
   importance: 'high' | 'medium' | 'low'
 }
@@ -54,7 +54,7 @@ const comparisonMetrics: ComparisonMetric[] = [
     label: 'Monthly Payment',
     icon: DollarSign,
     format: (value) => formatCurrency(value),
-    accessor: (scenario) => scenario.monthlyPayment,
+    accessor: (scenario) => scenario.calculatedMetrics?.monthlyPayment || 0,
     type: 'currency',
     importance: 'high'
   },
@@ -63,7 +63,7 @@ const comparisonMetrics: ComparisonMetric[] = [
     label: 'Total Interest',
     icon: Calculator,
     format: (value) => formatCurrency(value),
-    accessor: (scenario) => scenario.totalInterest,
+    accessor: (scenario) => scenario.calculatedMetrics?.totalInterest || 0,
     type: 'currency',
     importance: 'high'
   },
@@ -72,7 +72,7 @@ const comparisonMetrics: ComparisonMetric[] = [
     label: 'Total Cost',
     icon: Target,
     format: (value) => formatCurrency(value),
-    accessor: (scenario) => scenario.totalCost,
+    accessor: (scenario) => scenario.calculatedMetrics?.totalCost || 0,
     type: 'currency',
     importance: 'high'
   },
@@ -81,7 +81,7 @@ const comparisonMetrics: ComparisonMetric[] = [
     label: 'Loan Duration',
     icon: Calendar,
     format: (value) => `${value} months`,
-    accessor: (scenario) => scenario.totalDuration,
+    accessor: (scenario) => scenario.calculatedMetrics?.payoffTimeMonths || scenario.target_timeframe_months || 240,
     type: 'months',
     importance: 'medium'
   },
@@ -90,7 +90,7 @@ const comparisonMetrics: ComparisonMetric[] = [
     label: 'Interest Rate',
     icon: TrendingUp,
     format: (value) => `${value.toFixed(2)}%`,
-    accessor: (scenario) => scenario.interestRate,
+    accessor: (scenario) => scenario.expected_roi || 10.5,
     type: 'percentage',
     importance: 'high'
   },
@@ -116,7 +116,7 @@ const ScenarioComparisonTable: React.FC<ScenarioComparisonTableProps> = ({
   }, [scenarios, selectedScenarioIds])
 
   const baselineScenario = useMemo(() => {
-    return selectedScenarios.find(s => s.type === 'baseline') || selectedScenarios[0]
+    return selectedScenarios.find(s => s.scenarioType === 'baseline') || selectedScenarios[0]
   }, [selectedScenarios])
 
   const getComparisonIndicator = (currentValue: any, baselineValue: any, type: string) => {
@@ -163,8 +163,10 @@ const ScenarioComparisonTable: React.FC<ScenarioComparisonTableProps> = ({
         return 'bg-green-100 text-green-800 border-green-300'
       case 'pessimistic':
         return 'bg-red-100 text-red-800 border-red-300'
-      case 'custom':
+      case 'alternative':
         return 'bg-purple-100 text-purple-800 border-purple-300'
+      case 'stress_test':
+        return 'bg-orange-100 text-orange-800 border-orange-300'
       default:
         return 'bg-gray-100 text-gray-800 border-gray-300'
     }
@@ -224,13 +226,13 @@ const ScenarioComparisonTable: React.FC<ScenarioComparisonTableProps> = ({
                 {selectedScenarios.map((scenario) => (
                   <TableHead key={scenario.id} className="text-center min-w-[150px]">
                     <div className="space-y-2">
-                      <div className="font-medium">{scenario.name}</div>
+                      <div className="font-medium">{scenario.plan_name}</div>
                       <div className="flex items-center justify-center gap-2">
                         <Badge 
                           variant="outline" 
-                          className={cn('text-xs', getScenarioTypeColor(scenario.type))}
+                          className={cn('text-xs', getScenarioTypeColor(scenario.scenarioType))}
                         >
-                          {scenario.type}
+                          {scenario.scenarioType}
                         </Badge>
                         <Badge 
                           variant="outline" 
@@ -302,8 +304,8 @@ const ScenarioComparisonTable: React.FC<ScenarioComparisonTableProps> = ({
           <h4 className="font-medium mb-4">Scenario Summary</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {selectedScenarios.map((scenario) => {
-              const totalCost = scenario.totalCost
-              const bestCost = Math.min(...selectedScenarios.map(s => s.totalCost))
+              const totalCost = scenario.calculatedMetrics?.totalCost || 0
+              const bestCost = Math.min(...selectedScenarios.map(s => s.calculatedMetrics?.totalCost || 0))
               const costSavings = totalCost - bestCost
               const isBest = totalCost === bestCost
 
@@ -327,7 +329,7 @@ const ScenarioComparisonTable: React.FC<ScenarioComparisonTableProps> = ({
                   )}
                   
                   <div className="space-y-2">
-                    <div className="font-medium text-sm">{scenario.name}</div>
+                    <div className="font-medium text-sm">{scenario.plan_name}</div>
                     <div className="text-xs text-gray-600">
                       Total Cost: {formatCurrency(totalCost)}
                     </div>

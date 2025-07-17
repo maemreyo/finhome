@@ -188,7 +188,7 @@ const MobileTimelineEvent: React.FC<MobileTimelineEventProps> = ({
                   </p>
                   
                   {/* Event Details */}
-                  {(event.balanceAfterEvent || event.paymentChange) && (
+                  {(event.balanceAfterEvent || event.financialImpact) && (
                     <div className="space-y-2">
                       {event.balanceAfterEvent && (
                         <div className="flex justify-between text-sm">
@@ -199,15 +199,15 @@ const MobileTimelineEvent: React.FC<MobileTimelineEventProps> = ({
                         </div>
                       )}
                       
-                      {event.paymentChange && (
+                      {event.financialImpact && (
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-500">Payment Change:</span>
+                          <span className="text-gray-500">Financial Impact:</span>
                           <span className={cn(
                             "font-medium",
-                            event.paymentChange > 0 ? "text-red-600" : "text-green-600"
+                            event.financialImpact > 0 ? "text-green-600" : "text-red-600"
                           )}>
-                            {event.paymentChange > 0 ? "+" : ""}
-                            {formatCurrency(event.paymentChange)}
+                            {event.financialImpact > 0 ? "+" : ""}
+                            {formatCurrency(event.financialImpact)}
                           </span>
                         </div>
                       )}
@@ -270,7 +270,7 @@ export const MobileTimeline: React.FC<MobileTimelineProps> = ({
   
   // Touch gesture handling
   const handleSwipe = (direction: 'up' | 'down') => {
-    if (direction === 'up' && currentIndex < scenario.events.length - 1) {
+    if (direction === 'up' && currentIndex < (scenario.events?.length || 0) - 1) {
       setCurrentIndex(prev => prev + 1)
     } else if (direction === 'down' && currentIndex > 0) {
       setCurrentIndex(prev => prev - 1)
@@ -281,7 +281,7 @@ export const MobileTimeline: React.FC<MobileTimelineProps> = ({
   useEffect(() => {
     if (containerRef.current) {
       const currentMonth = new Date().getMonth()
-      const currentEventIndex = scenario.events.findIndex(
+      const currentEventIndex = (scenario.events || []).findIndex(
         event => event.month >= currentMonth
       )
       
@@ -295,10 +295,10 @@ export const MobileTimeline: React.FC<MobileTimelineProps> = ({
     <div className={cn("w-full max-w-md mx-auto", className)}>
       {/* Timeline Header */}
       <div className="mb-4 p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg">
-        <h3 className="font-bold text-lg">{scenario.name}</h3>
+        <h3 className="font-bold text-lg">{scenario.plan_name}</h3>
         <div className="flex justify-between items-center mt-2">
           <div className="text-sm opacity-90">
-            {scenario.events.length} Events
+            {scenario.events?.length || 0} Events
           </div>
           <Badge 
             variant="secondary" 
@@ -328,12 +328,12 @@ export const MobileTimeline: React.FC<MobileTimelineProps> = ({
           }
         }}
       >
-        {scenario.events.map((event, index) => (
+        {(scenario.events || []).map((event, index) => (
           <MobileTimelineEvent
             key={event.id}
             event={event}
             index={index}
-            isLast={index === scenario.events.length - 1}
+            isLast={index === (scenario.events?.length || 0) - 1}
             onEventClick={onEventClick}
             onPrepaymentAdd={onPrepaymentAdd}
           />
@@ -344,14 +344,14 @@ export const MobileTimeline: React.FC<MobileTimelineProps> = ({
       <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
           <span>Progress</span>
-          <span>{Math.round((currentIndex / scenario.events.length) * 100)}%</span>
+          <span>{Math.round((currentIndex / (scenario.events?.length || 1)) * 100)}%</span>
         </div>
         
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <motion.div
             className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: `${(currentIndex / scenario.events.length) * 100}%` }}
+            animate={{ width: `${(currentIndex / (scenario.events?.length || 1)) * 100}%` }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
           />
         </div>
@@ -360,14 +360,14 @@ export const MobileTimeline: React.FC<MobileTimelineProps> = ({
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div className="text-center">
             <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
-              {scenario.totalDuration}M
+              {scenario.calculatedMetrics?.payoffTimeMonths || 0}M
             </div>
             <div className="text-xs text-gray-500">Total Duration</div>
           </div>
           
           <div className="text-center">
             <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
-              {formatCurrency(scenario.totalInterest)}
+              {formatCurrency(scenario.calculatedMetrics?.totalInterest || 0)}
             </div>
             <div className="text-xs text-gray-500">Total Interest</div>
           </div>
