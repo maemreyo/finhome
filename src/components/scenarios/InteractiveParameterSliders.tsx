@@ -136,7 +136,7 @@ export default function InteractiveParameterSliders({
     monthlyExpenses: baseScenario.monthly_expenses || 20000000,
     currentSavings: baseScenario.current_savings || 0,
     otherDebts: 0,
-    expectedRentalIncome: baseScenario.expected_rental_income,
+    expectedRentalIncome: baseScenario.expected_rental_income || undefined,
     expectedAppreciationRate: 6.5,
     riskTolerance: 'moderate',
     investmentHorizonMonths: 240,
@@ -187,7 +187,7 @@ export default function InteractiveParameterSliders({
       monthly_income: params.monthlyIncome,
       monthly_expenses: params.monthlyExpenses,
       current_savings: params.currentSavings,
-      expected_rental_income: params.expectedRentalIncome,
+      expected_rental_income: params.expectedRentalIncome || null,
       calculatedMetrics: {
         monthlyPayment,
         totalInterest: monthlyPayment * params.loanTermYears * 12 - calculatedLoanAmount,

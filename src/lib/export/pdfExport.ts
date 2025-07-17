@@ -90,7 +90,7 @@ export class FinancialPlanWithMetricsPDFExporter {
     // Plan name
     this.doc.setFontSize(16)
     this.doc.setFont('helvetica', 'normal')
-    this.doc.text(plan.planName, this.pageWidth / 2, 35, { align: 'center' })
+    this.doc.text(plan.plan_name, this.pageWidth / 2, 35, { align: 'center' })
     
     // Generation date
     this.doc.setFontSize(10)
@@ -111,19 +111,19 @@ export class FinancialPlanWithMetricsPDFExporter {
     this.addSectionTitle('Plan Overview')
     
     const overviewData = [
-      ['Plan Type', this.formatPlanType(plan.planType)],
-      ['Property Price', formatCurrency(plan.purchasePrice)],
-      ['Down Payment', `${formatCurrency(plan.downPayment)} (${((plan.downPayment / plan.purchasePrice) * 100).toFixed(1)}%)`],
-      ['Loan Amount', formatCurrency(plan.purchasePrice - plan.downPayment)],
-      ['Monthly Income', formatCurrency(plan.monthlyIncome)],
-      ['Monthly Expenses', formatCurrency(plan.monthlyExpenses)],
-      ['Current Savings', formatCurrency(plan.currentSavings)],
-      ['Plan Status', plan.planStatus.toUpperCase()],
-      ['Created Date', plan.createdAt.toLocaleDateString('vi-VN')]
+      ['Plan Type', this.formatPlanType(plan.plan_type)],
+      ['Property Price', formatCurrency(plan.purchase_price || 0)],
+      ['Down Payment', `${formatCurrency(plan.down_payment || 0)} (${(((plan.down_payment || 0) / (plan.purchase_price || 1)) * 100).toFixed(1)}%)`],
+      ['Loan Amount', formatCurrency((plan.purchase_price || 0) - (plan.down_payment || 0))],
+      ['Monthly Income', formatCurrency(plan.monthly_income || 0)],
+      ['Monthly Expenses', formatCurrency(plan.monthly_expenses || 0)],
+      ['Current Savings', formatCurrency(plan.current_savings || 0)],
+      ['Plan Status', plan.status.toUpperCase()],
+      ['Created Date', new Date(plan.created_at).toLocaleDateString('vi-VN')]
     ]
 
-    if (plan.expectedRentalIncome) {
-      overviewData.splice(6, 0, ['Expected Rental Income', formatCurrency(plan.expectedRentalIncome)])
+    if (plan.expected_rental_income) {
+      overviewData.splice(6, 0, ['Expected Rental Income', formatCurrency(plan.expected_rental_income)])
     }
 
     this.doc.autoTable({
@@ -155,7 +155,7 @@ export class FinancialPlanWithMetricsPDFExporter {
     this.addSectionTitle('Financial Summary')
     
     // Calculate metrics
-    const loanAmount = plan.purchasePrice - plan.downPayment
+    const loanAmount = (plan.purchase_price || 0) - (plan.down_payment || 0)
     const loanParams: LoanParameters = {
       principal: loanAmount,
       annualRate: 10.5,
@@ -165,15 +165,15 @@ export class FinancialPlanWithMetricsPDFExporter {
     }
 
     const personalFinances = {
-      monthlyIncome: plan.monthlyIncome,
-      monthlyExpenses: plan.monthlyExpenses
+      monthlyIncome: plan.monthly_income || 0,
+      monthlyExpenses: plan.monthly_expenses || 0
     }
 
-    const investmentParams = plan.expectedRentalIncome ? {
-      expectedRentalIncome: plan.expectedRentalIncome,
-      propertyExpenses: plan.expectedRentalIncome * 0.1,
+    const investmentParams = plan.expected_rental_income ? {
+      expectedRentalIncome: plan.expected_rental_income,
+      propertyExpenses: plan.expected_rental_income * 0.1,
       appreciationRate: 8,
-      initialPropertyValue: plan.purchasePrice
+      initialPropertyValue: plan.purchase_price || 0
     } : undefined
 
     const metrics = calculateFinancialMetrics(
@@ -188,7 +188,7 @@ export class FinancialPlanWithMetricsPDFExporter {
       ['Total Interest', formatCurrency(metrics.totalInterest)],
       ['Debt-to-Income Ratio', `${metrics.debtToIncomeRatio.toFixed(1)}%`],
       ['Affordability Score', `${metrics.affordabilityScore}/10`],
-      ['Net Monthly Cash Flow', formatCurrency(plan.monthlyIncome - plan.monthlyExpenses - metrics.monthlyPayment + (plan.expectedRentalIncome || 0))]
+      ['Net Monthly Cash Flow', formatCurrency((plan.monthly_income || 0) - (plan.monthly_expenses || 0) - metrics.monthlyPayment + (plan.expected_rental_income || 0))]
     ]
 
     if (metrics.roi) {
@@ -228,21 +228,21 @@ export class FinancialPlanWithMetricsPDFExporter {
     this.addSectionTitle('Detailed Financial Breakdown')
     
     // Monthly cash flow breakdown
-    const monthlyPayment = plan.monthlyPayment || 0
-    const rentalIncome = plan.expectedRentalIncome || 0
-    const netIncome = plan.monthlyIncome - plan.monthlyExpenses
+    const monthlyPayment = (plan.cached_calculations as any)?.monthlyPayment || 0
+    const rentalIncome = plan.expected_rental_income || 0
+    const netIncome = (plan.monthly_income || 0) - (plan.monthly_expenses || 0)
     const netCashFlow = netIncome - monthlyPayment + rentalIncome
 
     const breakdownData = [
       ['INCOME', '', ''],
-      ['Monthly Salary', formatCurrency(plan.monthlyIncome), ''],
+      ['Monthly Salary', formatCurrency(plan.monthly_income || 0), ''],
       ['Rental Income', formatCurrency(rentalIncome), ''],
-      ['Total Monthly Income', formatCurrency(plan.monthlyIncome + rentalIncome), ''],
+      ['Total Monthly Income', formatCurrency((plan.monthly_income || 0) + rentalIncome), ''],
       ['', '', ''],
       ['EXPENSES', '', ''],
-      ['Living Expenses', formatCurrency(plan.monthlyExpenses), ''],
+      ['Living Expenses', formatCurrency(plan.monthly_expenses || 0), ''],
       ['Loan Payment', formatCurrency(monthlyPayment), ''],
-      ['Total Monthly Expenses', formatCurrency(plan.monthlyExpenses + monthlyPayment), ''],
+      ['Total Monthly Expenses', formatCurrency((plan.monthly_expenses || 0) + monthlyPayment), ''],
       ['', '', ''],
       ['NET CASH FLOW', formatCurrency(netCashFlow), netCashFlow >= 0 ? 'POSITIVE' : 'NEGATIVE']
     ]
@@ -338,7 +338,7 @@ export class FinancialPlanWithMetricsPDFExporter {
     this.addSectionTitle('Key Milestones Timeline')
     
     const milestones = [
-      { event: 'Contract Signing', date: 'Month 0', amount: formatCurrency(plan.downPayment) },
+      { event: 'Contract Signing', date: 'Month 0', amount: formatCurrency(plan.down_payment || 0) },
       { event: 'Property Handover', date: 'Month 1', amount: 'Keys received' },
       { event: 'Promotional Rate Ends', date: 'Month 24', amount: 'Payment increases' },
       { event: 'Break-even Point', date: 'Month 60', amount: 'Investment neutral' },
@@ -451,8 +451,8 @@ export class FinancialPlanWithMetricsPDFExporter {
     const risks = []
     
     // Debt-to-income ratio risk
-    const monthlyPayment = plan.monthlyPayment || 0
-    const debtRatio = (monthlyPayment / plan.monthlyIncome) * 100
+    const monthlyPayment = (plan.cached_calculations as any)?.monthlyPayment || 0
+    const debtRatio = (monthlyPayment / (plan.monthly_income || 1)) * 100
     
     if (debtRatio > 40) {
       risks.push({
@@ -469,7 +469,7 @@ export class FinancialPlanWithMetricsPDFExporter {
     }
     
     // Down payment risk
-    const downPaymentRatio = (plan.downPayment / plan.purchasePrice) * 100
+    const downPaymentRatio = ((plan.down_payment || 0) / (plan.purchase_price || 1)) * 100
     if (downPaymentRatio < 20) {
       risks.push({
         factor: 'Low Down Payment',
@@ -479,11 +479,12 @@ export class FinancialPlanWithMetricsPDFExporter {
     }
     
     // Affordability risk
-    if (plan.affordabilityScore && plan.affordabilityScore < 5) {
+    const affordabilityScore = (plan.cached_calculations as any)?.affordabilityScore
+    if (affordabilityScore && affordabilityScore < 5) {
       risks.push({
         factor: 'Poor Affordability',
         level: 'HIGH',
-        description: `Affordability score of ${plan.affordabilityScore}/10 indicates high financial stress`
+        description: `Affordability score of ${affordabilityScore}/10 indicates high financial stress`
       })
     }
     
@@ -507,9 +508,10 @@ export class FinancialPlanWithMetricsPDFExporter {
 
   private generateRecommendations(plan: FinancialPlanWithMetrics): Array<{title: string, description: string}> {
     const recommendations = []
+    const affordabilityScore = (plan.cached_calculations as any)?.affordabilityScore
     
     // Affordability recommendations
-    if (plan.affordabilityScore && plan.affordabilityScore >= 8) {
+    if (affordabilityScore && affordabilityScore >= 8) {
       recommendations.push({
         title: 'Consider Early Payments',
         description: 'Your excellent affordability score suggests you could make additional principal payments to save on interest and pay off the loan earlier.'
@@ -517,8 +519,8 @@ export class FinancialPlanWithMetricsPDFExporter {
     }
     
     // Cash flow recommendations
-    const monthlyPayment = plan.monthlyPayment || 0
-    const netFlow = plan.monthlyIncome - plan.monthlyExpenses - monthlyPayment + (plan.expectedRentalIncome || 0)
+    const monthlyPayment = (plan.cached_calculations as any)?.monthlyPayment || 0
+    const netFlow = (plan.monthly_income || 0) - (plan.monthly_expenses || 0) - monthlyPayment + (plan.expected_rental_income || 0)
     
     if (netFlow < 0) {
       recommendations.push({
@@ -528,7 +530,8 @@ export class FinancialPlanWithMetricsPDFExporter {
     }
     
     // Investment recommendations
-    if (plan.planType === 'investment' && plan.roi && plan.roi < 8) {
+    const roi = (plan.cached_calculations as any)?.roi
+    if (plan.plan_type === 'investment' && roi && roi < 8) {
       recommendations.push({
         title: 'Review Investment Strategy',
         description: 'Current ROI projections are below market average. Consider alternative investment opportunities or ways to increase rental income.'
@@ -536,8 +539,8 @@ export class FinancialPlanWithMetricsPDFExporter {
     }
     
     // Emergency fund recommendation
-    const emergencyFund = plan.currentSavings - plan.downPayment
-    const monthlyExpenses = plan.monthlyExpenses
+    const emergencyFund = (plan.current_savings || 0) - (plan.down_payment || 0)
+    const monthlyExpenses = plan.monthly_expenses || 0
     if (emergencyFund < monthlyExpenses * 6) {
       recommendations.push({
         title: 'Build Emergency Fund',
@@ -578,7 +581,7 @@ export async function exportFinancialPlanToPDF(
     const url = URL.createObjectURL(pdfBlob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `${plan.planName.replace(/[^a-z0-9]/gi, '_')}_financial_plan.pdf`
+    link.download = `${plan.plan_name.replace(/[^a-z0-9]/gi, '_')}_financial_plan.pdf`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)

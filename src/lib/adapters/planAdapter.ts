@@ -48,12 +48,12 @@ export function apiPlanToUIplan(apiPlan: APIPlan): UIFinancialPlan {
     createdAt: new Date(apiPlan.created_at),
     updatedAt: new Date(apiPlan.updated_at),
     // Calculated metrics from cached calculations
-    monthlyPayment: apiPlan.cached_calculations?.monthlyPayment,
-    totalInterest: apiPlan.cached_calculations?.totalInterest,
-    affordabilityScore: apiPlan.cached_calculations?.affordabilityScore,
-    riskLevel: getRiskLevel(apiPlan.cached_calculations?.affordabilityScore),
-    roi: apiPlan.cached_calculations?.roi,
-    expectedRentalIncome: apiPlan.expected_rental_income
+    monthlyPayment: apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).monthlyPayment : undefined,
+    totalInterest: apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).totalInterest : undefined,
+    affordabilityScore: apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).affordabilityScore : undefined,
+    riskLevel: getRiskLevel(apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).affordabilityScore : undefined),
+    roi: apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).roi : undefined,
+    expectedRentalIncome: apiPlan.expected_rental_income || undefined
   }
 }
 

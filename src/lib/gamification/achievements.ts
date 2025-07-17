@@ -246,10 +246,10 @@ export class AchievementEngine {
 
   private updateProgressData(plans: FinancialPlanWithMetrics[]): void {
     this.userProgress.progressData.plansCreated = plans.length
-    this.userProgress.progressData.plansCompleted = plans.filter(p => p.planStatus === 'completed').length
+    this.userProgress.progressData.plansCompleted = plans.filter(p => p.status === 'completed').length
     
     // Calculate highest ROI
-    const rois = plans.filter(p => p.roi).map(p => p.roi!)
+    const rois = plans.filter(p => (p.cached_calculations as any)?.roi).map(p => (p.cached_calculations as any).roi!)
     this.userProgress.progressData.highestROI = rois.length > 0 ? Math.max(...rois) : 0
     
     // This would be updated from actual user activity tracking

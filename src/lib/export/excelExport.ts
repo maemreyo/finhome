@@ -64,34 +64,34 @@ export class FinancialPlanExcelExporter {
       ['Generated on', new Date().toLocaleDateString('vi-VN')],
       [''],
       ['PLAN INFORMATION', ''],
-      ['Plan Name', plan.planName],
-      ['Plan Type', this.formatPlanType(plan.planType)],
-      ['Plan Status', plan.planStatus.toUpperCase()],
-      ['Created Date', plan.createdAt.toLocaleDateString('vi-VN')],
-      ['Last Updated', plan.updatedAt.toLocaleDateString('vi-VN')],
+      ['Plan Name', plan.plan_name],
+      ['Plan Type', this.formatPlanType(plan.plan_type)],
+      ['Plan Status', plan.status.toUpperCase()],
+      ['Created Date', new Date(plan.created_at).toLocaleDateString('vi-VN')],
+      ['Last Updated', new Date(plan.updated_at).toLocaleDateString('vi-VN')],
       [''],
       ['PROPERTY DETAILS', ''],
-      ['Purchase Price', plan.purchasePrice],
-      ['Down Payment', plan.downPayment],
-      ['Down Payment %', (plan.downPayment / plan.purchasePrice) * 100],
-      ['Loan Amount', plan.purchasePrice - plan.downPayment],
+      ['Purchase Price', plan.purchase_price || 0],
+      ['Down Payment', plan.down_payment || 0],
+      ['Down Payment %', ((plan.down_payment || 0) / (plan.purchase_price || 1)) * 100],
+      ['Loan Amount', (plan.purchase_price || 0) - (plan.down_payment || 0)],
       [''],
       ['PERSONAL FINANCES', ''],
-      ['Monthly Income', plan.monthlyIncome],
-      ['Monthly Expenses', plan.monthlyExpenses],
-      ['Current Savings', plan.currentSavings],
-      ['Net Monthly Income', plan.monthlyIncome - plan.monthlyExpenses]
+      ['Monthly Income', plan.monthly_income || 0],
+      ['Monthly Expenses', plan.monthly_expenses || 0],
+      ['Current Savings', plan.current_savings || 0],
+      ['Net Monthly Income', (plan.monthly_income || 0) - (plan.monthly_expenses || 0)]
     ]
 
-    if (plan.expectedRentalIncome) {
+    if (plan.expected_rental_income) {
       summaryData.push(
-        ['Expected Rental Income', plan.expectedRentalIncome],
-        ['Gross Rental Yield %', (plan.expectedRentalIncome * 12 / plan.purchasePrice) * 100]
+        ['Expected Rental Income', plan.expected_rental_income],
+        ['Gross Rental Yield %', (plan.expected_rental_income * 12 / (plan.purchase_price || 1)) * 100]
       )
     }
 
     // Calculate financial metrics
-    const loanAmount = plan.purchasePrice - plan.downPayment
+    const loanAmount = (plan.purchase_price || 0) - (plan.down_payment || 0)
     const loanParams: LoanParameters = {
       principal: loanAmount,
       annualRate: 10.5,
@@ -101,15 +101,15 @@ export class FinancialPlanExcelExporter {
     }
 
     const personalFinances = {
-      monthlyIncome: plan.monthlyIncome,
-      monthlyExpenses: plan.monthlyExpenses
+      monthlyIncome: plan.monthly_income || 0,
+      monthlyExpenses: plan.monthly_expenses || 0
     }
 
-    const investmentParams = plan.expectedRentalIncome ? {
-      expectedRentalIncome: plan.expectedRentalIncome,
-      propertyExpenses: plan.expectedRentalIncome * 0.1,
+    const investmentParams = plan.expected_rental_income ? {
+      expectedRentalIncome: plan.expected_rental_income,
+      propertyExpenses: plan.expected_rental_income * 0.1,
       appreciationRate: 8,
-      initialPropertyValue: plan.purchasePrice
+      initialPropertyValue: plan.purchase_price || 0
     } : undefined
 
     const metrics = calculateFinancialMetrics(
@@ -138,7 +138,7 @@ export class FinancialPlanExcelExporter {
     }
 
     // Net cash flow calculation
-    const netCashFlow = plan.monthlyIncome - plan.monthlyExpenses - metrics.monthlyPayment + (plan.expectedRentalIncome || 0)
+    const netCashFlow = (plan.monthly_income || 0) - (plan.monthly_expenses || 0) - metrics.monthlyPayment + (plan.expected_rental_income || 0)
     summaryData.push(
       [''],
       ['CASH FLOW ANALYSIS', ''],
@@ -160,27 +160,27 @@ export class FinancialPlanExcelExporter {
       ['Financial Plan Detailed Breakdown', ''],
       [''],
       ['MONTHLY INCOME BREAKDOWN', ''],
-      ['Primary Income', plan.monthlyIncome],
-      ['Rental Income', plan.expectedRentalIncome || 0],
-      ['Total Monthly Income', plan.monthlyIncome + (plan.expectedRentalIncome || 0)],
+      ['Primary Income', plan.monthly_income || 0],
+      ['Rental Income', plan.expected_rental_income || 0],
+      ['Total Monthly Income', (plan.monthly_income || 0) + (plan.expected_rental_income || 0)],
       [''],
       ['MONTHLY EXPENSE BREAKDOWN', ''],
-      ['Living Expenses', plan.monthlyExpenses],
-      ['Loan Payment (Promotional)', (plan.monthlyPayment || 0) * 0.75],
-      ['Loan Payment (Regular)', plan.monthlyPayment || 0],
-      ['Property Expenses (Est.)', (plan.expectedRentalIncome || 0) * 0.1],
-      ['Total Monthly Expenses', plan.monthlyExpenses + (plan.monthlyPayment || 0)],
+      ['Living Expenses', plan.monthly_expenses || 0],
+      ['Loan Payment (Promotional)', ((plan.cached_calculations as any)?.monthlyPayment || 0) * 0.75],
+      ['Loan Payment (Regular)', (plan.cached_calculations as any)?.monthlyPayment || 0],
+      ['Property Expenses (Est.)', (plan.expected_rental_income || 0) * 0.1],
+      ['Total Monthly Expenses', (plan.monthly_expenses || 0) + ((plan.cached_calculations as any)?.monthlyPayment || 0)],
       [''],
       ['ONE-TIME COSTS', ''],
-      ['Property Purchase Price', plan.purchasePrice],
-      ['Down Payment', plan.downPayment],
-      ['Transfer Tax (0.5%)', plan.purchasePrice * 0.005],
+      ['Property Purchase Price', plan.purchase_price || 0],
+      ['Down Payment', plan.down_payment || 0],
+      ['Transfer Tax (0.5%)', (plan.purchase_price || 0) * 0.005],
       ['Registration Fees (Est.)', 5000000],
       ['Lawyer Fees (Est.)', 3000000],
-      ['Total Upfront Costs', plan.downPayment + (plan.purchasePrice * 0.005) + 5000000 + 3000000],
+      ['Total Upfront Costs', (plan.down_payment || 0) + ((plan.purchase_price || 0) * 0.005) + 5000000 + 3000000],
       [''],
       ['LOAN DETAILS', ''],
-      ['Loan Principal', plan.purchasePrice - plan.downPayment],
+      ['Loan Principal', (plan.purchase_price || 0) - (plan.down_payment || 0)],
       ['Loan Term (Years)', 20],
       ['Promotional Rate (%)', 7.5],
       ['Promotional Period (Months)', 24],
@@ -189,16 +189,16 @@ export class FinancialPlanExcelExporter {
       ['INVESTMENT ANALYSIS', '']
     ]
 
-    if (plan.planType === 'investment' && plan.expectedRentalIncome) {
-      const annualRental = plan.expectedRentalIncome * 12
-      const grossYield = (annualRental / plan.purchasePrice) * 100
-      const netYield = ((annualRental - (annualRental * 0.1)) / plan.purchasePrice) * 100
+    if (plan.plan_type === 'investment' && plan.expected_rental_income) {
+      const annualRental = plan.expected_rental_income * 12
+      const grossYield = (annualRental / (plan.purchase_price || 1)) * 100
+      const netYield = ((annualRental - (annualRental * 0.1)) / (plan.purchase_price || 1)) * 100
       
       breakdownData.push(
         ['Annual Rental Income', annualRental],
         ['Gross Rental Yield (%)', grossYield],
         ['Net Rental Yield (%)', netYield],
-        ['Cash-on-Cash Return (%)', ((annualRental - (plan.monthlyPayment || 0) * 12) / plan.downPayment) * 100]
+        ['Cash-on-Cash Return (%)', ((annualRental - ((plan.cached_calculations as any)?.monthlyPayment || 0) * 12) / (plan.down_payment || 1)) * 100]
       )
     }
 
@@ -209,7 +209,7 @@ export class FinancialPlanExcelExporter {
   }
 
   private addAmortizationSchedule(plan: FinancialPlanWithMetrics): void {
-    const loanAmount = plan.purchasePrice - plan.downPayment
+    const loanAmount = (plan.purchase_price || 0) - (plan.down_payment || 0)
     const schedule = this.generateAmortizationSchedule(loanAmount, 7.5, 10.5, 240, 24)
     
     const scheduleData = [
@@ -238,8 +238,8 @@ export class FinancialPlanExcelExporter {
     ]
 
     let cumulativeCashFlow = 0
-    const annualRental = (plan.expectedRentalIncome || 0) * 12
-    const annualLoanPayment = (plan.monthlyPayment || 0) * 12
+    const annualRental = (plan.expected_rental_income || 0) * 12
+    const annualLoanPayment = ((plan.cached_calculations as any)?.monthlyPayment || 0) * 12
     const annualPropertyExpenses = annualRental * 0.1
 
     for (let year = 1; year <= years; year++) {
@@ -270,19 +270,19 @@ export class FinancialPlanExcelExporter {
     const scenarios = [
       {
         name: 'Conservative (80% LTV, 25 years)',
-        downPayment: plan.purchasePrice * 0.2,
+        downPayment: (plan.purchase_price || 0) * 0.2,
         loanTerm: 25,
         rate: 10.5
       },
       {
         name: 'Moderate (70% LTV, 20 years)',
-        downPayment: plan.purchasePrice * 0.3,
+        downPayment: (plan.purchase_price || 0) * 0.3,
         loanTerm: 20,
         rate: 10.5
       },
       {
         name: 'Aggressive (60% LTV, 15 years)',
-        downPayment: plan.purchasePrice * 0.4,
+        downPayment: (plan.purchase_price || 0) * 0.4,
         loanTerm: 15,
         rate: 10.5
       }
@@ -296,7 +296,7 @@ export class FinancialPlanExcelExporter {
     const metrics = ['Down Payment', 'Loan Amount', 'Monthly Payment', 'Total Interest', 'Total Cost']
 
     scenarios.forEach((scenario, index) => {
-      const loanAmount = plan.purchasePrice - scenario.downPayment
+      const loanAmount = (plan.purchase_price || 0) - scenario.downPayment
       const monthlyRate = scenario.rate / 100 / 12
       const totalMonths = scenario.loanTerm * 12
       
@@ -481,7 +481,7 @@ export async function exportFinancialPlanToExcel(
     const url = URL.createObjectURL(excelBlob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `${plan.planName.replace(/[^a-z0-9]/gi, '_')}_financial_analysis.xlsx`
+    link.download = `${plan.plan_name.replace(/[^a-z0-9]/gi, '_')}_financial_analysis.xlsx`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -502,19 +502,25 @@ export async function exportPlansComparison(
     
     // Create comparison sheet
     const comparisonData = [
-      ['Financial Plans Comparison', ...plans.map(p => p.planName)],
+      ['Financial Plans Comparison', ...plans.map(p => p.plan_name)],
       [''],
-      ['Plan Type', ...plans.map(p => p.planType)],
-      ['Purchase Price', ...plans.map(p => p.purchasePrice)],
-      ['Down Payment', ...plans.map(p => p.downPayment)],
-      ['Down Payment %', ...plans.map(p => (p.downPayment / p.purchasePrice * 100).toFixed(1) + '%')],
-      ['Monthly Income', ...plans.map(p => p.monthlyIncome)],
-      ['Monthly Expenses', ...plans.map(p => p.monthlyExpenses)],
-      ['Expected Rental', ...plans.map(p => p.expectedRentalIncome || 0)],
-      ['Monthly Payment', ...plans.map(p => p.monthlyPayment || 0)],
-      ['Affordability Score', ...plans.map(p => p.affordabilityScore || 0)],
-      ['Risk Level', ...plans.map(p => p.riskLevel || 'Unknown')],
-      ['ROI %', ...plans.map(p => p.roi ? p.roi.toFixed(1) + '%' : 'N/A')]
+      ['Plan Type', ...plans.map(p => p.plan_type)],
+      ['Purchase Price', ...plans.map(p => p.purchase_price || 0)],
+      ['Down Payment', ...plans.map(p => p.down_payment || 0)],
+      ['Down Payment %', ...plans.map(p => (((p.down_payment || 0) / (p.purchase_price || 1)) * 100).toFixed(1) + '%')],
+      ['Monthly Income', ...plans.map(p => p.monthly_income || 0)],
+      ['Monthly Expenses', ...plans.map(p => p.monthly_expenses || 0)],
+      ['Expected Rental', ...plans.map(p => p.expected_rental_income || 0)],
+      ['Monthly Payment', ...plans.map(p => (p.cached_calculations as any)?.monthlyPayment || 0)],
+      ['Affordability Score', ...plans.map(p => (p.cached_calculations as any)?.affordabilityScore || 0)],
+      ['Risk Level', ...plans.map(p => {
+        const score = (p.cached_calculations as any)?.affordabilityScore
+        return score ? (score >= 8 ? 'Low' : score >= 5 ? 'Medium' : 'High') : 'Unknown'
+      })],
+      ['ROI %', ...plans.map(p => {
+        const roi = (p.cached_calculations as any)?.roi
+        return roi ? roi.toFixed(1) + '%' : 'N/A'
+      })]
     ]
     
     const worksheet = XLSX.utils.aoa_to_sheet(comparisonData)

@@ -43,9 +43,12 @@ import { formatCurrency } from '@/lib/utils'
 import ScenarioComparisonTable from '@/components/scenarios/ScenarioComparisonTable'
 import ScenarioChart from '@/components/scenarios/ScenarioChart'
 import ScenarioParameterEditor from '@/components/scenarios/ScenarioParameterEditor'
+import AdvancedScenarioCharts from '@/components/scenarios/AdvancedScenarioCharts'
+import InteractiveParameterSliders from '@/components/scenarios/InteractiveParameterSliders'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import LoadingStates from '@/components/common/LoadingStates'
 import type { TimelineScenario } from '@/components/timeline/TimelineVisualization'
+import type { FinancialScenario, ScenarioParameters } from '@/types/scenario'
 
 // Create a helper function to generate mock scenarios
 const createMockScenario = (
@@ -167,6 +170,7 @@ const EnhancedScenariosPage: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingScenario, setEditingScenario] = useState<TimelineScenario | null>(null)
   const [smartScenariosLoading, setSmartScenariosLoading] = useState(false)
+  const [baseScenario, setBaseScenario] = useState<FinancialScenario | null>(null)
 
   // Filtered scenarios based on filters
   const filteredScenarios = useMemo(() => {
@@ -176,6 +180,29 @@ const EnhancedScenariosPage: React.FC = () => {
       return matchesRisk && matchesType
     })
   }, [scenarios, filterRiskLevel, filterType])
+
+  // Convert TimelineScenario to FinancialScenario for charts
+  const chartScenarios: FinancialScenario[] = useMemo(() => {
+    return scenarios.map(scenario => ({
+      ...scenario,
+      riskLevel: scenario.riskLevel,
+      calculatedMetrics: scenario.calculatedMetrics
+    } as FinancialScenario))
+  }, [scenarios])
+
+  // Handle parameter changes for interactive sliders
+  const handleParametersChange = (parameters: ScenarioParameters) => {
+    // Update base scenario with new parameters
+    console.log('Parameters changed:', parameters)
+  }
+
+  const handleScenarioUpdate = (scenario: FinancialScenario) => {
+    // Update the scenario in our list
+    const updatedScenarios = scenarios.map(s => 
+      s.id === scenario.id ? { ...s, ...scenario } : s
+    )
+    setScenarios(updatedScenarios)
+  }
 
   // Handle scenario selection
   const handleScenarioSelect = (scenarioId: string) => {
