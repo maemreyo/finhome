@@ -505,9 +505,11 @@ const EnhancedScenariosPage: React.FC = () => {
 
       {/* Main Content */}
       <Tabs defaultValue="comparison" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="comparison">Comparison Table</TabsTrigger>
           <TabsTrigger value="charts">Visual Charts</TabsTrigger>
+          <TabsTrigger value="advanced">Advanced Charts</TabsTrigger>
+          <TabsTrigger value="interactive">Interactive Sliders</TabsTrigger>
           <TabsTrigger value="analysis">Analysis</TabsTrigger>
         </TabsList>
 
@@ -529,6 +531,42 @@ const EnhancedScenariosPage: React.FC = () => {
               chartType={chartType}
               onChartTypeChange={setChartType}
             />
+          </ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="advanced" className="space-y-6">
+          <ErrorBoundary>
+            {chartScenarios.length > 0 ? (
+              <AdvancedScenarioCharts
+                scenarios={chartScenarios.filter(s => selectedScenarioIds.includes(s.id))}
+                selectedMetrics={['monthlyPayment', 'totalCost', 'dtiRatio', 'affordabilityScore']}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-8">
+                  <p className="text-center text-gray-500">Select scenarios to view advanced charts</p>
+                </CardContent>
+              </Card>
+            )}
+          </ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="interactive" className="space-y-6">
+          <ErrorBoundary>
+            {chartScenarios.length > 0 && selectedScenarioIds.length > 0 ? (
+              <InteractiveParameterSliders
+                baseScenario={chartScenarios.find(s => selectedScenarioIds.includes(s.id)) || chartScenarios[0]}
+                onParametersChange={handleParametersChange}
+                onScenarioUpdate={handleScenarioUpdate}
+                realTimeMode={true}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-8">
+                  <p className="text-center text-gray-500">Select at least one scenario to use interactive sliders</p>
+                </CardContent>
+              </Card>
+            )}
           </ErrorBoundary>
         </TabsContent>
 
