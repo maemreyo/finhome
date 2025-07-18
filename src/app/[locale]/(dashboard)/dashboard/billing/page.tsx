@@ -1,5 +1,7 @@
 // Billing management page with locale support
+'use client'
 
+import { useTranslations } from 'next-intl'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { SubscriptionCard } from '@/components/billing/SubscriptionCard'
 import { BillingHistory } from '@/components/billing/BillingHistory'
@@ -8,26 +10,22 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 type PageProps = {
-  params: Promise<{ locale: string }>
+  params: { locale: string }
 }
 
-export const metadata = {
-  title: 'Billing',
-  description: 'Manage your subscription and billing information',
-}
-
-export default async function BillingPage({ params }: PageProps) {
-  const { locale } = await params
+export default function BillingPage({ params }: PageProps) {
+  const t = useTranslations('Dashboard.Billing')
+  const { locale } = params
 
   return (
     <DashboardShell
-      title="Billing"
-      description="Manage your subscription, payment methods, and billing history"
+      title={t('title')}
+      description={t('description')}
       headerAction={
         <Button asChild>
           <Link href={`/${locale}/pricing`}>
             <ExternalLink className="mr-2 h-4 w-4" />
-            View All Plans
+            {t('viewAllPlans')}
           </Link>
         </Button>
       }

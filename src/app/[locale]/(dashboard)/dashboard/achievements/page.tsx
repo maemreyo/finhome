@@ -38,8 +38,8 @@ export default function AchievementsPage() {
   const achievements = [
     {
       id: 1,
-      title: t('achievements.newInvestor'),
-      description: 'Create your first financial plan',
+      title: t('achievements.newInvestor.title'),
+      description: t('achievements.newInvestor.description'),
       icon: Home,
       category: 'planning',
       status: 'completed',
@@ -49,8 +49,8 @@ export default function AchievementsPage() {
     },
     {
       id: 2,
-      title: t('achievements.strategist'),
-      description: 'Create 5 successful financial plans',
+      title: t('achievements.strategist.title'),
+      description: t('achievements.strategist.description'),
       icon: Target,
       category: 'planning',
       status: 'completed',
@@ -60,8 +60,8 @@ export default function AchievementsPage() {
     },
     {
       id: 3,
-      title: t('achievements.futureMillionaire'),
-      description: 'Reach savings goal of 1 billion VND',
+      title: t('achievements.futureMillionaire.title'),
+      description: t('achievements.futureMillionaire.description'),
       icon: Crown,
       category: 'savings',
       status: 'in_progress',
@@ -73,8 +73,8 @@ export default function AchievementsPage() {
     },
     {
       id: 4,
-      title: t('achievements.analysisExpert'),
-      description: 'Compare 10 investment scenarios',
+      title: t('achievements.analysisExpert.title'),
+      description: t('achievements.analysisExpert.description'),
       icon: BarChart3,
       category: 'investment',
       status: 'in_progress',
@@ -86,8 +86,8 @@ export default function AchievementsPage() {
     },
     {
       id: 5,
-      title: t('achievements.investmentMaster'),
-      description: 'Complete 3 successful investment plans',
+      title: t('achievements.investmentMaster.title'),
+      description: t('achievements.investmentMaster.description'),
       icon: Trophy,
       category: 'investment',
       status: 'locked',
@@ -99,8 +99,8 @@ export default function AchievementsPage() {
     },
     {
       id: 6,
-      title: t('achievements.persistent'),
-      description: 'Use the app for 30 consecutive days',
+      title: t('achievements.persistent.title'),
+      description: t('achievements.persistent.description'),
       icon: Zap,
       category: 'milestones',
       status: 'in_progress',

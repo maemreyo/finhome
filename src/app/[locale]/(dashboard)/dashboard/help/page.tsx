@@ -149,14 +149,14 @@ export default function HelpPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="h-5 w-5" />
-              Tìm Kiếm Hỗ Trợ
+              {t('search.title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Tìm kiếm câu hỏi thường gặp..."
+                placeholder={t('search.placeholder')}
                 className="pl-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -176,9 +176,9 @@ export default function HelpPage() {
           <TabsContent value="faq" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Câu Hỏi Thường Gặp</CardTitle>
+                <CardTitle>{t('faq.title')}</CardTitle>
                 <CardDescription>
-                  Tìm câu trả lời cho những câu hỏi phổ biến nhất
+                  {t('faq.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -216,9 +216,9 @@ export default function HelpPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Hướng Dẫn Nhanh</CardTitle>
+                <CardTitle>{t('quickStart.title')}</CardTitle>
                 <CardDescription>
-                  Các bước cơ bản để bắt đầu sử dụng FinHome
+                  {t('quickStart.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -228,9 +228,9 @@ export default function HelpPage() {
                       1
                     </div>
                     <div>
-                      <h4 className="font-medium">Hoàn thành hồ sơ cá nhân</h4>
+                      <h4 className="font-medium">{t('quickStart.step1.title')}</h4>
                       <p className="text-sm text-muted-foreground">
-                        Cập nhật thông tin cá nhân và tùy chọn cá nhân hóa
+                        {t('quickStart.step1.description')}
                       </p>
                     </div>
                   </div>
@@ -240,9 +240,9 @@ export default function HelpPage() {
                       2
                     </div>
                     <div>
-                      <h4 className="font-medium">Tạo kế hoạch tài chính đầu tiên</h4>
+                      <h4 className="font-medium">{t('quickStart.step2.title')}</h4>
                       <p className="text-sm text-muted-foreground">
-                        Sử dụng wizard tạo kế hoạch để thiết lập mục tiêu đầu tư
+                        {t('quickStart.step2.description')}
                       </p>
                     </div>
                   </div>
@@ -252,9 +252,9 @@ export default function HelpPage() {
                       3
                     </div>
                     <div>
-                      <h4 className="font-medium">Khám phá tính năng so sánh kịch bản</h4>
+                      <h4 className="font-medium">{t('quickStart.step3.title')}</h4>
                       <p className="text-sm text-muted-foreground">
-                        Phân tích các phương án đầu tư khác nhau
+                        {t('quickStart.step3.description')}
                       </p>
                     </div>
                   </div>
@@ -264,9 +264,9 @@ export default function HelpPage() {
                       4
                     </div>
                     <div>
-                      <h4 className="font-medium">Thử nghiệm trong Phòng Thí Nghiệm</h4>
+                      <h4 className="font-medium">{t('quickStart.step4.title')}</h4>
                       <p className="text-sm text-muted-foreground">
-                        Điều chỉnh các thông số để tối ưu hóa kế hoạch
+                        {t('quickStart.step4.description')}
                       </p>
                     </div>
                   </div>
@@ -281,16 +281,16 @@ export default function HelpPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Mail className="h-5 w-5" />
-                    Email
+                    {t('contact.email.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Gửi email cho chúng tôi
+                    {t('contact.email.description')}
                   </p>
                   <p className="font-medium">support@finhome.vn</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Phản hồi trong 24h
+                    {t('contact.email.response')}
                   </p>
                 </CardContent>
               </Card>
@@ -299,16 +299,16 @@ export default function HelpPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Phone className="h-5 w-5" />
-                    Điện thoại
+                    {t('contact.phone.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Gọi hotline hỗ trợ
+                    {t('contact.phone.description')}
                   </p>
                   <p className="font-medium">1900 1234</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    T2-T6: 8:00 - 18:00
+                    {t('contact.phone.hours')}
                   </p>
                 </CardContent>
               </Card>
@@ -317,18 +317,18 @@ export default function HelpPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
-                    Live Chat
+                    {t('contact.chat.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Trò chuyện trực tiếp
+                    {t('contact.chat.description')}
                   </p>
                   <Button className="w-full">
-                    Bắt đầu chat
+                    {t('contact.chat.button')}
                   </Button>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Trực tuyến 24/7
+                    {t('contact.chat.availability')}
                   </p>
                 </CardContent>
               </Card>
@@ -336,28 +336,28 @@ export default function HelpPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Gửi Yêu Cầu Hỗ Trợ</CardTitle>
+                <CardTitle>{t('supportForm.title')}</CardTitle>
                 <CardDescription>
-                  Mô tả vấn đề bạn gặp phải và chúng tôi sẽ hỗ trợ bạn
+                  {t('supportForm.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Tiêu đề</Label>
+                    <Label htmlFor="subject">{t('supportForm.subject')}</Label>
                     <Input
                       id="subject"
-                      placeholder="Mô tả ngắn gọn vấn đề..."
+                      placeholder={t('supportForm.subjectPlaceholder')}
                       value={contactForm.subject}
                       onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="message">Nội dung</Label>
+                    <Label htmlFor="message">{t('supportForm.message')}</Label>
                     <Textarea
                       id="message"
-                      placeholder="Mô tả chi tiết vấn đề bạn gặp phải..."
+                      placeholder={t('supportForm.messagePlaceholder')}
                       rows={4}
                       value={contactForm.message}
                       onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
@@ -365,7 +365,7 @@ export default function HelpPage() {
                   </div>
                   
                   <div className="flex justify-end">
-                    <Button type="submit">Gửi yêu cầu</Button>
+                    <Button type="submit">{t('supportForm.submit')}</Button>
                   </div>
                 </form>
               </CardContent>
@@ -375,9 +375,9 @@ export default function HelpPage() {
           <TabsContent value="tickets" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Yêu Cầu Hỗ Trợ Của Bạn</CardTitle>
+                <CardTitle>{t('tickets.title')}</CardTitle>
                 <CardDescription>
-                  Theo dõi trạng thái các yêu cầu hỗ trợ
+                  {t('tickets.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -391,17 +391,16 @@ export default function HelpPage() {
                           <div>
                             <p className="font-medium">{ticket.subject}</p>
                             <p className="text-sm text-muted-foreground">
-                              {ticket.id} • {new Date(ticket.created).toLocaleDateString('vi-VN')}
+                              {ticket.id} • {new Date(ticket.created).toLocaleDateString(t('locale'))}
                             </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant="outline">
-                            {ticket.status === 'resolved' ? 'Đã giải quyết' : 
-                             ticket.status === 'pending' ? 'Đang chờ' : 'Đang xử lý'}
+                            {t(`tickets.status.${ticket.status}`)}
                           </Badge>
                           <Button variant="ghost" size="sm">
-                            Chi tiết
+                            {t('tickets.details')}
                           </Button>
                         </div>
                       </div>

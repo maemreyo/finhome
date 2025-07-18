@@ -225,26 +225,26 @@ export default function DashboardPage({ params }: PageProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            Tổng Quan Tài Chính
+            {t('title')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Theo dõi tiến độ và quản lý đầu tư bất động sản của bạn
+            {t('description')}
           </p>
         </div>
         
         <div className="flex items-center gap-3">
           <Badge variant="outline" className="text-sm">
             <RefreshCw className="w-3 h-3 mr-1" />
-            Cập nhật: {lastUpdated.toLocaleTimeString('vi-VN')}
+            {t('lastUpdated', { time: lastUpdated.toLocaleTimeString(locale) })}
           </Badge>
           <NotificationCenter />
           <Button variant="outline" size="sm">
             <Settings className="w-4 h-4 mr-1" />
-            Cài Đặt
+            {t('settings')}
           </Button>
           <Button size="sm" onClick={handleCreatePlan}>
             <Plus className="w-4 h-4 mr-1" />
-            Tạo Kế Hoạch
+            {t('createPlan')}
           </Button>
         </div>
       </div>
@@ -275,7 +275,7 @@ export default function DashboardPage({ params }: PageProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calculator className="w-5 h-5 text-blue-600" />
-                    Hành Động Nhanh
+                    {t('quickActions.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -297,9 +297,9 @@ export default function DashboardPage({ params }: PageProps) {
                               {action.icon}
                             </div>
                             <div>
-                              <div className="font-medium">{action.title}</div>
+                              <div className="font-medium">{t(`quickActions.items.${action.id}.title`)}</div>
                               <div className="text-xs text-muted-foreground mt-1">
-                                {action.description}
+                                {t(`quickActions.items.${action.id}.description`)}
                               </div>
                             </div>
                           </div>
@@ -321,15 +321,15 @@ export default function DashboardPage({ params }: PageProps) {
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="portfolio" className="flex items-center gap-2">
                     <Home className="w-4 h-4" />
-                    Danh Mục BDS
+                    {t('tabs.portfolio')}
                   </TabsTrigger>
                   <TabsTrigger value="analytics" className="flex items-center gap-2">
                     <PieChart className="w-4 h-4" />
-                    Phân Tích
+                    {t('tabs.analytics')}
                   </TabsTrigger>
                   <TabsTrigger value="calendar" className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    Lịch Trình
+                    {t('tabs.schedule')}
                   </TabsTrigger>
                 </TabsList>
 
@@ -340,14 +340,14 @@ export default function DashboardPage({ params }: PageProps) {
                 <TabsContent value="analytics" className="space-y-4">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Phân Tích Đầu Tư</CardTitle>
+                      <CardTitle>{t('investmentAnalysis.title')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
                         <div className="text-center">
                           <PieChart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                           <p className="text-muted-foreground">
-                            Biểu đồ phân tích đầu tư sẽ hiển thị ở đây
+                            {t('investmentAnalysis.placeholder')}
                           </p>
                         </div>
                       </div>
@@ -358,14 +358,14 @@ export default function DashboardPage({ params }: PageProps) {
                 <TabsContent value="calendar" className="space-y-4">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Lịch Trình Tài Chính</CardTitle>
+                      <CardTitle>{t('financialSchedule.title')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
                         <div className="text-center">
                           <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                           <p className="text-muted-foreground">
-                            Lịch trình thanh toán và mục tiêu sẽ hiển thị ở đây
+                            {t('financialSchedule.placeholder')}
                           </p>
                         </div>
                       </div>
@@ -398,13 +398,13 @@ export default function DashboardPage({ params }: PageProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="w-5 h-5" />
-                    Market Insights
+                    {t('marketInsights.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Avg Price/m²</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('marketInsights.avgPrice')}</p>
                       <p className="text-lg font-bold text-blue-600">
                         {formatCurrency(marketData.averagePrice)}
                       </p>
@@ -415,12 +415,12 @@ export default function DashboardPage({ params }: PageProps) {
                     </div>
                     
                     <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Interest Rate</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('marketInsights.interestRate')}</p>
                       <p className="text-lg font-bold text-green-600">
                         {marketData.interestRates.promotional}%
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        Promotional rate
+                        {t('marketInsights.promotionalRate')}
                       </p>
                     </div>
                   </div>
@@ -447,25 +447,25 @@ export default function DashboardPage({ params }: PageProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Target className="w-5 h-5 text-purple-600" />
-                    Thống Kê Nhanh
+                    {t('quickStats.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Tổng kế hoạch:</span>
+                      <span className="text-sm text-muted-foreground">{t('quickStats.totalPlans')}:</span>
                       <span className="font-medium">3</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">BDS quan tâm:</span>
+                      <span className="text-sm text-muted-foreground">{t('quickStats.interestedProperties')}:</span>
                       <span className="font-medium">8</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Ngân hàng so sánh:</span>
+                      <span className="text-sm text-muted-foreground">{t('quickStats.comparedBanks')}:</span>
                       <span className="font-medium">12</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Thành tích:</span>
+                      <span className="text-sm text-muted-foreground">{t('quickStats.achievements')}:</span>
                       <span className="font-medium">7</span>
                     </div>
                   </div>

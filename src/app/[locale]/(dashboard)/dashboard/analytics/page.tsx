@@ -125,15 +125,15 @@ export default function AnalyticsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5" />
-                    Phân Bố Kế Hoạch
+                    {t('planDistribution.title')}
                   </CardTitle>
                   <CardDescription>
-                    Phân tích theo loại bất động sản và khu vực
+                    {t('planDistribution.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-64 flex items-center justify-center text-muted-foreground">
-                    Biểu đồ phân bố kế hoạch sẽ hiển thị tại đây
+                    {t('planDistribution.placeholder')}
                   </div>
                 </CardContent>
               </Card>
@@ -142,15 +142,15 @@ export default function AnalyticsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    Xu Hướng Đầu Tư
+                    {t('investmentTrends.title')}
                   </CardTitle>
                   <CardDescription>
-                    Theo dõi xu hướng đầu tư theo thời gian
+                    {t('investmentTrends.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-64 flex items-center justify-center text-muted-foreground">
-                    Biểu đồ xu hướng đầu tư sẽ hiển thị tại đây
+                    {t('investmentTrends.placeholder')}
                   </div>
                 </CardContent>
               </Card>
@@ -160,14 +160,14 @@ export default function AnalyticsPage() {
           <TabsContent value="performance" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Hiệu Suất Kế Hoạch</CardTitle>
+                <CardTitle>{t('planPerformance.title')}</CardTitle>
                 <CardDescription>
-                  Đánh giá hiệu suất các kế hoạch tài chính
+                  {t('planPerformance.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-96 flex items-center justify-center text-muted-foreground">
-                  Bảng hiệu suất kế hoạch sẽ hiển thị tại đây
+                  {t('planPerformance.placeholder')}
                 </div>
               </CardContent>
             </Card>
@@ -176,14 +176,14 @@ export default function AnalyticsPage() {
           <TabsContent value="trends" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Xu Hướng Thị Trường</CardTitle>
+                <CardTitle>{t('marketTrends.title')}</CardTitle>
                 <CardDescription>
-                  Phân tích xu hướng thị trường bất động sản
+                  {t('marketTrends.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-96 flex items-center justify-center text-muted-foreground">
-                  Biểu đồ xu hướng thị trường sẽ hiển thị tại đây
+                  {t('marketTrends.placeholder')}
                 </div>
               </CardContent>
             </Card>
@@ -194,16 +194,16 @@ export default function AnalyticsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5" />
-                  Mục Tiêu Tài Chính
+                  {t('financialGoals.title')}
                 </CardTitle>
                 <CardDescription>
-                  Theo dõi tiến độ đạt mục tiêu tài chính
+                  {t('financialGoals.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Mục tiêu tiết kiệm năm 2024</span>
+                    <span className="text-sm font-medium">{t('financialGoals.savingsGoal')}</span>
                     <span className="text-sm text-muted-foreground">75%</span>
                   </div>
                   <div className="w-full bg-secondary rounded-full h-2">
@@ -211,7 +211,7 @@ export default function AnalyticsPage() {
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Mục tiêu đầu tư bất động sản</span>
+                    <span className="text-sm font-medium">{t('financialGoals.investmentGoal')}</span>
                     <span className="text-sm text-muted-foreground">40%</span>
                   </div>
                   <div className="w-full bg-secondary rounded-full h-2">
@@ -219,7 +219,7 @@ export default function AnalyticsPage() {
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Mục tiêu lợi nhuận tối thiểu</span>
+                    <span className="text-sm font-medium">{t('financialGoals.profitGoal')}</span>
                     <span className="text-sm text-muted-foreground">90%</span>
                   </div>
                   <div className="w-full bg-secondary rounded-full h-2">

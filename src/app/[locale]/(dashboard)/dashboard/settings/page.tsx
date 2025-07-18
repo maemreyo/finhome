@@ -54,10 +54,10 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5" />
-                Cài Đặt Chung
+                {t('general.title')}
               </CardTitle>
               <CardDescription>
-                Quản lý thông tin cơ bản và tùy chọn hiển thị
+                {t('general.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -98,7 +98,7 @@ export default function SettingsPage() {
                   <SelectContent>
                     <SelectItem value="Asia/Ho_Chi_Minh">Việt Nam (UTC+7)</SelectItem>
                     <SelectItem value="Asia/Bangkok">Bangkok (UTC+7)</SelectItem>
-                    <SelectItem value="Asia/Singapore">Singapore (UTC+8)</SelectItem>
+                    <SelectItem value="Asia/Singapore">{t('general.timezones.singapore')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -266,9 +266,9 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Hiển thị gợi ý</Label>
+                    <Label>{t('preferences.showHints')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Hiển thị gợi ý và mẹo khi sử dụng
+                      {t('preferences.showHintsDescription')}
                     </p>
                   </div>
                   <Switch defaultChecked />
@@ -278,9 +278,9 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Tự động lưu kế hoạch</Label>
+                    <Label>{t('preferences.autoSave')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Tự động lưu các thay đổi trong kế hoạch
+                      {t('preferences.autoSaveDescription')}
                     </p>
                   </div>
                   <Switch defaultChecked />
@@ -290,9 +290,9 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Hiển thị biểu đồ nâng cao</Label>
+                    <Label>{t('preferences.showAdvancedCharts')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Hiển thị các biểu đồ phân tích chi tiết
+                      {t('preferences.showAdvancedChartsDescription')}
                     </p>
                   </div>
                   <Switch defaultChecked />
@@ -300,7 +300,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button>Lưu tùy chọn</Button>
+                <Button>{t('preferences.savePreferences')}</Button>
               </div>
             </CardContent>
           </Card>
@@ -314,21 +314,21 @@ export default function SettingsPage() {
                 Quản Lý Tài Khoản
               </CardTitle>
               <CardDescription>
-                Xuất dữ liệu và quản lý tài khoản
+                {t('account.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Xuất dữ liệu</Label>
+                    <Label>{t('account.exportData')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Tải xuống bản sao dữ liệu tài khoản của bạn
+                      {t('account.exportDataDescription')}
                     </p>
                   </div>
                   <Button variant="outline">
                     <Download className="mr-2 h-4 w-4" />
-                    Xuất dữ liệu
+                    {t('account.exportDataButton')}
                   </Button>
                 </div>
 
@@ -337,19 +337,19 @@ export default function SettingsPage() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-destructive">
                     <AlertTriangle className="h-4 w-4" />
-                    <Label>Vùng nguy hiểm</Label>
+                    <Label>{t('account.dangerZone')}</Label>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <Label>Xóa tài khoản</Label>
+                      <Label>{t('account.deleteAccount')}</Label>
                       <p className="text-sm text-muted-foreground">
-                        Xóa vĩnh viễn tài khoản và toàn bộ dữ liệu
+                        {t('account.deleteAccountDescription')}
                       </p>
                     </div>
                     <Button variant="destructive">
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Xóa tài khoản
+                      {t('account.deleteAccountButton')}
                     </Button>
                   </div>
                 </div>

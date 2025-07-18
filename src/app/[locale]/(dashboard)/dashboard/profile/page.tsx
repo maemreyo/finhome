@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useTranslations } from 'next-intl';
 import { useAuth, useProfile } from '@/hooks/useAuth'
 import { Loader2, Upload } from 'lucide-react'
 
@@ -27,6 +28,7 @@ const profileSchema = z.object({
 type ProfileForm = z.infer<typeof profileSchema>
 
 export default function ProfilePage() {
+  const t = useTranslations('Dashboard.Profile');
   const { user } = useAuth()
   const { profile, loading, updateProfile } = useProfile()
   const [isUpdating, setIsUpdating] = useState(false)
@@ -61,7 +63,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <DashboardShell title="Profile" description="Manage your account settings">
+      <DashboardShell title={t('title')} description={t('description')}>
         <Card>
           <CardContent className="p-6">
             <div className="animate-pulse space-y-4">
@@ -78,16 +80,16 @@ export default function ProfilePage() {
 
   return (
     <DashboardShell 
-      title="Profile" 
-      description="Manage your account settings and personal information"
+      title={t('title')} 
+      description={t('description')}
     >
       <div className="grid gap-6">
         {/* Profile Picture */}
         <Card>
           <CardHeader>
-            <CardTitle>Profile Picture</CardTitle>
+            <CardTitle>{t('picture.title')}</CardTitle>
             <CardDescription>
-              Update your profile picture to personalize your account
+              {t('picture.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -103,10 +105,10 @@ export default function ProfilePage() {
               </Avatar>
               <Button variant="outline" disabled>
                 <Upload className="mr-2 h-4 w-4" />
-                Upload Image
+                {t('picture.upload')}
               </Button>
               <p className="text-sm text-muted-foreground">
-                Coming soon: Upload custom profile pictures
+                {t('picture.comingSoon')}
               </p>
             </div>
           </CardContent>
@@ -115,19 +117,19 @@ export default function ProfilePage() {
         {/* Profile Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
+            <CardTitle>{t('info.title')}</CardTitle>
             <CardDescription>
-              Update your personal details and preferences
+              {t('info.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name</Label>
+                  <Label htmlFor="full_name">{t('info.name')}</Label>
                   <Input
                     id="full_name"
-                    placeholder="Enter your full name"
+                    placeholder={t('info.namePlaceholder')}
                     {...register('full_name')}
                   />
                   {errors.full_name && (
@@ -136,7 +138,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('info.email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -145,33 +147,33 @@ export default function ProfilePage() {
                     className="bg-muted"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Contact support to change your email address
+                    {t('info.emailDescription')}
                   </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="company">Company</Label>
+                  <Label htmlFor="company">{t('info.company')}</Label>
                   <Input
                     id="company"
-                    placeholder="Enter your company name"
+                    placeholder={t('info.companyPlaceholder')}
                     {...register('company')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="location">{t('info.location')}</Label>
                   <Input
                     id="location"
-                    placeholder="Enter your location"
+                    placeholder={t('info.locationPlaceholder')}
                     {...register('location')}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="website">Website</Label>
+                <Label htmlFor="website">{t('info.website')}</Label>
                 <Input
                   id="website"
                   type="url"
@@ -184,10 +186,10 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
+                <Label htmlFor="bio">{t('info.bio')}</Label>
                 <Textarea
                   id="bio"
-                  placeholder="Tell us about yourself..."
+                  placeholder={t('info.bioPlaceholder')}
                   className="resize-none"
                   rows={3}
                   {...register('bio')}
@@ -196,7 +198,7 @@ export default function ProfilePage() {
                   <p className="text-sm text-destructive">{errors.bio.message}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  Brief description for your profile. Maximum 160 characters.
+                  {t('info.bioDescription')}
                 </p>
               </div>
 
@@ -206,7 +208,7 @@ export default function ProfilePage() {
                   disabled={!isDirty || isUpdating}
                 >
                   {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
+                  {t('info.save')}
                 </Button>
               </div>
             </form>
@@ -216,22 +218,22 @@ export default function ProfilePage() {
         {/* Account Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Account Information</CardTitle>
+            <CardTitle>{t('account.title')}</CardTitle>
             <CardDescription>
-              View your account details and creation date
+              {t('account.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Account Created</Label>
+                  <Label className="text-sm font-medium">{t('account.created')}</Label>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
+                    {user?.created_at ? new Date(user.created_at).toLocaleDateString() : t('account.unknown')}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">User ID</Label>
+                  <Label className="text-sm font-medium">{t('account.userId')}</Label>
                   <p className="text-sm text-muted-foreground mt-1 font-mono">
                     {user?.id}
                   </p>

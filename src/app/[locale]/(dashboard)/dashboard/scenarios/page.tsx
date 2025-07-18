@@ -1,63 +1,95 @@
 // src/app/[locale]/dashboard/scenarios/page.tsx
 // Scenario comparison and management page with i18n support
 
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
-import { DashboardShell } from '@/components/dashboard/DashboardShell'
-import { ScenarioComparison } from '@/components/scenarios/ScenarioComparison'
-import { useScenarios } from '@/hooks/useScenarios'
-import { useAuth } from '@/hooks/useAuth'
-import type { FinancialScenario } from '@/types/scenario'
-import { useBankRates } from '@/hooks/useBankRates'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Plus, TrendingUp, Calculator, AlertCircle, Sparkles, RefreshCw } from 'lucide-react'
-import { toast } from 'sonner'
-import { formatCurrency } from '@/lib/utils'
-import { calculateMonthlyPayment } from '@/lib/financial/calculations'
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { ScenarioComparison } from "@/components/scenarios/ScenarioComparison";
+import { useScenarios } from "@/hooks/useScenarios";
+import { useAuth } from "@/hooks/useAuth";
+import type { FinancialScenario } from "@/types/scenario";
+import { useBankRates } from "@/hooks/useBankRates";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Plus,
+  TrendingUp,
+  Calculator,
+  AlertCircle,
+  Sparkles,
+  RefreshCw,
+} from "lucide-react";
+import { toast } from "sonner";
+import { formatCurrency } from "@/lib/utils";
+import { calculateMonthlyPayment } from "@/lib/financial/calculations";
 
 // Helper function to create mock financial scenarios
 const createMockScenario = (params: {
-  id: string
-  name: string
-  scenarioType: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test'
-  purchasePrice: number
-  downPayment: number
-  loanAmount: number
-  interestRate: number
-  loanTermYears: number
-  monthlyIncome: number
-  monthlyExpenses: number
-  riskLevel: 'low' | 'medium' | 'high'
+  id: string;
+  name: string;
+  scenarioType:
+    | "baseline"
+    | "optimistic"
+    | "pessimistic"
+    | "alternative"
+    | "stress_test";
+  purchasePrice: number;
+  downPayment: number;
+  loanAmount: number;
+  interestRate: number;
+  loanTermYears: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  riskLevel: "low" | "medium" | "high";
 }): FinancialScenario => {
   const monthlyPayment = calculateMonthlyPayment({
     principal: params.loanAmount,
     annualRate: params.interestRate,
-    termMonths: params.loanTermYears * 12
-  })
-  const totalInterest = (monthlyPayment * params.loanTermYears * 12) - params.loanAmount
-  const totalCost = params.purchasePrice + totalInterest
-  const dtiRatio = (monthlyPayment / params.monthlyIncome) * 100
-  const ltvRatio = (params.loanAmount / params.purchasePrice) * 100
+    termMonths: params.loanTermYears * 12,
+  });
+  const totalInterest =
+    monthlyPayment * params.loanTermYears * 12 - params.loanAmount;
+  const totalCost = params.purchasePrice + totalInterest;
+  const dtiRatio = (monthlyPayment / params.monthlyIncome) * 100;
+  const ltvRatio = (params.loanAmount / params.purchasePrice) * 100;
 
   return {
     // Base FinancialPlan fields
     id: params.id,
-    user_id: 'demo-user',
+    user_id: "demo-user",
     plan_name: params.name,
     description: `Mock ${params.scenarioType} scenario`,
-    plan_type: 'home_purchase',
-    status: 'draft',
+    plan_type: "home_purchase",
+    status: "draft",
     property_id: null,
     custom_property_data: null,
     target_age: null,
@@ -78,7 +110,7 @@ const createMockScenario = (params: {
     investment_purpose: null,
     desired_features: {},
     down_payment_target: null,
-    risk_tolerance: 'moderate',
+    risk_tolerance: "moderate",
     investment_horizon_months: null,
     expected_roi: 10.5,
     preferred_banks: null,
@@ -97,11 +129,11 @@ const createMockScenario = (params: {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     completed_at: null,
-    
+
     // Scenario-specific properties
     scenarioType: params.scenarioType,
     riskLevel: params.riskLevel,
-    
+
     // Calculated metrics
     calculatedMetrics: {
       monthlyPayment,
@@ -110,175 +142,209 @@ const createMockScenario = (params: {
       dtiRatio,
       ltvRatio,
       affordabilityScore: 7,
-      payoffTimeMonths: params.loanTermYears * 12
-    }
-  }
-}
-
-// Mock data for demonstration
-const mockScenarios: FinancialScenario[] = [
-  createMockScenario({
-    id: 'scenario-1',
-    name: 'Bảo Thủ - 30% vốn tự có',
-    scenarioType: 'baseline',
-    purchasePrice: 2500000000,
-    downPayment: 750000000,
-    loanAmount: 1750000000,
-    interestRate: 8.0,
-    loanTermYears: 15,
-    monthlyIncome: 45000000,
-    monthlyExpenses: 18000000,
-    riskLevel: 'low'
-  }),
-  createMockScenario({
-    id: 'scenario-2',
-    name: 'Cân Bằng - 20% vốn tự có',
-    scenarioType: 'alternative',
-    purchasePrice: 2500000000,
-    downPayment: 500000000,
-    loanAmount: 2000000000,
-    interestRate: 8.5,
-    loanTermYears: 20,
-    monthlyIncome: 45000000,
-    monthlyExpenses: 18000000,
-    riskLevel: 'medium'
-  }),
-  createMockScenario({
-    id: 'scenario-3',
-    name: 'Tích Cực - 15% vốn tự có',
-    scenarioType: 'optimistic',
-    purchasePrice: 2500000000,
-    downPayment: 375000000,
-    loanAmount: 2125000000,
-    interestRate: 9.0,
-    loanTermYears: 25,
-    monthlyIncome: 45000000,
-    monthlyExpenses: 18000000,
-    riskLevel: 'medium'
-  }),
-  createMockScenario({
-    id: 'scenario-4',
-    name: 'Rủi Ro Cao - 10% vốn tự có',
-    scenarioType: 'stress_test',
-    purchasePrice: 2500000000,
-    downPayment: 250000000,
-    loanAmount: 2250000000,
-    interestRate: 10.0,
-    loanTermYears: 30,
-    monthlyIncome: 45000000,
-    monthlyExpenses: 18000000,
-    riskLevel: 'high'
-  })
-]
+      payoffTimeMonths: params.loanTermYears * 12,
+    },
+  };
+};
 
 interface ScenarioGeneratorForm {
-  propertyPrice: number
-  monthlyIncome: number
-  monthlyExpenses: number
-  loanType: 'home_purchase' | 'investment' | 'commercial'
+  propertyPrice: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  loanType: "home_purchase" | "investment" | "commercial";
 }
 
 export default function ScenariosPage() {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const {
     scenarios,
     loading,
     error,
     createScenario,
     updateScenario,
-    deleteScenario
-  } = useScenarios(user?.id || '')
-  
-  const { rates, isLoading: ratesLoading, getRates } = useBankRates()
-  const [selectedScenario, setSelectedScenario] = useState<FinancialScenario | null>(null)
-  const [showCreateModal, setShowCreateModal] = useState(false)
+    deleteScenario,
+  } = useScenarios(user?.id || "");
+  const t = useTranslations("Dashboard.Scenarios");
+  const { rates, isLoading: ratesLoading, getRates } = useBankRates();
+  const [selectedScenario, setSelectedScenario] =
+    useState<FinancialScenario | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [generatorForm, setGeneratorForm] = useState<ScenarioGeneratorForm>({
     propertyPrice: 2500000000,
     monthlyIncome: 45000000,
     monthlyExpenses: 18000000,
-    loanType: 'home_purchase'
-  })
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedScenarios, setGeneratedScenarios] = useState<FinancialScenario[]>([])
+    loanType: "home_purchase",
+  });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedScenarios, setGeneratedScenarios] = useState<
+    FinancialScenario[]
+  >([]);
+
+  // Mock data for demonstration
+  const mockScenarios: FinancialScenario[] = [
+    createMockScenario({
+      id: "scenario-1",
+      name: t("mockScenarios.conservative.name"),
+      scenarioType: "baseline",
+      purchasePrice: 2500000000,
+      downPayment: 750000000,
+      loanAmount: 1750000000,
+      interestRate: 8.0,
+      loanTermYears: 15,
+      monthlyIncome: 45000000,
+      monthlyExpenses: 18000000,
+      riskLevel: "low",
+    }),
+    createMockScenario({
+      id: "scenario-2",
+      name: t("mockScenarios.balanced.name"),
+      scenarioType: "alternative",
+      purchasePrice: 2500000000,
+      downPayment: 500000000,
+      loanAmount: 2000000000,
+      interestRate: 8.5,
+      loanTermYears: 20,
+      monthlyIncome: 45000000,
+      monthlyExpenses: 18000000,
+      riskLevel: "medium",
+    }),
+    createMockScenario({
+      id: "scenario-3",
+      name: t("mockScenarios.optimistic.name"),
+      scenarioType: "optimistic",
+      purchasePrice: 2500000000,
+      downPayment: 375000000,
+      loanAmount: 2125000000,
+      interestRate: 9.0,
+      loanTermYears: 25,
+      monthlyIncome: 45000000,
+      monthlyExpenses: 18000000,
+      riskLevel: "medium",
+    }),
+    createMockScenario({
+      id: "scenario-4",
+      name: t("mockScenarios.highRisk.name"),
+      scenarioType: "stress_test",
+      purchasePrice: 2500000000,
+      downPayment: 250000000,
+      loanAmount: 2250000000,
+      interestRate: 10.0,
+      loanTermYears: 30,
+      monthlyIncome: 45000000,
+      monthlyExpenses: 18000000,
+      riskLevel: "high",
+    }),
+  ];
 
   const handleScenarioSelect = (scenario: FinancialScenario) => {
-    setSelectedScenario(scenario)
+    setSelectedScenario(scenario);
     // In a real app, this would navigate to a detailed view or apply the scenario
-    console.log('Selected scenario:', scenario)
-  }
+    console.log("Selected scenario:", scenario);
+  };
 
   const handleCreateNewScenario = () => {
-    setShowCreateModal(true)
+    setShowCreateModal(true);
     // Load latest bank rates when opening the modal
-    getRates({ loanType: generatorForm.loanType, isActive: true })
-  }
+    getRates({ loanType: generatorForm.loanType, isActive: true });
+  };
 
   const generateSmartScenarios = async () => {
-    setIsGenerating(true)
+    setIsGenerating(true);
     try {
       // Get current bank rates for the loan type
-      await getRates({ 
-        loanType: generatorForm.loanType, 
+      await getRates({
+        loanType: generatorForm.loanType,
         isActive: true,
         minAmount: generatorForm.propertyPrice * 0.7, // Assume 70% loan amount
-        maxAmount: generatorForm.propertyPrice * 0.9  // Max 90% loan amount
-      })
+        maxAmount: generatorForm.propertyPrice * 0.9, // Max 90% loan amount
+      });
 
       // Create scenarios with different down payment percentages
-      const downPaymentOptions = [10, 15, 20, 25, 30]
-      const loanTermOptions = [15, 20, 25, 30]
-      
-      const generatedScenarios: FinancialScenario[] = []
-      let scenarioId = 1
+      const downPaymentOptions = [10, 15, 20, 25, 30];
+      const loanTermOptions = [15, 20, 25, 30];
+
+      const generatedScenarios: FinancialScenario[] = [];
+      let scenarioId = 1;
 
       for (const downPaymentPercent of downPaymentOptions) {
         for (const loanTermYears of loanTermOptions) {
-          if (generatedScenarios.length >= 6) break // Limit to 6 scenarios
+          if (generatedScenarios.length >= 6) break; // Limit to 6 scenarios
 
-          const downPayment = Math.round(generatorForm.propertyPrice * (downPaymentPercent / 100))
-          const loanAmount = generatorForm.propertyPrice - downPayment
+          const downPayment = Math.round(
+            generatorForm.propertyPrice * (downPaymentPercent / 100)
+          );
+          const loanAmount = generatorForm.propertyPrice - downPayment;
 
           // Use rates from bank data or fallback to market average
-          const applicableRates = rates.filter(rate => 
-            (rate.min_amount || 0) <= loanAmount && 
-            (rate.max_amount || Infinity) >= loanAmount &&
-            (rate.min_term_months || 0) <= loanTermYears * 12 &&
-            (rate.max_term_months || Infinity) >= loanTermYears * 12
-          )
+          const applicableRates = rates.filter(
+            (rate) =>
+              (rate.min_amount || 0) <= loanAmount &&
+              (rate.max_amount || Infinity) >= loanAmount &&
+              (rate.min_term_months || 0) <= loanTermYears * 12 &&
+              (rate.max_term_months || Infinity) >= loanTermYears * 12
+          );
 
-          const bestRate = applicableRates.length > 0 ? 
-            Math.min(...applicableRates.map(r => r.promotional_rate || r.base_rate)) :
-            8.5 + (loanTermYears > 20 ? 1.0 : 0) + (downPaymentPercent < 20 ? 0.5 : 0)
+          const bestRate =
+            applicableRates.length > 0
+              ? Math.min(
+                  ...applicableRates.map(
+                    (r) => r.promotional_rate || r.base_rate
+                  )
+                )
+              : 8.5 +
+                (loanTermYears > 20 ? 1.0 : 0) +
+                (downPaymentPercent < 20 ? 0.5 : 0);
 
           const monthlyPayment = calculateMonthlyPayment({
             principal: loanAmount,
             annualRate: bestRate,
-            termMonths: loanTermYears * 12
-          })
+            termMonths: loanTermYears * 12,
+          });
 
-          const totalPayment = monthlyPayment * loanTermYears * 12
-          const totalInterest = totalPayment - loanAmount
-          const netCashFlow = generatorForm.monthlyIncome - generatorForm.monthlyExpenses - monthlyPayment
+          const totalPayment = monthlyPayment * loanTermYears * 12;
+          const totalInterest = totalPayment - loanAmount;
+          const netCashFlow =
+            generatorForm.monthlyIncome -
+            generatorForm.monthlyExpenses -
+            monthlyPayment;
 
           // Determine risk level and recommendation
-          const debtToIncomeRatio = (monthlyPayment / generatorForm.monthlyIncome) * 100
-          let riskLevel: 'low' | 'medium' | 'high' = 'low'
-          let recommendation: 'optimal' | 'safe' | 'aggressive' | 'risky' = 'safe'
+          const debtToIncomeRatio =
+            (monthlyPayment / generatorForm.monthlyIncome) * 100;
+          let riskLevel: "low" | "medium" | "high" = "low";
+          let recommendation: "optimal" | "safe" | "aggressive" | "risky" =
+            "safe";
 
-          if (debtToIncomeRatio > 45 || netCashFlow < 0 || downPaymentPercent < 15) {
-            riskLevel = 'high'
-            recommendation = 'risky'
+          if (
+            debtToIncomeRatio > 45 ||
+            netCashFlow < 0 ||
+            downPaymentPercent < 15
+          ) {
+            riskLevel = "high";
+            recommendation = "risky";
           } else if (debtToIncomeRatio > 35 || downPaymentPercent < 20) {
-            riskLevel = 'medium'
-            recommendation = 'aggressive'
-          } else if (debtToIncomeRatio <= 30 && downPaymentPercent >= 20 && netCashFlow > 5000000) {
-            recommendation = 'optimal'
+            riskLevel = "medium";
+            recommendation = "aggressive";
+          } else if (
+            debtToIncomeRatio <= 30 &&
+            downPaymentPercent >= 20 &&
+            netCashFlow > 5000000
+          ) {
+            recommendation = "optimal";
           }
 
           const scenario: FinancialScenario = createMockScenario({
             id: `generated-${scenarioId++}`,
-            name: `${downPaymentPercent}% vốn tự có - ${loanTermYears} năm`,
-            scenarioType: riskLevel === 'low' ? 'baseline' : riskLevel === 'medium' ? 'alternative' : 'stress_test',
+            name: t("generatedScenarioName", {
+              downPaymentPercent,
+              loanTermYears,
+            }),
+            scenarioType:
+              riskLevel === "low"
+                ? "baseline"
+                : riskLevel === "medium"
+                  ? "alternative"
+                  : "stress_test",
             purchasePrice: generatorForm.propertyPrice,
             downPayment,
             loanAmount,
@@ -286,52 +352,54 @@ export default function ScenariosPage() {
             loanTermYears,
             monthlyIncome: generatorForm.monthlyIncome,
             monthlyExpenses: generatorForm.monthlyExpenses,
-            riskLevel
-          })
+            riskLevel,
+          });
 
-          generatedScenarios.push(scenario)
+          generatedScenarios.push(scenario);
         }
-        if (generatedScenarios.length >= 6) break
+        if (generatedScenarios.length >= 6) break;
       }
 
       // Sort by risk level priority and add to scenarios
       const sortedScenarios = generatedScenarios.sort((a, b) => {
-        const priority = { low: 3, medium: 2, high: 1 }
-        return priority[b.riskLevel] - priority[a.riskLevel]
-      })
+        const priority = { low: 3, medium: 2, high: 1 };
+        return priority[b.riskLevel] - priority[a.riskLevel];
+      });
 
       // Note: In a real implementation, you would use the createScenario function
       // from the useScenarios hook to save these to the database
-      setGeneratedScenarios(sortedScenarios)
+      setGeneratedScenarios(sortedScenarios);
 
-      setShowCreateModal(false)
-      toast.success(`Generated ${sortedScenarios.length} scenarios based on current market rates!`)
-      
+      setShowCreateModal(false);
+      toast.success(t("generationSuccess", { count: sortedScenarios.length }));
     } catch (error) {
-      console.error('Error generating scenarios:', error)
-      toast.error('Failed to generate scenarios. Please try again.')
+      console.error("Error generating scenarios:", error);
+      toast.error(t("generationError"));
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
 
   // Load bank rates on component mount
   useEffect(() => {
-    getRates({ loanType: 'home_purchase', isActive: true })
-  }, [])
+    getRates({ loanType: "home_purchase", isActive: true });
+  }, []);
 
   // Use mock data for demo purposes when no user is authenticated
-  const displayScenarios = user ? scenarios : mockScenarios
-  const lowRiskScenarios = displayScenarios.filter(s => s.riskLevel === 'low')
-  const totalScenarios = displayScenarios.length
-  const avgMonthlyPayment = displayScenarios.reduce((sum, s) => sum + (s.calculatedMetrics?.monthlyPayment || 0), 0) / totalScenarios
+  const displayScenarios = user ? scenarios : mockScenarios;
+  const lowRiskScenarios = displayScenarios.filter(
+    (s) => s.riskLevel === "low"
+  );
+  const totalScenarios = displayScenarios.length;
+  const avgMonthlyPayment =
+    displayScenarios.reduce(
+      (sum, s) => sum + (s.calculatedMetrics?.monthlyPayment || 0),
+      0
+    ) / totalScenarios;
 
   if (loading && user) {
     return (
-      <DashboardShell 
-        title="So Sánh Kịch Bản" 
-        description="Phân tích và so sánh các tùy chọn vay khác nhau"
-      >
+      <DashboardShell title={t("title")} description={t("description")}>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Skeleton className="h-32" />
@@ -341,33 +409,30 @@ export default function ScenariosPage() {
           <Skeleton className="h-96" />
         </div>
       </DashboardShell>
-    )
+    );
   }
 
   if (error && user) {
     return (
-      <DashboardShell 
-        title="So Sánh Kịch Bản" 
-        description="Phân tích và so sánh các tùy chọn vay khác nhau"
-      >
+      <DashboardShell title={t("title")} description={t("description")}>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       </DashboardShell>
-    )
+    );
   }
 
   return (
-    <DashboardShell 
-      title="So Sánh Kịch Bản" 
-      description="Phân tích và so sánh các tùy chọn vay khác nhau"
+    <DashboardShell
+      title={t("title")}
+      description={t("description")}
       headerAction={
         <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Tạo Kịch Bản
+              {t("createScenarioButton")}
             </Button>
           </DialogTrigger>
         </Dialog>
@@ -379,146 +444,178 @@ export default function ScenariosPage() {
           <Alert className="border-blue-200 bg-blue-50">
             <AlertCircle className="h-4 w-4 text-blue-600" />
             <AlertDescription className="text-blue-800">
-              <strong>Chế độ Demo:</strong> Bạn đang xem dữ liệu mẫu. Đăng nhập để tạo và quản lý kịch bản thực tế của riêng bạn.
+              <strong>{t("demoMode.strong")}</strong> {t("demoMode.text")}
             </AlertDescription>
           </Alert>
         )}
-        
+
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tổng Kịch Bản</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {t("summary.totalScenarios")}
+              </CardTitle>
               <Calculator className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalScenarios}</div>
               <p className="text-xs text-muted-foreground">
-                Các tùy chọn đã tạo
+                {t("summary.optionsCreated")}
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Kịch Bản Tối Ưu</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {t("summary.optimalScenarios")}
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{lowRiskScenarios.length}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {lowRiskScenarios.length}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Được đánh giá tốt nhất
+                {t("summary.bestRated")}
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Trả Trung Bình</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {t("summary.averagePayment")}
+              </CardTitle>
               <Calculator className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {new Intl.NumberFormat('vi-VN', {
-                  style: 'currency',
-                  currency: 'VND',
-                  notation: 'compact',
-                  maximumFractionDigits: 1
+                {new Intl.NumberFormat(t("locale"), {
+                  style: "currency",
+                  currency: "VND",
+                  notation: "compact",
+                  maximumFractionDigits: 1,
                 }).format(avgMonthlyPayment)}
               </div>
               <p className="text-xs text-muted-foreground">
-                Hàng tháng
+                {t("summary.monthly")}
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Hành Động</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {t("summary.actions")}
+              </CardTitle>
               <Plus className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent className="space-y-2">
               <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
                 <DialogTrigger asChild>
-                  <Button 
+                  <Button
                     onClick={handleCreateNewScenario}
                     className="w-full"
                     size="sm"
                   >
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Tạo Thông Minh
+                    {t("smartGenerateButton")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5 text-blue-600" />
-                      Tạo Kịch Bản Thông Minh
+                      {t("smartGenerateModal.title")}
                     </DialogTitle>
                     <DialogDescription>
-                      Sử dụng lãi suất thị trường thực tế để tạo các kịch bản tối ưu
+                      {t("smartGenerateModal.description")}
                     </DialogDescription>
                   </DialogHeader>
-                  
+
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
-                      <Label htmlFor="propertyPrice">Giá bất động sản (VNĐ)</Label>
+                      <Label htmlFor="propertyPrice">
+                        {t("smartGenerateModal.propertyPrice")}
+                      </Label>
                       <Input
                         id="propertyPrice"
                         type="number"
                         value={generatorForm.propertyPrice}
-                        onChange={(e) => setGeneratorForm(prev => ({ 
-                          ...prev, 
-                          propertyPrice: Number(e.target.value) 
-                        }))}
+                        onChange={(e) =>
+                          setGeneratorForm((prev) => ({
+                            ...prev,
+                            propertyPrice: Number(e.target.value),
+                          }))
+                        }
                         placeholder="2,500,000,000"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="monthlyIncome">Thu nhập hàng tháng (VNĐ)</Label>
+                      <Label htmlFor="monthlyIncome">
+                        {t("smartGenerateModal.monthlyIncome")}
+                      </Label>
                       <Input
                         id="monthlyIncome"
                         type="number"
                         value={generatorForm.monthlyIncome}
-                        onChange={(e) => setGeneratorForm(prev => ({ 
-                          ...prev, 
-                          monthlyIncome: Number(e.target.value) 
-                        }))}
+                        onChange={(e) =>
+                          setGeneratorForm((prev) => ({
+                            ...prev,
+                            monthlyIncome: Number(e.target.value),
+                          }))
+                        }
                         placeholder="45,000,000"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="monthlyExpenses">Chi phí hàng tháng (VNĐ)</Label>
+                      <Label htmlFor="monthlyExpenses">
+                        {t("smartGenerateModal.monthlyExpenses")}
+                      </Label>
                       <Input
                         id="monthlyExpenses"
                         type="number"
                         value={generatorForm.monthlyExpenses}
-                        onChange={(e) => setGeneratorForm(prev => ({ 
-                          ...prev, 
-                          monthlyExpenses: Number(e.target.value) 
-                        }))}
+                        onChange={(e) =>
+                          setGeneratorForm((prev) => ({
+                            ...prev,
+                            monthlyExpenses: Number(e.target.value),
+                          }))
+                        }
                         placeholder="18,000,000"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="loanType">Loại vay</Label>
+                      <Label htmlFor="loanType">
+                        {t("smartGenerateModal.loanType")}
+                      </Label>
                       <Select
                         value={generatorForm.loanType}
-                        onValueChange={(value: any) => setGeneratorForm(prev => ({ 
-                          ...prev, 
-                          loanType: value 
-                        }))}
+                        onValueChange={(value: any) =>
+                          setGeneratorForm((prev) => ({
+                            ...prev,
+                            loanType: value,
+                          }))
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="home_purchase">Mua nhà ở</SelectItem>
-                          <SelectItem value="investment">Đầu tư</SelectItem>
-                          <SelectItem value="commercial">Thương mại</SelectItem>
+                          <SelectItem value="home_purchase">
+                            {t("smartGenerateModal.loanTypes.homePurchase")}
+                          </SelectItem>
+                          <SelectItem value="investment">
+                            {t("smartGenerateModal.loanTypes.investment")}
+                          </SelectItem>
+                          <SelectItem value="commercial">
+                            {t("smartGenerateModal.loanTypes.commercial")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -527,7 +624,7 @@ export default function ScenariosPage() {
                       <Alert>
                         <RefreshCw className="h-4 w-4 animate-spin" />
                         <AlertDescription>
-                          Đang tải lãi suất thị trường...
+                          {t("smartGenerateModal.loadingRates")}
                         </AlertDescription>
                       </Alert>
                     )}
@@ -536,7 +633,9 @@ export default function ScenariosPage() {
                       <Alert>
                         <TrendingUp className="h-4 w-4" />
                         <AlertDescription>
-                          Tìm thấy {rates.length} lãi suất áp dụng cho kịch bản của bạn
+                          {t("smartGenerateModal.ratesFound", {
+                            count: rates.length,
+                          })}
                         </AlertDescription>
                       </Alert>
                     )}
@@ -548,7 +647,7 @@ export default function ScenariosPage() {
                       variant="outline"
                       className="flex-1"
                     >
-                      Hủy
+                      {t("smartGenerateModal.cancel")}
                     </Button>
                     <Button
                       onClick={generateSmartScenarios}
@@ -558,21 +657,24 @@ export default function ScenariosPage() {
                       {isGenerating ? (
                         <>
                           <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                          Đang tạo...
+                          {t("smartGenerateModal.generating")}
                         </>
                       ) : (
                         <>
                           <Sparkles className="h-4 w-4 mr-2" />
-                          Tạo Kịch Bản
+                          {t("smartGenerateModal.generateButton")}
                         </>
                       )}
                     </Button>
                   </div>
                 </DialogContent>
               </Dialog>
-              
-              <Badge variant="outline" className="w-full justify-center text-xs">
-                {rates.length} lãi suất có sẵn
+
+              <Badge
+                variant="outline"
+                className="w-full justify-center text-xs"
+              >
+                {t("availableRates", { count: rates.length })}
               </Badge>
             </CardContent>
           </Card>
@@ -588,15 +690,16 @@ export default function ScenariosPage() {
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>Chưa có kịch bản nào</CardTitle>
-              <CardDescription>
-                Tạo kịch bản đầu tiên để bắt đầu so sánh các tùy chọn vay
-              </CardDescription>
+              <CardTitle>{t("noScenario.title")}</CardTitle>
+              <CardDescription>{t("noScenario.description")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={handleCreateNewScenario} className="flex items-center gap-2">
+              <Button
+                onClick={handleCreateNewScenario}
+                className="flex items-center gap-2"
+              >
                 <Plus className="w-4 h-4" />
-                Tạo Kịch Bản Đầu Tiên
+                {t("noScenario.createButton")}
               </Button>
             </CardContent>
           </Card>
@@ -606,99 +709,158 @@ export default function ScenariosPage() {
         {selectedScenario && (
           <Card>
             <CardHeader>
-              <CardTitle>Kịch Bản Đã Chọn</CardTitle>
+              <CardTitle>{t("selectedScenario.title")}</CardTitle>
               <CardDescription>
-                Chi tiết về kịch bản: {selectedScenario.plan_name}
+                {t("selectedScenario.description", {
+                  planName: selectedScenario.plan_name,
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-medium mb-2">Thông Tin Cơ Bản</h4>
+                  <h4 className="font-medium mb-2">
+                    {t("selectedScenario.basicInfo.title")}
+                  </h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span>Giá nhà:</span>
+                      <span>
+                        {t("selectedScenario.basicInfo.propertyPrice")}:
+                      </span>
                       <span className="font-medium">
-                        {new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                          notation: 'compact'
+                        {new Intl.NumberFormat(t("locale"), {
+                          style: "currency",
+                          currency: "VND",
+                          notation: "compact",
                         }).format(selectedScenario.purchase_price || 0)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Vốn tự có:</span>
+                      <span>
+                        {t("selectedScenario.basicInfo.downPayment")}:
+                      </span>
                       <span className="font-medium">
-                        {new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                          notation: 'compact'
-                        }).format(selectedScenario.down_payment || 0)} ({Math.round(((selectedScenario.down_payment || 0) / (selectedScenario.purchase_price || 1)) * 100)}%)
+                        {new Intl.NumberFormat(t("locale"), {
+                          style: "currency",
+                          currency: "VND",
+                          notation: "compact",
+                        }).format(selectedScenario.down_payment || 0)}{" "}
+                        (
+                        {Math.round(
+                          ((selectedScenario.down_payment || 0) /
+                            (selectedScenario.purchase_price || 1)) *
+                            100
+                        )}
+                        %)
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Số tiền vay:</span>
+                      <span>{t("selectedScenario.basicInfo.loanAmount")}:</span>
                       <span className="font-medium">
-                        {new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                          notation: 'compact'
-                        }).format((selectedScenario.purchase_price || 0) - (selectedScenario.down_payment || 0))}
+                        {new Intl.NumberFormat(t("locale"), {
+                          style: "currency",
+                          currency: "VND",
+                          notation: "compact",
+                        }).format(
+                          (selectedScenario.purchase_price || 0) -
+                            (selectedScenario.down_payment || 0)
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Thời gian vay:</span>
-                      <span className="font-medium">{Math.round((selectedScenario.loanCalculations?.[0]?.loan_term_months || 0) / 12)} năm</span>
+                      <span>{t("selectedScenario.basicInfo.loanTerm")}:</span>
+                      <span className="font-medium">
+                        {Math.round(
+                          (selectedScenario.loanCalculations?.[0]
+                            ?.loan_term_months || 0) / 12
+                        )}{" "}
+                        {t("selectedScenario.basicInfo.years")}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Lãi suất:</span>
-                      <span className="font-medium">{selectedScenario.loanCalculations?.[0]?.interest_rate || 0}%/năm</span>
+                      <span>
+                        {t("selectedScenario.basicInfo.interestRate")}:
+                      </span>
+                      <span className="font-medium">
+                        {selectedScenario.loanCalculations?.[0]
+                          ?.interest_rate || 0}
+                        %/{t("selectedScenario.basicInfo.perYear")}
+                      </span>
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
-                  <h4 className="font-medium mb-2">Tài Chính Hàng Tháng</h4>
+                  <h4 className="font-medium mb-2">
+                    {t("selectedScenario.monthlyFinance.title")}
+                  </h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span>Thu nhập:</span>
+                      <span>
+                        {t("selectedScenario.monthlyFinance.income")}:
+                      </span>
                       <span className="font-medium text-green-600">
-                        {new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                          notation: 'compact'
+                        {new Intl.NumberFormat(t("locale"), {
+                          style: "currency",
+                          currency: "VND",
+                          notation: "compact",
                         }).format(selectedScenario.monthly_income || 0)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Chi phí sinh hoạt:</span>
+                      <span>
+                        {t("selectedScenario.monthlyFinance.expenses")}:
+                      </span>
                       <span className="font-medium text-red-600">
-                        {new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                          notation: 'compact'
+                        {new Intl.NumberFormat(t("locale"), {
+                          style: "currency",
+                          currency: "VND",
+                          notation: "compact",
                         }).format(selectedScenario.monthly_expenses || 0)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Trả vay hàng tháng:</span>
+                      <span>
+                        {t(
+                          "selectedScenario.monthlyFinance.monthlyLoanPayment"
+                        )}
+                        :
+                      </span>
                       <span className="font-medium text-blue-600">
-                        {new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                          notation: 'compact'
-                        }).format(selectedScenario.calculatedMetrics?.monthlyPayment || 0)}
+                        {new Intl.NumberFormat(t("locale"), {
+                          style: "currency",
+                          currency: "VND",
+                          notation: "compact",
+                        }).format(
+                          selectedScenario.calculatedMetrics?.monthlyPayment ||
+                            0
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between border-t pt-2">
-                      <span className="font-medium">Dòng tiền ròng:</span>
-                      <span className={`font-bold ${(selectedScenario.monthly_income || 0) - (selectedScenario.monthly_expenses || 0) - (selectedScenario.calculatedMetrics?.monthlyPayment || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {(selectedScenario.monthly_income || 0) - (selectedScenario.monthly_expenses || 0) - (selectedScenario.calculatedMetrics?.monthlyPayment || 0) >= 0 ? '+' : ''}
-                        {new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                          notation: 'compact'
-                        }).format((selectedScenario.monthly_income || 0) - (selectedScenario.monthly_expenses || 0) - (selectedScenario.calculatedMetrics?.monthlyPayment || 0))}
+                      <span className="font-medium">
+                        {t("selectedScenario.monthlyFinance.netCashFlow")}:
+                      </span>
+                      <span
+                        className={`font-bold ${(selectedScenario.monthly_income || 0) - (selectedScenario.monthly_expenses || 0) - (selectedScenario.calculatedMetrics?.monthlyPayment || 0) >= 0 ? "text-green-600" : "text-red-600"}`}
+                      >
+                        {(selectedScenario.monthly_income || 0) -
+                          (selectedScenario.monthly_expenses || 0) -
+                          (selectedScenario.calculatedMetrics?.monthlyPayment ||
+                            0) >=
+                        0
+                          ? "+"
+                          : ""}
+                        {new Intl.NumberFormat(t("locale"), {
+                          style: "currency",
+                          currency: "VND",
+                          notation: "compact",
+                        }).format(
+                          (selectedScenario.monthly_income || 0) -
+                            (selectedScenario.monthly_expenses || 0) -
+                            (selectedScenario.calculatedMetrics
+                              ?.monthlyPayment || 0)
+                        )}
                       </span>
                     </div>
                   </div>
@@ -709,5 +871,5 @@ export default function ScenariosPage() {
         )}
       </div>
     </DashboardShell>
-  )
+  );
 }

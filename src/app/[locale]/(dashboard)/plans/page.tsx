@@ -302,13 +302,13 @@ export default function PlansPage() {
         // Show enhanced success message with rate info
         if (optimalRatesData && optimalRatesData.recommendedRates.length > 0) {
           const bestRate = optimalRatesData.recommendedRates[0]
-          toast.success(`${t('messages.createSuccess')} - Best rate found: ${bestRate.effectiveRate}%`)
+          toast.success(`${t('messages.createSuccess')} - ${t('messages.bestRateFound', { rate: bestRate.effectiveRate })}`)
         } else {
           toast.success(t('messages.createSuccess'))
         }
       } else {
         // For non-authenticated users, show demo message
-        toast.info('Demo mode: Sign in to save real financial plans')
+        toast.info(t('messages.demoMode.save'))
         setViewMode('list')
       }
     } catch (error) {

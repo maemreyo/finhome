@@ -126,9 +126,9 @@ const createMockScenario = (
 const mockScenarios: TimelineScenario[] = [
   createMockScenario(
     'scenario-baseline',
-    'Baseline Scenario',
+    t('enhancedScenarios.mockScenarios.baseline.name'),
     'baseline',
-    'Standard 20% down payment with current market rates',
+    t('enhancedScenarios.mockScenarios.baseline.description'),
     24500000,
     2880000000,
     5880000000,
@@ -137,9 +137,9 @@ const mockScenarios: TimelineScenario[] = [
   ),
   createMockScenario(
     'scenario-optimistic',
-    'Optimistic Scenario',
+    t('enhancedScenarios.mockScenarios.optimistic.name'),
     'optimistic',
-    'Lower interest rates with favorable market conditions',
+    t('enhancedScenarios.mockScenarios.optimistic.description'),
     21200000,
     2188000000,
     5188000000,
@@ -148,9 +148,9 @@ const mockScenarios: TimelineScenario[] = [
   ),
   createMockScenario(
     'scenario-pessimistic',
-    'Pessimistic Scenario',
+    t('enhancedScenarios.mockScenarios.pessimistic.name'),
     'pessimistic',
-    'Higher interest rates with conservative market outlook',
+    t('enhancedScenarios.mockScenarios.pessimistic.description'),
     28100000,
     3744000000,
     6744000000,
@@ -339,9 +339,9 @@ const EnhancedScenariosPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Enhanced Scenario Analysis</h1>
+          <h1 className="text-3xl font-bold">{t('enhancedScenarios.title')}</h1>
           <p className="text-gray-600 mt-2">
-            Compare multiple financial scenarios with advanced analytics
+            {t('enhancedScenarios.description')}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -355,7 +355,7 @@ const EnhancedScenariosPage: React.FC = () => {
             ) : (
               <Sparkles className="w-4 h-4 mr-2" />
             )}
-            Generate Smart Scenarios
+            {t('enhancedScenarios.generateSmartScenarios')}
           </Button>
           <Button
             variant="outline"
@@ -363,19 +363,19 @@ const EnhancedScenariosPage: React.FC = () => {
             disabled={selectedScenarioIds.length === 0}
           >
             <Download className="w-4 h-4 mr-2" />
-            Export
+            {t('enhancedScenarios.export')}
           </Button>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="w-4 h-4 mr-2" />
-                Create Scenario
+                {t('enhancedScenarios.createScenario')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
-                  {editingScenario ? 'Edit Scenario' : 'Create New Scenario'}
+                  {editingScenario ? t('enhancedScenarios.editScenario') : t('enhancedScenarios.createNewScenario')}
                 </DialogTitle>
               </DialogHeader>
               <ErrorBoundary>
