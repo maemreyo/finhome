@@ -1,7 +1,7 @@
 // src/lib/services/dashboardService.ts
 // Database service functions for dashboard analytics and data integration
 
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import type { 
   FinancialPlan, 
   AnalyticsMetric, 
@@ -17,7 +17,7 @@ import type {
 
 export class DashboardService {
   private static getClient() {
-    return createClient()
+    return supabase
   }
 
   // ===== DASHBOARD METRICS =====
@@ -35,11 +35,21 @@ export class DashboardService {
       const propertiesData: any[] = []
 
       // Get user experience points (handle missing data gracefully)
-      const { data: experienceData, error: experienceError } = await supabase
-        .from('user_experience')
-        .select('total_experience, current_level')
-        .eq('user_id', userId)
-        .maybeSingle()
+      let experienceData = null
+      try {
+        const { data, error: experienceError } = await supabase
+          .from('user_experience')
+          .select('total_experience, current_level')
+          .eq('user_id', userId)
+          .maybeSingle()
+        
+        if (!experienceError && data) {
+          experienceData = data
+        }
+      } catch (error) {
+        // Silently handle missing table or RLS issues
+        experienceData = null
+      }
 
       // Get unread notifications count
       const { data: notificationsData, error: notificationsError } = await supabase
@@ -272,38 +282,39 @@ export class DashboardService {
         .from('user_experience')
         .select('*')
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
       if (error) {
-        // Handle "no rows returned" error by returning default values
-        if (error.code === 'PGRST116') {
-          return {
-            id: userId,
-            user_id: userId,
-            total_experience: 0,
-            current_level: 1,
-            experience_in_level: 0,
-            experience_to_next_level: 100,
-            plans_created: 0,
-            calculations_performed: 0,
-            properties_viewed: 0,
-            achievements_unlocked: 0,
-            days_active: 0,
-            current_login_streak: 0,
-            longest_login_streak: 0,
-            last_activity_date: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        }
-        console.error('Error fetching user experience:', error)
-        return null
+        console.warn('Error fetching user experience:', error)
+        return this.getDefaultUserExperience(userId)
       }
 
-      return data
+      // Return data if found, otherwise return default
+      return data || this.getDefaultUserExperience(userId)
     } catch (error) {
-      console.error('Database connection error:', error)
-      return null
+      console.warn('User experience table not available:', error)
+      return this.getDefaultUserExperience(userId)
+    }
+  }
+
+  private static getDefaultUserExperience(userId: string) {
+    return {
+      id: userId,
+      user_id: userId,
+      total_experience: 0,
+      current_level: 1,
+      experience_in_level: 0,
+      experience_to_next_level: 100,
+      plans_created: 0,
+      calculations_performed: 0,
+      properties_viewed: 0,
+      achievements_unlocked: 0,
+      days_active: 0,
+      current_login_streak: 0,
+      longest_login_streak: 0,
+      last_activity_date: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
   }
 

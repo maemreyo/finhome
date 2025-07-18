@@ -1,29 +1,25 @@
 // lib/supabase/client.ts
-// Supabase client configuration with TypeScript types
+// Unified Supabase client with SSR support and singleton pattern
 
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from './types'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Create Supabase client with TypeScript types
-export const supabase = createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10
-    }
-  }
-})
+// Singleton instance to prevent multiple GoTrueClient instances
+let supabaseInstance: ReturnType<typeof createBrowserClient<Database>> | null = null
 
-// Export a function to create a new client (for admin operations)
-export const createClient = () => supabase
+// Function to get or create the singleton SSR-compatible Supabase client
+export const createClient = () => {
+  if (!supabaseInstance) {
+    supabaseInstance = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
+  }
+  return supabaseInstance
+}
+
+// Export the singleton instance for backward compatibility
+export const supabase = createClient()
 
 // Export types for use throughout the application
 export type { Database } from './types'

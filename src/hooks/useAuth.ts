@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabaseClient as supabase } from '@/lib/supabase/client-ssr'
+import { supabase } from '@/lib/supabase/client'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { toast } from 'sonner'
 
