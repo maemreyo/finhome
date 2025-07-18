@@ -4,7 +4,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -30,62 +30,82 @@ interface SidebarProps {
   className?: string
 }
 
-const navigation = [
+// Navigation items with existing status
+const navigationItems = [
   {
     name: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
+    exists: true,
   },
   {
     name: 'Kế Hoạch Tài Chính',
     href: '/dashboard/plans',
     icon: FileText,
+    exists: true,
   },
   {
     name: 'So Sánh Kịch Bản',
     href: '/dashboard/scenarios',
     icon: Calculator,
+    exists: true,
   },
   {
     name: 'Phòng Thí Nghiệm',
     href: '/dashboard/laboratory',
     icon: Beaker,
-  },
-  {
-    name: 'Phân Tích',
-    href: '/dashboard/analytics',
-    icon: BarChart3,
-  },
-  {
-    name: 'Thành Tích',
-    href: '/dashboard/achievements',
-    icon: Trophy,
+    exists: true,
   },
   {
     name: 'Hồ Sơ',
     href: '/dashboard/profile',
     icon: User,
+    exists: true,
   },
   {
     name: 'Thanh Toán',
     href: '/dashboard/billing',
     icon: CreditCard,
+    exists: true,
+  },
+  // These pages exist
+  {
+    name: 'Phân Tích',
+    href: '/dashboard/analytics',
+    icon: BarChart3,
+    exists: true,
+  },
+  {
+    name: 'Thành Tích',
+    href: '/dashboard/achievements',
+    icon: Trophy,
+    exists: true,
   },
   {
     name: 'Cài Đặt',
     href: '/dashboard/settings',
     icon: Settings,
+    exists: true,
   },
   {
     name: 'Trợ Giúp',
     href: '/dashboard/help',
     icon: HelpCircle,
+    exists: true,
   },
 ]
 
 export function Sidebar({ className }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const pathname = usePathname()
+  const params = useParams()
+  const locale = params?.locale as string || 'en'
+
+  // Create locale-prefixed navigation
+  const navigation = navigationItems.filter(item => item.exists).map(item => ({
+    ...item,
+    href: `/${locale}${item.href}`
+  }))
 
   return (
     <>
@@ -116,7 +136,7 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center border-b px-6">
-            <Link href="/dashboard" className="flex items-center space-x-2">
+            <Link href={`/${locale}/dashboard`} className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <Home className="h-5 w-5 text-primary-foreground" />
               </div>
@@ -131,7 +151,7 @@ export function Sidebar({ className }: SidebarProps) {
             <nav className="space-y-1">
               {navigation.map((item) => {
                 const isActive = pathname === item.href || 
-                  (item.href !== '/dashboard' && pathname.startsWith(item.href))
+                  (item.href !== `/${locale}/dashboard` && pathname.startsWith(item.href))
                 
                 return (
                   <Link

@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { Header } from '@/components/dashboard/Header'
+import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { ScenarioComparison } from '@/components/scenarios/ScenarioComparison'
 import { useScenarios } from '@/hooks/useScenarios'
 import type { FinancialScenario } from '@/types/scenario'
@@ -324,12 +324,11 @@ export default function ScenariosPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <Header 
-          title="So Sánh Kịch Bản" 
-          description="Phân tích và so sánh các tùy chọn vay khác nhau"
-        />
-        <div className="p-6 space-y-6">
+      <DashboardShell 
+        title="So Sánh Kịch Bản" 
+        description="Phân tích và so sánh các tùy chọn vay khác nhau"
+      >
+        <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Skeleton className="h-32" />
             <Skeleton className="h-32" />
@@ -337,35 +336,40 @@ export default function ScenariosPage() {
           </div>
           <Skeleton className="h-96" />
         </div>
-      </div>
+      </DashboardShell>
     )
   }
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <Header 
-          title="So Sánh Kịch Bản" 
-          description="Phân tích và so sánh các tùy chọn vay khác nhau"
-        />
-        <div className="p-6">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </div>
-      </div>
+      <DashboardShell 
+        title="So Sánh Kịch Bản" 
+        description="Phân tích và so sánh các tùy chọn vay khác nhau"
+      >
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </DashboardShell>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <Header 
-        title="So Sánh Kịch Bản" 
-        description="Phân tích và so sánh các tùy chọn vay khác nhau"
-      />
-      
-      <div className="p-6 space-y-6">
+    <DashboardShell 
+      title="So Sánh Kịch Bản" 
+      description="Phân tích và so sánh các tùy chọn vay khác nhau"
+      headerAction={
+        <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Tạo Kịch Bản
+            </Button>
+          </DialogTrigger>
+        </Dialog>
+      }
+    >
+      <div className="space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
@@ -690,6 +694,6 @@ export default function ScenariosPage() {
           </Card>
         )}
       </div>
-    </div>
+    </DashboardShell>
   )
 }

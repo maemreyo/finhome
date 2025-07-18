@@ -512,5 +512,81 @@
         "description": "Standard financial plan with current market conditions"
       }
     }
+  },
+  "Dashboard": {
+    "title": "Financial Overview",
+    "description": "Track progress and manage your real estate investments",
+    "Analytics": {
+      "title": "Analytics",
+      "description": "Track performance and trends of your financial plans",
+      "tabs": {
+        "overview": "Overview",
+        "performance": "Performance",
+        "trends": "Trends",
+        "goals": "Goals"
+      },
+      "metrics": {
+        "totalPlans": "Total Plans",
+        "totalInvestment": "Total Investment",
+        "expectedProfit": "Expected Profit",
+        "activeScenarios": "Active Scenarios"
+      }
+    },
+    "Achievements": {
+      "title": "Achievements",
+      "description": "Track your progress and achievements in your investment journey",
+      "categories": {
+        "all": "All",
+        "planning": "Planning",
+        "investment": "Investment",
+        "savings": "Savings",
+        "milestones": "Milestones"
+      },
+      "achievements": {
+        "newInvestor": "New Investor",
+        "strategist": "Strategist",
+        "futureMillionaire": "Future Millionaire",
+        "analysisExpert": "Analysis Expert",
+        "investmentMaster": "Investment Master",
+        "persistent": "Persistent"
+      }
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Manage your account settings and application preferences",
+      "tabs": {
+        "general": "General",
+        "notifications": "Notifications",
+        "security": "Security",
+        "preferences": "Preferences",
+        "account": "Account"
+      },
+      "general": {
+        "language": "Language",
+        "currency": "Currency",
+        "timezone": "Timezone",
+        "theme": "Theme"
+      },
+      "notifications": {
+        "emailNotifications": "Email Notifications",
+        "pushNotifications": "Push Notifications",
+        "marketingEmails": "Marketing Emails"
+      }
+    },
+    "Help": {
+      "title": "Help",
+      "description": "Find answers to your questions and get technical support",
+      "tabs": {
+        "faq": "FAQ",
+        "guides": "Guides",
+        "contact": "Contact",
+        "tickets": "Support Tickets"
+      },
+      "contact": {
+        "email": "Email",
+        "phone": "Phone",
+        "chat": "Live Chat"
+      }
+    }
   }
 }

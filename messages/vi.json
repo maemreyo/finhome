@@ -351,5 +351,81 @@
         "description": "Kế hoạch tài chính tiêu chuẩn với điều kiện thị trường hiện tại"
       }
     }
+  },
+  "Dashboard": {
+    "title": "Tổng Quan Tài Chính",
+    "description": "Theo dõi tiến độ và quản lý đầu tư bất động sản của bạn",
+    "Analytics": {
+      "title": "Phân Tích",
+      "description": "Theo dõi hiệu suất và xu hướng kế hoạch tài chính của bạn",
+      "tabs": {
+        "overview": "Tổng Quan",
+        "performance": "Hiệu Suất",
+        "trends": "Xu Hướng",
+        "goals": "Mục Tiêu"
+      },
+      "metrics": {
+        "totalPlans": "Tổng Kế Hoạch",
+        "totalInvestment": "Tổng Đầu Tư",
+        "expectedProfit": "Lợi Nhuận Dự Kiến",
+        "activeScenarios": "Kịch Bản Hoạt Động"
+      }
+    },
+    "Achievements": {
+      "title": "Thành Tích",
+      "description": "Theo dõi tiến độ và thành tích trong hành trình đầu tư của bạn",
+      "categories": {
+        "all": "Tất cả",
+        "planning": "Kế hoạch",
+        "investment": "Đầu tư",
+        "savings": "Tiết kiệm",
+        "milestones": "Mốc quan trọng"
+      },
+      "achievements": {
+        "newInvestor": "Nhà Đầu Tư Mới",
+        "strategist": "Chiến Lược Gia",
+        "futureMillionaire": "Triệu Phú Tương Lai",
+        "analysisExpert": "Chuyên Gia Phân Tích",
+        "investmentMaster": "Bậc Thầy Đầu Tư",
+        "persistent": "Người Kiên Trì"
+      }
+    },
+    "Settings": {
+      "title": "Cài Đặt",
+      "description": "Quản lý tùy chọn tài khoản và ứng dụng của bạn",
+      "tabs": {
+        "general": "Chung",
+        "notifications": "Thông báo",
+        "security": "Bảo mật",
+        "preferences": "Tùy chọn",
+        "account": "Tài khoản"
+      },
+      "general": {
+        "language": "Ngôn ngữ",
+        "currency": "Đơn vị tiền tệ",
+        "timezone": "Múi giờ",
+        "theme": "Giao diện"
+      },
+      "notifications": {
+        "emailNotifications": "Thông báo email",
+        "pushNotifications": "Thông báo đẩy",
+        "marketingEmails": "Email tiếp thị"
+      }
+    },
+    "Help": {
+      "title": "Trợ Giúp",
+      "description": "Tìm câu trả lời cho câu hỏi và nhận hỗ trợ kỹ thuật",
+      "tabs": {
+        "faq": "Câu Hỏi Thường Gặp",
+        "guides": "Hướng Dẫn",
+        "contact": "Liên Hệ",
+        "tickets": "Yêu Cầu Hỗ Trợ"
+      },
+      "contact": {
+        "email": "Email",
+        "phone": "Điện thoại",
+        "chat": "Live Chat"
+      }
+    }
   }
 }

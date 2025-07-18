@@ -201,19 +201,17 @@ export default function DashboardPage({ params }: PageProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="grid lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <div className="h-64 bg-gray-200 rounded-lg"></div>
-                <div className="h-48 bg-gray-200 rounded-lg"></div>
-              </div>
-              <div className="space-y-6">
-                <div className="h-32 bg-gray-200 rounded-lg"></div>
-                <div className="h-48 bg-gray-200 rounded-lg"></div>
-              </div>
+      <div className="space-y-6 p-6">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-muted rounded w-1/4"></div>
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="h-64 bg-muted rounded-lg"></div>
+              <div className="h-48 bg-muted rounded-lg"></div>
+            </div>
+            <div className="space-y-6">
+              <div className="h-32 bg-muted rounded-lg"></div>
+              <div className="h-48 bg-muted rounded-lg"></div>
             </div>
           </div>
         </div>
@@ -222,40 +220,36 @@ export default function DashboardPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="space-y-6 p-6">
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Tổng Quan Tài Chính
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Theo dõi tiến độ và quản lý đầu tư bất động sản của bạn
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <Badge variant="outline" className="text-sm">
-                <RefreshCw className="w-3 h-3 mr-1" />
-                Cập nhật: {lastUpdated.toLocaleTimeString('vi-VN')}
-              </Badge>
-              <NotificationCenter />
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-1" />
-                Cài Đặt
-              </Button>
-              <Button size="sm" onClick={handleCreatePlan}>
-                <Plus className="w-4 h-4 mr-1" />
-                Tạo Kế Hoạch
-              </Button>
-            </div>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">
+            Tổng Quan Tài Chính
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Theo dõi tiến độ và quản lý đầu tư bất động sản của bạn
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="text-sm">
+            <RefreshCw className="w-3 h-3 mr-1" />
+            Cập nhật: {lastUpdated.toLocaleTimeString('vi-VN')}
+          </Badge>
+          <NotificationCenter />
+          <Button variant="outline" size="sm">
+            <Settings className="w-4 h-4 mr-1" />
+            Cài Đặt
+          </Button>
+          <Button size="sm" onClick={handleCreatePlan}>
+            <Plus className="w-4 h-4 mr-1" />
+            Tạo Kế Hoạch
+          </Button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="space-y-6">
         {/* New Dashboard Layout */}
         <div className="grid lg:grid-cols-3 gap-6">
           
