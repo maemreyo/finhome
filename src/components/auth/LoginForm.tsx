@@ -51,9 +51,9 @@ export function LoginForm() {
     
     if (error) {
       setError(error.message)
+      setIsLoading(false)
     }
-    
-    setIsLoading(false)
+    // Don't set loading to false on success, let the redirect happen
   }
 
   const handleProviderSignIn = async (provider: 'google' | 'github') => {

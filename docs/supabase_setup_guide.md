@@ -228,15 +228,47 @@ ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE financial_plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE loan_calculations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE loan_terms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE billing_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_achievements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_properties ENABLE ROW LEVEL SECURITY;
+ALTER TABLE property_favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_activities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
 ```
 
 ### **Step 2: Create Security Policies**
+First, drop existing policies if they exist, then create fresh ones:
+
 ```sql
+-- Drop existing policies (ignore errors if they don't exist)
+DROP POLICY IF EXISTS "Users can view own profile" ON user_profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON user_profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON user_profiles;
+DROP POLICY IF EXISTS "Users can view own plans" ON financial_plans;
+DROP POLICY IF EXISTS "Users can create own plans" ON financial_plans;
+DROP POLICY IF EXISTS "Users can update own plans" ON financial_plans;
+DROP POLICY IF EXISTS "Users can delete own plans" ON financial_plans;
+DROP POLICY IF EXISTS "Users can access own calculations" ON loan_calculations;
+DROP POLICY IF EXISTS "Users can access own loan terms" ON loan_terms;
+DROP POLICY IF EXISTS "Users can manage own properties" ON user_properties;
+DROP POLICY IF EXISTS "Users can manage own favorites" ON property_favorites;
+DROP POLICY IF EXISTS "Users can view own activities" ON user_activities;
+DROP POLICY IF EXISTS "Users can view own submissions" ON contact_submissions;
+DROP POLICY IF EXISTS "Users can create submissions" ON contact_submissions;
+DROP POLICY IF EXISTS "Users can view own subscription" ON subscriptions;
+DROP POLICY IF EXISTS "Service role can manage subscriptions" ON subscriptions;
+DROP POLICY IF EXISTS "Users can view own notifications" ON notifications;
+DROP POLICY IF EXISTS "Users can update own notifications" ON notifications;
+DROP POLICY IF EXISTS "Anyone can view banks" ON banks;
+DROP POLICY IF EXISTS "Anyone can view interest rates" ON bank_interest_rates;
+DROP POLICY IF EXISTS "Anyone can view properties" ON properties;
+DROP POLICY IF EXISTS "Anyone can view achievements" ON achievements;
+DROP POLICY IF EXISTS "Anyone can view property market data" ON property_market_data;
+
+-- Create fresh policies
 -- User profiles - users can only access their own data
 CREATE POLICY "Users can view own profile" ON user_profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);
@@ -257,6 +289,27 @@ USING (
     )
 );
 
+-- Loan terms - users can access terms for their plans
+CREATE POLICY "Users can access own loan terms" ON loan_terms FOR ALL 
+USING (
+    financial_plan_id IN (
+        SELECT id FROM financial_plans WHERE user_id = auth.uid()
+    )
+);
+
+-- User properties - users can only access their own properties
+CREATE POLICY "Users can manage own properties" ON user_properties FOR ALL USING (auth.uid() = user_id);
+
+-- Property favorites - users can only access their own favorites
+CREATE POLICY "Users can manage own favorites" ON property_favorites FOR ALL USING (auth.uid() = user_id);
+
+-- User activities - users can only view their own activities
+CREATE POLICY "Users can view own activities" ON user_activities FOR SELECT USING (auth.uid() = user_id);
+
+-- Contact submissions - users can view their own submissions, admins can view all
+CREATE POLICY "Users can view own submissions" ON contact_submissions FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can create submissions" ON contact_submissions FOR INSERT WITH CHECK (true);
+
 -- Subscriptions - users can only access their own subscription
 CREATE POLICY "Users can view own subscription" ON subscriptions FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Service role can manage subscriptions" ON subscriptions FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
@@ -270,6 +323,7 @@ CREATE POLICY "Anyone can view banks" ON banks FOR SELECT USING (true);
 CREATE POLICY "Anyone can view interest rates" ON bank_interest_rates FOR SELECT USING (true);
 CREATE POLICY "Anyone can view properties" ON properties FOR SELECT USING (true);
 CREATE POLICY "Anyone can view achievements" ON achievements FOR SELECT USING (true);
+CREATE POLICY "Anyone can view property market data" ON property_market_data FOR SELECT USING (true);
 ```
 
 ### **Step 3: Test RLS**

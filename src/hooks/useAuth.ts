@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase/client'
+import { supabaseClient as supabase } from '@/lib/supabase/client-ssr'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { toast } from 'sonner'
 
@@ -123,20 +123,27 @@ export function useAuthActions() {
 
   const signIn = async (email: string, password: string, redirectTo?: string) => {
     try {
+      console.log('Attempting sign in with:', email)
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Sign in error:', error)
+        throw error
+      }
 
-      // Redirect after successful sign in
-      const redirectUrl = redirectTo || '/dashboard'
-      router.push(redirectUrl)
+      console.log('Sign in successful, redirecting...')
+      
+      // Use router push instead of window.location for better Next.js integration
+      router.push(redirectTo || '/en/dashboard')
 
       return { data, error: null }
     } catch (error) {
       const authError = error as AuthError
+      console.error('Sign in failed:', authError)
       toast.error(authError.message)
       return { data: null, error: authError }
     }

@@ -12,13 +12,14 @@ const i18nMiddleware = createMiddleware({
 });
 
 export async function middleware(request: NextRequest) {
-  // Run next-intl middleware first
-  const response = i18nMiddleware(request);
+  // Create response that will include updated cookies
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-  // Now, apply your existing authentication and route protection logic
-  const { pathname } = request.nextUrl;
-
-  // Create a Supabase client configured to use cookies
+  // Create a Supabase client configured to use cookies (Next.js 15 compatible)
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -30,15 +31,27 @@ export async function middleware(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set({ name, value });
-            response.cookies.set({ name, value, ...options }); // Use the response from i18nMiddleware
+            response.cookies.set({ name, value, ...options });
           });
         },
       },
     }
   );
 
-  // Refresh session if expired - required for Server Components
+  // IMPORTANT: Always refresh the session to get updated cookies
   const { data: { user }, error } = await supabase.auth.getUser();
+
+  // Apply i18n middleware to the response
+  response = i18nMiddleware(request) || response;
+  
+  // Now, apply authentication and route protection logic
+  const { pathname } = request.nextUrl;
+  
+  // Debug logging for authentication
+  console.log('Middleware - pathname:', pathname)
+  console.log('Middleware - user:', user?.email || 'no user')  
+  console.log('Middleware - error:', error?.message || 'no error')
+  console.log('Middleware - has auth cookies:', request.cookies.getAll().some(c => c.name.includes('supabase')))
 
   // Define protected and public routes
   const protectedRoutes = [
@@ -74,6 +87,8 @@ export async function middleware(request: NextRequest) {
 
   // Handle protected routes
   if (isProtectedRoute && !user) {
+    console.log('Middleware - redirecting to login, protected route:', pathname)
+    console.log('Middleware - cookies:', request.cookies.getAll().map(c => `${c.name}=${c.value.substring(0, 20)}...`))
     const redirectUrl = new URL(`/${defaultLocale}/auth/login`, request.url); // Use defaultLocale
     redirectUrl.searchParams.set('redirectTo', pathname);
     return NextResponse.redirect(redirectUrl);
@@ -81,7 +96,12 @@ export async function middleware(request: NextRequest) {
 
   // Handle auth routes (redirect authenticated users away)
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL(`/${defaultLocale}/dashboard`, request.url)); // Use defaultLocale
+    const redirectResponse = NextResponse.redirect(new URL(`/${defaultLocale}/dashboard`, request.url));
+    // Copy cookies from the main response to maintain session
+    response.cookies.getAll().forEach(cookie => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+    });
+    return redirectResponse;
   }
 
   // Special handling for API routes
