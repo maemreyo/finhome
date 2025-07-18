@@ -139,17 +139,17 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
   const getActivityColor = (type: ActivityItem['type']) => {
     switch (type) {
       case 'plan_created':
-        return 'bg-blue-100 text-blue-600'
+        return 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
       case 'property_viewed':
-        return 'bg-green-100 text-green-600'
+        return 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400'
       case 'achievement_unlocked':
-        return 'bg-purple-100 text-purple-600'
+        return 'bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
       case 'rate_comparison':
-        return 'bg-orange-100 text-orange-600'
+        return 'bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400'
       case 'goal_reached':
-        return 'bg-pink-100 text-pink-600'
+        return 'bg-pink-100 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400'
       default:
-        return 'bg-gray-100 text-gray-600'
+        return 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
     }
   }
 
@@ -178,10 +178,10 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="animate-pulse flex gap-3">
-                <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
                 </div>
               </div>
             ))}
@@ -215,8 +215,8 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
               className={cn(
-                "flex items-start gap-3 p-3 rounded-lg transition-colors hover:bg-gray-50",
-                activity.isNew && "bg-blue-50 border border-blue-200"
+                "flex items-start gap-3 p-3 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50",
+                activity.isNew && "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
               )}
             >
               {/* Activity Icon */}
@@ -252,7 +252,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
                           </Badge>
                         )}
                         {activity.metadata.achievementName && (
-                          <Badge className="bg-purple-100 text-purple-800 border-purple-300 text-xs">
+                          <Badge className="bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-700 text-xs">
                             🏆 {activity.metadata.achievementName}
                           </Badge>
                         )}

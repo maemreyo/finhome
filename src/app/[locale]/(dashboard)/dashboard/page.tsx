@@ -170,30 +170,22 @@ export default function DashboardPage({ params }: PageProps) {
   // Quick actions data
   const quickActions = [
     {
-      id: '1',
-      title: 'Tìm Bất Động Sản',
-      description: 'Khám phá cơ hội đầu tư mới',
+      id: 'findProperty',
       icon: <Search className="w-5 h-5" />,
       href: `/${locale}/properties`
     },
     {
-      id: '2',
-      title: 'Tạo Kế Hoạch Mới',
-      description: 'Lập kế hoạch tài chính chi tiết',
+      id: 'newPlan',
       icon: <Calculator className="w-5 h-5" />,
       href: `/${locale}/dashboard/plans/new`
     },
     {
-      id: '3',
-      title: 'So Sánh Lãi Suất',
-      description: 'Tìm gói vay ưu đãi nhất',
+      id: 'compareRates',
       icon: <TrendingUp className="w-5 h-5" />,
       href: `/${locale}/banks`
     },
     {
-      id: '4',
-      title: 'Danh Mục Đầu Tư',
-      description: 'Theo dõi hiệu suất đầu tư',
+      id: 'portfolio',
       icon: <Target className="w-5 h-5" />,
       href: `/${locale}/investments`
     }
@@ -293,7 +285,7 @@ export default function DashboardPage({ params }: PageProps) {
                           onClick={() => window.location.href = action.href}
                         >
                           <div className="flex items-start gap-3">
-                            <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+                            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex-shrink-0">
                               {action.icon}
                             </div>
                             <div>
@@ -343,7 +335,7 @@ export default function DashboardPage({ params }: PageProps) {
                       <CardTitle>{t('investmentAnalysis.title')}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
                         <div className="text-center">
                           <PieChart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                           <p className="text-muted-foreground">
@@ -361,7 +353,7 @@ export default function DashboardPage({ params }: PageProps) {
                       <CardTitle>{t('financialSchedule.title')}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
                         <div className="text-center">
                           <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                           <p className="text-muted-foreground">
