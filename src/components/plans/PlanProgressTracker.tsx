@@ -30,36 +30,12 @@ import {
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
 import { UIFinancialPlan } from '@/lib/adapters/planAdapter'
-import type { PlanStatus } from '@/lib/supabase/types'
-
-export interface PlanMilestone {
-  id: string
-  title: string
-  description: string
-  targetDate: Date
-  completedDate?: Date
-  status: 'pending' | 'in_progress' | 'completed' | 'overdue'
-  category: 'financial' | 'legal' | 'property' | 'admin'
-  requiredAmount?: number
-  currentAmount?: number
-  documents?: string[]
-  priority: 'high' | 'medium' | 'low'
-}
-
-export interface PlanProgress {
-  totalProgress: number // 0-100
-  financialProgress: number // 0-100
-  savingsTarget: number
-  currentSavings: number
-  monthlyContribution: number
-  estimatedCompletionDate: Date
-  milestones: PlanMilestone[]
-  statusHistory: Array<{
-    status: PlanStatus
-    date: Date
-    note?: string
-  }>
-}
+import { useTranslations } from 'next-intl'
+import type { 
+  PlanStatus, 
+  PlanMilestone, 
+  PlanProgress 
+} from '@/types/plans'
 
 interface PlanProgressTrackerProps {
   plan: UIFinancialPlan
@@ -78,6 +54,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
   onContributionUpdate,
   className
 }) => {
+  const t = useTranslations('PlanProgressTracker')
   const [activeTab, setActiveTab] = useState('overview')
 
   // Group milestones by category
@@ -108,31 +85,31 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
         return { 
           icon: FileText, 
           color: 'bg-gray-100 text-gray-800 border-gray-300',
-          label: 'Nháp'
+          label: t('statusLabels.draft')
         }
       case 'active':
         return { 
           icon: Play, 
           color: 'bg-green-100 text-green-800 border-green-300',
-          label: 'Đang thực hiện'
+          label: t('statusLabels.active')
         }
       case 'archived':
         return { 
           icon: Pause, 
           color: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-          label: 'Lưu trữ'
+          label: t('statusLabels.archived')
         }
       case 'completed':
         return { 
           icon: CheckCircle, 
           color: 'bg-blue-100 text-blue-800 border-blue-300',
-          label: 'Hoàn thành'
+          label: t('statusLabels.completed')
         }
-      case 'archived':
+      default:
         return { 
           icon: RotateCcw, 
           color: 'bg-gray-100 text-gray-600 border-gray-200',
-          label: 'Lưu trữ'
+          label: t('statusLabels.archived')
         }
     }
   }
@@ -185,10 +162,10 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-blue-600" />
-                {plan.planName} - Progress Tracker
+                {plan.planName} - {t('progressTracker')}
               </CardTitle>
               <CardDescription>
-                Track milestones and monitor your financial plan progress
+                {t('trackDescription')}
               </CardDescription>
             </div>
             <Badge variant="outline" className={cn("flex items-center gap-1", statusConfig.color)}>
@@ -201,7 +178,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
           {/* Overall Progress */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Overall Progress</span>
+              <span className="text-sm font-medium">{t('overallProgress')}</span>
               <span className="text-sm text-muted-foreground">{Math.round(progress.totalProgress)}%</span>
             </div>
             <Progress value={progress.totalProgress} className="w-full" />
@@ -211,28 +188,28 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                 <div className="text-2xl font-bold text-green-600">
                   {formatCurrency(progress.currentSavings)}
                 </div>
-                <div className="text-xs text-muted-foreground">Current Savings</div>
+                <div className="text-xs text-muted-foreground">{t('currentSavings')}</div>
               </div>
               
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
                   {formatCurrency(progress.savingsTarget)}
                 </div>
-                <div className="text-xs text-muted-foreground">Target Amount</div>
+                <div className="text-xs text-muted-foreground">{t('targetAmount')}</div>
               </div>
               
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
                   {formatCurrency(progress.monthlyContribution)}
                 </div>
-                <div className="text-xs text-muted-foreground">Monthly Contribution</div>
+                <div className="text-xs text-muted-foreground">{t('monthlyContribution')}</div>
               </div>
               
               <div className="text-center">
                 <div className="text-2xl font-bold text-orange-600">
                   {daysToCompletion > 0 ? daysToCompletion : 0}
                 </div>
-                <div className="text-xs text-muted-foreground">Days to Target</div>
+                <div className="text-xs text-muted-foreground">{t('daysToTarget')}</div>
               </div>
             </div>
           </div>
@@ -242,10 +219,10 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
       {/* Progress Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="milestones">Milestones</TabsTrigger>
-          <TabsTrigger value="financial">Financial</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
+          <TabsTrigger value="overview">{t('overview')}</TabsTrigger>
+          <TabsTrigger value="milestones">{t('milestones')}</TabsTrigger>
+          <TabsTrigger value="financial">{t('financial')}</TabsTrigger>
+          <TabsTrigger value="history">{t('history')}</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -254,17 +231,12 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
             {/* Category Progress */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Progress by Category</CardTitle>
+                <CardTitle className="text-lg">{t('progressByCategory')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {Object.entries(categoryProgress).map(([category, percentage]) => {
                   const Icon = getCategoryIcon(category)
-                  const categoryName = {
-                    financial: 'Tài chính',
-                    legal: 'Pháp lý',
-                    property: 'Bất động sản',
-                    admin: 'Thủ tục'
-                  }[category]
+                  const categoryName = t(`categories.${category}`)
                   
                   return (
                     <div key={category} className="space-y-2">
@@ -287,7 +259,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
             {/* Quick Actions */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
+                <CardTitle className="text-lg">{t('quickActions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button
@@ -297,7 +269,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                   variant={plan.planStatus === 'active' ? 'secondary' : 'default'}
                 >
                   <Play className="w-4 h-4 mr-2" />
-                  {plan.planStatus === 'active' ? 'Plan is Active' : 'Start Plan'}
+                  {plan.planStatus === 'active' ? t('planIsActive') : t('startPlan')}
                 </Button>
                 
                 <Button
@@ -307,7 +279,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                   className="w-full justify-start"
                 >
                   <Pause className="w-4 h-4 mr-2" />
-                  Pause Plan
+                  {t('pausePlan')}
                 </Button>
                 
                 <Button
@@ -316,7 +288,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                   className="w-full justify-start"
                 >
                   <TrendingUp className="w-4 h-4 mr-2" />
-                  Increase Monthly Contribution
+                  {t('increaseContribution')}
                 </Button>
               </CardContent>
             </Card>
@@ -325,7 +297,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
           {/* Recent Milestones */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Recent Milestones</CardTitle>
+              <CardTitle className="text-lg">{t('recentMilestones')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -342,7 +314,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                         <div>
                           <div className="font-medium text-sm">{milestone.title}</div>
                           <div className="text-xs text-muted-foreground">
-                            Target: {milestone.targetDate.toLocaleDateString('vi-VN')}
+                            {t('target')}: {milestone.targetDate.toLocaleDateString('vi-VN')}
                           </div>
                         </div>
                       </div>
@@ -360,12 +332,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
         <TabsContent value="milestones" className="space-y-4">
           {Object.entries(milestonesByCategory).map(([category, milestones]) => {
             const Icon = getCategoryIcon(category)
-            const categoryName = {
-              financial: 'Tài chính',
-              legal: 'Pháp lý', 
-              property: 'Bất động sản',
-              admin: 'Thủ tục'
-            }[category]
+            const categoryName = t(`categories.${category}`)
 
             return (
               <Card key={category}>
@@ -403,7 +370,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                             </div>
                             {milestone.status === 'overdue' && (
                               <Badge variant="destructive">
-                                Overdue
+                                {t('overdue')}
                               </Badge>
                             )}
                           </div>
@@ -412,7 +379,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                         {milestone.requiredAmount && (
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span>Progress</span>
+                              <span>{t('progress')}</span>
                               <span>
                                 {formatCurrency(milestone.currentAmount || 0)} / {formatCurrency(milestone.requiredAmount)}
                               </span>
@@ -433,7 +400,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                               completedDate: milestone.status === 'completed' ? undefined : new Date()
                             })}
                           >
-                            {milestone.status === 'completed' ? 'Mark Incomplete' : 'Mark Complete'}
+                            {milestone.status === 'completed' ? t('milestoneActions.markIncomplete') : t('milestoneActions.markComplete')}
                           </Button>
                           
                           {milestone.status !== 'completed' && (
@@ -444,7 +411,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                                 status: 'in_progress'
                               })}
                             >
-                              Start Working
+                              {t('milestoneActions.startWorking')}
                             </Button>
                           )}
                         </div>
@@ -462,7 +429,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Savings Progress</CardTitle>
+                <CardTitle>{t('savingsProgress')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center space-y-2">
@@ -481,15 +448,15 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                 
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span>Monthly contribution:</span>
+                    <span>{t('monthlyContributionLabel')}</span>
                     <span className="font-medium">{formatCurrency(progress.monthlyContribution)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Remaining amount:</span>
+                    <span>{t('remainingAmount')}</span>
                     <span className="font-medium">{formatCurrency(progress.savingsTarget - progress.currentSavings)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Estimated completion:</span>
+                    <span>{t('estimatedCompletion')}</span>
                     <span className="font-medium">{progress.estimatedCompletionDate.toLocaleDateString('vi-VN')}</span>
                   </div>
                 </div>
@@ -498,12 +465,12 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
 
             <Card>
               <CardHeader>
-                <CardTitle>Financial Metrics</CardTitle>
+                <CardTitle>{t('financialMetrics')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Monthly Progress Rate</span>
+                    <span className="text-sm">{t('monthlyProgressRate')}</span>
                     <div className="flex items-center gap-1">
                       {monthlyProgressRate > 2 ? (
                         <TrendingUp className="w-4 h-4 text-green-600" />
@@ -515,14 +482,14 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Plan Affordability Score</span>
+                    <span className="text-sm">{t('planAffordabilityScore')}</span>
                     <Badge variant={plan.affordabilityScore && plan.affordabilityScore >= 7 ? "default" : "secondary"}>
                       {plan.affordabilityScore || 'N/A'}/10
                     </Badge>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Risk Level</span>
+                    <span className="text-sm">{t('riskLevel')}</span>
                     <Badge variant={plan.riskLevel === 'low' ? "default" : plan.riskLevel === 'medium' ? "secondary" : "destructive"}>
                       {plan.riskLevel || 'N/A'}
                     </Badge>
@@ -537,7 +504,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
         <TabsContent value="history" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Status History</CardTitle>
+              <CardTitle>{t('statusHistory')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">

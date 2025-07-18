@@ -28,27 +28,12 @@ import {
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
 import { toast } from 'sonner'
-import type { PlanStatus } from '@/lib/supabase/types'
-
-export interface PlanStatusHistory {
-  id: string
-  previousStatus: PlanStatus
-  newStatus: PlanStatus
-  changedBy: string
-  changedAt: Date
-  reason?: string
-  notes?: string
-}
-
-export interface PlanStatusInfo {
-  status: PlanStatus
-  progress: number
-  statusHistory: PlanStatusHistory[]
-  canTransitionTo: PlanStatus[]
-  estimatedCompletionDate?: Date
-  actualCompletionDate?: Date
-  archiveReason?: string
-}
+import { useTranslations } from 'next-intl'
+import type { 
+  PlanStatus, 
+  PlanStatusHistory, 
+  PlanStatusInfo 
+} from '@/types/plans'
 
 interface PlanStatusManagerProps {
   planId: string
@@ -61,28 +46,20 @@ interface PlanStatusManagerProps {
 
 const STATUS_CONFIG = {
   draft: {
-    label: 'Draft',
     color: 'bg-gray-100 text-gray-800',
-    icon: FileText,
-    description: 'Plan is being created or modified'
+    icon: FileText
   },
   active: {
-    label: 'Active',
     color: 'bg-blue-100 text-blue-800',
-    icon: Play,
-    description: 'Plan is currently being executed'
+    icon: Play
   },
   completed: {
-    label: 'Completed',
     color: 'bg-green-100 text-green-800',
-    icon: CheckCircle,
-    description: 'Plan has been successfully completed'
+    icon: CheckCircle
   },
   archived: {
-    label: 'Archived',
     color: 'bg-gray-100 text-gray-600',
-    icon: Archive,
-    description: 'Plan is archived for reference'
+    icon: Archive
   }
 }
 
@@ -106,6 +83,27 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
   const [transitionNotes, setTransitionNotes] = useState('')
   const [isTransitionDialogOpen, setIsTransitionDialogOpen] = useState(false)
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false)
+  const t = useTranslations('PlanStatusManager')
+
+  const getStatusLabel = (status: PlanStatus) => {
+    switch (status) {
+      case 'draft': return t('status.draft')
+      case 'active': return t('status.active')
+      case 'completed': return t('status.completed')
+      case 'archived': return t('status.archived')
+      default: return t('status.unknown')
+    }
+  }
+
+  const getStatusDescription = (status: PlanStatus) => {
+    switch (status) {
+      case 'draft': return t('description.draft')
+      case 'active': return t('description.active')
+      case 'completed': return t('description.completed')
+      case 'archived': return t('description.archived')
+      default: return t('description.unknown')
+    }
+  }
 
   const availableTransitions = TRANSITION_RULES[currentStatus] || []
   const currentConfig = STATUS_CONFIG[currentStatus]
@@ -123,7 +121,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
 
     // Validate required fields based on transition
     if (selectedTransition === 'archived' && !transitionReason.trim()) {
-      toast.error('Please provide a reason for archiving this plan')
+      toast.error(t('validation.archiveReasonRequired'))
       return
     }
 
@@ -133,7 +131,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
     setTransitionReason('')
     setTransitionNotes('')
     
-    toast.success(`Plan status changed to ${STATUS_CONFIG[selectedTransition].label}`)
+    toast.success(t('messages.statusChanged', { status: getStatusLabel(selectedTransition) }))
   }
 
   const getStatusProgress = () => {
@@ -156,21 +154,21 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
     const timeDiff = Date.now() - lastStatusChange.changedAt.getTime()
     const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
     
-    if (days === 0) return 'Today'
-    if (days === 1) return '1 day'
-    return `${days} days`
+    if (days === 0) return t('time.today')
+    if (days === 1) return t('time.oneDay')
+    return t('time.days', { count: days })
   }
 
   const getEstimatedCompletion = () => {
-    if (currentStatus === 'completed') return 'Completed'
-    if (currentStatus === 'archived') return 'Archived'
-    if (!statusInfo.estimatedCompletionDate) return 'Not set'
+    if (currentStatus === 'completed') return t('status.completed')
+    if (currentStatus === 'archived') return t('status.archived')
+    if (!statusInfo.estimatedCompletionDate) return t('completion.notSet')
     
     const isOverdue = statusInfo.estimatedCompletionDate < new Date()
     return (
       <span className={cn(isOverdue ? 'text-red-600' : 'text-gray-600')}>
         {statusInfo.estimatedCompletionDate.toLocaleDateString('vi-VN')}
-        {isOverdue && ' (Overdue)'}
+        {isOverdue && ` (${t('completion.overdue')})`}
       </span>
     )
   }
@@ -180,10 +178,10 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CurrentIcon className="w-5 h-5" />
-          Plan Status Management
+          {t('title')}
         </CardTitle>
         <CardDescription>
-          Track and manage the lifecycle of your financial plan
+          {t('subtitle')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -191,13 +189,13 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium text-sm text-gray-600">Current Status</h3>
+              <h3 className="font-medium text-sm text-gray-600">{t('currentStatus')}</h3>
               <div className="flex items-center gap-2 mt-1">
                 <Badge className={cn('text-sm', currentConfig.color)}>
                   <CurrentIcon className="w-3 h-3 mr-1" />
-                  {currentConfig.label}
+                  {getStatusLabel(currentStatus)}
                 </Badge>
-                <span className="text-xs text-gray-500">for {getTimeInStatus()}</span>
+                <span className="text-xs text-gray-500">{t('time.for')} {getTimeInStatus()}</span>
               </div>
             </div>
             <Button
@@ -206,16 +204,16 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
               onClick={() => setIsHistoryDialogOpen(true)}
             >
               <Clock className="w-4 h-4 mr-2" />
-              History
+              {t('history.title')}
             </Button>
           </div>
 
-          <div className="text-sm text-gray-600">{currentConfig.description}</div>
+          <div className="text-sm text-gray-600">{getStatusDescription(currentStatus)}</div>
 
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Progress</span>
+              <span className="text-gray-600">{t('progress')}</span>
               <span className="font-medium">{getStatusProgress()}%</span>
             </div>
             <Progress value={getStatusProgress()} className="h-2" />
@@ -224,15 +222,15 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
           {/* Status Details */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Estimated Completion:</span>
+              <span className="text-gray-600">{t('estimatedCompletion')}:</span>
               <div className="font-medium">{getEstimatedCompletion()}</div>
             </div>
             <div>
-              <span className="text-gray-600">Last Updated:</span>
+              <span className="text-gray-600">{t('lastUpdated')}:</span>
               <div className="font-medium">
                 {statusInfo.statusHistory.length > 0 
                   ? statusInfo.statusHistory[0].changedAt.toLocaleDateString('vi-VN')
-                  : 'Never'
+                  : t('never')
                 }
               </div>
             </div>
@@ -244,7 +242,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
           <Alert>
             <Archive className="h-4 w-4" />
             <AlertDescription>
-              <strong>Archive Reason:</strong> {statusInfo.archiveReason}
+              <strong>{t('archiveReason')}:</strong> {statusInfo.archiveReason}
             </AlertDescription>
           </Alert>
         )}
@@ -253,7 +251,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
           <Alert>
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Completed on:</strong> {statusInfo.actualCompletionDate.toLocaleDateString('vi-VN')}
+              <strong>{t('completedOn')}:</strong> {statusInfo.actualCompletionDate.toLocaleDateString('vi-VN')}
             </AlertDescription>
           </Alert>
         )}
@@ -261,7 +259,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
         {/* Available Transitions */}
         {availableTransitions.length > 0 && (
           <div className="space-y-3">
-            <h4 className="font-medium text-sm">Available Actions</h4>
+            <h4 className="font-medium text-sm">{t('availableActions')}</h4>
             <div className="flex flex-wrap gap-2">
               {availableTransitions.map((status) => {
                 const config = STATUS_CONFIG[status]
@@ -276,7 +274,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
                     className="flex items-center gap-2"
                   >
                     <Icon className="w-3 h-3" />
-                    {config.label}
+                    {getStatusLabel(status)}
                   </Button>
                 )
               })}
@@ -289,7 +287,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                Change Status to {selectedTransition ? STATUS_CONFIG[selectedTransition].label : ''}
+                {t('dialog.changeStatusTo')} {selectedTransition ? getStatusLabel(selectedTransition) : ''}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
@@ -297,13 +295,13 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
                 <div className="flex items-center gap-2">
                   <Badge className={cn('text-sm', currentConfig.color)}>
                     <CurrentIcon className="w-3 h-3 mr-1" />
-                    {currentConfig.label}
+                    {getStatusLabel(currentStatus)}
                   </Badge>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
                   {selectedTransition && (
                     <Badge className={cn('text-sm', STATUS_CONFIG[selectedTransition].color)}>
                       {React.createElement(STATUS_CONFIG[selectedTransition].icon, { className: "w-3 h-3 mr-1" })}
-                      {STATUS_CONFIG[selectedTransition].label}
+                      {getStatusLabel(selectedTransition)}
                     </Badge>
                   )}
                 </div>
@@ -312,23 +310,23 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
               {selectedTransition === 'archived' && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    Reason <span className="text-red-500">*</span>
+                    {t('dialog.reason')} <span className="text-red-500">*</span>
                   </label>
                   <Textarea
                     value={transitionReason}
                     onChange={(e) => setTransitionReason(e.target.value)}
-                    placeholder={`Please provide a reason for ${STATUS_CONFIG[selectedTransition!].label.toLowerCase()}...`}
+                    placeholder={t('dialog.reasonPlaceholder', { status: getStatusLabel(selectedTransition!).toLowerCase() })}
                     rows={3}
                   />
                 </div>
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Additional Notes</label>
+                <label className="text-sm font-medium">{t('dialog.additionalNotes')}</label>
                 <Textarea
                   value={transitionNotes}
                   onChange={(e) => setTransitionNotes(e.target.value)}
-                  placeholder="Any additional notes or comments..."
+                  placeholder={t('dialog.notesPlaceholder')}
                   rows={2}
                 />
               </div>
@@ -338,10 +336,10 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
                   variant="outline"
                   onClick={() => setIsTransitionDialogOpen(false)}
                 >
-                  Cancel
+                  {t('dialog.cancel')}
                 </Button>
                 <Button onClick={handleTransitionConfirm}>
-                  Confirm Change
+                  {t('dialog.confirm')}
                 </Button>
               </div>
             </div>
@@ -352,11 +350,11 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
         <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Status History</DialogTitle>
+              <DialogTitle>{t('history.title')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {statusInfo.statusHistory.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">No status history available</p>
+                <p className="text-gray-500 text-center py-8">{t('history.empty')}</p>
               ) : (
                 <div className="space-y-3">
                   {statusInfo.statusHistory.map((history, index) => {
@@ -377,12 +375,12 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
                           <div className="flex items-center gap-2">
                             <Badge className={cn('text-xs', oldConfig.color)}>
                               <OldIcon className="w-3 h-3 mr-1" />
-                              {oldConfig.label}
+                              {getStatusLabel(history.previousStatus)}
                             </Badge>
                             <ArrowRight className="w-3 h-3 text-gray-400" />
                             <Badge className={cn('text-xs', newConfig.color)}>
                               <NewIcon className="w-3 h-3 mr-1" />
-                              {newConfig.label}
+                              {getStatusLabel(history.newStatus)}
                             </Badge>
                           </div>
                           <div className="text-xs text-gray-500">
@@ -393,14 +391,14 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
                         <div className="text-sm">
                           <div className="flex items-center gap-2 mb-1">
                             <User className="w-3 h-3 text-gray-400" />
-                            <span className="text-gray-600">Changed by:</span>
+                            <span className="text-gray-600">{t('history.changedBy')}:</span>
                             <span className="font-medium">{history.changedBy}</span>
                           </div>
                           
                           {history.reason && (
                             <div className="flex items-start gap-2 mb-1">
                               <MessageSquare className="w-3 h-3 text-gray-400 mt-0.5" />
-                              <span className="text-gray-600">Reason:</span>
+                              <span className="text-gray-600">{t('history.reason')}:</span>
                               <span>{history.reason}</span>
                             </div>
                           )}
@@ -408,7 +406,7 @@ const PlanStatusManager: React.FC<PlanStatusManagerProps> = ({
                           {history.notes && (
                             <div className="flex items-start gap-2">
                               <MessageSquare className="w-3 h-3 text-gray-400 mt-0.5" />
-                              <span className="text-gray-600">Notes:</span>
+                              <span className="text-gray-600">{t('history.notes')}:</span>
                               <span>{history.notes}</span>
                             </div>
                           )}

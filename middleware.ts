@@ -12,6 +12,13 @@ const i18nMiddleware = createMiddleware({
 });
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // Skip i18n middleware for API routes
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
   // Create response that will include updated cookies
   let response = NextResponse.next({
     request: {
@@ -45,7 +52,6 @@ export async function middleware(request: NextRequest) {
   response = i18nMiddleware(request) || response;
   
   // Now, apply authentication and route protection logic
-  const { pathname } = request.nextUrl;
   
   // Debug logging for authentication
   console.log('Middleware - pathname:', pathname)
@@ -131,9 +137,8 @@ export const config = {
   matcher: [
     // Match all request paths except for the ones starting with:
     // - _next (Next.js internals)
-    // - api (API routes)
     // - public files (public folder)
     // - All other files in the root (e.g. favicon.ico)
-    '/((?!_next|api|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, createContext, useContext } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { 
   CheckCircle, 
   AlertCircle, 
@@ -281,60 +282,74 @@ export const ToastHelpers = {
     message,
     action,
     duration: 8000 // Longer duration for achievements
-  }),
-
-  // Financial-specific helpers
-  paymentReminder: (amount: number, propertyName: string) => ({
-    type: 'warning' as const,
-    title: 'Nhắc nhở thanh toán',
-    message: `Khoản vay ${propertyName} có kỳ thanh toán ${amount.toLocaleString('vi-VN')} VND sắp đến hạn`,
-    action: {
-      label: 'Xem chi tiết',
-      onClick: () => window.location.href = '/plans'
-    },
-    duration: 10000
-  }),
-
-  marketUpdate: (message: string) => ({
-    type: 'info' as const,
-    title: 'Cập nhật thị trường',
-    message,
-    action: {
-      label: 'Xem thêm',
-      onClick: () => window.location.href = '/banks'
-    }
-  }),
-
-  goalProgress: (percentage: number, goalName: string) => ({
-    type: 'success' as const,
-    title: 'Tiến độ mục tiêu',
-    message: `Bạn đã hoàn thành ${percentage}% mục tiêu "${goalName}"`,
-    action: {
-      label: 'Xem mục tiêu',
-      onClick: () => window.location.href = '/goals'
-    }
-  }),
-
-  newAchievement: (achievementName: string) => ({
-    type: 'achievement' as const,
-    title: 'Thành tích mới! 🏆',
-    message: `Bạn đã mở khóa thành tích "${achievementName}"`,
-    action: {
-      label: 'Xem thành tích',
-      onClick: () => window.location.href = '/achievements'
-    },
-    duration: 10000
-  }),
-
-  propertyAlert: (propertyName: string, changePercent: number) => ({
-    type: 'info' as const,
-    title: 'Cảnh báo bất động sản',
-    message: `Giá ${propertyName} đã ${changePercent > 0 ? 'tăng' : 'giảm'} ${Math.abs(changePercent)}%`,
-    action: {
-      label: 'Xem chi tiết',
-      onClick: () => window.location.href = '/properties'
-    }
   })
+}
+
+// Hook to use internationalized toast helpers
+export const useToastHelpers = () => {
+  const t = useTranslations('Toast')
+  
+  return {
+    // Financial-specific helpers
+    paymentReminder: (amount: number, propertyName: string) => ({
+      type: 'warning' as const,
+      title: t('paymentReminder.title'),
+      message: t('paymentReminder.message', { 
+        propertyName, 
+        amount: amount.toLocaleString('vi-VN') 
+      }),
+      action: {
+        label: t('paymentReminder.action'),
+        onClick: () => window.location.href = '/plans'
+      },
+      duration: 10000
+    }),
+
+    marketUpdate: (message: string) => ({
+      type: 'info' as const,
+      title: t('marketUpdate.title'),
+      message,
+      action: {
+        label: t('marketUpdate.action'),
+        onClick: () => window.location.href = '/banks'
+      }
+    }),
+
+    goalProgress: (percentage: number, goalName: string) => ({
+      type: 'success' as const,
+      title: t('goalProgress.title'),
+      message: t('goalProgress.message', { percentage, goalName }),
+      action: {
+        label: t('goalProgress.action'),
+        onClick: () => window.location.href = '/goals'
+      }
+    }),
+
+    newAchievement: (achievementName: string) => ({
+      type: 'achievement' as const,
+      title: t('newAchievement.title'),
+      message: t('newAchievement.message', { achievementName }),
+      action: {
+        label: t('newAchievement.action'),
+        onClick: () => window.location.href = '/achievements'
+      },
+      duration: 10000
+    }),
+
+    propertyAlert: (propertyName: string, changePercent: number) => ({
+      type: 'info' as const,
+      title: t('propertyAlert.title'),
+      message: t('propertyAlert.message', { 
+        propertyName, 
+        changeType: t(`propertyAlert.changeTypes.${changePercent > 0 ? 'increase' : 'decrease'}`),
+        changePercent: Math.abs(changePercent)
+      }),
+      action: {
+        label: t('propertyAlert.action'),
+        onClick: () => window.location.href = '/properties'
+      }
+    })
+  }
 }
 
 export default ToastProvider

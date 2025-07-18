@@ -5,6 +5,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -33,62 +34,62 @@ interface SidebarProps {
 // Navigation items with existing status
 const navigationItems = [
   {
-    name: 'Dashboard',
+    nameKey: 'dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
     exists: true,
   },
   {
-    name: 'Kế Hoạch Tài Chính',
+    nameKey: 'plans',
     href: '/dashboard/plans',
     icon: FileText,
     exists: true,
   },
   {
-    name: 'So Sánh Kịch Bản',
+    nameKey: 'scenarios',
     href: '/dashboard/scenarios',
     icon: Calculator,
     exists: true,
   },
   {
-    name: 'Phòng Thí Nghiệm',
+    nameKey: 'laboratory',
     href: '/dashboard/laboratory',
     icon: Beaker,
     exists: true,
   },
   {
-    name: 'Hồ Sơ',
+    nameKey: 'profile',
     href: '/dashboard/profile',
     icon: User,
     exists: true,
   },
   {
-    name: 'Thanh Toán',
+    nameKey: 'billing',
     href: '/dashboard/billing',
     icon: CreditCard,
     exists: true,
   },
   // These pages exist
   {
-    name: 'Phân Tích',
+    nameKey: 'analytics',
     href: '/dashboard/analytics',
     icon: BarChart3,
     exists: true,
   },
   {
-    name: 'Thành Tích',
+    nameKey: 'achievements',
     href: '/dashboard/achievements',
     icon: Trophy,
     exists: true,
   },
   {
-    name: 'Cài Đặt',
+    nameKey: 'settings',
     href: '/dashboard/settings',
     icon: Settings,
     exists: true,
   },
   {
-    name: 'Trợ Giúp',
+    nameKey: 'help',
     href: '/dashboard/help',
     icon: HelpCircle,
     exists: true,
@@ -100,10 +101,12 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
   const params = useParams()
   const locale = params?.locale as string || 'en'
+  const t = useTranslations('Dashboard.navigation')
 
   // Create locale-prefixed navigation
   const navigation = navigationItems.filter(item => item.exists).map(item => ({
     ...item,
+    name: t(item.nameKey),
     href: `/${locale}${item.href}`
   }))
 
@@ -155,7 +158,7 @@ export function Sidebar({ className }: SidebarProps) {
                 
                 return (
                   <Link
-                    key={item.name}
+                    key={item.href}
                     href={item.href}
                     onClick={() => setIsMobileOpen(false)}
                     className={cn(

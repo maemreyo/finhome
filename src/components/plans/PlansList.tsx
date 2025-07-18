@@ -8,6 +8,7 @@ import { formatCurrency } from '@/lib/utils'
 import { Eye, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { Database } from '@/lib/supabase/types'
+import { useTranslations } from 'next-intl'
 
 type FinancialPlan = Database['public']['Tables']['financial_plans']['Row']
 
@@ -15,30 +16,50 @@ interface PlansListProps {
   plans: FinancialPlan[]
 }
 
-const statusMap = {
-  draft: { label: 'Bản nháp', variant: 'secondary' as const },
-  active: { label: 'Đang hoạt động', variant: 'default' as const },
-  completed: { label: 'Hoàn thành', variant: 'outline' as const },
-  archived: { label: 'Lưu trữ', variant: 'destructive' as const },
-}
-
-const typeMap = {
-  home_purchase: 'Mua nhà ở',
-  investment: 'Đầu tư',
-  upgrade: 'Nâng cấp',
-  refinance: 'Tái cấu trúc',
-}
+// Status and type maps will be replaced with translation keys
 
 export function PlansList({ plans }: PlansListProps) {
+  const t = useTranslations('PlansList')
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'draft': return t('status.draft')
+      case 'active': return t('status.active')
+      case 'completed': return t('status.completed')
+      case 'archived': return t('status.archived')
+      default: return t('status.unknown')
+    }
+  }
+
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'draft': return 'secondary' as const
+      case 'active': return 'default' as const
+      case 'completed': return 'outline' as const
+      case 'archived': return 'destructive' as const
+      default: return 'secondary' as const
+    }
+  }
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'home_purchase': return t('types.homePurchase')
+      case 'investment': return t('types.investment')
+      case 'upgrade': return t('types.upgrade')
+      case 'refinance': return t('types.refinance')
+      default: return t('types.unknown')
+    }
+  }
+
   if (plans.length === 0) {
     return (
       <div className="text-center py-12">
-        <h3 className="text-lg font-semibold mb-2">Chưa có kế hoạch nào</h3>
+        <h3 className="text-lg font-semibold mb-2">{t('empty.title')}</h3>
         <p className="text-muted-foreground mb-4">
-          Bắt đầu tạo kế hoạch tài chính đầu tiên của bạn
+          {t('empty.description')}
         </p>
         <Link href="/dashboard/plans/new">
-          <Button>Tạo Kế Hoạch Đầu Tiên</Button>
+          <Button>{t('empty.createButton')}</Button>
         </Link>
       </div>
     )
@@ -53,27 +74,27 @@ export function PlansList({ plans }: PlansListProps) {
               <div>
                 <CardTitle className="text-lg">{plan.plan_name}</CardTitle>
                 <CardDescription>
-                  {typeMap[plan.plan_type]} • {new Date(plan.created_at).toLocaleDateString('vi-VN')}
+                  {getTypeLabel(plan.plan_type)} • {new Date(plan.created_at).toLocaleDateString('vi-VN')}
                 </CardDescription>
               </div>
-              <Badge variant={statusMap[plan.status as keyof typeof statusMap]?.variant || 'secondary'}>
-                {statusMap[plan.status as keyof typeof statusMap]?.label || 'Unknown'}
+              <Badge variant={getStatusVariant(plan.status)}>
+                {getStatusLabel(plan.status)}
               </Badge>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Giá mua:</span>
+                <span className="text-sm text-muted-foreground">{t('details.purchasePrice')}:</span>
                 <span className="font-semibold">{formatCurrency(plan.purchase_price || 0)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Vốn tự có:</span>
+                <span className="text-sm text-muted-foreground">{t('details.downPayment')}:</span>
                 <span className="font-semibold">{formatCurrency(plan.down_payment || 0)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Thu nhập:</span>
-                <span className="font-semibold">{formatCurrency(plan.monthly_income || 0)}/tháng</span>
+                <span className="text-sm text-muted-foreground">{t('details.monthlyIncome')}:</span>
+                <span className="font-semibold">{formatCurrency(plan.monthly_income || 0)}/{t('details.month')}</span>
               </div>
             </div>
             
@@ -81,7 +102,7 @@ export function PlansList({ plans }: PlansListProps) {
               <Link href={`/dashboard/plans/${plan.id}`} className="flex-1">
                 <Button variant="outline" size="sm" className="w-full">
                   <Eye className="w-4 h-4 mr-1" />
-                  Xem
+                  {t('actions.view')}
                 </Button>
               </Link>
               <Link href={`/dashboard/plans/${plan.id}/edit`}>

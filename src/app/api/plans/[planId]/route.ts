@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 const updatePlanSchema = z.object({
   plan_name: z.string().min(1).optional(),
-  plan_description: z.string().optional(),
+  description: z.string().optional(),
   plan_type: z.enum(['home_purchase', 'investment', 'upgrade', 'refinance']).optional(),
   purchase_price: z.number().min(1).optional(),
   down_payment: z.number().min(1).optional(),
@@ -17,8 +17,8 @@ const updatePlanSchema = z.object({
   other_debts: z.number().optional(),
   expected_rental_income: z.number().optional(),
   expected_appreciation_rate: z.number().optional(),
-  investment_horizon_years: z.number().optional(),
-  plan_status: z.enum(['draft', 'active', 'completed', 'archived']).optional(),
+  investment_horizon_months: z.number().optional(),
+  status: z.enum(['draft', 'active', 'completed', 'archived']).optional(),
   is_public: z.boolean().optional(),
 })
 
@@ -111,7 +111,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Failed to update plan' }, { status: 500 })
     }
 
-    return NextResponse.json({ plan })
+    return NextResponse.json({ data: plan })
 
   } catch (error) {
     if (error instanceof z.ZodError) {

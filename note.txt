@@ -1,0 +1,1 @@
+Check @supabase/migrations/ @src/types/ @src/lib/supabase/types.ts before processing

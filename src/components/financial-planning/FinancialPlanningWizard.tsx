@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { 
   ArrowRight, 
   ArrowLeft, 
@@ -113,6 +114,7 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
   initialData,
   className
 }) => {
+  const t = useTranslations('FinancialPlanningWizard')
   const [currentStep, setCurrentStep] = useState(0)
   const [planData, setPlanData] = useState<PlanData>({
     personalInfo: {
@@ -157,13 +159,13 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
         <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Calculator className="w-8 h-8 text-blue-600" />
         </div>
-        <h3 className="text-2xl font-bold mb-2">Thông Tin Cá Nhân</h3>
-        <p className="text-gray-600">Cung cấp thông tin tài chính cơ bản của bạn</p>
+        <h3 className="text-2xl font-bold mb-2">{t('steps.personalInfo.title')}</h3>
+        <p className="text-gray-600">{t('steps.personalInfo.description')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="name">Họ và tên</Label>
+          <Label htmlFor="name">{t('steps.personalInfo.fields.name.label')}</Label>
           <Input
             id="name"
             value={planData.personalInfo.name}
@@ -171,12 +173,12 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
               ...prev,
               personalInfo: { ...prev.personalInfo, name: e.target.value }
             }))}
-            placeholder="Nhập họ và tên"
+            placeholder={t('steps.personalInfo.fields.name.placeholder')}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="age">Tuổi</Label>
+          <Label htmlFor="age">{t('steps.personalInfo.fields.age.label')}</Label>
           <Input
             id="age"
             type="number"
@@ -191,7 +193,7 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="income">Thu nhập hàng tháng (VND)</Label>
+          <Label htmlFor="income">{t('steps.personalInfo.fields.monthlyIncome.label')}</Label>
           <Input
             id="income"
             type="number"
@@ -208,7 +210,7 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="expenses">Chi phí hàng tháng (VND)</Label>
+          <Label htmlFor="expenses">{t('steps.personalInfo.fields.monthlyExpenses.label')}</Label>
           <Input
             id="expenses"
             type="number"
@@ -225,7 +227,7 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="savings">Tiết kiệm hiện có (VND)</Label>
+          <Label htmlFor="savings">{t('steps.personalInfo.fields.currentSavings.label')}</Label>
           <Input
             id="savings"
             type="number"
@@ -242,7 +244,7 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dependents">Số người phụ thuộc</Label>
+          <Label htmlFor="dependents">{t('steps.personalInfo.fields.dependents.label')}</Label>
           <Select 
             value={planData.personalInfo.dependents.toString()} 
             onValueChange={(value) => setPlanData(prev => ({
@@ -273,7 +275,7 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
           </h4>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Thu nhập ròng:</span>
+              <span className="text-gray-600">{t('steps.personalInfo.summary.netIncome')}:</span>
               <span className="font-medium text-green-600 ml-2">
                 {formatCurrency(planData.personalInfo.monthlyIncome - planData.personalInfo.monthlyExpenses)}
               </span>
@@ -825,51 +827,51 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
   const steps: WizardStep[] = [
     {
       id: 'personal',
-      title: 'Thông Tin Cá Nhân',
-      description: 'Tình hình tài chính hiện tại',
+      title: t('steps.personalInfo.title'),
+      description: t('steps.personalInfo.description'),
       icon: Calculator,
       component: PersonalInfoStep,
       validation: (data) => {
         const errors = []
-        if (!data.personalInfo.name) errors.push('Vui lòng nhập họ tên')
-        if (data.personalInfo.monthlyIncome <= 0) errors.push('Thu nhập phải lớn hơn 0')
+        if (!data.personalInfo.name) errors.push(t('validation.nameRequired'))
+        if (data.personalInfo.monthlyIncome <= 0) errors.push(t('validation.incomeRequired'))
         if (data.personalInfo.monthlyExpenses >= data.personalInfo.monthlyIncome) {
-          errors.push('Chi phí không được lớn hơn thu nhập')
+          errors.push(t('validation.expensesGreaterThanIncome'))
         }
         return errors
       }
     },
     {
       id: 'property',
-      title: 'Mục Tiêu BDS',
-      description: 'Loại bất động sản mong muốn',
+      title: t('steps.propertyGoals.title'),
+      description: t('steps.propertyGoals.description'),
       icon: Home,
       component: PropertyGoalsStep,
       validation: (data) => {
         const errors = []
-        if (!data.propertyGoals.location) errors.push('Vui lòng chọn khu vực')
-        if (data.propertyGoals.budget <= 0) errors.push('Ngân sách phải lớn hơn 0')
+        if (!data.propertyGoals.location) errors.push(t('validation.locationRequired'))
+        if (data.propertyGoals.budget <= 0) errors.push(t('validation.budgetRequired'))
         return errors
       }
     },
     {
       id: 'strategy',
-      title: 'Chiến Lược',
-      description: 'Rủi ro và đầu tư',
+      title: t('steps.financialStrategy.title'),
+      description: t('steps.financialStrategy.description'),
       icon: TrendingUp,
       component: FinancialStrategyStep
     },
     {
       id: 'goals',
-      title: 'Mục Tiêu Khác',
-      description: 'Các mục tiêu bổ sung',
+      title: t('steps.additionalGoals.title'),
+      description: t('steps.additionalGoals.description'),
       icon: Target,
       component: AdditionalGoalsStep
     },
     {
       id: 'review',
-      title: 'Xem Lại',
-      description: 'Tóm tắt và xác nhận',
+      title: t('steps.summary.title'),
+      description: t('steps.summary.description'),
       icon: CheckCircle,
       component: ReviewStep
     }
@@ -1007,14 +1009,14 @@ export const FinancialPlanningWizard: React.FC<FinancialPlanningWizardProps> = (
             className="flex items-center gap-2"
           >
             <Zap className="w-4 h-4" />
-            Hoàn thành kế hoạch
+            {t('navigation.complete')}
           </Button>
         ) : (
           <Button
             onClick={handleNext}
             className="flex items-center gap-2"
           >
-            Tiếp theo
+            {t('navigation.next')}
             <ArrowRight className="w-4 h-4" />
           </Button>
         )}

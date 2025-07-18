@@ -22,7 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { useToast, ToastHelpers } from '@/components/notifications/ToastNotification'
+import { useToast, ToastHelpers, useToastHelpers } from '@/components/notifications/ToastNotification'
 import useGlobalState from '@/lib/hooks/useGlobalState'
 import { cn } from '@/lib/utils'
 
@@ -52,6 +52,7 @@ export const SystemIntegration: React.FC<SystemIntegrationProps> = ({
   className
 }) => {
   const { showToast } = useToast()
+  const toastHelpers = useToastHelpers()
   const { 
     addNotification, 
     unlockAchievement, 
@@ -158,7 +159,7 @@ export const SystemIntegration: React.FC<SystemIntegrationProps> = ({
           system: 'Progress Tracking',
           completed: false,
           action: () => {
-            showToast(ToastHelpers.goalProgress(75, 'Tiết kiệm mua nhà'))
+            showToast(toastHelpers.goalProgress(75, 'Tiết kiệm mua nhà'))
             addExperience(10)
           }
         },

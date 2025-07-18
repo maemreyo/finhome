@@ -43,10 +43,10 @@ import { toast } from 'sonner'
 // Import our components
 import { TimelineVisualization, TimelineScenario } from '@/components/timeline/TimelineVisualization'
 import { FinancialScenario } from '@/types/scenario'
-import PlanProgressTracker, { PlanProgress, PlanMilestone } from '@/components/plans/PlanProgressTracker'
+import { PlanProgressTracker } from '@/components/plans/PlanProgressTracker'
 import { PlanStatusManager } from '@/components/financial-plans/PlanStatusManager'
 import { UIFinancialPlan } from '@/lib/adapters/planAdapter'
-import type { PlanStatus } from '@/lib/supabase/types'
+import type { PlanStatus, PlanProgress, PlanMilestone } from '@/types/plans'
 import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 
 // Import export functions

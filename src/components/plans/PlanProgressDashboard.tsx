@@ -4,6 +4,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -26,10 +27,15 @@ import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
 
 // Import our components
-import PlanStatusManager, { type PlanStatusInfo } from './PlanStatusManager'
-import type { PlanStatus } from '@/lib/supabase/types'
-import PlanProgressTracker, { type PlanProgress, type PlanMilestone } from './PlanProgressTracker'
+import PlanStatusManager from './PlanStatusManager'
+import { PlanProgressTracker } from './PlanProgressTracker'
 import { UIFinancialPlan } from '@/lib/adapters/planAdapter'
+import type { 
+  PlanStatus, 
+  PlanProgress, 
+  PlanMilestone, 
+  PlanStatusInfo 
+} from '@/types/plans'
 
 interface PlanProgressDashboardProps {
   plan: UIFinancialPlan
@@ -74,7 +80,9 @@ const mockStatusInfo: PlanStatusInfo = {
   ],
   canTransitionTo: ['archived', 'completed'],
   estimatedCompletionDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-  archiveReason: undefined
+  archiveReason: undefined,
+  createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+  updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
 }
 
 // Mock progress data
@@ -146,6 +154,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
   onContributionUpdate,
   className
 }) => {
+  const t = useTranslations('PlanProgressDashboard')
   const [statusInfo, setStatusInfo] = useState<PlanStatusInfo>(mockStatusInfo)
   const [progress, setProgress] = useState<PlanProgress>(mockProgress)
 
@@ -232,7 +241,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Overall Progress</p>
+                <p className="text-sm font-medium text-gray-600">{t('overallProgress')}</p>
                 <div className="text-2xl font-bold">{progress.totalProgress}%</div>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
@@ -249,7 +258,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Savings Progress</p>
+                <p className="text-sm font-medium text-gray-600">{t('savingsProgress')}</p>
                 <div className="text-2xl font-bold">{keyMetrics.savingsProgress.toFixed(1)}%</div>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
@@ -266,7 +275,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Milestones</p>
+                <p className="text-sm font-medium text-gray-600">{t('milestones')}</p>
                 <div className="text-2xl font-bold">
                   {keyMetrics.completedMilestones}/{keyMetrics.totalMilestones}
                 </div>
@@ -285,7 +294,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Health Score</p>
+                <p className="text-sm font-medium text-gray-600">{t('healthScore')}</p>
                 <div className={cn('text-2xl font-bold', healthColor)}>
                   {healthScore}
                 </div>
@@ -317,7 +326,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="w-5 h-5" />
-              Current Status
+              {t('currentStatus')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -327,11 +336,11 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
                   {statusInfo.status.charAt(0).toUpperCase() + statusInfo.status.slice(1)}
                 </Badge>
                 <span className="text-sm text-gray-600">
-                  Last updated: {statusInfo.statusHistory[0]?.changedAt.toLocaleDateString('vi-VN')}
+                  {t('lastUpdated')}: {statusInfo.statusHistory[0]?.changedAt.toLocaleDateString('vi-VN')}
                 </span>
               </div>
               <div className="text-sm text-gray-600">
-                Plan: {plan.planName}
+                {t('plan')}: {plan.planName}
               </div>
             </div>
             
@@ -340,7 +349,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
                 <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
                   <AlertTriangle className="w-4 h-4" />
                   <span className="text-sm">
-                    {keyMetrics.overdueMilestones} milestone{keyMetrics.overdueMilestones > 1 ? 's' : ''} overdue
+                    {keyMetrics.overdueMilestones} {t('milestonesOverdue', { count: keyMetrics.overdueMilestones })}
                   </span>
                 </div>
               )}
@@ -349,7 +358,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
                 <div className="flex items-center gap-2 text-yellow-600 bg-yellow-50 p-3 rounded-lg">
                   <Clock className="w-4 h-4" />
                   <span className="text-sm">
-                    Savings progress is behind schedule. Consider increasing monthly contributions.
+                    {t('savingsBehindSchedule')}
                   </span>
                 </div>
               )}
@@ -358,7 +367,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
                 <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
                   <CheckCircle className="w-4 h-4" />
                   <span className="text-sm">
-                    Excellent progress! You&apos;re on track to meet your savings goal.
+                    {t('excellentProgress')}
                   </span>
                 </div>
               )}
@@ -370,28 +379,28 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              Key Dates
+              {t('keyDates')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Estimated Completion</span>
+                <span className="text-sm text-gray-600">{t('estimatedCompletion')}</span>
                 <span className="text-sm font-medium">
                   {progress.estimatedCompletionDate.toLocaleDateString('vi-VN')}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Months to Target</span>
+                <span className="text-sm text-gray-600">{t('monthsToTarget')}</span>
                 <span className="text-sm font-medium">{keyMetrics.monthsToTarget}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Next Milestone</span>
+                <span className="text-sm text-gray-600">{t('nextMilestone')}</span>
                 <span className="text-sm font-medium">
                   {progress.milestones
                     .filter(m => m.status === 'pending')
                     .sort((a, b) => a.targetDate.getTime() - b.targetDate.getTime())[0]
-                    ?.targetDate.toLocaleDateString('vi-VN') || 'None'}
+                    ?.targetDate.toLocaleDateString('vi-VN') || t('none')}
                 </span>
               </div>
             </div>
@@ -402,9 +411,9 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
       {/* Main Content Tabs */}
       <Tabs defaultValue="status" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="status">Status Management</TabsTrigger>
-          <TabsTrigger value="progress">Progress Tracking</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="status">{t('statusManagement')}</TabsTrigger>
+          <TabsTrigger value="progress">{t('progressTracking')}</TabsTrigger>
+          <TabsTrigger value="analytics">{t('analytics')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="status">
@@ -433,25 +442,25 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="w-5 h-5" />
-                  Progress Analytics
+                  {t('progressAnalytics')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Financial Progress</span>
+                    <span className="text-sm text-gray-600">{t('financialProgress')}</span>
                     <span className="text-sm font-medium">{progress.financialProgress}%</span>
                   </div>
                   <Progress value={progress.financialProgress} className="h-2" />
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Milestone Completion</span>
+                    <span className="text-sm text-gray-600">{t('milestoneCompletion')}</span>
                     <span className="text-sm font-medium">{keyMetrics.milestoneProgress.toFixed(1)}%</span>
                   </div>
                   <Progress value={keyMetrics.milestoneProgress} className="h-2" />
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Overall Health</span>
+                    <span className="text-sm text-gray-600">{t('overallHealth')}</span>
                     <span className={cn('text-sm font-medium', healthColor)}>{healthScore}%</span>
                   </div>
                   <Progress value={healthScore} className="h-2" />
@@ -463,25 +472,25 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChart className="w-5 h-5" />
-                  Financial Breakdown
+                  {t('financialBreakdown')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Current Savings</span>
+                    <span className="text-sm text-gray-600">{t('currentSavings')}</span>
                     <span className="text-sm font-medium">{formatCurrency(progress.currentSavings)}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Target Amount</span>
+                    <span className="text-sm text-gray-600">{t('targetAmount')}</span>
                     <span className="text-sm font-medium">{formatCurrency(progress.savingsTarget)}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Monthly Contribution</span>
+                    <span className="text-sm text-gray-600">{t('monthlyContribution')}</span>
                     <span className="text-sm font-medium">{formatCurrency(progress.monthlyContribution)}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Remaining</span>
+                    <span className="text-sm text-gray-600">{t('remaining')}</span>
                     <span className="text-sm font-medium">
                       {formatCurrency(progress.savingsTarget - progress.currentSavings)}
                     </span>

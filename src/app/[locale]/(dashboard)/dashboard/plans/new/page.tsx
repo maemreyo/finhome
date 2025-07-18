@@ -2,6 +2,7 @@
 import { getUser } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { CreatePlanForm } from '@/components/plans/CreatePlanForm'
+import { getTranslations } from 'next-intl/server'
 
 type PageProps = {
   params: Promise<{ locale: string }>
@@ -15,12 +16,14 @@ export default async function NewPlanPage({ params }: PageProps) {
     redirect(`/${locale}/auth/login`)
   }
 
+  const t = await getTranslations('NewPlanPage')
+
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Tạo Kế Hoạch Tài Chính Mới</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Bắt đầu hành trình mua nhà của bạn với kế hoạch tài chính chi tiết
+          {t('description')}
         </p>
       </div>
 

@@ -100,6 +100,7 @@ export const AdminSidebar: React.FC = () => {
   const params = useParams()
   const locale = params.locale as string
   const t = useTranslations('Admin.navigation')
+  const tDashboard = useTranslations('Admin.dashboard')
 
   return (
     <aside className="fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 overflow-y-auto">
@@ -151,23 +152,23 @@ export const AdminSidebar: React.FC = () => {
 
         {/* Quick Stats */}
         <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-          <h4 className="text-sm font-semibold text-gray-900 mb-3">Quick Stats</h4>
+          <h4 className="text-sm font-semibold text-gray-900 mb-3">{tDashboard('quickStats')}</h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-600">Active Users</span>
+              <span className="text-gray-600">{tDashboard('totalUsers')}</span>
               <span className="font-medium">1,234</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Total Banks</span>
+              <span className="text-gray-600">{tDashboard('totalBanks')}</span>
               <span className="font-medium">25</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Achievements</span>
+              <span className="text-gray-600">{tDashboard('achievements')}</span>
               <span className="font-medium">18</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Notifications</span>
-              <span className="font-medium text-blue-600">5 pending</span>
+              <span className="text-gray-600">{tDashboard('notifications')}</span>
+              <span className="font-medium text-blue-600">5 {tDashboard('pendingNotifications')}</span>
             </div>
           </div>
         </div>

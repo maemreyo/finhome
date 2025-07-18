@@ -7,6 +7,7 @@ import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 
 type PageProps = {
   params: Promise<{ locale: string }>
@@ -19,23 +20,24 @@ export default async function PlansPage({ params }: PageProps) {
   if (!user) {
     redirect(`/${locale}/auth/login`)
   }
-
+  
   const plans = await getUserFinancialPlans(user.id)
+  const t = await getTranslations('DashboardPlansPage')
 
   return (
     <DashboardShell
-      title="Kế Hoạch Tài Chính"
-      description="Quản lý và theo dõi các kế hoạch mua nhà của bạn"
+      title={t('title')}
+      description={t('description')}
       headerAction={
         <Link href={`/${locale}/dashboard/plans/new`}>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Tạo Kế Hoạch Mới
+            {t('createButton')}
           </Button>
         </Link>
       }
     >
-      <Suspense fallback={<div>Đang tải...</div>}>
+      <Suspense fallback={<div>{t('loading')}</div>}>
         <PlansList plans={plans} />
       </Suspense>
     </DashboardShell>

@@ -236,7 +236,7 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: user.id,
         plan_name: validatedData.planName,
-        plan_description: validatedData.planDescription,
+        description: validatedData.planDescription,
         plan_type: validatedData.planType,
         purchase_price: validatedData.purchasePrice,
         down_payment: validatedData.downPayment,
@@ -247,7 +247,7 @@ export async function POST(request: NextRequest) {
         other_debts: validatedData.otherDebts,
         expected_rental_income: validatedData.expectedRentalIncome,
         expected_appreciation_rate: validatedData.expectedAppreciationRate,
-        investment_horizon_years: validatedData.investmentHorizonYears,
+        investment_horizon_months: validatedData.investmentHorizonYears ? validatedData.investmentHorizonYears * 12 : null,
         is_public: validatedData.isPublic,
         status: 'draft',
         cached_calculations: cachedCalculations,
