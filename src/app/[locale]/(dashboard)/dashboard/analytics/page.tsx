@@ -1,9 +1,10 @@
-// Dashboard analytics page with locale support
+// Dashboard analytics page with locale support - UPDATED: 2024-01-18 - Integrated with real database
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/hooks/useAuth'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -18,10 +19,16 @@ import {
   Target,
   Activity
 } from 'lucide-react'
+import { DashboardService } from '@/lib/services/dashboardService'
+import { formatCurrency } from '@/lib/utils'
 
 export default function AnalyticsPage() {
   const t = useTranslations('Dashboard.Analytics')
+  const { user, isAuthenticated } = useAuth()
   const [selectedPeriod, setSelectedPeriod] = useState('7d')
+  const [isLoading, setIsLoading] = useState(true)
+  const [analyticsData, setAnalyticsData] = useState<any[]>([])
+  const [dashboardMetrics, setDashboardMetrics] = useState<any>(null)
 
   const periods = [
     { value: '7d', label: '7 days' },
@@ -30,35 +37,70 @@ export default function AnalyticsPage() {
     { value: '1y', label: '1 year' },
   ]
 
+  // Load analytics data
+  useEffect(() => {
+    const loadAnalyticsData = async () => {
+      try {
+        setIsLoading(true)
+        if (isAuthenticated && user) {
+          const [metrics, dashboardData] = await Promise.all([
+            DashboardService.getAnalyticsMetrics(user.id),
+            DashboardService.getDashboardMetrics(user.id)
+          ])
+          
+          setAnalyticsData(metrics)
+          setDashboardMetrics(dashboardData)
+        }
+      } catch (error) {
+        console.error('Error loading analytics data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadAnalyticsData()
+  }, [isAuthenticated, user])
+
+  // Get metric values from database or use defaults
+  const getMetricValue = (metricName: string, type: 'currency' | 'number' = 'number') => {
+    const metric = analyticsData.find(m => m.metric_name === metricName)
+    if (!metric) return type === 'currency' ? '0 VND' : '0'
+    
+    if (type === 'currency') {
+      return formatCurrency(metric.metric_value)
+    }
+    return metric.metric_value.toString()
+  }
+
   const metrics = [
     {
       title: t('metrics.totalPlans'),
-      value: '12',
-      change: '+2.5%',
+      value: dashboardMetrics?.total_plans?.toString() || '0',
+      change: '+2.5%', // Could be calculated from historical data
       trend: 'up',
       icon: Home,
       color: 'text-blue-600'
     },
     {
       title: t('metrics.totalInvestment'),
-      value: '2.4 tỷ VND',
-      change: '+12.3%',
+      value: formatCurrency(dashboardMetrics?.total_portfolio_value || 0),
+      change: '+12.3%', // Could be calculated from historical data
       trend: 'up',
       icon: DollarSign,
       color: 'text-green-600'
     },
     {
       title: t('metrics.expectedProfit'),
-      value: '480 triệu VND',
-      change: '+8.1%',
+      value: formatCurrency(dashboardMetrics?.monthly_rental_income * 12 || 0),
+      change: `+${dashboardMetrics?.portfolio_roi || 0}%`,
       trend: 'up',
       icon: TrendingUp,
       color: 'text-emerald-600'
     },
     {
       title: t('metrics.activeScenarios'),
-      value: '8',
-      change: '+1.2%',
+      value: dashboardMetrics?.active_plans?.toString() || '0',
+      change: '+1.2%', // Could be calculated from historical data
       trend: 'up',
       icon: Activity,
       color: 'text-orange-600'
@@ -132,9 +174,24 @@ export default function AnalyticsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 flex items-center justify-center text-muted-foreground">
-                    {t('planDistribution.placeholder')}
-                  </div>
+                  {isLoading ? (
+                    <div className="h-64 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  ) : analyticsData.length > 0 ? (
+                    <div className="space-y-4">
+                      {analyticsData.filter(m => m.metric_type === 'count').map((metric, index) => (
+                        <div key={metric.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                          <span className="text-sm font-medium capitalize">{metric.metric_name.replace('_', ' ')}</span>
+                          <span className="text-lg font-bold">{metric.metric_value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="h-64 flex items-center justify-center text-muted-foreground">
+                      {t('planDistribution.placeholder')}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -149,9 +206,32 @@ export default function AnalyticsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 flex items-center justify-center text-muted-foreground">
-                    {t('investmentTrends.placeholder')}
-                  </div>
+                  {isLoading ? (
+                    <div className="h-64 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  ) : analyticsData.length > 0 ? (
+                    <div className="space-y-4">
+                      {analyticsData.filter(m => m.metric_type === 'percentage').map((metric, index) => (
+                        <div key={metric.id} className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="capitalize">{metric.metric_name.replace('_', ' ')}</span>
+                            <span className="font-medium">{metric.metric_value}%</span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2">
+                            <div 
+                              className="bg-primary h-2 rounded-full transition-all duration-300" 
+                              style={{ width: `${Math.min(metric.metric_value, 100)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="h-64 flex items-center justify-center text-muted-foreground">
+                      {t('investmentTrends.placeholder')}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

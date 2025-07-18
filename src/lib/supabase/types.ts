@@ -1035,6 +1035,337 @@ export interface Database {
         }
         Relationships: []
       }
+      faq_items: {
+        Row: {
+          id: string
+          question: string
+          question_vi: string
+          answer: string
+          answer_vi: string
+          category: string
+          sort_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          question: string
+          question_vi: string
+          answer: string
+          answer_vi: string
+          category: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          question?: string
+          question_vi?: string
+          answer?: string
+          answer_vi?: string
+          category?: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          id: string
+          user_id: string | null
+          ticket_number: string
+          subject: string
+          description: string
+          status: 'open' | 'in_progress' | 'resolved' | 'closed'
+          priority: 'low' | 'medium' | 'high' | 'urgent'
+          category: string
+          assigned_to: string | null
+          created_at: string
+          updated_at: string
+          resolved_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          ticket_number: string
+          subject: string
+          description: string
+          status?: 'open' | 'in_progress' | 'resolved' | 'closed'
+          priority?: 'low' | 'medium' | 'high' | 'urgent'
+          category: string
+          assigned_to?: string | null
+          created_at?: string
+          updated_at?: string
+          resolved_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          ticket_number?: string
+          subject?: string
+          description?: string
+          status?: 'open' | 'in_progress' | 'resolved' | 'closed'
+          priority?: 'low' | 'medium' | 'high' | 'urgent'
+          category?: string
+          assigned_to?: string | null
+          created_at?: string
+          updated_at?: string
+          resolved_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      analytics_metrics: {
+        Row: {
+          id: string
+          user_id: string | null
+          metric_name: string
+          metric_value: number
+          metric_type: 'currency' | 'percentage' | 'count' | 'ratio'
+          period_start: string
+          period_end: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          metric_name: string
+          metric_value: number
+          metric_type: 'currency' | 'percentage' | 'count' | 'ratio'
+          period_start: string
+          period_end: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          metric_name?: string
+          metric_value?: number
+          metric_type?: 'currency' | 'percentage' | 'count' | 'ratio'
+          period_start?: string
+          period_end?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_metrics_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      financial_scenarios: {
+        Row: {
+          id: string
+          user_id: string | null
+          financial_plan_id: string | null
+          scenario_name: string
+          scenario_type: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test'
+          description: string | null
+          property_price: number
+          down_payment: number
+          loan_amount: number
+          interest_rate: number
+          loan_term_months: number
+          monthly_income: number | null
+          monthly_expenses: number | null
+          monthly_payment: number
+          total_interest: number
+          total_cost: number
+          debt_to_income_ratio: number | null
+          loan_to_value_ratio: number | null
+          risk_level: 'low' | 'medium' | 'high'
+          risk_factors: Json
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          financial_plan_id?: string | null
+          scenario_name: string
+          scenario_type: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test'
+          description?: string | null
+          property_price: number
+          down_payment: number
+          loan_amount: number
+          interest_rate: number
+          loan_term_months: number
+          monthly_income?: number | null
+          monthly_expenses?: number | null
+          monthly_payment: number
+          total_interest: number
+          total_cost: number
+          debt_to_income_ratio?: number | null
+          loan_to_value_ratio?: number | null
+          risk_level: 'low' | 'medium' | 'high'
+          risk_factors?: Json
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          financial_plan_id?: string | null
+          scenario_name?: string
+          scenario_type?: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test'
+          description?: string | null
+          property_price?: number
+          down_payment?: number
+          loan_amount?: number
+          interest_rate?: number
+          loan_term_months?: number
+          monthly_income?: number | null
+          monthly_expenses?: number | null
+          monthly_payment?: number
+          total_interest?: number
+          total_cost?: number
+          debt_to_income_ratio?: number | null
+          loan_to_value_ratio?: number | null
+          risk_level?: 'low' | 'medium' | 'high'
+          risk_factors?: Json
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_scenarios_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_scenarios_financial_plan_id_fkey"
+            columns: ["financial_plan_id"]
+            referencedRelation: "financial_plans"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      market_insights: {
+        Row: {
+          id: string
+          title: string
+          title_vi: string
+          content: string
+          content_vi: string
+          insight_type: 'trend' | 'forecast' | 'analysis' | 'news'
+          location: string | null
+          property_type: 'apartment' | 'house' | 'villa' | 'townhouse' | 'land' | 'commercial' | null
+          impact_score: number | null
+          is_featured: boolean
+          published_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          title_vi: string
+          content: string
+          content_vi: string
+          insight_type: 'trend' | 'forecast' | 'analysis' | 'news'
+          location?: string | null
+          property_type?: 'apartment' | 'house' | 'villa' | 'townhouse' | 'land' | 'commercial' | null
+          impact_score?: number | null
+          is_featured?: boolean
+          published_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          title_vi?: string
+          content?: string
+          content_vi?: string
+          insight_type?: 'trend' | 'forecast' | 'analysis' | 'news'
+          location?: string | null
+          property_type?: 'apartment' | 'house' | 'villa' | 'townhouse' | 'land' | 'commercial' | null
+          impact_score?: number | null
+          is_featured?: boolean
+          published_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      user_experience: {
+        Row: {
+          id: string
+          user_id: string
+          total_experience: number
+          current_level: number
+          experience_in_level: number
+          experience_to_next_level: number
+          plans_created: number
+          calculations_performed: number
+          properties_viewed: number
+          achievements_unlocked: number
+          days_active: number
+          current_login_streak: number
+          longest_login_streak: number
+          last_activity_date: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          total_experience?: number
+          current_level?: number
+          experience_in_level?: number
+          experience_to_next_level?: number
+          plans_created?: number
+          calculations_performed?: number
+          properties_viewed?: number
+          achievements_unlocked?: number
+          days_active?: number
+          current_login_streak?: number
+          longest_login_streak?: number
+          last_activity_date?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          total_experience?: number
+          current_level?: number
+          experience_in_level?: number
+          experience_to_next_level?: number
+          plans_created?: number
+          calculations_performed?: number
+          properties_viewed?: number
+          achievements_unlocked?: number
+          days_active?: number
+          current_login_streak?: number
+          longest_login_streak?: number
+          last_activity_date?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_experience_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1092,6 +1423,30 @@ export interface Database {
         }
         Returns: undefined
       }
+      get_user_dashboard_metrics: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          total_plans: number
+          active_plans: number
+          total_portfolio_value: number
+          monthly_rental_income: number
+          portfolio_roi: number
+          experience_points: number
+          current_level: number
+          unread_notifications: number
+        }
+      }
+      get_dashboard_market_summary: {
+        Args: {}
+        Returns: {
+          location: string
+          property_type: 'apartment' | 'house' | 'villa' | 'townhouse' | 'land' | 'commercial'
+          avg_price_change: number
+          trend_direction: string
+        }[]
+      }
     }
     Enums: {
       user_subscription_tier: 'free' | 'premium' | 'professional'
@@ -1127,6 +1482,12 @@ export type Notification = Database['public']['Tables']['notifications']['Row']
 export type AppSetting = Database['public']['Tables']['app_settings']['Row']
 export type Subscription = Database['public']['Tables']['subscriptions']['Row']
 export type BillingHistory = Database['public']['Tables']['billing_history']['Row']
+export type FaqItem = Database['public']['Tables']['faq_items']['Row']
+export type SupportTicket = Database['public']['Tables']['support_tickets']['Row']
+export type AnalyticsMetric = Database['public']['Tables']['analytics_metrics']['Row']
+export type FinancialScenario = Database['public']['Tables']['financial_scenarios']['Row']
+export type MarketInsight = Database['public']['Tables']['market_insights']['Row']
+export type UserExperience = Database['public']['Tables']['user_experience']['Row']
 
 // Enum types
 export type UserSubscriptionTier = Database['public']['Enums']['user_subscription_tier']

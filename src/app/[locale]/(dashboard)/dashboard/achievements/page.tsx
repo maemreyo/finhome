@@ -1,9 +1,10 @@
-// Dashboard achievements page with locale support
+// Dashboard achievements page with locale support - UPDATED: 2024-01-18 - Integrated with real database
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/hooks/useAuth'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -22,10 +23,16 @@ import {
   Home,
   BarChart3
 } from 'lucide-react'
+import { DashboardService } from '@/lib/services/dashboardService'
 
 export default function AchievementsPage() {
   const t = useTranslations('Dashboard.Achievements')
+  const { user, isAuthenticated } = useAuth()
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [isLoading, setIsLoading] = useState(true)
+  const [userAchievements, setUserAchievements] = useState<any[]>([])
+  const [availableAchievements, setAvailableAchievements] = useState<any[]>([])
+  const [userExperience, setUserExperience] = useState<any>(null)
 
   const categories = [
     { value: 'all', label: t('categories.all') },
@@ -34,6 +41,32 @@ export default function AchievementsPage() {
     { value: 'savings', label: t('categories.savings') },
     { value: 'milestones', label: t('categories.milestones') },
   ]
+
+  // Load achievements data
+  useEffect(() => {
+    const loadAchievementsData = async () => {
+      try {
+        setIsLoading(true)
+        if (isAuthenticated && user) {
+          const [userAchievementsData, availableAchievementsData, userExperienceData] = await Promise.all([
+            DashboardService.getUserAchievements(user.id),
+            DashboardService.getAvailableAchievements(),
+            DashboardService.getUserExperience(user.id)
+          ])
+          
+          setUserAchievements(userAchievementsData)
+          setAvailableAchievements(availableAchievementsData)
+          setUserExperience(userExperienceData)
+        }
+      } catch (error) {
+        console.error('Error loading achievements data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadAchievementsData()
+  }, [isAuthenticated, user])
 
   const achievements = [
     {
@@ -126,12 +159,37 @@ export default function AchievementsPage() {
     locked: 'text-gray-400'
   }
 
-  const filteredAchievements = selectedCategory === 'all' 
-    ? achievements 
-    : achievements.filter(a => a.category === selectedCategory)
+  // Merge database achievements with available achievements
+  const mergedAchievements = availableAchievements.map(achievement => {
+    const userAchievement = userAchievements.find(ua => ua.achievements?.id === achievement.id)
+    const isCompleted = !!userAchievement
+    
+    return {
+      id: achievement.id,
+      title: achievement.name,
+      description: achievement.description,
+      icon: achievement.category === 'planning' ? Home : 
+            achievement.category === 'investment' ? BarChart3 :
+            achievement.category === 'savings' ? Crown :
+            achievement.category === 'milestones' ? Zap : Trophy,
+      category: achievement.category,
+      status: isCompleted ? 'completed' : 'locked',
+      completedAt: userAchievement?.unlocked_at,
+      progress: userAchievement?.progress_data?.progress || 0,
+      xp: achievement.points,
+      rarity: achievement.rarity || 'common'
+    }
+  })
 
-  const completedCount = achievements.filter(a => a.status === 'completed').length
-  const totalXP = achievements.filter(a => a.status === 'completed').reduce((sum, a) => sum + a.xp, 0)
+  // Use mock data as fallback if no database data
+  const displayAchievements = mergedAchievements.length > 0 ? mergedAchievements : achievements
+
+  const filteredAchievements = selectedCategory === 'all' 
+    ? displayAchievements 
+    : displayAchievements.filter(a => a.category === selectedCategory)
+
+  const completedCount = displayAchievements.filter(a => a.status === 'completed').length
+  const totalXP = displayAchievements.filter(a => a.status === 'completed').reduce((sum, a) => sum + a.xp, 0)
 
   return (
     <DashboardShell 
@@ -147,9 +205,11 @@ export default function AchievementsPage() {
               <Trophy className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{completedCount}</div>
+              <div className="text-2xl font-bold">
+                {isLoading ? '...' : completedCount}
+              </div>
               <p className="text-xs text-muted-foreground">
-                / {achievements.length} tổng cộng
+                / {displayAchievements.length} tổng cộng
               </p>
             </CardContent>
           </Card>
@@ -160,7 +220,9 @@ export default function AchievementsPage() {
               <Star className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalXP.toLocaleString()}</div>
+              <div className="text-2xl font-bold">
+                {isLoading ? '...' : (userExperience?.total_experience || totalXP).toLocaleString()}
+              </div>
               <p className="text-xs text-muted-foreground">
                 XP tích lũy
               </p>
@@ -173,9 +235,13 @@ export default function AchievementsPage() {
               <Award className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Level {Math.floor(totalXP / 500) + 1}</div>
+              <div className="text-2xl font-bold">
+                {isLoading ? '...' : `Level ${userExperience?.current_level || Math.floor(totalXP / 500) + 1}`}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Nhà đầu tư {Math.floor(totalXP / 500) < 1 ? 'mới' : 'có kinh nghiệm'}
+                {userExperience?.experience_to_next_level 
+                  ? `Còn ${userExperience.experience_to_next_level} XP để lên cấp ${userExperience.current_level + 1}`
+                  : 'Nhà đầu tư có kinh nghiệm'}
               </p>
             </CardContent>
           </Card>
@@ -224,7 +290,7 @@ export default function AchievementsPage() {
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
                       <span>Tiến độ</span>
-                      <span>{achievement.current}/{achievement.target}</span>
+                      <span>{(achievement as any).current || 0}/{(achievement as any).target || 0}</span>
                     </div>
                     <Progress value={achievement.progress} className="h-2" />
                   </div>

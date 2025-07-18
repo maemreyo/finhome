@@ -1,9 +1,10 @@
-// Dashboard help page with locale support
+// Dashboard help page with locale support - UPDATED: 2024-01-18 - Integrated with real database
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/hooks/useAuth'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -27,15 +28,45 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react'
+import { DashboardService } from '@/lib/services/dashboardService'
+import { toast } from 'sonner'
 
 export default function HelpPage() {
   const t = useTranslations('Dashboard.Help')
+  const { user, isAuthenticated } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [contactForm, setContactForm] = useState({
     subject: '',
     message: '',
     category: 'general'
   })
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [dbFaqItems, setDbFaqItems] = useState<any[]>([])
+  const [dbSupportTickets, setDbSupportTickets] = useState<any[]>([])
+
+  // Load FAQ and support tickets from database
+  useEffect(() => {
+    const loadHelpData = async () => {
+      try {
+        setIsLoading(true)
+        const [faqData, supportData] = await Promise.all([
+          DashboardService.getFaqItems(),
+          isAuthenticated && user ? DashboardService.getSupportTickets(user.id) : Promise.resolve([])
+        ])
+        
+        setDbFaqItems(faqData)
+        setDbSupportTickets(supportData)
+      } catch (error) {
+        console.error('Error loading help data:', error)
+        toast.error('Failed to load help data')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadHelpData()
+  }, [isAuthenticated, user])
 
   const faqItems = [
     {
@@ -133,10 +164,46 @@ export default function HelpPage() {
     in_progress: 'text-blue-600'
   }
 
-  const filteredFAQ = faqItems.filter(item => 
-    item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.answer.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Submit contact form
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!isAuthenticated || !user) {
+      toast.error('Please login to submit support tickets')
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+      await DashboardService.createSupportTicket(user.id, {
+        subject: contactForm.subject,
+        description: contactForm.message,
+        category: contactForm.category
+      })
+      
+      toast.success('Support ticket submitted successfully!')
+      setContactForm({ subject: '', message: '', category: 'general' })
+      
+      // Reload support tickets
+      const supportData = await DashboardService.getSupportTickets(user.id)
+      setDbSupportTickets(supportData)
+    } catch (error) {
+      console.error('Error submitting contact form:', error)
+      toast.error('Failed to submit support ticket')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Use database FAQ items or fallback to mock data
+  const displayFaqItems = dbFaqItems.length > 0 ? dbFaqItems : faqItems
+  const displaySupportTickets = dbSupportTickets.length > 0 ? dbSupportTickets : supportTickets
+
+  const filteredFAQ = displayFaqItems.filter(item => {
+    const question = item.question || item.question_vi || ''
+    const answer = item.answer || item.answer_vi || ''
+    return question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           answer.toLowerCase().includes(searchQuery.toLowerCase())
+  })
 
   return (
     <DashboardShell 
@@ -182,18 +249,36 @@ export default function HelpPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Accordion type="single" collapsible className="w-full">
-                  {filteredFAQ.map((item, index) => (
-                    <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger className="text-left">
-                        {item.question}
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <p className="text-muted-foreground">{item.answer}</p>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                {isLoading ? (
+                  <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-12 bg-gray-100 rounded animate-pulse"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <Accordion type="single" collapsible className="w-full">
+                    {filteredFAQ.map((item, index) => (
+                      <AccordionItem key={item.id || index} value={`item-${index}`}>
+                        <AccordionTrigger className="text-left">
+                          {item.question || item.question_vi || 'Question'}
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <p className="text-muted-foreground">
+                            {item.answer || item.answer_vi || 'Answer'}
+                          </p>
+                          {item.category && (
+                            <Badge variant="secondary" className="mt-2">
+                              {item.category}
+                            </Badge>
+                          )}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -342,7 +427,7 @@ export default function HelpPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4">
+                <form onSubmit={handleContactSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="subject">{t('supportForm.subject')}</Label>
                     <Input
@@ -350,6 +435,7 @@ export default function HelpPage() {
                       placeholder={t('supportForm.subjectPlaceholder')}
                       value={contactForm.subject}
                       onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
+                      required
                     />
                   </div>
                   
@@ -361,11 +447,14 @@ export default function HelpPage() {
                       rows={4}
                       value={contactForm.message}
                       onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                      required
                     />
                   </div>
                   
                   <div className="flex justify-end">
-                    <Button type="submit">{t('supportForm.submit')}</Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? 'Submitting...' : t('supportForm.submit')}
+                    </Button>
                   </div>
                 </form>
               </CardContent>
@@ -381,32 +470,45 @@ export default function HelpPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {supportTickets.map((ticket) => {
-                    const StatusIcon = statusIcons[ticket.status as keyof typeof statusIcons]
-                    return (
-                      <div key={ticket.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <StatusIcon className={`h-4 w-4 ${statusColors[ticket.status as keyof typeof statusColors]}`} />
-                          <div>
-                            <p className="font-medium">{ticket.subject}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {ticket.id} • {new Date(ticket.created).toLocaleDateString(t('locale'))}
-                            </p>
+                {isLoading ? (
+                  <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="h-16 bg-gray-100 rounded animate-pulse"></div>
+                    ))}
+                  </div>
+                ) : displaySupportTickets.length > 0 ? (
+                  <div className="space-y-4">
+                    {displaySupportTickets.map((ticket) => {
+                      const StatusIcon = statusIcons[ticket.status as keyof typeof statusIcons]
+                      return (
+                        <div key={ticket.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <StatusIcon className={`h-4 w-4 ${statusColors[ticket.status as keyof typeof statusColors]}`} />
+                            <div>
+                              <p className="font-medium">{ticket.subject}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {ticket.ticket_number || ticket.id} • {new Date(ticket.created_at || ticket.created).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">
+                              {t(`tickets.status.${ticket.status}`) || ticket.status}
+                            </Badge>
+                            <Button variant="ghost" size="sm">
+                              {t('tickets.details')}
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">
-                            {t(`tickets.status.${ticket.status}`)}
-                          </Badge>
-                          <Button variant="ghost" size="sm">
-                            {t('tickets.details')}
-                          </Button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No support tickets yet. Submit a support request to get started.</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

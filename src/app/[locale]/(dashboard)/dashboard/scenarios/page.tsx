@@ -11,6 +11,7 @@ import { useScenarios } from "@/hooks/useScenarios";
 import { useAuth } from "@/hooks/useAuth";
 import type { FinancialScenario } from "@/types/scenario";
 import { useBankRates } from "@/hooks/useBankRates";
+import { DashboardService } from "@/lib/services/dashboardService";
 import {
   Card,
   CardContent,
@@ -179,8 +180,93 @@ export default function ScenariosPage() {
   const [generatedScenarios, setGeneratedScenarios] = useState<
     FinancialScenario[]
   >([]);
+  const [dbScenarios, setDbScenarios] = useState<any[]>([]);
+  const [isLoadingDb, setIsLoadingDb] = useState(true);
 
-  // Mock data for demonstration
+  // Load database scenarios
+  useEffect(() => {
+    const loadDbScenarios = async () => {
+      try {
+        setIsLoadingDb(true);
+        const scenarios = await DashboardService.getFinancialScenarios(user?.id || '');
+        setDbScenarios(scenarios);
+      } catch (error) {
+        console.error('Error loading database scenarios:', error);
+      } finally {
+        setIsLoadingDb(false);
+      }
+    };
+
+    if (user) {
+      loadDbScenarios();
+    } else {
+      setIsLoadingDb(false);
+    }
+  }, [user]);
+
+  // Convert database scenarios to FinancialScenario format
+  const convertDbScenario = (dbScenario: any): FinancialScenario => {
+    return {
+      id: dbScenario.id,
+      user_id: dbScenario.user_id,
+      plan_name: dbScenario.scenario_name,
+      description: dbScenario.description,
+      plan_type: 'home_purchase',
+      status: 'draft',
+      property_id: null,
+      custom_property_data: null,
+      target_age: null,
+      current_monthly_income: dbScenario.monthly_income,
+      monthly_income: dbScenario.monthly_income,
+      current_monthly_expenses: dbScenario.monthly_expenses,
+      monthly_expenses: dbScenario.monthly_expenses,
+      current_savings: null,
+      dependents: 0,
+      purchase_price: dbScenario.property_price,
+      down_payment: dbScenario.down_payment,
+      additional_costs: 0,
+      other_debts: 0,
+      target_property_type: null,
+      target_location: null,
+      target_budget: null,
+      target_timeframe_months: null,
+      investment_purpose: null,
+      desired_features: {},
+      down_payment_target: null,
+      risk_tolerance: 'moderate',
+      investment_horizon_months: null,
+      expected_roi: null,
+      preferred_banks: null,
+      expected_rental_income: null,
+      expected_appreciation_rate: null,
+      emergency_fund_target: null,
+      education_fund_target: null,
+      retirement_fund_target: null,
+      other_goals: {},
+      feasibility_score: null,
+      recommended_adjustments: {},
+      is_public: false,
+      view_count: 0,
+      cached_calculations: null,
+      calculations_last_updated: null,
+      created_at: dbScenario.created_at,
+      updated_at: dbScenario.updated_at,
+      completed_at: null,
+      calculatedMetrics: {
+        monthlyPayment: dbScenario.monthly_payment,
+        totalInterest: dbScenario.total_interest,
+        totalCost: dbScenario.total_cost,
+        dtiRatio: dbScenario.debt_to_income_ratio,
+        ltvRatio: dbScenario.loan_to_value_ratio,
+        affordabilityScore: 0,
+        payoffTimeMonths: dbScenario.loan_term_months
+      },
+      riskLevel: dbScenario.risk_level,
+      scenarioType: dbScenario.scenario_type
+    };
+  };
+
+  // Mock data for demonstration (fallback)
   const mockScenarios: FinancialScenario[] = [
     createMockScenario({
       id: "scenario-1",
@@ -385,8 +471,10 @@ export default function ScenariosPage() {
     getRates({ loanType: "home_purchase", isActive: true });
   }, []);
 
-  // Use mock data for demo purposes when no user is authenticated
-  const displayScenarios = user ? scenarios : mockScenarios;
+  // Use database scenarios first, then hook scenarios, then mock data as fallback
+  const displayScenarios = user 
+    ? (dbScenarios.length > 0 ? dbScenarios.map(convertDbScenario) : scenarios.length > 0 ? scenarios : mockScenarios)
+    : mockScenarios;
   const lowRiskScenarios = displayScenarios.filter(
     (s) => s.riskLevel === "low"
   );
@@ -397,7 +485,7 @@ export default function ScenariosPage() {
       0
     ) / totalScenarios;
 
-  if (loading && user) {
+  if ((loading || isLoadingDb) && user) {
     return (
       <DashboardShell title={t("title")} description={t("description")}>
         <div className="space-y-6">

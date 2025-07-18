@@ -1,11 +1,12 @@
 // src/app/[locale]/dashboard/page.tsx
-// Main dashboard page with locale support
+// Main dashboard page with locale support - UPDATED: 2024-01-18 - Integrated with real database
 
 'use client'
 
-import React, { useState, useMemo, use } from 'react'
+import React, { useState, useMemo, use, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/hooks/useAuth'
 import {
   TrendingUp,
   TrendingDown,
@@ -43,6 +44,9 @@ import { PropertyPortfolio } from '@/components/dashboard/PropertyPortfolio'
 import NotificationCenter from '@/components/notifications/NotificationCenter'
 import AchievementSystem from '@/components/achievements/AchievementSystem'
 
+// Import database service
+import { DashboardService } from '@/lib/services/dashboardService'
+
 // Import legacy components for fallback
 import { TimelineVisualization } from '@/components/timeline/TimelineVisualization'
 import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
@@ -54,110 +58,105 @@ type PageProps = {
   params: Promise<{ locale: string }>
 }
 
-// Sample data for dashboard
-const samplePlans: FinancialPlanWithMetrics[] = [
-  {
-    id: '1',
-    user_id: 'sample-user',
-    plan_name: 'My First Home Purchase',
-    description: 'Buying a 2-bedroom apartment in District 7',
-    plan_type: 'home_purchase',
-    status: 'active',
-    property_id: null,
-    custom_property_data: null,
-    target_age: null,
-    current_monthly_income: null,
-    monthly_income: 50000000,
-    current_monthly_expenses: null,
-    monthly_expenses: 25000000,
-    current_savings: 800000000,
-    dependents: 0,
-    purchase_price: 3000000000,
-    down_payment: 600000000,
-    additional_costs: 0,
-    other_debts: 0,
-    target_property_type: null,
-    target_location: null,
-    target_budget: null,
-    target_timeframe_months: null,
-    investment_purpose: null,
-    desired_features: {},
-    down_payment_target: null,
-    risk_tolerance: 'moderate',
-    investment_horizon_months: null,
-    expected_roi: null,
-    preferred_banks: null,
-    expected_rental_income: null,
-    expected_appreciation_rate: null,
-    emergency_fund_target: null,
-    education_fund_target: null,
-    retirement_fund_target: null,
-    other_goals: {},
-    feasibility_score: null,
-    recommended_adjustments: {},
-    is_public: false,
-    view_count: 0,
-    cached_calculations: {
-      monthlyPayment: 17400000,
-      totalInterest: 1200000000,
-      debtToIncomeRatio: 34.8,
-      affordabilityScore: 7
-    },
-    calculations_last_updated: null,
-    created_at: '2024-01-15T00:00:00Z',
-    updated_at: '2024-01-20T00:00:00Z',
-    completed_at: null,
-    calculatedMetrics: {
-      monthlyPayment: 17400000,
-      totalInterest: 1200000000,
-      debtToIncomeRatio: 34.8,
-      affordabilityScore: 7
-    }
+// State interface for dashboard data
+interface DashboardData {
+  metrics: {
+    total_plans: number
+    active_plans: number
+    total_portfolio_value: number
+    monthly_rental_income: number
+    portfolio_roi: number
+    experience_points: number
+    current_level: number
+    unread_notifications: number
   }
-]
+  marketInsights: any[]
+  notifications: any[]
+  achievements: any[]
+  userExperience: any
+}
 
-const marketData = {
-  averagePrice: 45000000, // VND per m²
-  priceChange: 8.5, // % increase
-  interestRates: {
-    promotional: 7.5,
-    regular: 10.5,
-    trend: 'stable'
+// Mock fallback data (for demo or when user is not authenticated)
+const fallbackData: DashboardData = {
+  metrics: {
+    total_plans: 0,
+    active_plans: 0,
+    total_portfolio_value: 0,
+    monthly_rental_income: 0,
+    portfolio_roi: 0,
+    experience_points: 0,
+    current_level: 1,
+    unread_notifications: 0
   },
-  marketSentiment: 'positive'
+  marketInsights: [],
+  notifications: [],
+  achievements: [],
+  userExperience: null
 }
 
 export default function DashboardPage({ params }: PageProps) {
   const { locale } = use(params)
   const t = useTranslations('Dashboard')
+  const { user, isAuthenticated } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
   const [selectedView, setSelectedView] = useState<'overview' | 'legacy'>('overview')
+  const [dashboardData, setDashboardData] = useState<DashboardData>(fallbackData)
 
-  // Simulate loading
-  React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200)
-    return () => clearTimeout(timer)
-  }, [])
+  // Load dashboard data
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        setIsLoading(true)
+        
+        if (!isAuthenticated || !user) {
+          // Use fallback data for unauthenticated users
+          setDashboardData(fallbackData)
+          return
+        }
 
-  // Calculate portfolio summary
-  const portfolioSummary = useMemo(() => {
-    const totalValue = samplePlans.reduce((sum, plan) => sum + (plan.purchase_price || 0), 0)
-    const totalDownPayment = samplePlans.reduce((sum, plan) => sum + (plan.down_payment || 0), 0)
-    const totalMonthlyPayment = samplePlans.reduce((sum, plan) => sum + (plan.calculatedMetrics?.monthlyPayment || 0), 0)
-    const totalExpectedROI = samplePlans
-      .filter(plan => plan.calculatedMetrics?.roi)
-      .reduce((sum, plan) => sum + plan.calculatedMetrics!.roi!, 0) / samplePlans.filter(plan => plan.calculatedMetrics?.roi).length
+        // Load data in parallel
+        const [metrics, marketInsights, notifications, achievements, userExperience] = await Promise.all([
+          DashboardService.getDashboardMetrics(user.id),
+          DashboardService.getMarketInsights(3),
+          DashboardService.getNotifications(user.id, 5),
+          DashboardService.getUserAchievements(user.id),
+          DashboardService.getUserExperience(user.id)
+        ])
 
-    return {
-      totalValue,
-      totalDownPayment,
-      totalMonthlyPayment,
-      totalExpectedROI: isNaN(totalExpectedROI) ? 0 : totalExpectedROI,
-      activePlans: samplePlans.filter(plan => plan.status === 'active').length,
-      draftPlans: samplePlans.filter(plan => plan.status === 'draft').length
+        setDashboardData({
+          metrics,
+          marketInsights,
+          notifications,
+          achievements,
+          userExperience
+        })
+        
+        setLastUpdated(new Date())
+      } catch (error) {
+        console.error('Error loading dashboard data:', error)
+        // Use fallback data on error
+        setDashboardData(fallbackData)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  }, [])
+
+    loadDashboardData()
+  }, [isAuthenticated, user])
+
+  // Calculate portfolio summary from real data
+  const portfolioSummary = useMemo(() => {
+    const metrics = dashboardData.metrics
+    return {
+      totalValue: metrics.total_portfolio_value || 0,
+      totalDownPayment: 0, // Calculate from plans if needed
+      totalMonthlyPayment: metrics.monthly_rental_income || 0,
+      totalExpectedROI: metrics.portfolio_roi || 0,
+      activePlans: metrics.active_plans || 0,
+      draftPlans: (metrics.total_plans || 0) - (metrics.active_plans || 0)
+    }
+  }, [dashboardData.metrics])
 
   const handleCreatePlan = () => {
     window.location.href = `/${locale}/dashboard/plans/new`
@@ -394,28 +393,38 @@ export default function DashboardPage({ params }: PageProps) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('marketInsights.avgPrice')}</p>
-                      <p className="text-lg font-bold text-blue-600">
-                        {formatCurrency(marketData.averagePrice)}
-                      </p>
-                      <div className="flex items-center justify-center text-green-600 text-xs mt-1">
-                        <TrendingUp className="w-3 h-3 mr-1" />
-                        +{marketData.priceChange}%
-                      </div>
+                  {dashboardData.marketInsights.length > 0 ? (
+                    <div className="space-y-3">
+                      {dashboardData.marketInsights.slice(0, 3).map((insight, index) => (
+                        <div key={insight.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                            <div>
+                              <h4 className="font-medium text-sm">{insight.title}</h4>
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {insight.content}
+                              </p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Badge variant="secondary" className="text-xs">
+                                  {insight.insight_type}
+                                </Badge>
+                                {insight.location && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {insight.location}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    
-                    <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('marketInsights.interestRate')}</p>
-                      <p className="text-lg font-bold text-green-600">
-                        {marketData.interestRates.promotional}%
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {t('marketInsights.promotionalRate')}
-                      </p>
+                  ) : (
+                    <div className="text-center p-4 text-muted-foreground">
+                      <BarChart3 className="w-8 h-8 mx-auto mb-2" />
+                      <p className="text-sm">{t('marketInsights.noData')}</p>
                     </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -446,19 +455,23 @@ export default function DashboardPage({ params }: PageProps) {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">{t('quickStats.totalPlans')}:</span>
-                      <span className="font-medium">3</span>
+                      <span className="font-medium">{dashboardData.metrics.total_plans || 0}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">{t('quickStats.interestedProperties')}:</span>
-                      <span className="font-medium">8</span>
+                      <span className="text-sm text-muted-foreground">{t('quickStats.activePlans')}:</span>
+                      <span className="font-medium">{dashboardData.metrics.active_plans || 0}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">{t('quickStats.comparedBanks')}:</span>
-                      <span className="font-medium">12</span>
+                      <span className="text-sm text-muted-foreground">{t('quickStats.experience')}:</span>
+                      <span className="font-medium">{dashboardData.metrics.experience_points || 0}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">{t('quickStats.achievements')}:</span>
-                      <span className="font-medium">7</span>
+                      <span className="font-medium">{dashboardData.achievements.length || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">{t('quickStats.notifications')}:</span>
+                      <span className="font-medium">{dashboardData.metrics.unread_notifications || 0}</span>
                     </div>
                   </div>
                 </CardContent>

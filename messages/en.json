@@ -567,7 +567,7 @@
       "title": "Create New Financial Plan",
       "description": "Start your home buying journey with a detailed financial plan"
     }
-  },
+    },
   "Plans.detail": {
     "status": {
       "draft": "Draft",
@@ -634,8 +634,7 @@
         "placeholder": "Expense allocation chart will be displayed here"
       }
     }
-  }
-}
+  },
   "Dashboard": {
     "title": "Financial Overview",
     "description": "Track progress and manage your real estate investments",

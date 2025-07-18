@@ -48,6 +48,8 @@ import InteractiveParameterSliders from '@/components/scenarios/InteractiveParam
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import LoadingStates from '@/components/common/LoadingStates'
 import type { TimelineScenario } from '@/components/timeline/TimelineVisualization'
+import { DashboardService } from '@/lib/services/dashboardService'
+import { useAuth } from '@/hooks/useAuth'
 import type { FinancialScenario, ScenarioParameters } from '@/types/scenario'
 
 // Create a helper function to generate mock scenarios
@@ -122,46 +124,12 @@ const createMockScenario = (
   }
 })
 
-// Mock scenarios data
-const mockScenarios: TimelineScenario[] = [
-  createMockScenario(
-    'scenario-baseline',
-    t('enhancedScenarios.mockScenarios.baseline.name'),
-    'baseline',
-    t('enhancedScenarios.mockScenarios.baseline.description'),
-    24500000,
-    2880000000,
-    5880000000,
-    240,
-    'medium'
-  ),
-  createMockScenario(
-    'scenario-optimistic',
-    t('enhancedScenarios.mockScenarios.optimistic.name'),
-    'optimistic',
-    t('enhancedScenarios.mockScenarios.optimistic.description'),
-    21200000,
-    2188000000,
-    5188000000,
-    240,
-    'low'
-  ),
-  createMockScenario(
-    'scenario-pessimistic',
-    t('enhancedScenarios.mockScenarios.pessimistic.name'),
-    'pessimistic',
-    t('enhancedScenarios.mockScenarios.pessimistic.description'),
-    28100000,
-    3744000000,
-    6744000000,
-    240,
-    'high'
-  )
-]
+// Mock scenarios data will be created inside the component where t is available
 
 const EnhancedScenariosPage: React.FC = () => {
   const t = useTranslations('Dashboard')
-  const [scenarios, setScenarios] = useState<TimelineScenario[]>(mockScenarios)
+  const { user } = useAuth()
+  const [scenarios, setScenarios] = useState<TimelineScenario[]>([])
   const [selectedScenarioIds, setSelectedScenarioIds] = useState<string[]>(['scenario-baseline'])
   const [chartType, setChartType] = useState<'bar' | 'line' | 'pie' | 'area'>('bar')
   const [filterRiskLevel, setFilterRiskLevel] = useState<'all' | 'low' | 'medium' | 'high'>('all')
@@ -171,6 +139,52 @@ const EnhancedScenariosPage: React.FC = () => {
   const [editingScenario, setEditingScenario] = useState<TimelineScenario | null>(null)
   const [smartScenariosLoading, setSmartScenariosLoading] = useState(false)
   const [baseScenario, setBaseScenario] = useState<FinancialScenario | null>(null)
+  const [dbScenarios, setDbScenarios] = useState<any[]>([])
+  const [isLoadingDb, setIsLoadingDb] = useState(true)
+
+  // Mock scenarios data (now inside component where t is available)
+  const mockScenarios: TimelineScenario[] = useMemo(() => [
+    createMockScenario(
+      'scenario-baseline',
+      'Baseline Scenario',
+      'baseline',
+      'Standard baseline scenario with current market conditions',
+      24500000,
+      2880000000,
+      5880000000,
+      240,
+      'medium'
+    ),
+    createMockScenario(
+      'scenario-optimistic',
+      'Optimistic Scenario',
+      'optimistic',
+      'Optimistic scenario with favorable market conditions',
+      21200000,
+      2188000000,
+      5188000000,
+      240,
+      'low'
+    ),
+    createMockScenario(
+      'scenario-pessimistic',
+      'Pessimistic Scenario',
+      'pessimistic',
+      'Conservative scenario with challenging market conditions',
+      28100000,
+      3744000000,
+      6744000000,
+      240,
+      'high'
+    )
+  ], [])
+
+  // Initialize scenarios with mock data
+  useEffect(() => {
+    if (scenarios.length === 0) {
+      setScenarios(mockScenarios)
+    }
+  }, [mockScenarios, scenarios.length])
 
   // Filtered scenarios based on filters
   const filteredScenarios = useMemo(() => {
@@ -180,6 +194,43 @@ const EnhancedScenariosPage: React.FC = () => {
       return matchesRisk && matchesType
     })
   }, [scenarios, filterRiskLevel, filterType])
+
+  // Load database scenarios
+  useEffect(() => {
+    const loadDbScenarios = async () => {
+      try {
+        setIsLoadingDb(true)
+        if (user?.id) {
+          const dbData = await DashboardService.getFinancialScenarios(user.id)
+          setDbScenarios(dbData)
+          
+          // Convert database scenarios to TimelineScenario format
+          if (dbData.length > 0) {
+            const convertedScenarios = dbData.map(dbScenario => {
+              return createMockScenario(
+                dbScenario.id,
+                dbScenario.scenario_name,
+                dbScenario.scenario_type,
+                dbScenario.description || 'No description available',
+                dbScenario.monthly_payment,
+                dbScenario.total_interest,
+                dbScenario.total_cost,
+                dbScenario.loan_term_months,
+                dbScenario.risk_level
+              )
+            })
+            setScenarios(convertedScenarios)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading database scenarios:', error)
+      } finally {
+        setIsLoadingDb(false)
+      }
+    }
+
+    loadDbScenarios()
+  }, [user])
 
   // Convert TimelineScenario to FinancialScenario for charts
   const chartScenarios: FinancialScenario[] = useMemo(() => {

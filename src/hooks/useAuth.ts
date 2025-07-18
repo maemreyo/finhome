@@ -15,6 +15,7 @@ export interface AuthState {
   session: Session | null
   loading: boolean
   error: AuthError | null
+  isAuthenticated: boolean
 }
 
 // Main auth hook
@@ -24,6 +25,7 @@ export function useAuth() {
     session: null,
     loading: true,
     error: null,
+    isAuthenticated: false,
   })
 
   useEffect(() => {
@@ -38,12 +40,14 @@ export function useAuth() {
           user: session?.user ?? null,
           loading: false,
           error,
+          isAuthenticated: !!session?.user,
         }))
       } catch (error) {
         setState(prev => ({
           ...prev,
           loading: false,
           error: error as AuthError,
+          isAuthenticated: false,
         }))
       }
     }
@@ -59,6 +63,7 @@ export function useAuth() {
           user: session?.user ?? null,
           loading: false,
           error: null,
+          isAuthenticated: !!session?.user,
         }))
 
         // Handle auth events

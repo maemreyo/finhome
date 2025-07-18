@@ -1,10 +1,11 @@
 // src/app/[locale]/dashboard/laboratory/page.tsx
-// Financial Laboratory page for what-if analysis with i18n support
+// Financial Laboratory page for what-if analysis with i18n support - UPDATED: 2024-01-18 - Integrated with real database
 
 "use client";
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/dashboard/Header";
 import { FinancialLaboratory } from "@/components/laboratory/FinancialLaboratory";
 import {
@@ -32,6 +33,7 @@ import {
   Beaker,
 } from "lucide-react";
 import { type FinancialPlanWithMetrics } from "@/lib/api/plans";
+import { DashboardService } from "@/lib/services/dashboardService";
 
 // Mock financial plans data
 const mockPlans: FinancialPlanWithMetrics[] = [
@@ -171,12 +173,104 @@ const calculateLoanDetails = (plan: FinancialPlanWithMetrics) => {
 
 export default function LaboratoryPage() {
   const t = useTranslations("Dashboard.Laboratory");
+  const { user, isAuthenticated } = useAuth();
 
-  const [selectedPlanId, setSelectedPlanId] = useState<string>(mockPlans[0].id);
-  const [loading, setLoading] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dbPlans, setDbPlans] = useState<any[]>([]);
 
-  const selectedPlan = mockPlans.find((p) => p.id === selectedPlanId);
+  // Load database plans
+  useEffect(() => {
+    const loadDbPlans = async () => {
+      try {
+        setLoading(true);
+        if (isAuthenticated && user) {
+          const plans = await DashboardService.getFinancialPlans(user.id);
+          setDbPlans(plans);
+          if (plans.length > 0) {
+            setSelectedPlanId(plans[0].id);
+          }
+        } else {
+          // Use mock data for unauthenticated users
+          setDbPlans([]);
+          setSelectedPlanId(mockPlans[0].id);
+        }
+      } catch (err) {
+        console.error("Error loading financial plans:", err);
+        setError("Failed to load financial plans");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDbPlans();
+  }, [isAuthenticated, user]);
+
+  // Convert database plan to FinancialPlanWithMetrics format
+  const convertDbPlan = (dbPlan: any): FinancialPlanWithMetrics => {
+    return {
+      id: dbPlan.id,
+      user_id: dbPlan.user_id,
+      plan_name: dbPlan.plan_name,
+      description: dbPlan.description,
+      plan_type: dbPlan.plan_type,
+      status: dbPlan.status,
+      property_id: dbPlan.property_id,
+      custom_property_data: dbPlan.custom_property_data,
+      target_age: dbPlan.target_age,
+      current_monthly_income: dbPlan.current_monthly_income,
+      monthly_income: dbPlan.monthly_income,
+      current_monthly_expenses: dbPlan.current_monthly_expenses,
+      monthly_expenses: dbPlan.monthly_expenses,
+      current_savings: dbPlan.current_savings,
+      dependents: dbPlan.dependents,
+      purchase_price: dbPlan.purchase_price,
+      down_payment: dbPlan.down_payment,
+      additional_costs: dbPlan.additional_costs,
+      other_debts: dbPlan.other_debts,
+      target_property_type: dbPlan.target_property_type,
+      target_location: dbPlan.target_location,
+      target_budget: dbPlan.target_budget,
+      target_timeframe_months: dbPlan.target_timeframe_months,
+      investment_purpose: dbPlan.investment_purpose,
+      desired_features: dbPlan.desired_features,
+      down_payment_target: dbPlan.down_payment_target,
+      risk_tolerance: dbPlan.risk_tolerance,
+      investment_horizon_months: dbPlan.investment_horizon_months,
+      expected_roi: dbPlan.expected_roi,
+      preferred_banks: dbPlan.preferred_banks,
+      expected_rental_income: dbPlan.expected_rental_income,
+      expected_appreciation_rate: dbPlan.expected_appreciation_rate,
+      emergency_fund_target: dbPlan.emergency_fund_target,
+      education_fund_target: dbPlan.education_fund_target,
+      retirement_fund_target: dbPlan.retirement_fund_target,
+      other_goals: dbPlan.other_goals,
+      feasibility_score: dbPlan.feasibility_score,
+      recommended_adjustments: dbPlan.recommended_adjustments,
+      is_public: dbPlan.is_public,
+      view_count: dbPlan.view_count,
+      cached_calculations: dbPlan.cached_calculations,
+      calculations_last_updated: dbPlan.calculations_last_updated,
+      created_at: dbPlan.created_at,
+      updated_at: dbPlan.updated_at,
+      completed_at: dbPlan.completed_at,
+      calculatedMetrics: dbPlan.cached_calculations || {
+        monthlyPayment: 0,
+        totalInterest: 0,
+        debtToIncomeRatio: 0,
+        affordabilityScore: 0,
+        roi: 0,
+      },
+    };
+  };
+
+  // Use database plans or fallback to mock data
+  const availablePlans = isAuthenticated && dbPlans.length > 0 
+    ? dbPlans.map(convertDbPlan)
+    : mockPlans;
+
+  const selectedPlan = availablePlans.find((p) => p.id === selectedPlanId);
   const loanDetails = selectedPlan ? calculateLoanDetails(selectedPlan) : null;
 
   const handlePlanChange = (planId: string) => {
@@ -236,7 +330,7 @@ export default function LaboratoryPage() {
                     <SelectValue placeholder={t("planSelection.placeholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockPlans.map((plan) => (
+                    {availablePlans.map((plan) => (
                       <SelectItem key={plan.id} value={plan.id}>
                         <div className="flex items-center justify-between w-full">
                           <span>{plan.plan_name}</span>
