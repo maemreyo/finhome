@@ -142,49 +142,27 @@ const EnhancedScenariosPage: React.FC = () => {
   const [dbScenarios, setDbScenarios] = useState<any[]>([])
   const [isLoadingDb, setIsLoadingDb] = useState(true)
 
-  // Mock scenarios data (now inside component where t is available)
-  const mockScenarios: TimelineScenario[] = useMemo(() => [
+  // Demo scenarios data for unauthenticated users (minimal fallback)
+  const demoScenarios: TimelineScenario[] = useMemo(() => [
     createMockScenario(
-      'scenario-baseline',
-      'Baseline Scenario',
+      'demo-scenario-1',
+      'Kế hoạch mẫu',
       'baseline',
-      'Standard baseline scenario with current market conditions',
-      24500000,
-      2880000000,
-      5880000000,
+      'Kế hoạch mẫu cho người chưa đăng nhập',
+      20500000,
+      2920000000,
+      5420000000,
       240,
       'medium'
-    ),
-    createMockScenario(
-      'scenario-optimistic',
-      'Optimistic Scenario',
-      'optimistic',
-      'Optimistic scenario with favorable market conditions',
-      21200000,
-      2188000000,
-      5188000000,
-      240,
-      'low'
-    ),
-    createMockScenario(
-      'scenario-pessimistic',
-      'Pessimistic Scenario',
-      'pessimistic',
-      'Conservative scenario with challenging market conditions',
-      28100000,
-      3744000000,
-      6744000000,
-      240,
-      'high'
     )
   ], [])
 
-  // Initialize scenarios with mock data
+  // Initialize scenarios with demo data only for unauthenticated users
   useEffect(() => {
-    if (scenarios.length === 0) {
-      setScenarios(mockScenarios)
+    if (!user && scenarios.length === 0) {
+      setScenarios(demoScenarios)
     }
-  }, [mockScenarios, scenarios.length])
+  }, [user, demoScenarios, scenarios.length])
 
   // Filtered scenarios based on filters
   const filteredScenarios = useMemo(() => {
@@ -220,6 +198,9 @@ const EnhancedScenariosPage: React.FC = () => {
               )
             })
             setScenarios(convertedScenarios)
+          } else {
+            // Use demo scenarios if no database data for authenticated users
+            setScenarios(demoScenarios)
           }
         }
       } catch (error) {

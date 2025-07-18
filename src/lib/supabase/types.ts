@@ -1439,7 +1439,7 @@ export interface Database {
         }
       }
       get_dashboard_market_summary: {
-        Args: {}
+        Args: Record<string, never>
         Returns: {
           location: string
           property_type: 'apartment' | 'house' | 'villa' | 'townhouse' | 'land' | 'commercial'

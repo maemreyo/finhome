@@ -2,6 +2,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useParams } from 'next/navigation'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { SubscriptionCard } from '@/components/billing/SubscriptionCard'
 import { BillingHistory } from '@/components/billing/BillingHistory'
@@ -9,13 +10,9 @@ import { Button } from '@/components/ui/button'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
-type PageProps = {
-  params: { locale: string }
-}
-
-export default function BillingPage({ params }: PageProps) {
+export default function BillingPage() {
   const t = useTranslations('Dashboard.Billing')
-  const { locale } = params
+  const { locale } = useParams() as { locale: string }
 
   return (
     <DashboardShell

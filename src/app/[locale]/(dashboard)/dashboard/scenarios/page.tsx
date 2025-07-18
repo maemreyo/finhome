@@ -266,25 +266,12 @@ export default function ScenariosPage() {
     };
   };
 
-  // Mock data for demonstration (fallback)
-  const mockScenarios: FinancialScenario[] = [
+  // Demo scenarios for unauthenticated users (minimal fallback)
+  const demoScenarios: FinancialScenario[] = [
     createMockScenario({
-      id: "scenario-1",
-      name: t("mockScenarios.conservative.name"),
+      id: "demo-scenario-1",
+      name: "Kế hoạch mẫu cơ bản",
       scenarioType: "baseline",
-      purchasePrice: 2500000000,
-      downPayment: 750000000,
-      loanAmount: 1750000000,
-      interestRate: 8.0,
-      loanTermYears: 15,
-      monthlyIncome: 45000000,
-      monthlyExpenses: 18000000,
-      riskLevel: "low",
-    }),
-    createMockScenario({
-      id: "scenario-2",
-      name: t("mockScenarios.balanced.name"),
-      scenarioType: "alternative",
       purchasePrice: 2500000000,
       downPayment: 500000000,
       loanAmount: 2000000000,
@@ -293,32 +280,6 @@ export default function ScenariosPage() {
       monthlyIncome: 45000000,
       monthlyExpenses: 18000000,
       riskLevel: "medium",
-    }),
-    createMockScenario({
-      id: "scenario-3",
-      name: t("mockScenarios.optimistic.name"),
-      scenarioType: "optimistic",
-      purchasePrice: 2500000000,
-      downPayment: 375000000,
-      loanAmount: 2125000000,
-      interestRate: 9.0,
-      loanTermYears: 25,
-      monthlyIncome: 45000000,
-      monthlyExpenses: 18000000,
-      riskLevel: "medium",
-    }),
-    createMockScenario({
-      id: "scenario-4",
-      name: t("mockScenarios.highRisk.name"),
-      scenarioType: "stress_test",
-      purchasePrice: 2500000000,
-      downPayment: 250000000,
-      loanAmount: 2250000000,
-      interestRate: 10.0,
-      loanTermYears: 30,
-      monthlyIncome: 45000000,
-      monthlyExpenses: 18000000,
-      riskLevel: "high",
     }),
   ];
 
@@ -471,10 +432,10 @@ export default function ScenariosPage() {
     getRates({ loanType: "home_purchase", isActive: true });
   }, []);
 
-  // Use database scenarios first, then hook scenarios, then mock data as fallback
+  // Use database scenarios first, then hook scenarios, then demo data as fallback
   const displayScenarios = user 
-    ? (dbScenarios.length > 0 ? dbScenarios.map(convertDbScenario) : scenarios.length > 0 ? scenarios : mockScenarios)
-    : mockScenarios;
+    ? (dbScenarios.length > 0 ? dbScenarios.map(convertDbScenario) : scenarios.length > 0 ? scenarios : demoScenarios)
+    : demoScenarios;
   const lowRiskScenarios = displayScenarios.filter(
     (s) => s.riskLevel === "low"
   );

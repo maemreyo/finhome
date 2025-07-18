@@ -1,0 +1,46 @@
+react-dom-client.development.js:25022 Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+GoTrueClient.ts:201 Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.
+GoTrueClient @ GoTrueClient.ts:201
+SupabaseAuthClient @ SupabaseAuthClient.ts:6
+_initSupabaseAuthClient @ SupabaseClient.ts:299
+SupabaseClient @ SupabaseClient.ts:102
+createClient @ index.ts:40
+[project]/src/lib/supabase/client.ts [app-client] (ecmascript) @ client.ts:11
+layout.tsx:15 A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload assetPrefix="" globalError={[...]}>
+      <AppDevOverlay state={{nextId:1, ...}} globalError={[...]}>
+        <AppDevOverlayErrorBoundary globalError={[...]} onError={function bound dispatchSetState}>
+          <ReplaySsrOnlyErrors>
+          <DevRootHTTPAccessFallbackBoundary>
+            <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+              <HTTPAccessFallbackErrorBoundary pathname="/vi/dashboard" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+                <RedirectBoundary>
+                  <RedirectErrorBoundary router={{...}}>
+                    <Head>
+                    <RootLayout>
+                      <html
+-                       lang="vi"
+-                       className="dark"
+-                       style={{color-scheme:"dark"}}
+                      >
+                        <body
+-                         className="geist_e531dabc-module__QGiZLq__variable geist_mono_68a01160-module__YLcDdW__varia..."
+                        >
+                    ...
+        ...
+
+fetch.ts:15  GET https://gvifsgnvvweqvvtxwprs.supabase.co/rest/v1/user_experience?select=*&user_id=eq.457cc15c-4d5d-40c6-82e7-0814b75dda16 406 (Not Acceptable)
+fetch.ts:15  GET https://gvifsgnvvweqvvtxwprs.supabase.co/rest/v1/user_experience?select=*&user_id=eq.457cc15c-4d5d-40c6-82e7-0814b75dda16 406 (Not Acceptable)
+fetch.ts:15  GET https://gvifsgnvvweqvvtxwprs.supabase.co/rest/v1/user_experience?select=*&user_id=eq.457cc15c-4d5d-40c6-82e7-0814b75dda16 406 (Not Acceptable)

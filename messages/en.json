@@ -566,72 +566,72 @@
     "newPlan": {
       "title": "Create New Financial Plan",
       "description": "Start your home buying journey with a detailed financial plan"
-    }
     },
-  "Plans.detail": {
-    "status": {
-      "draft": "Draft",
-      "active": "Active",
-      "completed": "Completed",
-      "archived": "Archived"
-    },
-    "type": {
-      "home_purchase": "Home Purchase",
-      "investment": "Investment",
-      "upgrade": "Upgrade",
-      "refinance": "Refinance"
-    },
-    "createdAt": "Created on {date}",
-    "edit": "Edit",
-    "exportFile": "Export File",
-    "share": "Share",
-    "keyMetrics": {
-      "purchasePrice": "Purchase Price",
-      "downPayment": "Down Payment",
-      "monthlyPayment": "Monthly Payment",
-      "netCashFlow": "Net Cash Flow"
-    },
-    "loanDetails": {
-      "title": "Loan Details",
-      "description": "Information about loan conditions and interest rates",
-      "loanAmount": "Loan Amount",
-      "loanTerm": "Loan Term",
-      "years": "{count} years",
-      "interestRate": "Interest Rate",
-      "perYear": "{rate}% / year",
-      "bank": "Bank",
-      "notSelected": "Not selected"
-    },
-    "financialSummary": {
-      "title": "Financial Summary",
-      "description": "Income and expense analysis and affordability",
-      "income": "Income",
-      "basicSalary": "Basic Salary",
-      "rentalIncome": "Rental Income",
-      "totalIncome": "Total Income",
-      "expenses": "Expenses",
-      "livingExpenses": "Living Expenses",
-      "homeInstallment": "Home Installment",
-      "totalExpenses": "Total Expenses",
-      "monthlyNetCashFlow": "Monthly Net Cash Flow",
-      "positiveCashFlow": "Positive cash flow - Stable financial situation",
-      "negativeCashFlow": "Negative cash flow - Need to review plan"
-    },
-    "timeline": {
-      "title": "Completion Timeline",
-      "description": "Plan execution roadmap over time",
-      "placeholder": "Timeline will be displayed here"
-    },
-    "charts": {
-      "cashFlowChart": {
-        "title": "Cash Flow Chart",
-        "description": "Monthly cash flow forecast",
-        "placeholder": "Cash flow chart will be displayed here"
+    "detail": {
+      "status": {
+        "draft": "Draft",
+        "active": "Active",
+        "completed": "Completed",
+        "archived": "Archived"
       },
-      "expenseAllocation": {
-        "title": "Expense Allocation",
-        "description": "Proportion of monthly expenses",
-        "placeholder": "Expense allocation chart will be displayed here"
+      "type": {
+        "home_purchase": "Home Purchase",
+        "investment": "Investment",
+        "upgrade": "Upgrade",
+        "refinance": "Refinance"
+      },
+      "createdAt": "Created on {date}",
+      "edit": "Edit",
+      "exportFile": "Export File",
+      "share": "Share",
+      "keyMetrics": {
+        "purchasePrice": "Purchase Price",
+        "downPayment": "Down Payment",
+        "monthlyPayment": "Monthly Payment",
+        "netCashFlow": "Net Cash Flow"
+      },
+      "loanDetails": {
+        "title": "Loan Details",
+        "description": "Information about loan conditions and interest rates",
+        "loanAmount": "Loan Amount",
+        "loanTerm": "Loan Term",
+        "years": "{count} years",
+        "interestRate": "Interest Rate",
+        "perYear": "{rate}% / year",
+        "bank": "Bank",
+        "notSelected": "Not selected"
+      },
+      "financialSummary": {
+        "title": "Financial Summary",
+        "description": "Income and expense analysis and affordability",
+        "income": "Income",
+        "basicSalary": "Basic Salary",
+        "rentalIncome": "Rental Income",
+        "totalIncome": "Total Income",
+        "expenses": "Expenses",
+        "livingExpenses": "Living Expenses",
+        "homeInstallment": "Home Installment",
+        "totalExpenses": "Total Expenses",
+        "monthlyNetCashFlow": "Monthly Net Cash Flow",
+        "positiveCashFlow": "Positive cash flow - Stable financial situation",
+        "negativeCashFlow": "Negative cash flow - Need to review plan"
+      },
+      "timeline": {
+        "title": "Completion Timeline",
+        "description": "Plan execution roadmap over time",
+        "placeholder": "Timeline will be displayed here"
+      },
+      "charts": {
+        "cashFlowChart": {
+          "title": "Cash Flow Chart",
+          "description": "Monthly cash flow forecast",
+          "placeholder": "Cash flow chart will be displayed here"
+        },
+        "expenseAllocation": {
+          "title": "Expense Allocation",
+          "description": "Proportion of monthly expenses",
+          "placeholder": "Expense allocation chart will be displayed here"
+        }
       }
     }
   },
@@ -679,14 +679,18 @@
       "title": "Market Insights",
       "avgPrice": "Avg Price/m²",
       "interestRate": "Interest Rate",
-      "promotionalRate": "Promotional rate"
+      "promotionalRate": "Promotional rate",
+      "noData": "No data available"
     },
     "quickStats": {
       "title": "Quick Stats",
       "totalPlans": "Total plans",
       "interestedProperties": "Interested properties",
       "comparedBanks": "Compared banks",
-      "achievements": "Achievements"
+      "achievements": "Achievements",
+      "activePlans": "Active Plans",
+      "experience": "Experience",
+      "notifications": "Notifications"
     },
     "Analytics": {
       "title": "Analytics",

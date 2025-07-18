@@ -35,13 +35,13 @@ import {
 import { type FinancialPlanWithMetrics } from "@/lib/api/plans";
 import { DashboardService } from "@/lib/services/dashboardService";
 
-// Mock financial plans data
-const mockPlans: FinancialPlanWithMetrics[] = [
+// Demo financial plan for unauthenticated users (minimal fallback)
+const demoPlans: FinancialPlanWithMetrics[] = [
   {
-    id: "1",
+    id: "demo-1",
     user_id: "demo-user",
-    plan_name: "Mua nhà đầu tiên",
-    description: null,
+    plan_name: "Kế hoạch mẫu",
+    description: "Kế hoạch mẫu cho người chưa đăng nhập",
     plan_type: "home_purchase",
     status: "active",
     property_id: null,
@@ -84,65 +84,11 @@ const mockPlans: FinancialPlanWithMetrics[] = [
     updated_at: "2024-01-20T00:00:00Z",
     completed_at: null,
     calculatedMetrics: {
-      monthlyPayment: 0,
-      totalInterest: 0,
-      debtToIncomeRatio: 0,
+      monthlyPayment: 20500000,
+      totalInterest: 2920000000,
+      debtToIncomeRatio: 45.6,
       affordabilityScore: 8,
       roi: 8.5,
-    },
-  },
-  {
-    id: "2",
-    user_id: "demo-user",
-    plan_name: "Đầu tư căn hộ cho thuê",
-    description: null,
-    plan_type: "investment",
-    status: "completed",
-    property_id: null,
-    custom_property_data: null,
-    target_age: null,
-    current_monthly_income: null,
-    monthly_income: 45000000,
-    current_monthly_expenses: null,
-    monthly_expenses: 18000000,
-    current_savings: 500000000,
-    dependents: 0,
-    purchase_price: 1800000000,
-    down_payment: 400000000,
-    additional_costs: 0,
-    other_debts: 0,
-    target_property_type: null,
-    target_location: null,
-    target_budget: null,
-    target_timeframe_months: null,
-    investment_purpose: null,
-    desired_features: {},
-    down_payment_target: null,
-    risk_tolerance: null,
-    investment_horizon_months: null,
-    expected_roi: null,
-    preferred_banks: null,
-    expected_rental_income: null,
-    expected_appreciation_rate: null,
-    emergency_fund_target: null,
-    education_fund_target: null,
-    retirement_fund_target: null,
-    other_goals: {},
-    feasibility_score: null,
-    recommended_adjustments: {},
-    is_public: false,
-    view_count: 0,
-    cached_calculations: null,
-    calculations_last_updated: null,
-    created_at: "2024-02-01T00:00:00Z",
-    updated_at: "2024-02-15T00:00:00Z",
-    completed_at: null,
-    calculatedMetrics: {
-      monthlyPayment: 0,
-      totalInterest: 0,
-      debtToIncomeRatio: 0,
-      affordabilityScore: 7,
-      roi: 12.3,
     },
   },
 ];
@@ -192,9 +138,9 @@ export default function LaboratoryPage() {
             setSelectedPlanId(plans[0].id);
           }
         } else {
-          // Use mock data for unauthenticated users
+          // Use demo data for unauthenticated users
           setDbPlans([]);
-          setSelectedPlanId(mockPlans[0].id);
+          setSelectedPlanId(demoPlans[0].id);
         }
       } catch (err) {
         console.error("Error loading financial plans:", err);
@@ -265,10 +211,10 @@ export default function LaboratoryPage() {
     };
   };
 
-  // Use database plans or fallback to mock data
+  // Use database plans or fallback to demo data
   const availablePlans = isAuthenticated && dbPlans.length > 0 
     ? dbPlans.map(convertDbPlan)
-    : mockPlans;
+    : demoPlans;
 
   const selectedPlan = availablePlans.find((p) => p.id === selectedPlanId);
   const loanDetails = selectedPlan ? calculateLoanDetails(selectedPlan) : null;

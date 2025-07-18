@@ -405,6 +405,73 @@
     "newPlan": {
       "title": "Tạo Kế Hoạch Tài Chính Mới",
       "description": "Bắt đầu hành trình mua nhà của bạn với kế hoạch tài chính chi tiết"
+    },
+    "detail": {
+      "status": {
+        "draft": "Bản nháp",
+        "active": "Hoạt động",
+        "completed": "Hoàn thành",
+        "archived": "Lưu trữ"
+      },
+      "type": {
+        "home_purchase": "Mua nhà",
+        "investment": "Đầu tư",
+        "upgrade": "Nâng cấp",
+        "refinance": "Tái cấp vốn"
+      },
+      "createdAt": "Tạo vào ngày {date}",
+      "edit": "Chỉnh sửa",
+      "exportFile": "Xuất tệp",
+      "share": "Chia sẻ",
+      "keyMetrics": {
+        "purchasePrice": "Giá mua",
+        "downPayment": "Thanh toán trước",
+        "monthlyPayment": "Thanh toán hàng tháng",
+        "netCashFlow": "Dòng tiền ròng"
+      },
+      "loanDetails": {
+        "title": "Chi tiết khoản vay",
+        "description": "Thông tin về điều kiện vay và lãi suất",
+        "loanAmount": "Số tiền vay",
+        "loanTerm": "Kỳ hạn vay",
+        "years": "{count} năm",
+        "interestRate": "Lãi suất",
+        "perYear": "{rate}% / năm",
+        "bank": "Ngân hàng",
+        "notSelected": "Chưa chọn"
+      },
+      "financialSummary": {
+        "title": "Tóm tắt tài chính",
+        "description": "Phân tích thu nhập, chi phí và khả năng chi trả",
+        "income": "Thu nhập",
+        "basicSalary": "Lương cơ bản",
+        "rentalIncome": "Thu nhập cho thuê",
+        "totalIncome": "Tổng thu nhập",
+        "expenses": "Chi phí",
+        "livingExpenses": "Chi phí sinh hoạt",
+        "homeInstallment": "Trả góp nhà",
+        "totalExpenses": "Tổng chi phí",
+        "monthlyNetCashFlow": "Dòng tiền ròng hàng tháng",
+        "positiveCashFlow": "Dòng tiền dương - Tình hình tài chính ổn định",
+        "negativeCashFlow": "Dòng tiền âm - Cần xem xét lại kế hoạch"
+      },
+      "timeline": {
+        "title": "Lịch trình hoàn thành",
+        "description": "Lộ trình thực hiện kế hoạch theo thời gian",
+        "placeholder": "Lịch trình sẽ được hiển thị ở đây"
+      },
+      "charts": {
+        "cashFlowChart": {
+          "title": "Biểu đồ dòng tiền",
+          "description": "Dự báo dòng tiền hàng tháng",
+          "placeholder": "Biểu đồ dòng tiền sẽ được hiển thị ở đây"
+        },
+        "expenseAllocation": {
+          "title": "Phân bổ chi phí",
+          "description": "Tỷ trọng các khoản chi phí hàng tháng",
+          "placeholder": "Biểu đồ phân bổ chi phí sẽ được hiển thị ở đây"
+        }
+      }
     }
   },
   "Dashboard": {
@@ -451,14 +518,18 @@
       "title": "Thông Tin Thị Trường",
       "avgPrice": "Giá TB/m²",
       "interestRate": "Lãi Suất",
-      "promotionalRate": "Lãi suất ưu đãi"
+      "promotionalRate": "Lãi suất ưu đãi",
+      "noData": "Không có dữ liệu"
     },
     "quickStats": {
       "title": "Thống Kê Nhanh",
       "totalPlans": "Tổng kế hoạch",
       "interestedProperties": "BDS quan tâm",
       "comparedBanks": "Ngân hàng so sánh",
-      "achievements": "Thành tích"
+      "achievements": "Thành tích",
+      "activePlans": "Kế hoạch đang hoạt động",
+      "experience": "Kinh nghiệm",
+      "notifications": "Thông báo"
     },
     "Analytics": {
       "title": "Phân Tích",
