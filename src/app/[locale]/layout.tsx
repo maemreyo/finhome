@@ -76,40 +76,17 @@ export default async function LocaleLayout({
   }
   
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <head>
-        {/* Vercel Analytics */}
-        {process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_ID && (
-          <script
-            defer
-            src="https://unpkg.com/@vercel/analytics@1/dist/index.js"
-            data-mode="auto"
-          />
-        )}
-        
-        {/* Plausible Analytics */}
-        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
-          <script
-            defer
-            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
-            src="https://plausible.io/js/script.js"
-          />
-        )}
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-            storageKey="finhome-theme"
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem
+        disableTransitionOnChange
+        storageKey="finhome-theme"
+      >
+        {children}
+        <Toaster />
+      </ThemeProvider>
+    </NextIntlClientProvider>
   );
 }
