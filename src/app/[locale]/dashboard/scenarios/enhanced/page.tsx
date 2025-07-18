@@ -68,7 +68,7 @@ const createMockScenario = (
   description,
   riskLevel,
   events: [],
-  user_id: 'mock-user-id',
+  user_id: 'demo-user-id',
   plan_type: 'home_purchase',
   status: 'draft',
   created_at: new Date().toISOString(),

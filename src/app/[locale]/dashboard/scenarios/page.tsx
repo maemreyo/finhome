@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { ScenarioComparison } from '@/components/scenarios/ScenarioComparison'
 import { useScenarios } from '@/hooks/useScenarios'
+import { useAuth } from '@/hooks/useAuth'
 import type { FinancialScenario } from '@/types/scenario'
 import { useBankRates } from '@/hooks/useBankRates'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -52,7 +53,7 @@ const createMockScenario = (params: {
   return {
     // Base FinancialPlan fields
     id: params.id,
-    user_id: 'mock-user',
+    user_id: 'demo-user',
     plan_name: params.name,
     description: `Mock ${params.scenarioType} scenario`,
     plan_type: 'home_purchase',
@@ -178,6 +179,7 @@ interface ScenarioGeneratorForm {
 }
 
 export default function ScenariosPage() {
+  const { user } = useAuth()
   const {
     scenarios,
     loading,
@@ -185,7 +187,7 @@ export default function ScenariosPage() {
     createScenario,
     updateScenario,
     deleteScenario
-  } = useScenarios('mock-user') // Use mock user ID
+  } = useScenarios(user?.id || '')
   
   const { rates, isLoading: ratesLoading, getRates } = useBankRates()
   const [selectedScenario, setSelectedScenario] = useState<FinancialScenario | null>(null)
@@ -318,11 +320,13 @@ export default function ScenariosPage() {
     getRates({ loanType: 'home_purchase', isActive: true })
   }, [])
 
-  const lowRiskScenarios = scenarios.filter(s => s.riskLevel === 'low')
-  const totalScenarios = scenarios.length
-  const avgMonthlyPayment = scenarios.reduce((sum, s) => sum + (s.calculatedMetrics?.monthlyPayment || 0), 0) / totalScenarios
+  // Use mock data for demo purposes when no user is authenticated
+  const displayScenarios = user ? scenarios : mockScenarios
+  const lowRiskScenarios = displayScenarios.filter(s => s.riskLevel === 'low')
+  const totalScenarios = displayScenarios.length
+  const avgMonthlyPayment = displayScenarios.reduce((sum, s) => sum + (s.calculatedMetrics?.monthlyPayment || 0), 0) / totalScenarios
 
-  if (loading) {
+  if (loading && user) {
     return (
       <DashboardShell 
         title="So Sánh Kịch Bản" 
@@ -340,7 +344,7 @@ export default function ScenariosPage() {
     )
   }
 
-  if (error) {
+  if (error && user) {
     return (
       <DashboardShell 
         title="So Sánh Kịch Bản" 
@@ -370,6 +374,16 @@ export default function ScenariosPage() {
       }
     >
       <div className="space-y-6">
+        {/* Demo Alert for Non-Authenticated Users */}
+        {!user && (
+          <Alert className="border-blue-200 bg-blue-50">
+            <AlertCircle className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-800">
+              <strong>Chế độ Demo:</strong> Bạn đang xem dữ liệu mẫu. Đăng nhập để tạo và quản lý kịch bản thực tế của riêng bạn.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
@@ -565,9 +579,9 @@ export default function ScenariosPage() {
         </div>
 
         {/* Scenario Comparison Component */}
-        {scenarios.length > 0 ? (
+        {displayScenarios.length > 0 ? (
           <ScenarioComparison
-            scenarios={scenarios}
+            scenarios={displayScenarios}
             onScenarioSelect={handleScenarioSelect}
             onCreateNewScenario={handleCreateNewScenario}
           />

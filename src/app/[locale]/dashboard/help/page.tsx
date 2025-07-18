@@ -383,11 +383,11 @@ export default function HelpPage() {
               <CardContent>
                 <div className="space-y-4">
                   {supportTickets.map((ticket) => {
-                    const StatusIcon = statusIcons[ticket.status]
+                    const StatusIcon = statusIcons[ticket.status as keyof typeof statusIcons]
                     return (
                       <div key={ticket.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center gap-3">
-                          <StatusIcon className={`h-4 w-4 ${statusColors[ticket.status]}`} />
+                          <StatusIcon className={`h-4 w-4 ${statusColors[ticket.status as keyof typeof statusColors]}`} />
                           <div>
                             <p className="font-medium">{ticket.subject}</p>
                             <p className="text-sm text-muted-foreground">

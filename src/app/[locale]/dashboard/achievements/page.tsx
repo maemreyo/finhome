@@ -203,11 +203,11 @@ export default function AchievementsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className={`p-2 rounded-full ${achievement.status === 'completed' ? 'bg-green-100' : achievement.status === 'in_progress' ? 'bg-blue-100' : 'bg-gray-100'}`}>
-                      <achievement.icon className={`h-4 w-4 ${statusColors[achievement.status]}`} />
+                      <achievement.icon className={`h-4 w-4 ${statusColors[achievement.status as keyof typeof statusColors]}`} />
                     </div>
                     <div>
                       <CardTitle className="text-sm font-medium">{achievement.title}</CardTitle>
-                      <Badge variant="secondary" className={`text-xs ${rarityColors[achievement.rarity]}`}>
+                      <Badge variant="secondary" className={`text-xs ${rarityColors[achievement.rarity as keyof typeof rarityColors]}`}>
                         {achievement.rarity}
                       </Badge>
                     </div>
@@ -232,7 +232,7 @@ export default function AchievementsPage() {
                 
                 {achievement.status === 'completed' && (
                   <p className="text-xs text-green-600">
-                    Hoàn thành vào {new Date(achievement.completedAt).toLocaleDateString('vi-VN')}
+                    Hoàn thành vào {new Date(achievement.completedAt || '').toLocaleDateString('vi-VN')}
                   </p>
                 )}
                 
