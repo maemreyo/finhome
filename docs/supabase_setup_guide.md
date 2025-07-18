@@ -68,9 +68,11 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 # App Configuration
 NEXT_PUBLIC_APP_NAME=FinHome
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-# Email Configuration (optional for development)
-NEXT_PUBLIC_SUPABASE_EMAIL_FROM=noreply@finhome.com
+# Internationalization
+NEXT_PUBLIC_DEFAULT_LOCALE=en
+NEXT_PUBLIC_SUPPORTED_LOCALES=en,vi
 ```
 
 ### **Step 2: Verify Environment Variables**
@@ -175,9 +177,12 @@ INSERT INTO achievements (name, name_vi, description, description_vi, achievemen
 ```
 http://localhost:3000
 http://localhost:3000/auth/callback
-http://localhost:3000/auth/reset-password
+http://localhost:3000/en/auth/reset-password
+http://localhost:3000/vi/auth/reset-password
 https://your-domain.com (for production)
 https://your-domain.com/auth/callback (for production)
+https://your-domain.com/en/auth/reset-password (for production)
+https://your-domain.com/vi/auth/reset-password (for production)
 ```
 
 ### **Step 2: Enable Email Authentication**
