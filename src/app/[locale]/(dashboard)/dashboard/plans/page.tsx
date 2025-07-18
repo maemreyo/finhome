@@ -22,7 +22,7 @@ export default async function PlansPage({ params }: PageProps) {
   }
   
   const plans = await getUserFinancialPlans(user.id)
-  const t = await getTranslations('DashboardPlansPage')
+  const t = await getTranslations({ locale, namespace: 'DashboardPlansPage' })
 
   return (
     <DashboardShell

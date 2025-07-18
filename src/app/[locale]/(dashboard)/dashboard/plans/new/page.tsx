@@ -16,7 +16,7 @@ export default async function NewPlanPage({ params }: PageProps) {
     redirect(`/${locale}/auth/login`)
   }
 
-  const t = await getTranslations('NewPlanPage')
+  const t = await getTranslations({ locale, namespace: 'NewPlanPage' })
 
   return (
     <div className="container mx-auto py-6">
