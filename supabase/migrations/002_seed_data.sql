@@ -73,25 +73,25 @@ INSERT INTO interest_rates (bank_name, bank_code, rate_type, loan_term_years, in
 ('Vietcombank', 'VCB', 'promotional', 15, 7.5, 300000000, 30000000000, 30.0, '2024-01-01', ARRAY['First home buyers', 'Salary account required'], 'https://vietcombank.com.vn'),
 ('Vietcombank', 'VCB', 'promotional', 20, 7.8, 300000000, 30000000000, 30.0, '2024-01-01', ARRAY['First home buyers', 'Salary account required'], 'https://vietcombank.com.vn'),
 ('Vietcombank', 'VCB', 'promotional', 25, 8.0, 300000000, 30000000000, 30.0, '2024-01-01', ARRAY['First home buyers', 'Salary account required'], 'https://vietcombank.com.vn'),
-('Vietcombank', 'VCB', 'standard', 15, 10.2, 300000000, 30000000000, 20.0, '2024-01-01', ARRAY[], 'https://vietcombank.com.vn'),
-('Vietcombank', 'VCB', 'standard', 20, 10.5, 300000000, 30000000000, 20.0, '2024-01-01', ARRAY[], 'https://vietcombank.com.vn'),
-('Vietcombank', 'VCB', 'standard', 25, 10.8, 300000000, 30000000000, 20.0, '2024-01-01', ARRAY[], 'https://vietcombank.com.vn'),
+('Vietcombank', 'VCB', 'standard', 15, 10.2, 300000000, 30000000000, 20.0, '2024-01-01', ARRAY[]::text[], 'https://vietcombank.com.vn'),
+('Vietcombank', 'VCB', 'standard', 20, 10.5, 300000000, 30000000000, 20.0, '2024-01-01', ARRAY[]::text[], 'https://vietcombank.com.vn'),
+('Vietcombank', 'VCB', 'standard', 25, 10.8, 300000000, 30000000000, 20.0, '2024-01-01', ARRAY[]::text[], 'https://vietcombank.com.vn'),
 
 -- BIDV rates
 ('BIDV', 'BIDV', 'promotional', 15, 7.2, 200000000, 25000000000, 30.0, '2024-01-01', ARRAY['State employee discount', 'Payroll account'], 'https://bidv.com.vn'),
 ('BIDV', 'BIDV', 'promotional', 20, 7.5, 200000000, 25000000000, 30.0, '2024-01-01', ARRAY['State employee discount', 'Payroll account'], 'https://bidv.com.vn'),
 ('BIDV', 'BIDV', 'promotional', 25, 7.8, 200000000, 25000000000, 30.0, '2024-01-01', ARRAY['State employee discount', 'Payroll account'], 'https://bidv.com.vn'),
-('BIDV', 'BIDV', 'standard', 15, 10.0, 200000000, 25000000000, 20.0, '2024-01-01', ARRAY[], 'https://bidv.com.vn'),
-('BIDV', 'BIDV', 'standard', 20, 10.2, 200000000, 25000000000, 20.0, '2024-01-01', ARRAY[], 'https://bidv.com.vn'),
-('BIDV', 'BIDV', 'standard', 25, 10.5, 200000000, 25000000000, 20.0, '2024-01-01', ARRAY[], 'https://bidv.com.vn'),
+('BIDV', 'BIDV', 'standard', 15, 10.0, 200000000, 25000000000, 20.0, '2024-01-01', ARRAY[]::text[], 'https://bidv.com.vn'),
+('BIDV', 'BIDV', 'standard', 20, 10.2, 200000000, 25000000000, 20.0, '2024-01-01', ARRAY[]::text[], 'https://bidv.com.vn'),
+('BIDV', 'BIDV', 'standard', 25, 10.5, 200000000, 25000000000, 20.0, '2024-01-01', ARRAY[]::text[], 'https://bidv.com.vn'),
 
 -- Techcombank rates
 ('Techcombank', 'TCB', 'promotional', 15, 7.8, 500000000, 50000000000, 30.0, '2024-01-01', ARRAY['Premium customer', 'Life insurance required'], 'https://techcombank.com.vn'),
 ('Techcombank', 'TCB', 'promotional', 20, 8.1, 500000000, 50000000000, 30.0, '2024-01-01', ARRAY['Premium customer', 'Life insurance required'], 'https://techcombank.com.vn'),
 ('Techcombank', 'TCB', 'promotional', 25, 8.3, 500000000, 50000000000, 30.0, '2024-01-01', ARRAY['Premium customer', 'Life insurance required'], 'https://techcombank.com.vn'),
-('Techcombank', 'TCB', 'standard', 15, 10.5, 500000000, 50000000000, 20.0, '2024-01-01', ARRAY[], 'https://techcombank.com.vn'),
-('Techcombank', 'TCB', 'standard', 20, 10.8, 500000000, 50000000000, 20.0, '2024-01-01', ARRAY[], 'https://techcombank.com.vn'),
-('Techcombank', 'TCB', 'standard', 25, 11.1, 500000000, 50000000000, 20.0, '2024-01-01', ARRAY[], 'https://techcombank.com.vn');
+('Techcombank', 'TCB', 'standard', 15, 10.5, 500000000, 50000000000, 20.0, '2024-01-01', ARRAY[]::text[], 'https://techcombank.com.vn'),
+('Techcombank', 'TCB', 'standard', 20, 10.8, 500000000, 50000000000, 20.0, '2024-01-01', ARRAY[]::text[], 'https://techcombank.com.vn'),
+('Techcombank', 'TCB', 'standard', 25, 11.1, 500000000, 50000000000, 20.0, '2024-01-01', ARRAY[]::text[], 'https://techcombank.com.vn');
 
 -- =============================================
 -- PROPERTY MARKET DATA

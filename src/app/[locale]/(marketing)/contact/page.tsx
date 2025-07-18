@@ -80,7 +80,7 @@ export default function ContactPage({ params }: PageProps) {
     {
       icon: <Mail className="h-5 w-5" />,
       title: tContactInfo('emailTitle'),
-      details: 'hello@yoursaas.com',
+      details: 'contact@finhome.com',
       description: tContactInfo('emailDescription'),
     },
     {
