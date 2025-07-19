@@ -1809,5 +1809,50 @@
         "decrease": "giảm"
       }
     }
+  },
+  "Charts": {
+    "CashFlow": {
+      "tooltips": {
+        "month": "Tháng {month}"
+      },
+      "xAxis": {
+        "monthLabel": "T{month}"
+      },
+      "legend": {
+        "income": "Tổng thu nhập",
+        "expenses": "Tổng chi phí", 
+        "netCashFlow": "Dòng tiền thuần",
+        "cumulativeCashFlow": "Dòng tiền tích lũy"
+      }
+    },
+    "ExpensesBreakdown": {
+      "categories": {
+        "livingExpenses": "Chi phí sinh hoạt",
+        "mortgagePayment": "Trả nợ vay nhà",
+        "additionalCosts": "Chi phí phát sinh",
+        "otherDebts": "Nợ khác"
+      },
+      "summary": {
+        "totalExpenses": "Tổng chi phí hàng tháng",
+        "largestExpense": "Khoản chi lớn nhất"
+      }
+    },
+    "Amortization": {
+      "tooltips": {
+        "year": "Năm {year}"
+      },
+      "xAxis": {
+        "yearLabel": "N{year}"
+      },
+      "legend": {
+        "principalPayment": "Trả nợ gốc",
+        "interestPayment": "Trả lãi"
+      },
+      "summary": {
+        "totalInterest": "Tổng lãi đã trả",
+        "totalPrincipal": "Tổng gốc đã trả",
+        "interestRatio": "Tỷ lệ lãi"
+      }
+    }
   }
 }

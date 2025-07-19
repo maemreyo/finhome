@@ -220,7 +220,7 @@
 }
 
 .recharts-tooltip-wrapper {
-  @apply rounded-lg border bg-popover text-popover-foreground shadow-md;
+  @apply rounded-lg border bg-popover text-popover-foreground shadow-lg;
 }
 
 .recharts-tooltip-content {
@@ -229,6 +229,36 @@
 
 .recharts-legend-wrapper {
   @apply text-sm;
+}
+
+.recharts-legend-item-text {
+  color: hsl(var(--foreground)) !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: hsl(var(--muted-foreground)) !important;
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: hsl(var(--border)) !important;
+  opacity: 0.3;
+}
+
+.recharts-default-legend .recharts-legend-item {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Ensure chart text is visible in dark mode */
+.recharts-text {
+  fill: hsl(var(--muted-foreground)) !important;
+}
+
+/* Custom pie chart label styling */
+.recharts-pie-label-text {
+  fill: hsl(var(--background)) !important;
+  font-weight: 600;
+  font-size: 12px;
 }
 
 /* Timeline component styling */

@@ -12,6 +12,9 @@ import { EditPlanForm } from './EditPlanForm'
 import { SharePlanDialog } from './SharePlanDialog'
 import { ExportPlanDialog } from './ExportPlanDialog'
 import { useTranslations } from 'next-intl'
+import { CashFlowChart } from '@/components/charts/CashFlowChart'
+import { ExpensesBreakdownChart } from '@/components/charts/ExpensesBreakdownChart'
+import { AmortizationChart } from '@/components/charts/AmortizationChart'
 
 type FinancialPlanDetail = Database['public']['Tables']['financial_plans']['Row']
 
@@ -267,7 +270,7 @@ export function PlanDetailView({ plan }: PlanDetailViewProps) {
         </CardContent>
       </Card>
 
-      {/* Placeholder for Timeline */}
+      {/* Loan Amortization Timeline */}
       <Card>
         <CardHeader>
           <CardTitle>{t('timeline.title')}</CardTitle>
@@ -276,13 +279,16 @@ export function PlanDetailView({ plan }: PlanDetailViewProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="chart-container flex items-center justify-center text-muted-foreground">
-            {t('timeline.placeholder')}
-          </div>
+          <AmortizationChart
+            loanAmount={loanAmount}
+            interestRate={8.5}
+            loanTermMonths={240}
+            monthlyPayment={monthlyPayment}
+          />
         </CardContent>
       </Card>
 
-      {/* Placeholder for Charts */}
+      {/* Interactive Charts */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -292,9 +298,13 @@ export function PlanDetailView({ plan }: PlanDetailViewProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="chart-container flex items-center justify-center text-muted-foreground">
-              {t('charts.cashFlow.placeholder')}
-            </div>
+            <CashFlowChart
+              monthlyIncome={currentPlan.monthly_income || 0}
+              monthlyExpenses={currentPlan.monthly_expenses || 0}
+              monthlyPayment={monthlyPayment}
+              expectedRentalIncome={currentPlan.expected_rental_income || 0}
+              timeframe={currentPlan.target_timeframe_months || 60}
+            />
           </CardContent>
         </Card>
         
@@ -306,9 +316,12 @@ export function PlanDetailView({ plan }: PlanDetailViewProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="chart-container flex items-center justify-center text-muted-foreground">
-              {t('charts.expenses.placeholder')}
-            </div>
+            <ExpensesBreakdownChart
+              monthlyExpenses={currentPlan.monthly_expenses || 0}
+              monthlyPayment={monthlyPayment}
+              additionalCosts={currentPlan.additional_costs || 0}
+              otherDebts={currentPlan.other_debts || 0}
+            />
           </CardContent>
         </Card>
       </div>

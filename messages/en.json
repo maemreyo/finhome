@@ -1771,5 +1771,50 @@
         "decrease": "decreased"
       }
     }
+  },
+  "Charts": {
+    "CashFlow": {
+      "tooltips": {
+        "month": "Month {month}"
+      },
+      "xAxis": {
+        "monthLabel": "M{month}"
+      },
+      "legend": {
+        "income": "Total Income",
+        "expenses": "Total Expenses", 
+        "netCashFlow": "Net Cash Flow",
+        "cumulativeCashFlow": "Cumulative Cash Flow"
+      }
+    },
+    "ExpensesBreakdown": {
+      "categories": {
+        "livingExpenses": "Living Expenses",
+        "mortgagePayment": "Mortgage Payment",
+        "additionalCosts": "Additional Costs",
+        "otherDebts": "Other Debts"
+      },
+      "summary": {
+        "totalExpenses": "Total Monthly Expenses",
+        "largestExpense": "Largest Expense Category"
+      }
+    },
+    "Amortization": {
+      "tooltips": {
+        "year": "Year {year}"
+      },
+      "xAxis": {
+        "yearLabel": "Y{year}"
+      },
+      "legend": {
+        "principalPayment": "Principal Payment",
+        "interestPayment": "Interest Payment"
+      },
+      "summary": {
+        "totalInterest": "Total Interest Paid",
+        "totalPrincipal": "Total Principal Paid",
+        "interestRatio": "Interest Ratio"
+      }
+    }
   }
 }

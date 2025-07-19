@@ -1,1 +1,2 @@
 Check @supabase/migrations/ @src/types/ @src/lib/supabase/types.ts before processing
+I've implemented i18n already, you need to follow when you implement from now on
