@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { DashboardService } from '@/lib/services/dashboardService'
 import { 
   OnboardingFlow, 
   OnboardingStep, 
@@ -30,23 +31,47 @@ interface UseOnboardingReturn {
   error: string | null
 }
 
-// Mock user progress data - would be stored in database
-const getMockUserProgress = (userId: string, flowId: string): UserOnboardingProgress | null => {
-  // Check if user has existing progress
-  const existingProgress = localStorage.getItem(`onboarding_${userId}_${flowId}`)
-  
-  if (existingProgress) {
-    return JSON.parse(existingProgress)
+// Get user onboarding progress from database
+const getUserProgress = async (userId: string, flowId: string): Promise<UserOnboardingProgress | null> => {
+  try {
+    const preferences = await DashboardService.getUserPreferences(userId)
+    
+    if (preferences && (preferences as any).onboarding_progress) {
+      const allProgress = JSON.parse((preferences as any).onboarding_progress)
+      const flowProgress = allProgress[flowId]
+      
+      if (flowProgress) {
+        return {
+          ...flowProgress,
+          startedAt: new Date(flowProgress.startedAt),
+          lastActiveAt: new Date(flowProgress.lastActiveAt),
+          completedAt: flowProgress.completedAt ? new Date(flowProgress.completedAt) : undefined
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error loading onboarding progress from database:', error)
   }
   
   return null
 }
 
-const saveMockUserProgress = (progress: UserOnboardingProgress): void => {
-  localStorage.setItem(
-    `onboarding_${progress.userId}_${progress.flowId}`,
-    JSON.stringify(progress)
-  )
+const saveUserProgress = async (progress: UserOnboardingProgress): Promise<void> => {
+  try {
+    const preferences = await DashboardService.getUserPreferences(progress.userId)
+    const currentProgress = (preferences as any)?.onboarding_progress ? JSON.parse((preferences as any).onboarding_progress) : {}
+    
+    const updatedProgress = {
+      ...currentProgress,
+      [progress.flowId]: progress
+    }
+    
+    await DashboardService.updateUserPreferences(progress.userId, {
+      onboarding_progress: JSON.stringify(updatedProgress)
+    } as any)
+  } catch (error) {
+    console.error('Error saving onboarding progress to database:', error)
+  }
 }
 
 export function useOnboarding(flowId?: string): UseOnboardingReturn {
@@ -70,23 +95,23 @@ export function useOnboarding(flowId?: string): UseOnboardingReturn {
       setCurrentFlow(flow)
       
       // Load or create user progress
-      let userProgress = getMockUserProgress(user.id, flowId)
-      
-      if (!userProgress) {
-        userProgress = {
-          userId: user.id,
-          flowId,
-          currentStepId: flow.steps[0].id,
-          completedSteps: [],
-          startedAt: new Date(),
-          lastActiveAt: new Date(),
-          skipped: false,
-          flowType: flow.type
+      getUserProgress(user.id, flowId).then(userProgress => {
+        if (!userProgress) {
+          userProgress = {
+            userId: user.id,
+            flowId,
+            currentStepId: flow.steps[0].id,
+            completedSteps: [],
+            startedAt: new Date(),
+            lastActiveAt: new Date(),
+            skipped: false,
+            flowType: flow.type
+          }
+          saveUserProgress(userProgress).catch(console.error)
         }
-        saveMockUserProgress(userProgress)
-      }
-      
-      setProgress(userProgress)
+        
+        setProgress(userProgress)
+      })
       setError(null)
     } catch (err) {
       console.error('Error initializing onboarding:', err)
@@ -141,7 +166,7 @@ export function useOnboarding(flowId?: string): UseOnboardingReturn {
     }
     
     setProgress(newProgress)
-    saveMockUserProgress(newProgress)
+    saveUserProgress(newProgress).catch(console.error)
   }, [user])
 
   // Move to next step
@@ -160,7 +185,7 @@ export function useOnboarding(flowId?: string): UseOnboardingReturn {
       }
       
       setProgress(updatedProgress)
-      saveMockUserProgress(updatedProgress)
+      saveUserProgress(updatedProgress).catch(console.error)
     } else {
       // Complete onboarding
       const updatedProgress = {
@@ -170,7 +195,7 @@ export function useOnboarding(flowId?: string): UseOnboardingReturn {
       }
       
       setProgress(updatedProgress)
-      saveMockUserProgress(updatedProgress)
+      saveUserProgress(updatedProgress).catch(console.error)
     }
   }, [currentFlow, progress, currentStep])
 
@@ -190,7 +215,7 @@ export function useOnboarding(flowId?: string): UseOnboardingReturn {
       }
       
       setProgress(updatedProgress)
-      saveMockUserProgress(updatedProgress)
+      saveUserProgress(updatedProgress).catch(console.error)
     }
   }, [currentFlow, progress, currentStep])
 
@@ -211,7 +236,7 @@ export function useOnboarding(flowId?: string): UseOnboardingReturn {
     }
     
     setProgress(updatedProgress)
-    saveMockUserProgress(updatedProgress)
+    saveUserProgress(updatedProgress).catch(console.error)
   }, [progress])
 
   // Skip entire onboarding
@@ -225,7 +250,7 @@ export function useOnboarding(flowId?: string): UseOnboardingReturn {
     }
     
     setProgress(updatedProgress)
-    saveMockUserProgress(updatedProgress)
+    saveUserProgress(updatedProgress).catch(console.error)
   }, [progress])
 
   // Restart onboarding
@@ -244,7 +269,7 @@ export function useOnboarding(flowId?: string): UseOnboardingReturn {
     }
     
     setProgress(newProgress)
-    saveMockUserProgress(newProgress)
+    saveUserProgress(newProgress).catch(console.error)
   }, [user, currentFlow])
 
   return {
@@ -278,16 +303,17 @@ export function useOnboardingCheck() {
     if (!user) return
 
     // Check if user has completed basic onboarding
-    const basicProgress = getMockUserProgress(user.id, 'first_time_user')
-    const hasCompletedBasic = basicProgress?.completedAt || basicProgress?.skipped
+    getUserProgress(user.id, 'first_time_user').then(basicProgress => {
+      const hasCompletedBasic = basicProgress?.completedAt || basicProgress?.skipped
 
-    if (!hasCompletedBasic) {
-      setNeedsOnboarding(true)
-      setRecommendedFlow('first_time_user')
-    } else {
-      setNeedsOnboarding(false)
-      setRecommendedFlow(null)
-    }
+      if (!hasCompletedBasic) {
+        setNeedsOnboarding(true)
+        setRecommendedFlow('first_time_user')
+      } else {
+        setNeedsOnboarding(false)
+        setRecommendedFlow(null)
+      }
+    })
   }, [user])
 
   return {

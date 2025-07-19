@@ -2,7 +2,8 @@
 // Global state management for cross-system integration
 
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { DashboardService } from '@/lib/services/dashboardService'
+import { createClient } from '@/lib/supabase/client'
 
 interface UserProfile {
   id: string
@@ -83,15 +84,18 @@ interface GlobalState {
   
   // User preference actions
   updatePreferences: (preferences: Partial<UserProfile['preferences']>) => void
+  loadUserPreferences: () => Promise<void>
+  saveUserPreferences: () => Promise<void>
+  
+  // Stats actions
+  updateUserStats: () => Promise<void>
   
   // Achievement actions
   unlockAchievement: (achievementName: string) => void
   addExperience: (points: number) => void
 }
 
-export const useGlobalState = create<GlobalState>()(
-  persist(
-    (set, get) => ({
+export const useGlobalState = create<GlobalState>()((set, get) => ({
       // Initial state
       user: null,
       isAuthenticated: false,
@@ -161,12 +165,132 @@ export const useGlobalState = create<GlobalState>()(
       setTheme: (currentTheme) => set({ currentTheme }),
 
       // User preference actions
-      updatePreferences: (preferences) => set((state) => ({
-        user: state.user ? {
-          ...state.user,
-          preferences: { ...state.user.preferences, ...preferences }
-        } : null
-      })),
+      updatePreferences: (preferences) => {
+        set((state) => ({
+          user: state.user ? {
+            ...state.user,
+            preferences: { ...state.user.preferences, ...preferences }
+          } : null
+        }))
+        // Auto-save to database
+        get().saveUserPreferences()
+      },
+      
+      loadUserPreferences: async () => {
+        const state = get()
+        if (!state.user?.id) return
+        
+        try {
+          const preferences = await DashboardService.getUserPreferences(state.user.id)
+          const profile = await DashboardService.getUserProfile(state.user.id)
+          
+          if (preferences || profile) {
+            // Parse enhanced preferences from dashboard_widgets
+            let enhancedPrefs = {}
+            try {
+              enhancedPrefs = preferences?.dashboard_widgets ? JSON.parse(String(preferences.dashboard_widgets)) : {}
+            } catch (e) {
+              console.warn('Failed to parse dashboard_widgets:', e)
+            }
+            
+            set((state) => ({
+              user: state.user ? {
+                ...state.user,
+                name: profile?.full_name || state.user.name,
+                preferences: {
+                  currency: ((enhancedPrefs as any)?.currency as 'VND' | 'USD') || 'VND',
+                  language: ((enhancedPrefs as any)?.language as 'vi' | 'en') || 'vi',
+                  notifications: {
+                    email: preferences?.email_notifications ?? true,
+                    push: preferences?.push_notifications ?? true,
+                    achievements: preferences?.achievement_notifications ?? true,
+                    marketUpdates: preferences?.market_update_notifications ?? true,
+                    paymentReminders: preferences?.payment_reminder_notifications ?? true
+                  },
+                  dashboard: {
+                    layout: (preferences?.dashboard_layout as 'grid' | 'list') || 'grid',
+                    widgets: Array.isArray((enhancedPrefs as any)?.widgets) ? (enhancedPrefs as any).widgets : []
+                  }
+                },
+                stats: {
+                  level: Math.floor((profile?.experience_points || 0) / 1000) + 1, // Calculate level from experience
+                  experience: profile?.experience_points || 0,
+                  totalPlans: 0, // Will be updated separately via updateUserStats
+                  totalInvestments: 0, // Will be updated separately via updateUserStats
+                  achievementsUnlocked: 0 // Will be updated separately via updateUserStats
+                }
+              } : null
+            }))
+          }
+        } catch (error) {
+          console.error('Error loading user preferences:', error)
+        }
+      },
+      
+      saveUserPreferences: async () => {
+        const state = get()
+        if (!state.user?.id) return
+        
+        try {
+          // Save preferences with enhanced database integration
+          await DashboardService.updateUserPreferences(state.user.id, {
+            // Store currency and language in dashboard_widgets for now as JSON
+            dashboard_widgets: JSON.stringify({
+              ...state.user.preferences.dashboard.widgets,
+              currency: state.user.preferences.currency,
+              language: state.user.preferences.language
+            }),
+            email_notifications: state.user.preferences.notifications.email,
+            push_notifications: state.user.preferences.notifications.push,
+            achievement_notifications: state.user.preferences.notifications.achievements,
+            market_update_notifications: state.user.preferences.notifications.marketUpdates,
+            payment_reminder_notifications: state.user.preferences.notifications.paymentReminders,
+            dashboard_layout: state.user.preferences.dashboard.layout
+          })
+          
+          // Save enhanced profile stats using available fields
+          await DashboardService.updateUserProfile(state.user.id, {
+            experience_points: state.user.stats.experience,
+            // Store additional stats in a JSON field for now
+            full_name: state.user.name // Use existing field for name
+          } as any)
+        } catch (error) {
+          console.error('Error saving user preferences:', error)
+        }
+      },
+
+      // Stats update actions
+      updateUserStats: async () => {
+        const state = get()
+        if (!state.user?.id) return
+        
+        try {
+          // Get actual counts from database
+          const [plans, achievements, userExperience] = await Promise.all([
+            DashboardService.getFinancialPlans(state.user.id),
+            DashboardService.getUserAchievements(state.user.id),
+            DashboardService.getUserExperience(state.user.id)
+          ])
+          
+          const totalPlans = plans.length
+          const totalInvestments = plans.filter(plan => plan.plan_type === 'investment').length
+          const achievementsUnlocked = achievements.length
+          
+          set((state) => ({
+            user: state.user ? {
+              ...state.user,
+              stats: {
+                ...state.user.stats,
+                totalPlans,
+                totalInvestments,
+                achievementsUnlocked
+              }
+            } : null
+          }))
+        } catch (error) {
+          console.error('Error updating user stats:', error)
+        }
+      },
 
       // Achievement actions
       unlockAchievement: (achievementName) => {
@@ -195,47 +319,40 @@ export const useGlobalState = create<GlobalState>()(
         }
       },
       
-      addExperience: (points) => set((state) => {
-        if (!state.user) return state
-        
-        const newExperience = state.user.stats.experience + points
-        const newLevel = Math.floor(newExperience / 1000) + 1 // Level up every 1000 XP
-        
-        // Check if level increased
-        if (newLevel > state.user.stats.level) {
-          state.addNotification({
-            type: 'achievement',
-            title: 'Lên cấp! 🎉',
-            message: `Chúc mừng! Bạn đã đạt cấp độ ${newLevel}`,
-            isRead: false,
-            actionUrl: '/achievements'
-          })
-        }
-        
-        return {
-          user: {
-            ...state.user,
-            stats: {
-              ...state.user.stats,
-              experience: newExperience,
-              level: newLevel
+      addExperience: (points) => {
+        set((state) => {
+          if (!state.user) return state
+          
+          const newExperience = state.user.stats.experience + points
+          const newLevel = Math.floor(newExperience / 1000) + 1 // Level up every 1000 XP
+          
+          // Check if level increased
+          if (newLevel > state.user.stats.level) {
+            state.addNotification({
+              type: 'achievement',
+              title: 'Lên cấp! 🎉',
+              message: `Chúc mừng! Bạn đã đạt cấp độ ${newLevel}`,
+              isRead: false,
+              actionUrl: '/achievements'
+            })
+          }
+          
+          return {
+            user: {
+              ...state.user,
+              stats: {
+                ...state.user.stats,
+                experience: newExperience,
+                level: newLevel
+              }
             }
           }
-        }
-      })
-    }),
-    {
-      name: 'finhome-global-state',
-      partialize: (state) => ({
-        user: state.user,
-        isAuthenticated: state.isAuthenticated,
-        currentTheme: state.currentTheme,
-        sidebarOpen: state.sidebarOpen,
-        notifications: state.notifications.slice(0, 20) // Persist only recent notifications
-      })
-    }
-  )
-)
+        })
+        
+        // Auto-save to database
+        get().saveUserPreferences()
+      }
+  }))
 
 // Convenience hooks for specific parts of the state
 export const useUser = () => useGlobalState((state) => state.user)
@@ -265,6 +382,12 @@ export const useUI = () => useGlobalState((state) => ({
   toggleSidebar: state.toggleSidebar,
   setTheme: state.setTheme,
   setLoading: state.setLoading
+}))
+export const useUserPreferences = () => useGlobalState((state) => ({
+  preferences: state.user?.preferences,
+  updatePreferences: state.updatePreferences,
+  loadUserPreferences: state.loadUserPreferences,
+  saveUserPreferences: state.saveUserPreferences
 }))
 
 export default useGlobalState

@@ -96,6 +96,10 @@ const mockInterestRates: (BankInterestRate & { bank_name?: string; bank_code?: s
     effective_date: '2024-01-01T00:00:00Z',
     expiry_date: '2024-06-30T23:59:59Z',
     is_active: true,
+    promotional_rate: 6.5,
+    promotional_period_months: 12,
+    promotional_conditions: { new_customer: true },
+    promotional_end_date: '2024-06-30',
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-15T10:30:00Z'
   },
@@ -133,6 +137,10 @@ const mockInterestRates: (BankInterestRate & { bank_name?: string; bank_code?: s
     effective_date: '2024-01-15T00:00:00Z',
     expiry_date: '2024-12-31T23:59:59Z',
     is_active: true,
+    promotional_rate: null,
+    promotional_period_months: null,
+    promotional_conditions: {},
+    promotional_end_date: null,
     created_at: '2024-01-10T00:00:00Z',
     updated_at: '2024-01-20T14:45:00Z'
   },
@@ -171,6 +179,10 @@ const mockInterestRates: (BankInterestRate & { bank_name?: string; bank_code?: s
     effective_date: '2024-02-01T00:00:00Z',
     expiry_date: '2024-04-30T23:59:59Z',
     is_active: true,
+    promotional_rate: null,
+    promotional_period_months: null,
+    promotional_conditions: {},
+    promotional_end_date: null,
     created_at: '2024-01-25T00:00:00Z',
     updated_at: '2024-02-01T09:15:00Z'
   },
@@ -208,6 +220,10 @@ const mockInterestRates: (BankInterestRate & { bank_name?: string; bank_code?: s
     effective_date: '2024-01-01T00:00:00Z',
     expiry_date: '2024-03-31T23:59:59Z',
     is_active: false,
+    promotional_rate: null,
+    promotional_period_months: null,
+    promotional_conditions: {},
+    promotional_end_date: null,
     created_at: '2023-12-15T00:00:00Z',
     updated_at: '2024-01-05T16:20:00Z'
   },
@@ -245,6 +261,10 @@ const mockInterestRates: (BankInterestRate & { bank_name?: string; bank_code?: s
     effective_date: '2024-03-01T00:00:00Z',
     expiry_date: '2024-03-15T23:59:59Z',
     is_active: true,
+    promotional_rate: null,
+    promotional_period_months: null,
+    promotional_conditions: {},
+    promotional_end_date: null,
     created_at: '2024-02-15T00:00:00Z',
     updated_at: '2024-02-20T11:00:00Z'
   }

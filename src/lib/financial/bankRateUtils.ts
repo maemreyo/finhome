@@ -76,8 +76,8 @@ export async function getOptimalBankRate(
       bankName: rate.banks.bank_name,
       bankCode: rate.banks.bank_code,
       interestRate: rate.interest_rate,
-      promotionalRate: undefined, // Not available in bank_interest_rates table
-      promotionalPeriodMonths: undefined, // Not available in bank_interest_rates table
+      promotionalRate: rate.promotional_rate || undefined,
+      promotionalPeriodMonths: rate.promotional_period_months || undefined,
       maxLtvRatio: rate.max_ltv_ratio || undefined,
       processingFee: rate.processing_fee || undefined,
       minAmount: rate.min_loan_amount || undefined,
@@ -110,13 +110,15 @@ export async function getOptimalBankRate(
 
 /**
  * Get default rates when no database rates are available
+ * Now uses more realistic current market rates for Vietnam (2024)
  */
 export function getDefaultRates(loanType: string): LoanParameters {
+  // Current market rates in Vietnam as of 2024
   const defaultRates = {
-    home_purchase: { regular: 10.5, promotional: 7.5 },
-    investment: { regular: 11.0, promotional: 8.0 },
-    upgrade: { regular: 10.0, promotional: 7.0 },
-    refinance: { regular: 9.5, promotional: 6.5 }
+    home_purchase: { regular: 8.5, promotional: 7.2 },
+    investment: { regular: 9.0, promotional: 7.8 },
+    upgrade: { regular: 8.2, promotional: 6.9 },
+    refinance: { regular: 8.0, promotional: 6.5 }
   }
 
   const rates = defaultRates[loanType as keyof typeof defaultRates] || defaultRates.home_purchase
@@ -126,7 +128,7 @@ export function getDefaultRates(loanType: string): LoanParameters {
     annualRate: rates.regular,
     termMonths: 240, // 20 years default
     promotionalRate: rates.promotional,
-    promotionalPeriodMonths: 24 // 2 years promotional period
+    promotionalPeriodMonths: 12 // Updated to 1 year promotional period (more realistic)
   }
 }
 

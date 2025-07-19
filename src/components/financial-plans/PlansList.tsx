@@ -194,8 +194,11 @@ const PlanCard: React.FC<{
                 className="opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={onToggleFavorite}
               >
-                {/* TODO: Implement favorites functionality in database */}
-                <StarOff className="w-4 h-4 text-gray-400" />
+                {plan.is_favorite ? (
+                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                ) : (
+                  <StarOff className="w-4 h-4 text-gray-400" />
+                )}
               </Button>
               
               <DropdownMenu>
@@ -435,7 +438,13 @@ export const PlansList: React.FC<PlansListProps> = ({
       }
     })
     
-    // TODO: Implement favorites functionality in database
+    // Sort favorites to the top if any exist
+    filtered.sort((a, b) => {
+      if (a.is_favorite && !b.is_favorite) return -1
+      if (!a.is_favorite && b.is_favorite) return 1
+      return 0
+    })
+    
     return filtered
   }, [plans, searchQuery, filterStatus, sortBy])
   

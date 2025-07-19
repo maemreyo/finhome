@@ -5,6 +5,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { AchievementEngine, UserProgress } from '@/lib/gamification/achievements'
 import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
 import { useAuth } from '@/hooks/useAuth'
+import { DashboardService } from '@/lib/services/dashboardService'
+import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
 interface UseAchievementsReturn {
@@ -17,33 +19,101 @@ interface UseAchievementsReturn {
   markAchievementSeen: (achievementId: string) => void
 }
 
-// Mock function to get user progress - would be an API call in real app
+// Fetch user progress from database
 const fetchUserProgress = async (userId: string): Promise<UserProgress> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
-  return {
-    userId,
-    totalPoints: 1250,
-    level: 3,
-    completedAchievements: ['first_plan', 'smart_investor', 'planning_expert'],
-    progressData: {
-      plansCreated: 6,
-      totalSavingsOptimized: 75000000,
-      highestROI: 12.5,
-      plansCompleted: 2,
-      exportsGenerated: 8,
-      streakDays: 15,
-      lastActivityDate: new Date()
+  try {
+    // Get user experience and achievements from database
+    const [userExperience, userAchievements, availableAchievements] = await Promise.all([
+      DashboardService.getUserExperience(userId),
+      DashboardService.getUserAchievements(userId),
+      DashboardService.getAvailableAchievements()
+    ])
+
+    // Convert user achievements to completed achievement IDs
+    const completedAchievements = userAchievements.map(ua => ua.achievement_id)
+
+    // Calculate total points from unlocked achievements
+    const totalPoints = userAchievements.reduce((sum, ua) => {
+      const achievement = ua.achievements
+      return sum + (achievement?.experience_points || 0)
+    }, 0)
+
+    // Get user's financial plans to calculate metrics
+    const userPlans = await DashboardService.getFinancialPlans(userId)
+    
+    // Calculate totalSavingsOptimized from completed plans
+    const totalSavingsOptimized = userPlans
+      .filter(plan => plan.status === 'completed')
+      .reduce((sum, plan) => {
+        // Calculate savings from optimization (difference between original and optimized monthly payment)
+        const originalPayment = (plan as any).calculatedMetrics?.monthlyPayment || 0
+        const optimizedSavings = originalPayment * 0.1 // Assume 10% optimization savings
+        return sum + optimizedSavings * 12 // Annual savings
+      }, 0)
+
+    // Calculate highest ROI from investment plans
+    const highestROI = Math.max(
+      0,
+      ...userPlans
+        .filter(plan => plan.plan_type === 'investment' && plan.expected_roi)
+        .map(plan => plan.expected_roi || 0)
+    )
+
+    // Calculate completed plans count
+    const plansCompleted = userPlans.filter(plan => plan.status === 'completed').length
+
+    return {
+      userId,
+      totalPoints,
+      level: userExperience.current_level,
+      completedAchievements,
+      progressData: {
+        plansCreated: userExperience.plans_created,
+        totalSavingsOptimized,
+        highestROI,
+        plansCompleted,
+        exportsGenerated: (userExperience as any).exports_generated || 0, // Add to user_experience table if needed
+        streakDays: userExperience.current_login_streak,
+        lastActivityDate: new Date(userExperience.last_activity_date)
+      }
     }
+  } catch (error) {
+    console.error('Error fetching user progress:', error)
+    throw error
   }
 }
 
-// Mock function to save user progress - would be an API call in real app
+// Save user progress to database
 const saveUserProgress = async (progress: UserProgress): Promise<void> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 200))
-  console.log('Saving user progress:', progress)
+  try {
+    // Update user experience in database
+    const { error } = await supabase
+      .from('user_experience')
+      .upsert({
+        user_id: progress.userId,
+        total_experience: progress.totalPoints,
+        current_level: progress.level,
+        experience_in_level: progress.totalPoints % 100, // Simple calculation
+        experience_to_next_level: 100 - (progress.totalPoints % 100),
+        plans_created: progress.progressData.plansCreated,
+        calculations_performed: 0, // Would need tracking
+        properties_viewed: 0, // Would need tracking
+        achievements_unlocked: progress.completedAchievements.length,
+        days_active: progress.progressData.streakDays,
+        current_login_streak: progress.progressData.streakDays,
+        longest_login_streak: progress.progressData.streakDays,
+        last_activity_date: progress.progressData.lastActivityDate.toISOString(),
+        updated_at: new Date().toISOString()
+      })
+
+    if (error) {
+      console.error('Error saving user experience:', error)
+      throw error
+    }
+  } catch (error) {
+    console.error('Error saving user progress:', error)
+    throw error
+  }
 }
 
 export function useAchievements(): UseAchievementsReturn {
@@ -73,35 +143,57 @@ export function useAchievements(): UseAchievementsReturn {
   }, [user])
 
   // Check for new achievements
-  const checkAchievements = useCallback((plans: FinancialPlanWithMetrics[]) => {
-    if (!achievementEngine || !userProgress) return
+  const checkAchievements = useCallback(async (plans: FinancialPlanWithMetrics[]) => {
+    if (!achievementEngine || !userProgress || !user) return
 
     const newAchievements = achievementEngine.checkAchievements(plans)
     
     if (newAchievements.length > 0) {
-      // Update state with new achievements
-      setUserProgress(prev => ({
-        ...prev!,
-        completedAchievements: [...prev!.completedAchievements, ...newAchievements.map(a => a.id)],
-        totalPoints: prev!.totalPoints + newAchievements.reduce((sum, a) => sum + a.points, 0)
-      }))
+      try {
+        // Save new achievements to database
+        for (const achievement of newAchievements) {
+          const { error } = await supabase
+            .from('user_achievements')
+            .insert({
+              user_id: user.id,
+              achievement_id: achievement.id,
+              unlocked_at: new Date().toISOString(),
+              progress_data: {} // Store achievement progress data
+            })
 
-      // Show achievement unlock notifications
-      newAchievements.forEach(achievement => {
-        console.log('🎉 Achievement Unlocked!', achievement.title, achievement.description)
-        // In a real app, this would show a toast notification
-      })
+          if (error) {
+            console.error('Error saving achievement:', error)
+          } else {
+            // Show achievement unlock notification
+            toast.success(`🎉 Achievement Unlocked: ${achievement.title}`, {
+              description: achievement.description
+            })
+          }
+        }
 
-      // Save progress to backend
-      saveUserProgress(userProgress)
-        .catch(err => {
-          console.error('Error saving user progress:', err)
-        })
+        // Update local state with new achievements
+        setUserProgress(prev => ({
+          ...prev!,
+          completedAchievements: [...prev!.completedAchievements, ...newAchievements.map(a => a.id)],
+          totalPoints: prev!.totalPoints + newAchievements.reduce((sum, a) => sum + a.points, 0)
+        }))
+
+        // Update user experience in database
+        const updatedProgress = {
+          ...userProgress,
+          completedAchievements: [...userProgress.completedAchievements, ...newAchievements.map(a => a.id)],
+          totalPoints: userProgress.totalPoints + newAchievements.reduce((sum, a) => sum + a.points, 0)
+        }
+
+        await saveUserProgress(updatedProgress)
+      } catch (error) {
+        console.error('Error processing new achievements:', error)
+      }
     }
-  }, [achievementEngine, userProgress])
+  }, [achievementEngine, userProgress, user])
 
   // Update progress data
-  const updateProgress = useCallback((updates: Partial<UserProgress['progressData']>) => {
+  const updateProgress = useCallback(async (updates: Partial<UserProgress['progressData']>) => {
     if (!userProgress) return
 
     const updatedProgress = {
@@ -118,18 +210,34 @@ export function useAchievements(): UseAchievementsReturn {
     // Update achievement engine with new progress
     setAchievementEngine(new AchievementEngine(updatedProgress))
 
-    // Save to backend
-    saveUserProgress(updatedProgress)
-      .catch(err => {
-        console.error('Error saving user progress:', err)
-      })
+    try {
+      // Save to database
+      await saveUserProgress(updatedProgress)
+    } catch (error) {
+      console.error('Error saving user progress:', error)
+    }
   }, [userProgress])
 
   // Mark achievement as seen (for notification purposes)
-  const markAchievementSeen = useCallback((achievementId: string) => {
-    // This would typically update a "seen" flag in the database
-    console.log('Achievement marked as seen:', achievementId)
-  }, [])
+  const markAchievementSeen = useCallback(async (achievementId: string) => {
+    try {
+      // Create a notification entry to mark achievement as seen
+      if (user) {
+        const { error } = await supabase
+          .from('notifications')
+          .update({ is_read: true, read_at: new Date().toISOString() })
+          .eq('user_id', user.id)
+          .eq('type', 'achievement')
+          .like('metadata', `%${achievementId}%`)
+
+        if (error) {
+          console.error('Error marking achievement as seen:', error)
+        }
+      }
+    } catch (error) {
+      console.error('Error marking achievement as seen:', error)
+    }
+  }, [user])
 
   return {
     userProgress,
@@ -144,27 +252,69 @@ export function useAchievements(): UseAchievementsReturn {
 
 // Hook specifically for tracking plan-related achievements
 export function usePlanAchievements() {
-  const { checkAchievements } = useAchievements()
+  const { checkAchievements, updateProgress } = useAchievements()
 
-  const onPlanCreated = useCallback((_plan: FinancialPlanWithMetrics) => {
-    // This would increment the plan count in a real implementation
-    console.log('Plan created - updating progress')
-  }, [])
+  const onPlanCreated = useCallback(async (plan: FinancialPlanWithMetrics) => {
+    // Update progress with new plan count
+    await updateProgress({
+      plansCreated: (await DashboardService.getFinancialPlans(plan.user_id)).length
+    })
+    
+    // Check for achievements after plan creation
+    const allPlans = await DashboardService.getFinancialPlans(plan.user_id)
+    checkAchievements(allPlans as FinancialPlanWithMetrics[])
+  }, [checkAchievements, updateProgress])
 
-  const onPlanCompleted = useCallback((_plan: FinancialPlanWithMetrics) => {
-    // This would increment the completed plan count in a real implementation
-    console.log('Plan completed - updating progress')
-  }, [])
+  const onPlanCompleted = useCallback(async (plan: FinancialPlanWithMetrics) => {
+    // Update progress with completed plan count
+    const allPlans = await DashboardService.getFinancialPlans(plan.user_id)
+    const completedPlans = allPlans.filter(p => p.status === 'completed').length
+    
+    await updateProgress({
+      plansCompleted: completedPlans
+    })
+    
+    // Check for achievements after plan completion
+    checkAchievements(allPlans as FinancialPlanWithMetrics[])
+  }, [checkAchievements, updateProgress])
 
-  const onExportGenerated = useCallback(() => {
-    // This would increment the export count in a real implementation
-    console.log('Export generated - updating progress')
-  }, [])
+  const onExportGenerated = useCallback(async (userId: string) => {
+    try {
+      // Update export count in user experience
+      const userExperience = await DashboardService.getUserExperience(userId)
+      const newExportCount = ((userExperience as any).exports_generated || 0) + 1
+      
+      await updateProgress({
+        exportsGenerated: newExportCount
+      })
+      
+      // Update in database - add exports_generated field if it doesn't exist
+      await supabase
+        .from('user_experience')
+        .update({ 
+          exports_generated: newExportCount,
+          last_activity_date: new Date().toISOString()
+        })
+        .eq('user_id', userId)
+        
+      console.log('Export generated - progress updated')
+    } catch (error) {
+      console.error('Error updating export progress:', error)
+    }
+  }, [updateProgress])
 
-  const onROIAchieved = useCallback((roi: number) => {
-    // This would update the highest ROI in a real implementation
-    console.log('ROI achieved:', roi)
-  }, [])
+  const onROIAchieved = useCallback(async (roi: number, userId: string) => {
+    // Update the highest ROI achieved
+    const allPlans = await DashboardService.getFinancialPlans(userId)
+    const highestROI = Math.max(roi, ...allPlans.map(p => p.expected_roi || 0))
+    
+    await updateProgress({
+      highestROI
+    })
+    
+    // Check for achievements after ROI milestone
+    checkAchievements(allPlans as FinancialPlanWithMetrics[])
+  }, [checkAchievements, updateProgress])
 
   return {
     onPlanCreated,

@@ -3,7 +3,7 @@
 
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -25,6 +25,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
+import { DashboardService } from '@/lib/services/dashboardService'
+import { toast } from 'sonner'
 
 // Import our components
 import PlanStatusManager from './PlanStatusManager'
@@ -45,107 +47,7 @@ interface PlanProgressDashboardProps {
   className?: string
 }
 
-// Mock data for status info
-const mockStatusInfo: PlanStatusInfo = {
-  status: 'active',
-  progress: 65,
-  statusHistory: [
-    {
-      id: 'status-1',
-      previousStatus: 'draft',
-      newStatus: 'active',
-      changedBy: 'User',
-      changedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-      reason: 'Plan approved and ready to execute',
-      notes: 'All documents verified and finances confirmed'
-    },
-    {
-      id: 'status-2',
-      previousStatus: 'active',
-      newStatus: 'archived',
-      changedBy: 'User',
-      changedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      reason: 'Archived for review',
-      notes: 'Plan needs updates before reactivation'
-    },
-    {
-      id: 'status-3',
-      previousStatus: 'archived',
-      newStatus: 'active',
-      changedBy: 'User',
-      changedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      reason: 'Loan approved, resuming execution',
-      notes: 'All requirements met, proceeding with property purchase'
-    }
-  ],
-  canTransitionTo: ['archived', 'completed'],
-  estimatedCompletionDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-  archiveReason: undefined,
-  createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-  updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-}
-
-// Mock progress data
-const mockProgress: PlanProgress = {
-  totalProgress: 65,
-  financialProgress: 75,
-  savingsTarget: 600000000, // 600M VND
-  currentSavings: 450000000, // 450M VND
-  monthlyContribution: 25000000, // 25M VND
-  estimatedCompletionDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-  milestones: [
-    {
-      id: 'milestone-1',
-      title: 'Complete down payment savings',
-      description: 'Accumulate 600M VND for down payment',
-      targetDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
-      status: 'in_progress',
-      category: 'financial',
-      requiredAmount: 600000000,
-      currentAmount: 450000000,
-      priority: 'high'
-    },
-    {
-      id: 'milestone-2',
-      title: 'Secure loan pre-approval',
-      description: 'Get pre-approved for mortgage loan',
-      targetDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-      status: 'completed',
-      category: 'financial',
-      priority: 'high'
-    },
-    {
-      id: 'milestone-3',
-      title: 'Property legal verification',
-      description: 'Complete legal due diligence',
-      targetDate: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000),
-      status: 'pending',
-      category: 'legal',
-      priority: 'high'
-    },
-    {
-      id: 'milestone-4',
-      title: 'Property insurance',
-      description: 'Secure comprehensive property insurance',
-      targetDate: new Date(Date.now() + 160 * 24 * 60 * 60 * 1000),
-      status: 'pending',
-      category: 'admin',
-      priority: 'medium'
-    }
-  ],
-  statusHistory: [
-    {
-      status: 'draft',
-      date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      note: 'Plan created'
-    },
-    {
-      status: 'active',
-      date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-      note: 'Plan activated and execution started'
-    }
-  ]
-}
+// PlanProgressDashboard now uses real database data instead of mock data
 
 const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
   plan,
@@ -155,17 +57,148 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
   className
 }) => {
   const t = useTranslations('PlanProgressDashboard')
-  const [statusInfo, setStatusInfo] = useState<PlanStatusInfo>(mockStatusInfo)
-  const [progress, setProgress] = useState<PlanProgress>(mockProgress)
+  const [statusInfo, setStatusInfo] = useState<PlanStatusInfo | null>(null)
+  const [progress, setProgress] = useState<PlanProgress | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Load real data from database
+  useEffect(() => {
+    const loadPlanData = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        // Load plan progress data
+        const progressData = await DashboardService.getPlanProgress(plan.id)
+        
+        if (progressData) {
+          // Convert database progress to PlanProgress type
+          const planProgress: PlanProgress = {
+            totalProgress: progressData.totalProgress,
+            financialProgress: progressData.financialProgress,
+            savingsTarget: progressData.savingsTarget,
+            currentSavings: progressData.currentSavings,
+            monthlyContribution: progressData.monthlyContribution,
+            estimatedCompletionDate: progressData.estimatedCompletionDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            milestones: progressData.milestones.map(m => ({
+              id: m.id,
+              title: m.title,
+              description: m.description || '',
+              targetDate: m.target_date ? new Date(m.target_date) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              status: m.status as 'pending' | 'in_progress' | 'completed' | 'cancelled',
+              category: m.category as 'financial' | 'legal' | 'property' | 'admin' | 'personal',
+              requiredAmount: m.required_amount ?? undefined,
+              currentAmount: m.current_amount ?? undefined,
+              priority: m.priority as 'low' | 'medium' | 'high'
+            })),
+            statusHistory: progressData.statusHistory.map(h => ({
+              status: h.status as 'draft' | 'active' | 'completed' | 'archived',
+              date: new Date(h.created_at),
+              note: h.note || ''
+            }))
+          }
+          setProgress(planProgress)
+
+          // Create status info from plan and progress data
+          const planStatusInfo: PlanStatusInfo = {
+            status: plan.planStatus,
+            progress: progressData.totalProgress,
+            statusHistory: progressData.statusHistory.map((h, index) => ({
+              id: `status-${h.id}`,
+              previousStatus: index < progressData.statusHistory.length - 1 ? 
+                progressData.statusHistory[index + 1].status as PlanStatus : 'draft',
+              newStatus: h.status as PlanStatus,
+              changedBy: 'User', // TODO: Add user tracking to database
+              changedAt: new Date(h.created_at),
+              reason: h.note || 'Status updated',
+              notes: h.note || ''
+            })),
+            canTransitionTo: plan.planStatus === 'draft' ? ['active'] :
+                           plan.planStatus === 'active' ? ['archived', 'completed'] :
+                           plan.planStatus === 'archived' ? ['active'] : [],
+            estimatedCompletionDate: progressData.estimatedCompletionDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            archiveReason: undefined,
+            createdAt: plan.createdAt,
+            updatedAt: plan.updatedAt
+          }
+          setStatusInfo(planStatusInfo)
+        } else {
+          // Create default data if no progress data exists
+          const defaultProgress: PlanProgress = {
+            totalProgress: 0,
+            financialProgress: 0,
+            savingsTarget: plan.downPayment || 0,
+            currentSavings: plan.currentSavings || 0,
+            monthlyContribution: 0,
+            estimatedCompletionDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            milestones: [],
+            statusHistory: [
+              {
+                status: 'draft',
+                date: plan.createdAt,
+                note: 'Plan created'
+              }
+            ]
+          }
+          setProgress(defaultProgress)
+
+          const defaultStatusInfo: PlanStatusInfo = {
+            status: plan.planStatus,
+            progress: 0,
+            statusHistory: [
+              {
+                id: 'status-initial',
+                previousStatus: 'draft',
+                newStatus: plan.planStatus,
+                changedBy: 'User',
+                changedAt: plan.createdAt,
+                reason: 'Plan created',
+                notes: ''
+              }
+            ],
+            canTransitionTo: plan.planStatus === 'draft' ? ['active'] :
+                           plan.planStatus === 'active' ? ['archived', 'completed'] :
+                           plan.planStatus === 'archived' ? ['active'] : [],
+            estimatedCompletionDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            archiveReason: undefined,
+            createdAt: plan.createdAt,
+            updatedAt: plan.updatedAt
+          }
+          setStatusInfo(defaultStatusInfo)
+        }
+      } catch (err) {
+        console.error('Error loading plan data:', err)
+        setError(err instanceof Error ? err.message : 'Failed to load plan data')
+        toast.error('Failed to load plan progress data')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadPlanData()
+  }, [plan.id, plan.planStatus, plan.downPayment, plan.currentSavings, plan.createdAt, plan.updatedAt])
 
   // Calculate key metrics
   const keyMetrics = useMemo(() => {
-    const savingsProgress = (progress.currentSavings / progress.savingsTarget) * 100
-    const monthsToTarget = Math.ceil((progress.savingsTarget - progress.currentSavings) / progress.monthlyContribution)
+    if (!progress) {
+      return {
+        savingsProgress: 0,
+        monthsToTarget: 0,
+        milestoneProgress: 0,
+        completedMilestones: 0,
+        totalMilestones: 0,
+        overdueMilestones: 0
+      }
+    }
+
+    const savingsProgress = progress.savingsTarget > 0 ? (progress.currentSavings / progress.savingsTarget) * 100 : 0
+    const monthsToTarget = progress.monthlyContribution > 0 ? 
+      Math.ceil((progress.savingsTarget - progress.currentSavings) / progress.monthlyContribution) : 0
     
     const completedMilestones = progress.milestones.filter(m => m.status === 'completed').length
     const totalMilestones = progress.milestones.length
-    const milestoneProgress = (completedMilestones / totalMilestones) * 100
+    const milestoneProgress = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0
     
     const overdueMilestones = progress.milestones.filter(m => 
       m.status !== 'completed' && m.targetDate < new Date()
@@ -181,27 +214,37 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
     }
   }, [progress])
 
-  const handleStatusChange = (newStatus: PlanStatus, reason?: string, notes?: string) => {
-    // Update status info
-    const newStatusHistory = {
-      id: `status-${Date.now()}`,
-      previousStatus: statusInfo.status,
-      newStatus,
-      changedBy: 'User',
-      changedAt: new Date(),
-      reason,
-      notes
+  const handleStatusChange = async (newStatus: PlanStatus, reason?: string, notes?: string) => {
+    if (!statusInfo) return
+    
+    try {
+      // Call the parent handler to update the database
+      await onStatusChange(newStatus, reason, notes)
+      
+      // Update local status info
+      const newStatusHistory = {
+        id: `status-${Date.now()}`,
+        previousStatus: statusInfo.status,
+        newStatus,
+        changedBy: 'User',
+        changedAt: new Date(),
+        reason,
+        notes
+      }
+      
+      setStatusInfo(prev => prev ? ({
+        ...prev,
+        status: newStatus,
+        statusHistory: [newStatusHistory, ...prev.statusHistory],
+        archiveReason: newStatus === 'archived' ? reason : undefined,
+        actualCompletionDate: newStatus === 'completed' ? new Date() : undefined
+      }) : null)
+      
+      toast.success(`Plan status updated to ${newStatus}`)
+    } catch (error) {
+      console.error('Error updating status:', error)
+      toast.error('Failed to update plan status')
     }
-    
-    setStatusInfo(prev => ({
-      ...prev,
-      status: newStatus,
-      statusHistory: [newStatusHistory, ...prev.statusHistory],
-      archiveReason: newStatus === 'archived' ? reason : undefined,
-      actualCompletionDate: newStatus === 'completed' ? new Date() : undefined
-    }))
-    
-    onStatusChange(newStatus, reason, notes)
   }
 
   const getStatusColor = (status: PlanStatus) => {
@@ -215,6 +258,8 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
   }
 
   const getHealthScore = () => {
+    if (!statusInfo) return 0
+    
     let score = 100
     
     // Deduct points for overdue milestones
@@ -232,6 +277,55 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
   const healthScore = getHealthScore()
   const healthColor = healthScore >= 80 ? 'text-green-600' : 
                      healthScore >= 60 ? 'text-yellow-600' : 'text-red-600'
+
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <div className={cn('space-y-6', className)}>
+        <div className="animate-pulse">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
+            ))}
+          </div>
+          <div className="h-64 bg-gray-200 rounded-lg"></div>
+        </div>
+      </div>
+    )
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <div className={cn('space-y-6', className)}>
+        <Card>
+          <CardContent className="text-center py-12">
+            <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Error Loading Progress Data</h3>
+            <p className="text-gray-500 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Handle case where data is still loading or unavailable
+  if (!statusInfo || !progress) {
+    return (
+      <div className={cn('space-y-6', className)}>
+        <Card>
+          <CardContent className="text-center py-12">
+            <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No Progress Data Available</h3>
+            <p className="text-gray-500 mb-4">Plan progress data is not available yet</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -387,7 +481,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">{t('estimatedCompletion')}</span>
                 <span className="text-sm font-medium">
-                  {progress.estimatedCompletionDate.toLocaleDateString('vi-VN')}
+                  {progress.estimatedCompletionDate?.toLocaleDateString('vi-VN') || 'N/A'}
                 </span>
               </div>
               <div className="flex justify-between items-center">

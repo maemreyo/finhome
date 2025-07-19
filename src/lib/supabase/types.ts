@@ -456,6 +456,17 @@ export interface Database {
           view_count: number
           cached_calculations: Json | null
           calculations_last_updated: string | null
+          // New fields for progress tracking
+          is_favorite: boolean
+          roi: number | null
+          total_progress: number
+          financial_progress: number
+          monthly_contribution: number
+          estimated_completion_date: string | null
+          risk_level: 'low' | 'medium' | 'high'
+          tags: string[]
+          notes: string | null
+          shared_with: string[]
           created_at: string
           updated_at: string
           completed_at: string | null
@@ -728,6 +739,10 @@ export interface Database {
           effective_date: string
           expiry_date: string | null
           is_active: boolean
+          promotional_rate: number | null
+          promotional_period_months: number | null
+          promotional_conditions: Json
+          promotional_end_date: string | null
           created_at: string
           updated_at: string
         }
@@ -753,6 +768,10 @@ export interface Database {
           effective_date: string
           expiry_date?: string | null
           is_active?: boolean
+          promotional_rate?: number | null
+          promotional_period_months?: number | null
+          promotional_conditions?: Json
+          promotional_end_date?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -778,6 +797,10 @@ export interface Database {
           effective_date?: string
           expiry_date?: string | null
           is_active?: boolean
+          promotional_rate?: number | null
+          promotional_period_months?: number | null
+          promotional_conditions?: Json
+          promotional_end_date?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -1366,6 +1389,126 @@ export interface Database {
           }
         ]
       }
+      plan_milestones: {
+        Row: {
+          id: string
+          plan_id: string
+          title: string
+          description: string | null
+          category: 'financial' | 'legal' | 'property' | 'admin' | 'personal'
+          status: 'pending' | 'in_progress' | 'completed' | 'cancelled'
+          priority: 'low' | 'medium' | 'high'
+          required_amount: number | null
+          current_amount: number
+          target_date: string | null
+          completed_date: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          plan_id: string
+          title: string
+          description?: string | null
+          category?: 'financial' | 'legal' | 'property' | 'admin' | 'personal'
+          status?: 'pending' | 'in_progress' | 'completed' | 'cancelled'
+          priority?: 'low' | 'medium' | 'high'
+          required_amount?: number | null
+          current_amount?: number
+          target_date?: string | null
+          completed_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          plan_id?: string
+          title?: string
+          description?: string | null
+          category?: 'financial' | 'legal' | 'property' | 'admin' | 'personal'
+          status?: 'pending' | 'in_progress' | 'completed' | 'cancelled'
+          priority?: 'low' | 'medium' | 'high'
+          required_amount?: number | null
+          current_amount?: number
+          target_date?: string | null
+          completed_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_milestones_plan_id_fkey"
+            columns: ["plan_id"]
+            referencedRelation: "financial_plans"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      plan_status_history: {
+        Row: {
+          id: string
+          plan_id: string
+          status: 'draft' | 'active' | 'completed' | 'archived'
+          note: string | null
+          changed_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          plan_id: string
+          status: 'draft' | 'active' | 'completed' | 'archived'
+          note?: string | null
+          changed_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          plan_id?: string
+          status?: 'draft' | 'active' | 'completed' | 'archived'
+          note?: string | null
+          changed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_status_history_plan_id_fkey"
+            columns: ["plan_id"]
+            referencedRelation: "financial_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_status_history_changed_by_fkey"
+            columns: ["changed_by"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      user_favorites: {
+        Row: {
+          id: string
+          user_id: string
+          entity_type: 'property' | 'financial_plan' | 'bank' | 'scenario'
+          entity_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          entity_type: 'property' | 'financial_plan' | 'bank' | 'scenario'
+          entity_id: string
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          entity_type?: 'property' | 'financial_plan' | 'bank' | 'scenario'
+          entity_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1488,6 +1631,9 @@ export type AnalyticsMetric = Database['public']['Tables']['analytics_metrics'][
 export type FinancialScenario = Database['public']['Tables']['financial_scenarios']['Row']
 export type MarketInsight = Database['public']['Tables']['market_insights']['Row']
 export type UserExperience = Database['public']['Tables']['user_experience']['Row']
+export type PlanMilestone = Database['public']['Tables']['plan_milestones']['Row']
+export type PlanStatusHistory = Database['public']['Tables']['plan_status_history']['Row']
+export type UserFavorite = Database['public']['Tables']['user_favorites']['Row']
 
 // Enum types
 export type UserSubscriptionTier = Database['public']['Enums']['user_subscription_tier']
@@ -1506,3 +1652,7 @@ export type FinancialPlanInsert = Database['public']['Tables']['financial_plans'
 export type FinancialPlanUpdate = Database['public']['Tables']['financial_plans']['Update']
 export type LoanCalculationInsert = Database['public']['Tables']['loan_calculations']['Insert']
 export type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
+export type PlanMilestoneInsert = Database['public']['Tables']['plan_milestones']['Insert']
+export type PlanMilestoneUpdate = Database['public']['Tables']['plan_milestones']['Update']
+export type PlanStatusHistoryInsert = Database['public']['Tables']['plan_status_history']['Insert']
+export type UserFavoriteInsert = Database['public']['Tables']['user_favorites']['Insert']

@@ -3,6 +3,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/lib/supabase/types'
+import { DashboardService } from '@/lib/services/dashboardService'
 import {
   PropertySearchFilters,
   PropertySearchResults,
@@ -143,30 +144,34 @@ export class PropertyService {
   async addToFavorites(propertyId: string, notes?: string): Promise<PropertyFavorite> {
     const { data: { user } } = await this.supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
-
-    const favorite: Omit<PropertyFavorite, 'id'> = {
-      userId: user.id,
-      propertyId,
-      addedAt: new Date(),
-      notes
+    
+    try {
+      await DashboardService.addToFavorites(user.id, 'property', propertyId)
+      
+      // Return PropertyFavorite format for compatibility
+      return {
+        id: crypto.randomUUID(), // Temporary ID for interface compatibility
+        userId: user.id,
+        propertyId,
+        addedAt: new Date(),
+        notes
+      }
+    } catch (error) {
+      console.error('Error adding to favorites:', error)
+      throw new Error('Failed to add property to favorites')
     }
-
-    // Store in localStorage for now (in production, use a favorites table)
-    const favorites = this.getFavoritesFromStorage(user.id)
-    const newFavorite = { ...favorite, id: crypto.randomUUID() }
-    favorites.push(newFavorite)
-    localStorage.setItem(`favorites_${user.id}`, JSON.stringify(favorites))
-
-    return newFavorite
   }
 
   async removeFromFavorites(propertyId: string): Promise<void> {
     const { data: { user } } = await this.supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
 
-    const favorites = this.getFavoritesFromStorage(user.id)
-    const filtered = favorites.filter(f => f.propertyId !== propertyId)
-    localStorage.setItem(`favorites_${user.id}`, JSON.stringify(filtered))
+    try {
+      await DashboardService.removeFromFavorites(user.id, 'property', propertyId)
+    } catch (error) {
+      console.error('Error removing from favorites:', error)
+      throw new Error('Failed to remove property from favorites')
+    }
   }
 
   async getFavorites(userId?: string): Promise<PropertyFavorite[]> {
@@ -174,15 +179,33 @@ export class PropertyService {
     const targetUserId = userId || user?.id
     if (!targetUserId) return []
 
-    return this.getFavoritesFromStorage(targetUserId)
+    try {
+      const favorites = await DashboardService.getUserFavorites(targetUserId, 'property')
+      
+      // Convert database favorites to PropertyFavorite format for compatibility
+      return favorites.map((fav: any) => ({
+        id: fav.id,
+        userId: fav.user_id,
+        propertyId: fav.item_id,
+        addedAt: new Date(fav.created_at),
+        notes: fav.notes
+      }))
+    } catch (error) {
+      console.error('Error getting favorites:', error)
+      return []
+    }
   }
 
   async isFavorited(propertyId: string): Promise<boolean> {
     const { data: { user } } = await this.supabase.auth.getUser()
     if (!user) return false
 
-    const favorites = this.getFavoritesFromStorage(user.id)
-    return favorites.some(f => f.propertyId === propertyId)
+    try {
+      return await DashboardService.isFavorite(user.id, 'property', propertyId)
+    } catch (error) {
+      console.error('Error checking favorite status:', error)
+      return false
+    }
   }
 
   // Property Comparison
@@ -364,14 +387,6 @@ export class PropertyService {
     }
   }
 
-  private getFavoritesFromStorage(userId: string): PropertyFavorite[] {
-    try {
-      const stored = localStorage.getItem(`favorites_${userId}`)
-      return stored ? JSON.parse(stored) : []
-    } catch {
-      return []
-    }
-  }
 
   // Calculation methods
   private calculateMonthlyMortgage(property: Database['public']['Tables']['properties']['Row']): number {

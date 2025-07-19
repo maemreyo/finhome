@@ -1,10 +1,13 @@
-// Dashboard settings page with locale support
+// Dashboard settings page with locale support - UPDATED: Integrated with database
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/hooks/useAuth'
+import { DashboardService } from '@/lib/services/dashboardService'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
+import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,13 +30,164 @@ import {
 
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.Settings')
+  const { user } = useAuth()
+  
+  // User preferences state
   const [emailNotifications, setEmailNotifications] = useState(true)
   const [pushNotifications, setPushNotifications] = useState(true)
-  const [marketingEmails, setMarketingEmails] = useState(false)
-  const [theme, setTheme] = useState('system')
+  const [achievementNotifications, setAchievementNotifications] = useState(true)
+  const [marketUpdateNotifications, setMarketUpdateNotifications] = useState(true)
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const [dashboardLayout, setDashboardLayout] = useState<'grid' | 'list'>('grid')
+  const [profileVisibility, setProfileVisibility] = useState<'public' | 'private' | 'friends'>('private')
+  const [allowDataSharing, setAllowDataSharing] = useState(false)
+  
+  // User profile state
   const [language, setLanguage] = useState('vi')
   const [currency, setCurrency] = useState('VND')
   const [timezone, setTimezone] = useState('Asia/Ho_Chi_Minh')
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [company, setCompany] = useState('')
+  const [monthlyIncome, setMonthlyIncome] = useState(0)
+  const [city, setCity] = useState('')
+  const [district, setDistrict] = useState('')
+  const [address, setAddress] = useState('')
+  
+  // Loading states
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  // Load user settings on component mount
+  useEffect(() => {
+    if (!user) return
+
+    const loadSettings = async () => {
+      try {
+        setLoading(true)
+        
+        // Load user preferences and profile in parallel
+        const [preferences, profile] = await Promise.all([
+          DashboardService.getUserPreferences(user.id),
+          DashboardService.getUserProfile(user.id)
+        ])
+
+        // Update preferences state
+        setEmailNotifications(preferences.email_notifications)
+        setPushNotifications(preferences.push_notifications)
+        setAchievementNotifications(preferences.achievement_notifications)
+        setMarketUpdateNotifications(preferences.market_update_notifications)
+        setTheme(preferences.theme)
+        setDashboardLayout(preferences.dashboard_layout)
+        setProfileVisibility(preferences.profile_visibility)
+        setAllowDataSharing(preferences.allow_data_sharing)
+
+        // Update profile state
+        setLanguage(profile.preferred_language || profile.language || 'vi')
+        setCurrency(profile.currency || 'VND')
+        setTimezone(profile.timezone || 'Asia/Ho_Chi_Minh')
+        setFullName(profile.full_name || '')
+        setPhone(profile.phone || '')
+        setCompany(profile.company || '')
+        setMonthlyIncome(profile.monthly_income || 0)
+        setCity(profile.city || '')
+        setDistrict(profile.district || '')
+        setAddress(profile.address || '')
+      } catch (error) {
+        console.error('Error loading settings:', error)
+        toast.error('Lỗi tải cài đặt. Vui lòng thử lại.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadSettings()
+  }, [user])
+
+  // Save general settings
+  const saveGeneralSettings = async () => {
+    if (!user || saving) return
+
+    try {
+      setSaving(true)
+      
+      await DashboardService.updateUserProfile(user.id, {
+        preferred_language: language,
+        currency,
+        timezone,
+        full_name: fullName,
+        phone,
+        company,
+        monthly_income: monthlyIncome > 0 ? monthlyIncome : undefined,
+        city,
+        district,
+        address
+      })
+
+      toast.success('Đã lưu cài đặt chung thành công!')
+    } catch (error) {
+      console.error('Error saving general settings:', error)
+      toast.error('Lỗi lưu cài đặt. Vui lòng thử lại.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Save notification settings
+  const saveNotificationSettings = async () => {
+    if (!user || saving) return
+
+    try {
+      setSaving(true)
+      
+      await DashboardService.updateUserPreferences(user.id, {
+        email_notifications: emailNotifications,
+        push_notifications: pushNotifications,
+        achievement_notifications: achievementNotifications,
+        market_update_notifications: marketUpdateNotifications
+      })
+
+      toast.success('Đã lưu cài đặt thông báo thành công!')
+    } catch (error) {
+      console.error('Error saving notification settings:', error)
+      toast.error('Lỗi lưu cài đặt. Vui lòng thử lại.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Save preference settings
+  const savePreferenceSettings = async () => {
+    if (!user || saving) return
+
+    try {
+      setSaving(true)
+      
+      await DashboardService.updateUserPreferences(user.id, {
+        theme,
+        dashboard_layout: dashboardLayout,
+        profile_visibility: profileVisibility,
+        allow_data_sharing: allowDataSharing
+      })
+
+      toast.success('Đã lưu tùy chọn cá nhân thành công!')
+    } catch (error) {
+      console.error('Error saving preference settings:', error)
+      toast.error('Lỗi lưu cài đặt. Vui lòng thử lại.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <DashboardShell title={t('title')} description={t('description')}>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </DashboardShell>
+    )
+  }
 
   return (
     <DashboardShell 
@@ -105,20 +259,21 @@ export default function SettingsPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="theme">Giao diện</Label>
-                <Select value={theme} onValueChange={setTheme}>
+                <Select value={theme} onValueChange={(value: 'light' | 'dark') => setTheme(value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Chọn giao diện" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="light">Sáng</SelectItem>
                     <SelectItem value="dark">Tối</SelectItem>
-                    <SelectItem value="system">Theo hệ thống</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex justify-end">
-                <Button>Lưu thay đổi</Button>
+                <Button onClick={saveGeneralSettings} disabled={saving}>
+                  {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -171,21 +326,39 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="marketing-emails">Email tiếp thị</Label>
+                    <Label htmlFor="achievement-notifications">Thông báo thành tích</Label>
                     <p className="text-sm text-muted-foreground">
-                      Nhận thông tin về tính năng mới và ưu đãi
+                      Nhận thông báo khi đạt được thành tích mới
                     </p>
                   </div>
                   <Switch
-                    id="marketing-emails"
-                    checked={marketingEmails}
-                    onCheckedChange={setMarketingEmails}
+                    id="achievement-notifications"
+                    checked={achievementNotifications}
+                    onCheckedChange={setAchievementNotifications}
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="market-notifications">Thông báo thị trường</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Nhận thông tin cập nhật về thị trường bất động sản
+                    </p>
+                  </div>
+                  <Switch
+                    id="market-notifications"
+                    checked={marketUpdateNotifications}
+                    onCheckedChange={setMarketUpdateNotifications}
                   />
                 </div>
               </div>
 
               <div className="flex justify-end">
-                <Button>Lưu thay đổi</Button>
+                <Button onClick={saveNotificationSettings} disabled={saving}>
+                  {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -266,41 +439,63 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>{t('preferences.showHints')}</Label>
+                    <Label>Bố cục dashboard</Label>
                     <p className="text-sm text-muted-foreground">
-                      {t('preferences.showHintsDescription')}
+                      Chọn cách hiển thị dashboard
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Select value={dashboardLayout} onValueChange={(value: 'grid' | 'list') => setDashboardLayout(value)}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="grid">Lưới</SelectItem>
+                      <SelectItem value="list">Danh sách</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Separator />
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>{t('preferences.autoSave')}</Label>
+                    <Label>Hiển thị hồ sơ</Label>
                     <p className="text-sm text-muted-foreground">
-                      {t('preferences.autoSaveDescription')}
+                      Ai có thể xem hồ sơ của bạn
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Select value={profileVisibility} onValueChange={(value: 'public' | 'private' | 'friends') => setProfileVisibility(value)}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="private">Riêng tư</SelectItem>
+                      <SelectItem value="friends">Bạn bè</SelectItem>
+                      <SelectItem value="public">Công khai</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Separator />
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>{t('preferences.showAdvancedCharts')}</Label>
+                    <Label>Chia sẻ dữ liệu</Label>
                     <p className="text-sm text-muted-foreground">
-                      {t('preferences.showAdvancedChartsDescription')}
+                      Cho phép chia sẻ dữ liệu để cải thiện dịch vụ
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch
+                    checked={allowDataSharing}
+                    onCheckedChange={setAllowDataSharing}
+                  />
                 </div>
               </div>
 
               <div className="flex justify-end">
-                <Button>{t('preferences.savePreferences')}</Button>
+                <Button onClick={savePreferenceSettings} disabled={saving}>
+                  {saving ? 'Đang lưu...' : 'Lưu tùy chọn'}
+                </Button>
               </div>
             </CardContent>
           </Card>

@@ -2,6 +2,7 @@
 // Adapter to convert between API data structure and UI component structure
 
 import { type FinancialPlanWithMetrics as APIPlan } from '@/lib/api/plans'
+import { DashboardService } from '@/lib/services/dashboardService'
 
 // Legacy UI component interface
 export interface UIFinancialPlan {
@@ -31,7 +32,17 @@ export interface UIFinancialPlan {
 /**
  * Convert API plan to UI plan format
  */
-export function apiPlanToUIplan(apiPlan: APIPlan): UIFinancialPlan {
+export async function apiPlanToUIplan(apiPlan: APIPlan, userId?: string): Promise<UIFinancialPlan> {
+  // Check if plan is favorited by current user
+  let isFavorite = false
+  if (userId) {
+    try {
+      isFavorite = await DashboardService.isFavorite(userId, 'financial_plan', apiPlan.id)
+    } catch (error) {
+      console.error('Error checking favorite status:', error)
+      isFavorite = false
+    }
+  }
   return {
     id: apiPlan.id,
     planName: apiPlan.plan_name,
@@ -44,14 +55,14 @@ export function apiPlanToUIplan(apiPlan: APIPlan): UIFinancialPlan {
     currentSavings: apiPlan.current_savings || 0,
     planStatus: apiPlan.status,
     isPublic: apiPlan.is_public,
-    isFavorite: false, // TODO: Add favorites functionality
+    isFavorite,
     createdAt: new Date(apiPlan.created_at),
     updatedAt: new Date(apiPlan.updated_at),
     // Calculated metrics from cached calculations
     monthlyPayment: apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).monthlyPayment : undefined,
     totalInterest: apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).totalInterest : undefined,
     affordabilityScore: apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).affordabilityScore : undefined,
-    riskLevel: getRiskLevel(apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).affordabilityScore : undefined),
+    riskLevel: calculateRiskLevel(apiPlan),
     roi: apiPlan.cached_calculations ? (apiPlan.cached_calculations as any).roi : undefined,
     expectedRentalIncome: apiPlan.expected_rental_income || undefined
   }
@@ -60,18 +71,61 @@ export function apiPlanToUIplan(apiPlan: APIPlan): UIFinancialPlan {
 /**
  * Convert array of API plans to UI plans
  */
-export function apiPlansToUIPlans(apiPlans: APIPlan[]): UIFinancialPlan[] {
-  return apiPlans.map(apiPlanToUIplan)
+export async function apiPlansToUIPlans(apiPlans: APIPlan[], userId?: string): Promise<UIFinancialPlan[]> {
+  return Promise.all(apiPlans.map(plan => apiPlanToUIplan(plan, userId)))
 }
 
 /**
- * Determine risk level based on affordability score
+ * Calculate comprehensive risk level based on multiple factors
  */
-function getRiskLevel(affordabilityScore?: number): 'low' | 'medium' | 'high' {
-  if (!affordabilityScore) return 'medium'
+function calculateRiskLevel(apiPlan: APIPlan): 'low' | 'medium' | 'high' {
+  const calculations = apiPlan.cached_calculations as any || {}
   
-  if (affordabilityScore >= 8) return 'low'
-  if (affordabilityScore >= 5) return 'medium'
+  let riskScore = 0
+  let factorCount = 0
+  
+  // Factor 1: Affordability Score (40% weight)
+  if (calculations.affordabilityScore !== undefined) {
+    const affordabilityRisk = calculations.affordabilityScore >= 8 ? 1 : 
+                             calculations.affordabilityScore >= 5 ? 2 : 3
+    riskScore += affordabilityRisk * 0.4
+    factorCount++
+  }
+  
+  // Factor 2: Debt-to-Income Ratio (30% weight)
+  if (calculations.debtToIncomeRatio !== undefined) {
+    const dtiRisk = calculations.debtToIncomeRatio <= 0.3 ? 1 :
+                   calculations.debtToIncomeRatio <= 0.4 ? 2 : 3
+    riskScore += dtiRisk * 0.3
+    factorCount++
+  }
+  
+  // Factor 3: Down Payment Ratio (20% weight)
+  if (apiPlan.purchase_price && apiPlan.down_payment) {
+    const downPaymentRatio = apiPlan.down_payment / apiPlan.purchase_price
+    const downPaymentRisk = downPaymentRatio >= 0.3 ? 1 :
+                           downPaymentRatio >= 0.2 ? 2 : 3
+    riskScore += downPaymentRisk * 0.2
+    factorCount++
+  }
+  
+  // Factor 4: Current Savings vs Monthly Expenses (10% weight)
+  if (apiPlan.current_savings && apiPlan.monthly_expenses) {
+    const emergencyFundMonths = apiPlan.current_savings / apiPlan.monthly_expenses
+    const savingsRisk = emergencyFundMonths >= 6 ? 1 :
+                       emergencyFundMonths >= 3 ? 2 : 3
+    riskScore += savingsRisk * 0.1
+    factorCount++
+  }
+  
+  // If no factors available, default to medium risk
+  if (factorCount === 0) return 'medium'
+  
+  // Calculate final risk level
+  const finalScore = riskScore / factorCount
+  
+  if (finalScore <= 1.5) return 'low'
+  if (finalScore <= 2.5) return 'medium'
   return 'high'
 }
 

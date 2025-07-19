@@ -12,7 +12,12 @@ import type {
   UserExperience,
   MarketInsight,
   FaqItem,
-  SupportTicket
+  SupportTicket,
+  PlanMilestone,
+  PlanMilestoneInsert,
+  PlanMilestoneUpdate,
+  UserFavorite,
+  UserFavoriteInsert
 } from '@/lib/supabase/types'
 
 export class DashboardService {
@@ -536,6 +541,55 @@ export class DashboardService {
     return data
   }
 
+  // ===== PROPERTIES =====
+  static async getProperties(limit: number = 10) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('status', 'for_sale')
+        .order('published_at', { ascending: false })
+        .limit(limit)
+
+      if (error) {
+        console.error('Error fetching properties:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('Error fetching properties:', error)
+      return []
+    }
+  }
+
+  static async getUserInterestedProperties(userId: string) {
+    const supabase = this.getClient()
+    
+    try {
+      // For now, we'll get properties based on user's financial plans
+      // since there's no direct user-property favorites table
+      const plans = await this.getFinancialPlans(userId)
+      const properties = await this.getProperties(20)
+      
+      // Filter properties that match user's plan criteria
+      const interestedProperties = properties.filter(property => {
+        return plans.some(plan => 
+          plan.target_property_type === property.property_type &&
+          (plan.target_location?.includes(property.district) || 
+           plan.target_location?.includes(property.city))
+        )
+      })
+
+      return interestedProperties.slice(0, 10)
+    } catch (error) {
+      console.error('Error fetching user interested properties:', error)
+      return []
+    }
+  }
+
   // ===== FINANCIAL PLANS (for Laboratory) =====
   static async getFinancialPlans(userId: string) {
     const supabase = this.getClient()
@@ -572,6 +626,146 @@ export class DashboardService {
     return data || []
   }
 
+  // ===== USER PREFERENCES =====
+  static async getUserPreferences(userId: string) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle()
+
+      if (error) {
+        console.warn('Error fetching user preferences:', error)
+        return this.getDefaultUserPreferences(userId)
+      }
+
+      // Return data if found, otherwise return default
+      return data || this.getDefaultUserPreferences(userId)
+    } catch (error) {
+      console.warn('User preferences table not available:', error)
+      return this.getDefaultUserPreferences(userId)
+    }
+  }
+
+  private static getDefaultUserPreferences(userId: string) {
+    return {
+      id: crypto.randomUUID(),
+      user_id: userId,
+      email_notifications: true,
+      push_notifications: true,
+      achievement_notifications: true,
+      market_update_notifications: true,
+      payment_reminder_notifications: true,
+      theme: 'light' as const,
+      dashboard_layout: 'grid' as const,
+      dashboard_widgets: {},
+      profile_visibility: 'private' as const,
+      allow_data_sharing: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  }
+
+  static async updateUserPreferences(userId: string, preferences: Partial<{
+    email_notifications: boolean
+    push_notifications: boolean
+    achievement_notifications: boolean
+    market_update_notifications: boolean
+    payment_reminder_notifications: boolean
+    theme: 'light' | 'dark'
+    dashboard_layout: 'grid' | 'list'
+    dashboard_widgets: any
+    profile_visibility: 'public' | 'private' | 'friends'
+    allow_data_sharing: boolean
+  }>) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: userId,
+          ...preferences,
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error updating user preferences:', error)
+        throw error
+      }
+
+      return data
+    } catch (error) {
+      console.error('Error updating user preferences:', error)
+      throw error
+    }
+  }
+
+  static async getUserProfile(userId: string) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (error) {
+        console.error('Error fetching user profile:', error)
+        throw error
+      }
+
+      return data
+    } catch (error) {
+      console.error('Error fetching user profile:', error)
+      throw error
+    }
+  }
+
+  static async updateUserProfile(userId: string, profile: Partial<{
+    full_name: string
+    phone: string
+    company: string
+    monthly_income: number
+    city: string
+    district: string
+    address: string
+    currency: string
+    language: string
+    timezone: string
+    preferred_language: string
+  }>) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .update({
+          ...profile,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error updating user profile:', error)
+        throw error
+      }
+
+      return data
+    } catch (error) {
+      console.error('Error updating user profile:', error)
+      throw error
+    }
+  }
+
   // ===== SERVER-SIDE FUNCTIONS =====
   static async getServerDashboardMetrics(userId: string) {
     // For now, just use the client-side function
@@ -593,5 +787,261 @@ export class DashboardService {
     }
 
     return data || []
+  }
+
+  // ===== PLAN PROGRESS TRACKING =====
+  static async getPlanProgress(planId: string) {
+    const supabase = this.getClient()
+    
+    try {
+      // Get plan with progress fields
+      const { data: plan, error: planError } = await supabase
+        .from('financial_plans')
+        .select(`
+          *,
+          plan_milestones(*),
+          plan_status_history(*)
+        `)
+        .eq('id', planId)
+        .single()
+
+      if (planError) throw planError
+
+      // Calculate savings progress if we have the data
+      const savingsProgress = plan.current_savings && plan.down_payment 
+        ? Math.min(100, (plan.current_savings / plan.down_payment) * 100)
+        : 0
+
+      return {
+        totalProgress: plan.total_progress || 0,
+        financialProgress: plan.financial_progress || 0,
+        savingsProgress,
+        savingsTarget: plan.down_payment || 0,
+        currentSavings: plan.current_savings || 0,
+        monthlyContribution: plan.monthly_contribution || 0,
+        estimatedCompletionDate: plan.estimated_completion_date 
+          ? new Date(plan.estimated_completion_date) 
+          : null,
+        milestones: plan.plan_milestones || [],
+        statusHistory: plan.plan_status_history || []
+      }
+    } catch (error) {
+      console.error('Error getting plan progress:', error)
+      return null
+    }
+  }
+
+  static async updatePlanProgress(planId: string, updates: {
+    total_progress?: number
+    financial_progress?: number
+    monthly_contribution?: number
+    estimated_completion_date?: string | null
+    current_savings?: number
+  }) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('financial_plans')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', planId)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    } catch (error) {
+      console.error('Error updating plan progress:', error)
+      throw error
+    }
+  }
+
+  static async getPlanMilestones(planId: string) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('plan_milestones')
+        .select('*')
+        .eq('plan_id', planId)
+        .order('target_date', { ascending: true })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error('Error getting plan milestones:', error)
+      return []
+    }
+  }
+
+  static async createPlanMilestone(milestone: {
+    plan_id: string
+    title: string
+    description?: string
+    category?: 'financial' | 'legal' | 'property' | 'admin' | 'personal'
+    priority?: 'low' | 'medium' | 'high'
+    required_amount?: number
+    target_date?: string
+  }) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('plan_milestones')
+        .insert(milestone)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    } catch (error) {
+      console.error('Error creating plan milestone:', error)
+      throw error
+    }
+  }
+
+  static async updatePlanMilestone(milestoneId: string, updates: {
+    title?: string
+    description?: string
+    status?: 'pending' | 'in_progress' | 'completed' | 'cancelled'
+    priority?: 'low' | 'medium' | 'high'
+    current_amount?: number
+    target_date?: string
+    completed_date?: string
+  }) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('plan_milestones')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', milestoneId)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    } catch (error) {
+      console.error('Error updating plan milestone:', error)
+      throw error
+    }
+  }
+
+  static async deletePlanMilestone(milestoneId: string) {
+    const supabase = this.getClient()
+    
+    try {
+      const { error } = await supabase
+        .from('plan_milestones')
+        .delete()
+        .eq('id', milestoneId)
+
+      if (error) throw error
+    } catch (error) {
+      console.error('Error deleting plan milestone:', error)
+      throw error
+    }
+  }
+
+  // ===== FAVORITES MANAGEMENT =====
+  static async getUserFavorites(userId: string, entityType?: 'property' | 'financial_plan' | 'bank' | 'scenario') {
+    const supabase = this.getClient()
+    
+    try {
+      let query = supabase
+        .from('user_favorites')
+        .select('*')
+        .eq('user_id', userId)
+
+      if (entityType) {
+        query = query.eq('entity_type', entityType)
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error('Error getting user favorites:', error)
+      return []
+    }
+  }
+
+  static async addToFavorites(userId: string, entityType: 'property' | 'financial_plan' | 'bank' | 'scenario', entityId: string) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_favorites')
+        .insert({
+          user_id: userId,
+          entity_type: entityType,
+          entity_id: entityId
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    } catch (error) {
+      console.error('Error adding to favorites:', error)
+      throw error
+    }
+  }
+
+  static async removeFromFavorites(userId: string, entityType: 'property' | 'financial_plan' | 'bank' | 'scenario', entityId: string) {
+    const supabase = this.getClient()
+    
+    try {
+      const { error } = await supabase
+        .from('user_favorites')
+        .delete()
+        .eq('user_id', userId)
+        .eq('entity_type', entityType)
+        .eq('entity_id', entityId)
+
+      if (error) throw error
+    } catch (error) {
+      console.error('Error removing from favorites:', error)
+      throw error
+    }
+  }
+
+  static async isFavorite(userId: string, entityType: 'property' | 'financial_plan' | 'bank' | 'scenario', entityId: string) {
+    const supabase = this.getClient()
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_favorites')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('entity_type', entityType)
+        .eq('entity_id', entityId)
+        .maybeSingle()
+
+      if (error) throw error
+      return !!data
+    } catch (error) {
+      console.error('Error checking favorite status:', error)
+      return false
+    }
+  }
+
+  static async toggleFavorite(userId: string, entityType: 'property' | 'financial_plan' | 'bank' | 'scenario', entityId: string) {
+    const isFav = await this.isFavorite(userId, entityType, entityId)
+    
+    if (isFav) {
+      await this.removeFromFavorites(userId, entityType, entityId)
+      return false
+    } else {
+      await this.addToFavorites(userId, entityType, entityId)
+      return true
+    }
   }
 }

@@ -7,10 +7,10 @@ export interface PlanMilestone {
   id: string
   title: string
   description: string
-  category: 'financial' | 'legal' | 'property' | 'admin'
+  category: 'financial' | 'legal' | 'property' | 'admin' | 'personal'
   targetDate: Date
   completedDate?: Date
-  status: 'pending' | 'in_progress' | 'completed' | 'overdue'
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled'
   priority: 'low' | 'medium' | 'high'
   requiredAmount?: number
   currentAmount?: number
@@ -25,7 +25,7 @@ export interface PlanProgress {
   currentSavings: number
   savingsTarget: number
   monthlyContribution: number
-  estimatedCompletionDate: Date
+  estimatedCompletionDate: Date | null
   statusHistory: Array<{
     status: PlanStatus
     date: Date

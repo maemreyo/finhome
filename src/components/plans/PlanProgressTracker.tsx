@@ -120,7 +120,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
         return <CheckCircle className="w-4 h-4 text-green-600" />
       case 'in_progress':
         return <Clock className="w-4 h-4 text-blue-600" />
-      case 'overdue':
+      case 'cancelled': // Changed from 'overdue' to match the type
         return <AlertTriangle className="w-4 h-4 text-red-600" />
       default:
         return <Clock className="w-4 h-4 text-gray-400" />
@@ -147,7 +147,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
 
   // Calculate days until target completion
   const daysToCompletion = Math.ceil(
-    (progress.estimatedCompletionDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+    progress.estimatedCompletionDate ? (progress.estimatedCompletionDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24) : 0
   )
 
   // Calculate monthly progress rate
@@ -368,7 +368,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                             <div className="text-sm font-medium">
                               {milestone.targetDate.toLocaleDateString('vi-VN')}
                             </div>
-                            {milestone.status === 'overdue' && (
+                            {milestone.status === 'cancelled' && (
                               <Badge variant="destructive">
                                 {t('overdue')}
                               </Badge>
@@ -457,7 +457,7 @@ export const PlanProgressTracker: React.FC<PlanProgressTrackerProps> = ({
                   </div>
                   <div className="flex justify-between">
                     <span>{t('estimatedCompletion')}</span>
-                    <span className="font-medium">{progress.estimatedCompletionDate.toLocaleDateString('vi-VN')}</span>
+                    <span className="font-medium">{progress.estimatedCompletionDate?.toLocaleDateString('vi-VN') || 'N/A'}</span>
                   </div>
                 </div>
               </CardContent>

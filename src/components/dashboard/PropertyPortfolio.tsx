@@ -59,39 +59,64 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
   const [filter, setFilter] = useState<'all' | 'favorites' | 'planning'>('all')
   const t = useTranslations('Dashboard.PropertyPortfolio')
 
-  // Load real property data from financial plans
+  // Load real property data from database
   useEffect(() => {
     const loadProperties = async () => {
       setIsLoading(true)
       
       try {
         if (userId) {
-          // Load financial plans which represent user's property interests
-          const plans = await DashboardService.getFinancialPlans(userId)
+          // Load both user's interested properties and financial plans
+          const [interestedProperties, plans] = await Promise.all([
+            DashboardService.getUserInterestedProperties(userId),
+            DashboardService.getFinancialPlans(userId)
+          ])
           
-          const realProperties: Property[] = plans.map(plan => {
-            // Convert financial plan to property format
-            const customData = plan.custom_property_data as any || {} // Type assertion for custom data
-            const propertyType = plan.target_property_type || 'apartment'
-            const purchasePrice = plan.purchase_price || 0 // Default to 0 if null
-            const area = customData.area || Math.floor(purchasePrice / 45000000) // Estimate area
-            const bedrooms = customData.bedrooms || (area > 100 ? 3 : area > 70 ? 2 : 1)
-            
-            return {
-              id: plan.id,
-              name: plan.plan_name,
-              type: propertyType as Property['type'],
-              location: plan.target_location || 'TP.HCM',
-              price: purchasePrice,
-              pricePerSqm: area ? Math.floor(purchasePrice / area) : 45000000,
-              area: area,
-              bedrooms: bedrooms,
-              status: plan.status === 'active' ? 'planning' : 
-                     plan.status === 'completed' ? 'purchased' : 'interested',
-              roiProjection: plan.expected_roi || 8.0,
+          const realProperties: Property[] = []
+          
+          // Add properties from database
+          interestedProperties.forEach(property => {
+            realProperties.push({
+              id: property.id,
+              name: property.title || property.property_name || 'Unknown Property',
+              type: (property.property_type as Property['type']) || 'apartment',
+              location: `${property.district}, ${property.city}`,
+              price: property.list_price || property.listed_price || 0,
+              pricePerSqm: property.price_per_sqm || undefined,
+              area: property.area_sqm || property.total_area || undefined,
+              bedrooms: property.bedrooms || undefined,
+              status: 'interested', // All fetched properties are considered interested
+              roiProjection: 8.0, // Default ROI projection
               priceChange: Math.random() * 6 - 2, // Random price change for demo
-              lastViewed: new Date(plan.updated_at),
-              isFavorited: plan.status === 'active', // Active plans are considered favorites
+              lastViewed: new Date(property.updated_at || property.created_at),
+              isFavorited: Math.random() > 0.5, // Random favorited status for demo
+            })
+          })
+          
+          // Add properties from financial plans (for purchased/planning status)
+          plans.forEach(plan => {
+            if (plan.status === 'active' || plan.status === 'completed') {
+              const customData = plan.custom_property_data as any || {}
+              const propertyType = plan.target_property_type || 'apartment'
+              const purchasePrice = plan.purchase_price || 0
+              const area = customData.area || Math.floor(purchasePrice / 45000000)
+              const bedrooms = customData.bedrooms || (area > 100 ? 3 : area > 70 ? 2 : 1)
+              
+              realProperties.push({
+                id: `plan-${plan.id}`,
+                name: plan.plan_name,
+                type: propertyType as Property['type'],
+                location: plan.target_location || 'TP.HCM',
+                price: purchasePrice,
+                pricePerSqm: area ? Math.floor(purchasePrice / area) : 45000000,
+                area: area,
+                bedrooms: bedrooms,
+                status: plan.status === 'active' ? 'planning' : 'purchased',
+                roiProjection: plan.expected_roi || 8.0,
+                priceChange: Math.random() * 6 - 2,
+                lastViewed: new Date(plan.updated_at),
+                isFavorited: plan.status === 'active',
+              })
             }
           })
           

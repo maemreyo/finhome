@@ -61,6 +61,54 @@ export default function AdvancedScenarioCharts({
 }: AdvancedScenarioChartsProps) {
   const t = useTranslations('AdvancedScenarioCharts')
   
+  // Calculate ROI for a scenario
+  const calculateROI = (scenario: FinancialScenario): number => {
+    if (!scenario.purchase_price || scenario.purchase_price === 0) return 0
+    
+    // For investment properties, calculate rental yield + appreciation
+    if (scenario.plan_type === 'investment' && scenario.expected_rental_income) {
+      const annualRental = scenario.expected_rental_income * 12
+      const rentalYield = (annualRental / scenario.purchase_price) * 100
+      
+      // Add property appreciation (assume 4-8% annually based on risk level)
+      const appreciationRate = scenario.riskLevel === 'low' ? 4 : 
+                              scenario.riskLevel === 'medium' ? 6 : 8
+      
+      return rentalYield + appreciationRate
+    }
+    
+    // For home purchase, calculate savings vs renting
+    if (scenario.plan_type === 'home_purchase') {
+      const monthlyPayment = scenario.calculatedMetrics?.monthlyPayment || 0
+      const averageRent = scenario.purchase_price * 0.004 // Assume 0.4% of property value as monthly rent
+      const monthlyBenefit = averageRent - monthlyPayment
+      const annualBenefit = monthlyBenefit * 12
+      
+      if (annualBenefit > 0) {
+        return (annualBenefit / scenario.purchase_price) * 100
+      }
+      
+      // If no immediate savings, calculate long-term appreciation
+      return scenario.riskLevel === 'low' ? 3 : 
+             scenario.riskLevel === 'medium' ? 5 : 7
+    }
+    
+    // Default calculation based on total return vs investment
+    const totalInvestment = (scenario.down_payment || 0) + (scenario.additional_costs || 0) // Use additional_costs instead of closing_costs
+    if (totalInvestment === 0) return 0
+    
+    const currentValue = scenario.purchase_price || 0 // Use purchase_price as fallback since current_market_value doesn't exist
+    const gain = currentValue - (scenario.purchase_price || 0)
+    const totalReturn = gain + (scenario.expected_rental_income || 0) // Use expected_rental_income instead of total_rental_income
+    
+    // Calculate annualized ROI
+    const yearsHeld = scenario.updated_at ? 
+      (new Date().getTime() - new Date(scenario.updated_at).getTime()) / (1000 * 60 * 60 * 24 * 365) : 1
+    
+    const roi = (totalReturn / totalInvestment) / Math.max(yearsHeld, 1) * 100
+    return Math.max(0, roi)
+  }
+  
   // Prepare data for various chart types
   const chartData = useMemo(() => {
     return scenarios.map(scenario => ({
@@ -71,7 +119,7 @@ export default function AdvancedScenarioCharts({
       totalInterest: scenario.calculatedMetrics?.totalInterest || 0,
       dtiRatio: scenario.calculatedMetrics?.dtiRatio || 0,
       affordabilityScore: scenario.calculatedMetrics?.affordabilityScore || 0,
-      roi: 6.5, // Mock ROI
+      roi: calculateROI(scenario),
       riskScore: scenario.riskLevel === 'low' ? 2 : scenario.riskLevel === 'medium' ? 5 : 8,
       timeToPayoff: scenario.calculatedMetrics?.payoffTimeMonths || 240,
       color: SCENARIO_COLORS[scenario.scenarioType] || CHART_THEMES.primary
@@ -128,7 +176,7 @@ export default function AdvancedScenarioCharts({
             value = scenario.calculatedMetrics?.affordabilityScore || 0
             break
           case t('multidimensionalAnalysis.metrics.roiPotential'):
-            value = 65 // Mock value
+            value = Math.min(100, Math.max(0, calculateROI(scenario)))
             break
           case t('multidimensionalAnalysis.metrics.riskLevel'):
             value = 100 - (scenario.riskLevel === 'low' ? 20 : scenario.riskLevel === 'medium' ? 50 : 80)

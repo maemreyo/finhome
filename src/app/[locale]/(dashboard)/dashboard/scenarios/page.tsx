@@ -112,6 +112,17 @@ const createMockScenario = (
   cached_calculations: null,
   calculations_last_updated: null,
   completed_at: null,
+  // New required fields
+  is_favorite: false,
+  roi: 8.5,
+  total_progress: 0,
+  financial_progress: 0,
+  monthly_contribution: 0,
+  estimated_completion_date: null,
+  risk_level: riskLevel,
+  tags: [],
+  notes: null,
+  shared_with: [],
   calculatedMetrics: {
     monthlyPayment,
     totalInterest,

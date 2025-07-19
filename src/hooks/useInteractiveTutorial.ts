@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { DashboardService } from '@/lib/services/dashboardService'
 import { 
   InteractiveTutorial, 
   TutorialStep, 
@@ -59,42 +60,65 @@ const generateTutorialSessionId = () => {
   return `tutorial_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
-// Get user tutorial progress from localStorage
-const getUserTutorialProgress = (userId: string, tutorialId: string): UserTutorialProgress | null => {
-  const stored = localStorage.getItem(`tutorial_progress_${userId}_${tutorialId}`)
-  
-  if (stored) {
-    const parsed = JSON.parse(stored)
-    return {
-      ...parsed,
-      startedAt: new Date(parsed.startedAt),
-      lastActiveAt: new Date(parsed.lastActiveAt),
-      completedAt: parsed.completedAt ? new Date(parsed.completedAt) : undefined,
-      pausedAt: parsed.pausedAt ? new Date(parsed.pausedAt) : undefined
+// Get user tutorial progress from database
+const getUserTutorialProgress = async (userId: string, tutorialId: string): Promise<UserTutorialProgress | null> => {
+  try {
+    const preferences = await DashboardService.getUserPreferences(userId)
+    
+    if (preferences && (preferences as any).tutorial_progress) {
+      const allProgress = JSON.parse((preferences as any).tutorial_progress)
+      const tutorialProgress = allProgress[tutorialId]
+      
+      if (tutorialProgress) {
+        return {
+          ...tutorialProgress,
+          startedAt: new Date(tutorialProgress.startedAt),
+          lastActiveAt: new Date(tutorialProgress.lastActiveAt),
+          completedAt: tutorialProgress.completedAt ? new Date(tutorialProgress.completedAt) : undefined,
+          pausedAt: tutorialProgress.pausedAt ? new Date(tutorialProgress.pausedAt) : undefined
+        }
+      }
     }
+  } catch (error) {
+    console.error('Error loading tutorial progress from database:', error)
   }
   
   return null
 }
 
-// Save tutorial progress to localStorage
-const saveTutorialProgress = (progress: UserTutorialProgress) => {
-  localStorage.setItem(
-    `tutorial_progress_${progress.userId}_${progress.tutorialId}`, 
-    JSON.stringify(progress)
-  )
+// Save tutorial progress to database
+const saveTutorialProgress = async (progress: UserTutorialProgress) => {
+  try {
+    const preferences = await DashboardService.getUserPreferences(progress.userId)
+    const currentProgress = (preferences as any)?.tutorial_progress ? JSON.parse((preferences as any).tutorial_progress) : {}
+    
+    const updatedProgress = {
+      ...currentProgress,
+      [progress.tutorialId]: progress
+    }
+    
+    await DashboardService.updateUserPreferences(progress.userId, {
+      tutorial_progress: JSON.stringify(updatedProgress)
+    } as any)
+  } catch (error) {
+    console.error('Error saving tutorial progress to database:', error)
+  }
 }
 
-// Get user tutorial preferences
-const getUserTutorialPreferences = (userId: string): UserHelpPreferences => {
-  const stored = localStorage.getItem(`tutorial_preferences_${userId}`)
-  
-  if (stored) {
-    const parsed = JSON.parse(stored)
-    return {
-      ...parsed,
-      lastHelpInteraction: new Date(parsed.lastHelpInteraction)
+// Get user tutorial preferences from database
+const getUserTutorialPreferences = async (userId: string): Promise<UserHelpPreferences> => {
+  try {
+    const preferences = await DashboardService.getUserPreferences(userId)
+    
+    if (preferences && (preferences as any).tutorial_preferences) {
+      const parsed = JSON.parse((preferences as any).tutorial_preferences)
+      return {
+        ...parsed,
+        lastHelpInteraction: new Date(parsed.lastHelpInteraction)
+      }
     }
+  } catch (error) {
+    console.error('Error loading tutorial preferences from database:', error)
   }
 
   // Default preferences for new users
@@ -110,9 +134,15 @@ const getUserTutorialPreferences = (userId: string): UserHelpPreferences => {
   }
 }
 
-// Save tutorial preferences
-const saveTutorialPreferences = (preferences: UserHelpPreferences) => {
-  localStorage.setItem(`tutorial_preferences_${preferences.userId}`, JSON.stringify(preferences))
+// Save tutorial preferences to database
+const saveTutorialPreferences = async (preferences: UserHelpPreferences) => {
+  try {
+    await DashboardService.updateUserPreferences(preferences.userId, {
+      tutorial_preferences: JSON.stringify(preferences)
+    } as any)
+  } catch (error) {
+    console.error('Error saving tutorial preferences to database:', error)
+  }
 }
 
 // Predefined tutorials for key features
@@ -301,8 +331,9 @@ export function useInteractiveTutorial(): UseTutorialReturn {
   // Initialize tutorial preferences
   useEffect(() => {
     if (user) {
-      const preferences = getUserTutorialPreferences(user.id)
-      setTutorialPreferences(preferences)
+      getUserTutorialPreferences(user.id).then(preferences => {
+        setTutorialPreferences(preferences)
+      })
     }
   }, [user])
 
@@ -320,27 +351,27 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     if (!tutorialPreferences?.autoStartTutorials) return
 
     // Load existing progress or create new
-    let tutorialProgress = getUserTutorialProgress(user.id, tutorialId)
-    
-    if (!tutorialProgress) {
-      tutorialProgress = {
-        userId: user.id,
-        tutorialId,
-        currentStepIndex: 0,
-        completedSteps: [],
-        startedAt: new Date(),
-        lastActiveAt: new Date(),
-        skipped: false
+    getUserTutorialProgress(user.id, tutorialId).then(tutorialProgress => {
+      if (!tutorialProgress) {
+        tutorialProgress = {
+          userId: user.id,
+          tutorialId,
+          currentStepIndex: 0,
+          completedSteps: [],
+          startedAt: new Date(),
+          lastActiveAt: new Date(),
+          skipped: false
+        }
       }
-    }
 
-    setActiveTutorial(tutorial)
-    setCurrentStepIndex(tutorialProgress.currentStepIndex)
-    setProgress(tutorialProgress)
-    setIsActive(true)
-    setIsPaused(false)
-    
-    saveTutorialProgress(tutorialProgress)
+      setActiveTutorial(tutorial)
+      setCurrentStepIndex(tutorialProgress.currentStepIndex)
+      setProgress(tutorialProgress)
+      setIsActive(true)
+      setIsPaused(false)
+      
+      saveTutorialProgress(tutorialProgress).catch(console.error)
+    })
   }, [user, tutorialPreferences])
 
   // Move to next step
@@ -365,7 +396,7 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     setProgress(updatedProgress)
     setCanProceed(false)
     
-    saveTutorialProgress(updatedProgress)
+    saveTutorialProgress(updatedProgress).catch(console.error)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTutorial, progress, currentStepIndex, user])
 
@@ -383,7 +414,7 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     setCurrentStepIndex(prevIndex)
     setProgress(updatedProgress)
     
-    saveTutorialProgress(updatedProgress)
+    saveTutorialProgress(updatedProgress).catch(console.error)
   }, [activeTutorial, progress, currentStepIndex])
 
   // Skip current step
@@ -405,7 +436,7 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     setIsPaused(true)
     setProgress(updatedProgress)
     
-    saveTutorialProgress(updatedProgress)
+    saveTutorialProgress(updatedProgress).catch(console.error)
   }, [progress])
 
   // Resume tutorial
@@ -421,7 +452,7 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     setIsPaused(false)
     setProgress(updatedProgress)
     
-    saveTutorialProgress(updatedProgress)
+    saveTutorialProgress(updatedProgress).catch(console.error)
   }, [progress])
 
   // Complete tutorial
@@ -453,8 +484,8 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     setActiveTutorial(null)
     setCurrentStepIndex(0)
     
-    saveTutorialProgress(updatedProgress)
-    saveTutorialPreferences(updatedPreferences)
+    saveTutorialProgress(updatedProgress).catch(console.error)
+    saveTutorialPreferences(updatedPreferences).catch(console.error)
   }, [activeTutorial, progress, user, tutorialPreferences])
 
   // Exit tutorial
@@ -472,7 +503,7 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     setCurrentStepIndex(0)
     setProgress(null)
     
-    saveTutorialProgress(updatedProgress)
+    saveTutorialProgress(updatedProgress).catch(console.error)
   }, [progress])
 
   // Validate current step
@@ -523,7 +554,7 @@ export function useInteractiveTutorial(): UseTutorialReturn {
     }
 
     setTutorialPreferences(updatedPreferences)
-    saveTutorialPreferences(updatedPreferences)
+    saveTutorialPreferences(updatedPreferences).catch(console.error)
   }, [tutorialPreferences])
 
   // Get tutorial by ID

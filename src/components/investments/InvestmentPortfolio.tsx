@@ -46,30 +46,11 @@ import {
 
 import { formatCurrency } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { useInvestments } from '@/lib/hooks/useInvestments'
+import type { Investment as InvestmentType } from '@/lib/hooks/useInvestments'
 
-interface Investment {
-  id: string
-  name: string
-  type: 'apartment' | 'house' | 'villa' | 'townhouse' | 'commercial'
-  location: string
-  purchasePrice: number
-  currentValue: number
-  purchaseDate: Date
-  downPayment: number
-  loanAmount: number
-  monthlyPayment: number
-  monthlyRental?: number
-  totalInvestment: number // Total cash invested including down payment and fees
-  unrealizedGain: number
-  realizedGain: number
-  totalReturn: number
-  roiPercentage: number
-  annualizedReturn: number
-  cashFlow: number // Monthly cash flow
-  status: 'planning' | 'purchased' | 'rented' | 'sold'
-  riskLevel: 'low' | 'medium' | 'high'
-  notes?: string
-}
+// Use the Investment type from useInvestments hook
+type Investment = InvestmentType
 
 interface PortfolioMetrics {
   totalInvestment: number
@@ -92,160 +73,40 @@ export const InvestmentPortfolio: React.FC<InvestmentPortfolioProps> = ({
   userId,
   className
 }) => {
-  const [investments, setInvestments] = useState<Investment[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [selectedTimeframe, setSelectedTimeframe] = useState<'1M' | '3M' | '6M' | '1Y' | 'ALL'>('1Y')
-  const [filterType, setFilterType] = useState<'all' | 'apartment' | 'house' | 'villa' | 'commercial'>('all')
+  const [filterType, setFilterType] = useState<'all' | 'apartment' | 'house' | 'villa' | 'townhouse' | 'commercial'>('all')
   const [filterStatus, setFilterStatus] = useState<'all' | 'planning' | 'purchased' | 'rented' | 'sold'>('all')
 
-  // Mock data - in real app, this would fetch from API
-  useEffect(() => {
-    const loadInvestments = async () => {
-      setIsLoading(true)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      const mockInvestments: Investment[] = [
-        {
-          id: '1',
-          name: 'Căn hộ Vinhomes Central Park',
-          type: 'apartment',
-          location: 'Quận Bình Thạnh, TP.HCM',
-          purchasePrice: 3200000000,
-          currentValue: 3680000000,
-          purchaseDate: new Date('2023-01-15'),
-          downPayment: 640000000,
-          loanAmount: 2560000000,
-          monthlyPayment: 15200000,
-          monthlyRental: 18000000,
-          totalInvestment: 740000000, // Down payment + fees + renovations
-          unrealizedGain: 480000000,
-          realizedGain: 0,
-          totalReturn: 480000000,
-          roiPercentage: 15.0,
-          annualizedReturn: 12.8,
-          cashFlow: 2800000, // Rental - mortgage payment
-          status: 'rented',
-          riskLevel: 'low'
-        },
-        {
-          id: '2',
-          name: 'Nhà phố Thảo Điền',
-          type: 'townhouse',
-          location: 'Quận 2, TP.HCM',
-          purchasePrice: 5800000000,
-          currentValue: 6380000000,
-          purchaseDate: new Date('2022-06-10'),
-          downPayment: 1160000000,
-          loanAmount: 4640000000,
-          monthlyPayment: 28500000,
-          monthlyRental: 35000000,
-          totalInvestment: 1360000000,
-          unrealizedGain: 580000000,
-          realizedGain: 0,
-          totalReturn: 580000000,
-          roiPercentage: 10.0,
-          annualizedReturn: 8.2,
-          cashFlow: 6500000,
-          status: 'rented',
-          riskLevel: 'medium'
-        },
-        {
-          id: '3',
-          name: 'Biệt thự Phú Mỹ Hưng',
-          type: 'villa',
-          location: 'Quận 7, TP.HCM',
-          purchasePrice: 12500000000,
-          currentValue: 12500000000,
-          purchaseDate: new Date('2024-01-20'),
-          downPayment: 2500000000,
-          loanAmount: 10000000000,
-          monthlyPayment: 58000000,
-          totalInvestment: 2800000000,
-          unrealizedGain: 0,
-          realizedGain: 0,
-          totalReturn: 0,
-          roiPercentage: 0,
-          annualizedReturn: 0,
-          cashFlow: -58000000, // Still planning to rent
-          status: 'planning',
-          riskLevel: 'high'
-        },
-        {
-          id: '4',
-          name: 'Shophouse District 1',
-          type: 'commercial',
-          location: 'Quận 1, TP.HCM',
-          purchasePrice: 8500000000,
-          currentValue: 9200000000,
-          purchaseDate: new Date('2021-03-15'),
-          downPayment: 2550000000,
-          loanAmount: 5950000000,
-          monthlyPayment: 42000000,
-          monthlyRental: 48000000,
-          totalInvestment: 2850000000,
-          unrealizedGain: 700000000,
-          realizedGain: 0,
-          totalReturn: 700000000,
-          roiPercentage: 24.6,
-          annualizedReturn: 8.7,
-          cashFlow: 6000000,
-          status: 'rented',
-          riskLevel: 'medium'
-        }
-      ]
-      
-      setInvestments(mockInvestments)
-      setIsLoading(false)
-    }
+  // Use the real investment hook instead of mock data
+  const {
+    investments,
+    metrics,
+    isLoading,
+    error,
+    addInvestment,
+    updateInvestment,
+    deleteInvestment,
+    getInvestmentsByType,
+    getTopPerformers,
+    getWorstPerformers
+  } = useInvestments({
+    userId,
+    filterType,
+    filterStatus
+  })
 
-    loadInvestments()
-  }, [userId])
-
-  // Calculate portfolio metrics
-  const portfolioMetrics = useMemo((): PortfolioMetrics => {
-    const filteredInvestments = investments.filter(inv => {
-      const typeMatch = filterType === 'all' || inv.type === filterType
-      const statusMatch = filterStatus === 'all' || inv.status === filterStatus
-      return typeMatch && statusMatch
-    })
-
-    const totalInvestment = filteredInvestments.reduce((sum, inv) => sum + inv.totalInvestment, 0)
-    const totalCurrentValue = filteredInvestments.reduce((sum, inv) => sum + inv.currentValue, 0)
-    const totalUnrealizedGain = filteredInvestments.reduce((sum, inv) => sum + inv.unrealizedGain, 0)
-    const totalRealizedGain = filteredInvestments.reduce((sum, inv) => sum + inv.realizedGain, 0)
-    const totalReturn = totalUnrealizedGain + totalRealizedGain
-    const averageROI = filteredInvestments.length > 0 
-      ? filteredInvestments.reduce((sum, inv) => sum + inv.roiPercentage, 0) / filteredInvestments.length 
-      : 0
-    const monthlyPassiveIncome = filteredInvestments.reduce((sum, inv) => {
-      return sum + (inv.monthlyRental ? Math.max(0, inv.cashFlow) : 0)
-    }, 0)
-
-    // Calculate risk score (1-10, lower is better)
-    const riskScores = { low: 3, medium: 6, high: 9 }
-    const portfolioRiskScore = filteredInvestments.length > 0
-      ? filteredInvestments.reduce((sum, inv) => sum + riskScores[inv.riskLevel], 0) / filteredInvestments.length
-      : 0
-
-    // Calculate diversification score (1-10, higher is better)
-    const typeSet = new Set(filteredInvestments.map(inv => inv.type))
-    const locationSet = new Set(filteredInvestments.map(inv => inv.location.split(',')[0])) // By district
-    const diversificationScore = Math.min(10, (typeSet.size * 2) + (locationSet.size * 1.5))
-
-    return {
-      totalInvestment,
-      totalCurrentValue,
-      totalUnrealizedGain,
-      totalRealizedGain,
-      totalReturn,
-      averageROI,
-      monthlyPassiveIncome,
-      portfolioRiskScore,
-      diversificationScore
-    }
-  }, [investments, filterType, filterStatus])
+  // Use metrics from the hook instead of calculating locally
+  const portfolioMetrics: PortfolioMetrics = {
+    totalInvestment: metrics.totalInvestment,
+    totalCurrentValue: metrics.totalCurrentValue,
+    totalUnrealizedGain: metrics.totalUnrealizedGain,
+    totalRealizedGain: metrics.totalRealizedGain,
+    totalReturn: metrics.totalReturn,
+    averageROI: metrics.averageROI,
+    monthlyPassiveIncome: metrics.monthlyPassiveIncome,
+    portfolioRiskScore: metrics.portfolioRiskScore,
+    diversificationScore: metrics.diversificationScore
+  }
 
   const getTypeLabel = (type: Investment['type']) => {
     switch (type) {
@@ -298,11 +159,8 @@ export const InvestmentPortfolio: React.FC<InvestmentPortfolioProps> = ({
     }
   }
 
-  const filteredInvestments = investments.filter(inv => {
-    const typeMatch = filterType === 'all' || inv.type === filterType
-    const statusMatch = filterStatus === 'all' || inv.status === filterStatus
-    return typeMatch && statusMatch
-  })
+  // Investments are already filtered by the hook
+  const filteredInvestments = investments
 
   if (isLoading) {
     return (
@@ -316,6 +174,23 @@ export const InvestmentPortfolio: React.FC<InvestmentPortfolioProps> = ({
           </div>
           <div className="h-64 bg-gray-200 rounded-lg"></div>
         </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className={cn("space-y-6", className)}>
+        <Card>
+          <CardContent className="text-center py-12">
+            <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Lỗi tải dữ liệu</h3>
+            <p className="text-gray-500 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Thử lại
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -647,19 +522,62 @@ export const InvestmentPortfolio: React.FC<InvestmentPortfolioProps> = ({
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Biểu Đồ Hiệu Suất</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Biểu đồ hiệu suất đầu tư sẽ hiển thị ở đây</p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Performers</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {getTopPerformers(3).map((investment, index) => (
+                    <div key={investment.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                      <div>
+                        <div className="font-medium">{investment.name}</div>
+                        <div className="text-sm text-gray-600">{getTypeLabel(investment.type)}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-green-600">
+                          +{investment.roiPercentage.toFixed(1)}%
+                        </div>
+                        <div className="text-sm text-gray-500">ROI</div>
+                      </div>
+                    </div>
+                  ))}
+                  {getTopPerformers(3).length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      Chưa có dữ liệu hiệu suất
+                    </div>
+                  )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Portfolio Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {getInvestmentsByType().map((typeData) => (
+                    <div key={typeData.type} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">{getTypeLabel(typeData.type)}</span>
+                        <span className="text-sm text-gray-600">
+                          {typeData.count} ({typeData.percentage.toFixed(1)}%)
+                        </span>
+                      </div>
+                      <Progress value={typeData.percentage} className="h-2" />
+                    </div>
+                  ))}
+                  {getInvestmentsByType().length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      Chưa có đầu tư nào
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
@@ -669,11 +587,38 @@ export const InvestmentPortfolio: React.FC<InvestmentPortfolioProps> = ({
                 <CardTitle>Phân Bổ Theo Loại</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <PieChart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">Biểu đồ phân bổ sẽ hiển thị ở đây</p>
-                  </div>
+                <div className="space-y-4">
+                  {getInvestmentsByType().map((typeData) => {
+                    const percentage = typeData.percentage
+                    const IconComponent = getTypeIcon(typeData.type)
+                    
+                    return (
+                      <div key={typeData.type} className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <IconComponent className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm font-medium">{getTypeLabel(typeData.type)}</span>
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            {typeData.count} ({percentage.toFixed(1)}%)
+                          </span>
+                        </div>
+                        <div className="relative">
+                          <Progress value={percentage} className="h-3" />
+                          <div 
+                            className="absolute top-0 left-0 h-3 bg-blue-500 rounded-full transition-all duration-500"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                  {getInvestmentsByType().length === 0 && (
+                    <div className="text-center py-8">
+                      <PieChart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">Chưa có đầu tư nào để phân tích</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

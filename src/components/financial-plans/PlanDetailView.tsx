@@ -48,6 +48,7 @@ import { PlanStatusManager } from '@/components/financial-plans/PlanStatusManage
 import { UIFinancialPlan } from '@/lib/adapters/planAdapter'
 import type { PlanStatus, PlanProgress, PlanMilestone } from '@/types/plans'
 import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
+import { DashboardService } from '@/lib/services/dashboardService'
 
 // Import export functions
 import { exportFinancialPlanToPDF } from '@/lib/export/pdfExport'
@@ -422,6 +423,53 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
     scenarios.find(s => s.scenarioType === 'baseline')?.id || scenarios[0]?.id || ''
   )
   const [isExporting, setIsExporting] = useState(false)
+  const [planProgress, setPlanProgress] = useState<PlanProgress | null>(null)
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true)
+  
+  // Load plan progress data from database
+  React.useEffect(() => {
+    const loadPlanProgress = async () => {
+      try {
+        setIsLoadingProgress(true)
+        const progressData = await DashboardService.getPlanProgress(plan.id)
+        
+        if (progressData) {
+          // Convert database progress to PlanProgress type
+          const progress: PlanProgress = {
+            totalProgress: progressData.totalProgress,
+            financialProgress: progressData.financialProgress,
+            savingsTarget: progressData.savingsTarget,
+            currentSavings: progressData.currentSavings,
+            monthlyContribution: progressData.monthlyContribution,
+            estimatedCompletionDate: progressData.estimatedCompletionDate,
+            milestones: progressData.milestones.map(m => ({
+              id: m.id,
+              title: m.title,
+              description: m.description || '',
+              targetDate: m.target_date ? new Date(m.target_date) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default to 30 days from now
+              status: m.status as 'pending' | 'in_progress' | 'completed' | 'cancelled',
+              category: m.category as 'financial' | 'legal' | 'property' | 'admin' | 'personal',
+              requiredAmount: m.required_amount ?? undefined,
+              currentAmount: m.current_amount ?? undefined,
+              priority: m.priority as 'low' | 'medium' | 'high'
+            })),
+            statusHistory: progressData.statusHistory.map(h => ({
+              status: h.status as 'draft' | 'active' | 'completed' | 'archived',
+              date: new Date(h.created_at),
+              note: h.note || ''
+            }))
+          }
+          setPlanProgress(progress)
+        }
+      } catch (error) {
+        console.error('Error loading plan progress:', error)
+      } finally {
+        setIsLoadingProgress(false)
+      }
+    }
+
+    loadPlanProgress()
+  }, [plan.id])
 
   // Convert FinancialPlan to UIFinancialPlan for the progress tracker
   const uiPlan: UIFinancialPlan = {
@@ -434,86 +482,33 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
     monthlyIncome: plan.monthly_income || 0,
     monthlyExpenses: plan.monthly_expenses || 0,
     currentSavings: plan.current_savings || 0,
-    planStatus: 'active', // Default status since not in schema
+    planStatus: plan.status || 'draft', // Use actual status from database
     isPublic: plan.is_public,
-    isFavorite: false, // Default value since not in schema
+    isFavorite: plan.is_favorite || false, // Use database field
     createdAt: new Date(plan.created_at),
     updatedAt: new Date(plan.updated_at),
     monthlyPayment: plan.calculatedMetrics?.monthlyPayment,
     totalInterest: plan.calculatedMetrics?.totalInterest,
     affordabilityScore: plan.calculatedMetrics?.affordabilityScore,
-    riskLevel: plan.riskLevel,
-    roi: undefined, // ROI not in schema
+    riskLevel: plan.risk_level || plan.riskLevel || 'medium', // Use database field
+    roi: plan.roi || plan.expected_roi || undefined, // Use database field
     expectedRentalIncome: plan.expected_rental_income || undefined
   }
 
-  // Mock progress data - in a real app, this would come from an API
-  const mockProgress: PlanProgress = {
-    totalProgress: 65,
-    financialProgress: 75,
+  // Use real progress data from database or create default fallback
+  const defaultProgress: PlanProgress = {
+    totalProgress: 0,
+    financialProgress: 0,
     savingsTarget: plan.down_payment || 0,
     currentSavings: plan.current_savings || 0,
-    monthlyContribution: 5000000, // 5M VND per month
-    estimatedCompletionDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-    milestones: [
-      {
-        id: 'financial-1',
-        title: 'Complete down payment savings',
-        description: 'Accumulate full down payment amount',
-        targetDate: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000),
-        status: 'in_progress',
-        category: 'financial',
-        requiredAmount: plan.down_payment || 0,
-        currentAmount: plan.current_savings || 0,
-        priority: 'high'
-      },
-      {
-        id: 'legal-1',
-        title: 'Property legal verification',
-        description: 'Verify property ownership and legal status',
-        targetDate: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000),
-        status: 'pending',
-        category: 'legal',
-        priority: 'high'
-      },
-      {
-        id: 'financial-2',
-        title: 'Secure bank loan approval',
-        description: 'Get pre-approval from chosen bank',
-        targetDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-        status: 'pending',
-        category: 'financial',
-        priority: 'high'
-      },
-      {
-        id: 'property-1',
-        title: 'Property inspection',
-        description: 'Professional property condition assessment',
-        targetDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
-        status: 'pending',
-        category: 'property',
-        priority: 'medium'
-      },
-      {
-        id: 'admin-1',
-        title: 'Insurance setup',
-        description: 'Property and mortgage insurance arrangement',
-        targetDate: new Date(Date.now() + 190 * 24 * 60 * 60 * 1000),
-        status: 'pending',
-        category: 'admin',
-        priority: 'medium'
-      }
-    ],
+    monthlyContribution: 0,
+    estimatedCompletionDate: null,
+    milestones: [],
     statusHistory: [
       {
         status: 'draft',
-        date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        date: new Date(plan.created_at),
         note: 'Plan created'
-      },
-      {
-        status: 'active',
-        date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-        note: 'Plan activated by user'
       }
     ]
   }
@@ -544,8 +539,8 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
     purchase_price: plan.purchase_price,
     down_payment: plan.down_payment,
     loan_amount: ((plan.purchase_price || 0) - (plan.down_payment || 0)),
-    loan_term_months: 240,
-    interest_rate: 10.5,
+    loan_term_months: plan.target_timeframe_months || 240, // Use database field
+    interest_rate: (plan as any).interest_rate || 10.5, // Use plan's stored interest rate or fallback
     monthly_income: plan.monthly_income,
     monthly_expenses: plan.monthly_expenses,
     current_savings: plan.current_savings,
@@ -553,10 +548,11 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
     property_taxes: null,
     insurance_costs: null,
     maintenance_costs: null,
-    target_completion_date: null,
+    target_completion_date: plan.target_timeframe_months ? 
+      new Date(Date.now() + (plan.target_timeframe_months * 30 * 24 * 60 * 60 * 1000)).toISOString() : null,
     is_public: plan.is_public,
-    tags: null,
-    risk_level: 'medium',
+    tags: plan.tags,
+    risk_level: plan.risk_level || 'medium',
     status: plan.status || 'draft',
     completed_at: plan.completed_at || null,
     created_at: plan.created_at,
@@ -567,31 +563,89 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
       totalInterest: plan.calculatedMetrics.totalInterest,
       debtToIncomeRatio: plan.calculatedMetrics.dtiRatio || 0,
       affordabilityScore: plan.calculatedMetrics.affordabilityScore,
-      roi: 0,
+      roi: plan.roi || plan.expected_roi || 0, // Use database fields
       paybackPeriod: plan.calculatedMetrics.payoffTimeMonths || 0
     } : undefined,
-    // Add missing fields with defaults
-    additional_costs: 0,
-    other_debts: 0,
-    expected_appreciation_rate: 0,
-    investment_horizon_months: 0,
+    // Add missing fields using database data where available
+    additional_costs: plan.additional_costs || 0,
+    other_debts: plan.other_debts || 0,
+    expected_appreciation_rate: plan.expected_appreciation_rate || 0,
+    investment_horizon_months: plan.investment_horizon_months || 0,
     risk_factors: '',
-    notes: '',
-    shared_with: null,
-    cached_calculations: null,
-    calculations_last_updated: null
+    notes: plan.notes || '',
+    shared_with: plan.shared_with,
+    cached_calculations: plan.cached_calculations,
+    calculations_last_updated: plan.calculations_last_updated
   }
 
-  const handleMilestoneUpdate = (milestoneId: string, updates: Partial<PlanMilestone>) => {
-    // In a real app, this would call an API to update the milestone
-    console.log('Milestone update:', milestoneId, updates)
-    toast.success('Milestone updated successfully')
+  const handleMilestoneUpdate = async (milestoneId: string, updates: Partial<PlanMilestone>) => {
+    try {
+      await DashboardService.updatePlanMilestone(milestoneId, {
+        title: updates.title,
+        description: updates.description,
+        status: updates.status,
+        priority: updates.priority,
+        current_amount: updates.currentAmount,
+        target_date: updates.targetDate?.toISOString().split('T')[0],
+        completed_date: updates.status === 'completed' ? new Date().toISOString().split('T')[0] : undefined
+      })
+      
+      // Reload progress data to reflect changes
+      const progressData = await DashboardService.getPlanProgress(plan.id)
+      if (progressData) {
+        const progress: PlanProgress = {
+          totalProgress: progressData.totalProgress,
+          financialProgress: progressData.financialProgress,
+          savingsTarget: progressData.savingsTarget,
+          currentSavings: progressData.currentSavings,
+          monthlyContribution: progressData.monthlyContribution,
+          estimatedCompletionDate: progressData.estimatedCompletionDate,
+          milestones: progressData.milestones.map(m => ({
+            id: m.id,
+            title: m.title,
+            description: m.description || '',
+            targetDate: m.target_date ? new Date(m.target_date) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default to 30 days from now
+            status: m.status as 'pending' | 'in_progress' | 'completed' | 'cancelled',
+            category: m.category as 'financial' | 'legal' | 'property' | 'admin' | 'personal',
+            requiredAmount: m.required_amount ?? undefined,
+            currentAmount: m.current_amount ?? undefined,
+            priority: m.priority as 'low' | 'medium' | 'high'
+          })),
+          statusHistory: progressData.statusHistory.map(h => ({
+            status: h.status as 'draft' | 'active' | 'completed' | 'archived',
+            date: new Date(h.created_at),
+            note: h.note || ''
+          }))
+        }
+        setPlanProgress(progress)
+      }
+      
+      toast.success('Milestone updated successfully')
+    } catch (error) {
+      console.error('Error updating milestone:', error)
+      toast.error('Failed to update milestone')
+    }
   }
 
-  const handleContributionUpdate = (amount: number) => {
-    // In a real app, this would call an API to update the monthly contribution
-    console.log('Contribution update:', amount)
-    toast.success(`Monthly contribution updated to ${formatCurrency(amount)}`)
+  const handleContributionUpdate = async (amount: number) => {
+    try {
+      await DashboardService.updatePlanProgress(plan.id, {
+        monthly_contribution: amount
+      })
+      
+      // Update local state
+      if (planProgress) {
+        setPlanProgress({
+          ...planProgress,
+          monthlyContribution: amount
+        })
+      }
+      
+      toast.success(`Monthly contribution updated to ${formatCurrency(amount)}`)
+    } catch (error) {
+      console.error('Error updating contribution:', error)
+      toast.error('Failed to update monthly contribution')
+    }
   }
 
   const handleExportPDF = async () => {
@@ -761,13 +815,19 @@ export const PlanDetailView: React.FC<PlanDetailViewProps> = ({
             />
             
             {/* Traditional Progress Tracker */}
-            <PlanProgressTracker
-              plan={uiPlan}
-              progress={mockProgress}
-              onStatusChange={handleStatusChange}
-              onMilestoneUpdate={handleMilestoneUpdate}
-              onContributionUpdate={handleContributionUpdate}
-            />
+            {isLoadingProgress ? (
+              <div className="flex items-center justify-center p-8">
+                <div className="text-gray-500">Loading progress data...</div>
+              </div>
+            ) : (
+              <PlanProgressTracker
+                plan={uiPlan}
+                progress={planProgress || defaultProgress}
+                onStatusChange={handleStatusChange}
+                onMilestoneUpdate={handleMilestoneUpdate}
+                onContributionUpdate={handleContributionUpdate}
+              />
+            )}
           </div>
         </TabsContent>
         

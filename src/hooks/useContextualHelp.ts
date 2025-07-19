@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { DashboardService } from '@/lib/services/dashboardService'
 import { 
   ContextualHelpItem, 
   UserHelpState, 
@@ -31,17 +32,21 @@ const generateSessionId = () => {
   return `help_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
-// Get user help state from localStorage
-const getUserHelpState = (userId: string): UserHelpState => {
-  const stored = localStorage.getItem(`help_state_${userId}`)
-  
-  if (stored) {
-    const parsed = JSON.parse(stored)
-    return {
-      ...parsed,
-      lastHelpInteraction: new Date(parsed.lastHelpInteraction),
-      helpSessionId: generateSessionId() // Always generate new session ID
+// Get user help state from database
+const getUserHelpState = async (userId: string): Promise<UserHelpState> => {
+  try {
+    const preferences = await DashboardService.getUserPreferences(userId)
+    
+    if (preferences && (preferences as any).help_state) {
+      const helpState = JSON.parse((preferences as any).help_state)
+      return {
+        ...helpState,
+        lastHelpInteraction: new Date(helpState.lastHelpInteraction),
+        helpSessionId: generateSessionId() // Always generate new session ID
+      }
     }
+  } catch (error) {
+    console.error('Error loading help state from database:', error)
   }
 
   // Default state for new users
@@ -57,9 +62,15 @@ const getUserHelpState = (userId: string): UserHelpState => {
   }
 }
 
-// Save user help state to localStorage
-const saveUserHelpState = (state: UserHelpState) => {
-  localStorage.setItem(`help_state_${state.userId}`, JSON.stringify(state))
+// Save user help state to database
+const saveUserHelpState = async (state: UserHelpState) => {
+  try {
+    await DashboardService.updateUserPreferences(state.userId, {
+      help_state: JSON.stringify(state)
+    } as any)
+  } catch (error) {
+    console.error('Error saving help state to database:', error)
+  }
 }
 
 export function useContextualHelp(): UseContextualHelpReturn {
@@ -72,8 +83,9 @@ export function useContextualHelp(): UseContextualHelpReturn {
   // Initialize help state
   useEffect(() => {
     if (user) {
-      const state = getUserHelpState(user.id)
-      setHelpState(state)
+      getUserHelpState(user.id).then(state => {
+        setHelpState(state)
+      })
       
       // Register default help items
       const itemsMap = new Map<string, ContextualHelpItem>()
@@ -85,7 +97,7 @@ export function useContextualHelp(): UseContextualHelpReturn {
   }, [user])
 
   // Update help state and persist
-  const updateHelpState = useCallback((updates: Partial<UserHelpState>) => {
+  const updateHelpState = useCallback(async (updates: Partial<UserHelpState>) => {
     if (!helpState) return
 
     const newState = {
@@ -95,7 +107,7 @@ export function useContextualHelp(): UseContextualHelpReturn {
     }
     
     setHelpState(newState)
-    saveUserHelpState(newState)
+    await saveUserHelpState(newState)
   }, [helpState])
 
   // Check if help should be shown based on conditions
@@ -165,7 +177,7 @@ export function useContextualHelp(): UseContextualHelpReturn {
     if (helpState && !helpState.seenTooltips.includes(helpItem.id)) {
       updateHelpState({
         seenTooltips: [...helpState.seenTooltips, helpItem.id]
-      })
+      }).catch(console.error)
     }
   }, [shouldShowHelp, helpItems, helpState, updateHelpState])
 
@@ -193,7 +205,7 @@ export function useContextualHelp(): UseContextualHelpReturn {
     // Add to dismissed list
     updateHelpState({
       dismissedHelp: [...helpState.dismissedHelp, helpItem.id]
-    })
+    }).catch(console.error)
   }, [helpItems, helpState, hideHelp, updateHelpState])
 
   // Toggle global help on/off
@@ -202,7 +214,7 @@ export function useContextualHelp(): UseContextualHelpReturn {
 
     updateHelpState({
       showContextualHelp: !helpState.showContextualHelp
-    })
+    }).catch(console.error)
 
     // Hide all active help when disabling
     if (helpState.showContextualHelp) {
@@ -219,7 +231,7 @@ export function useContextualHelp(): UseContextualHelpReturn {
 
   // Update help preferences
   const updateHelpPreference = useCallback((key: keyof UserHelpState, value: any) => {
-    updateHelpState({ [key]: value })
+    updateHelpState({ [key]: value }).catch(console.error)
   }, [updateHelpState])
 
   // Register new help item
@@ -249,7 +261,7 @@ export function useContextualHelp(): UseContextualHelpReturn {
       dismissedHelp: [],
       seenTooltips: [],
       helpSessionId: generateSessionId()
-    })
+    }).catch(console.error)
     
     setActiveHelp(null)
     timeoutRef.current.forEach(timeout => clearTimeout(timeout))
