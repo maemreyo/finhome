@@ -1,7 +1,7 @@
 // src/lib/services/propertyService.ts
 // Service for property search, management, and related operations
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/lib/supabase/types'
 import {
   PropertySearchFilters,
@@ -15,13 +15,13 @@ import {
   MarketTrends
 } from '@/types/property'
 
-type SupabaseClient = ReturnType<typeof createClientComponentClient<Database>>
+type SupabaseClient = ReturnType<typeof createClient>
 
 export class PropertyService {
   private supabase: SupabaseClient
 
   constructor() {
-    this.supabase = createClientComponentClient<Database>()
+    this.supabase = createClient()
   }
 
   // Property Search and Filtering

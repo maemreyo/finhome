@@ -1199,6 +1199,82 @@
         "userId": "ID người dùng",
         "unknown": "Không xác định"
       }
+    },
+    "Scenarios": {
+      "title": "So Sánh Kịch Bản",
+      "description": "So sánh các kịch bản tài chính khác nhau để đưa ra quyết định sáng suốt",
+      "createScenarioButton": "Tạo Kịch Bản Mới",
+      "smartGenerateButton": "Tạo Thông Minh",
+      "generatedScenarioName": "Trả trước {downPaymentPercent}%, {loanTermYears} năm",
+      "generationSuccess": "Tạo thành công {count} kịch bản",
+      "generationError": "Không thể tạo kịch bản",
+      "availableRates": "{count} lãi suất có sẵn",
+      "demoMode": {
+        "strong": "Chế Độ Demo:",
+        "text": "Đăng nhập để truy cập kịch bản cá nhân và lưu công việc của bạn."
+      },
+      "summary": {
+        "totalScenarios": "Tổng Số Kịch Bản",
+        "optimalScenarios": "Kịch Bản Tối Ưu",
+        "averagePayment": "Thanh Toán Trung Bình",
+        "actions": "Hành Động",
+        "optionsCreated": "tùy chọn đã tạo",
+        "bestRated": "được đánh giá tốt nhất",
+        "monthly": "hàng tháng"
+      },
+      "smartGenerateModal": {
+        "title": "Trình Tạo Kịch Bản Thông Minh",
+        "description": "Tạo nhiều kịch bản dựa trên tình hình tài chính của bạn",
+        "propertyPrice": "Giá Bất Động Sản (VND)",
+        "monthlyIncome": "Thu Nhập Hàng Tháng (VND)",
+        "monthlyExpenses": "Chi Phí Hàng Tháng (VND)",
+        "loanType": "Loại Vay",
+        "loanTypes": {
+          "homePurchase": "Mua Nhà",
+          "investment": "Đầu Tư",
+          "commercial": "Thương Mại"
+        },
+        "loadingRates": "Đang tải lãi suất hiện tại...",
+        "ratesFound": "Tìm thấy {count} lãi suất phù hợp",
+        "cancel": "Hủy",
+        "generating": "Đang tạo...",
+        "generateButton": "Tạo Kịch Bản"
+      },
+      "noScenario": {
+        "title": "Không Có Kịch Bản",
+        "description": "Tạo kịch bản đầu tiên để bắt đầu so sánh các tùy chọn",
+        "createButton": "Tạo Kịch Bản Đầu Tiên"
+      },
+      "selectedScenario": {
+        "title": "Chi Tiết Kịch Bản Đã Chọn",
+        "description": "Thông tin chi tiết cho {planName}",
+        "basicInfo": {
+          "title": "Thông Tin Cơ Bản",
+          "propertyPrice": "Giá Bất Động Sản",
+          "downPayment": "Tiền Đặt Cọc",
+          "loanAmount": "Số Tiền Vay",
+          "loanTerm": "Thời Hạn Vay",
+          "interestRate": "Lãi Suất",
+          "years": "năm",
+          "perYear": "mỗi năm"
+        },
+        "monthlyFinance": {
+          "title": "Tài Chính Hàng Tháng",
+          "income": "Thu Nhập",
+          "expenses": "Chi Phí",
+          "monthlyLoanPayment": "Thanh Toán Vay Hàng Tháng",
+          "netCashFlow": "Dòng Tiền Ròng"
+        }
+      }
+    },
+    "enhancedScenarios": {
+      "title": "Phân Tích Kịch Bản Nâng Cao",
+      "description": "So sánh kịch bản nâng cao với biểu đồ tương tác và phân tích",
+      "generateSmartScenarios": "Tạo Kịch Bản Thông Minh",
+      "export": "Xuất",
+      "createScenario": "Tạo Kịch Bản",
+      "editScenario": "Chỉnh Sửa Kịch Bản",
+      "createNewScenario": "Tạo Kịch Bản Mới"
     }
   },
   "CreatePlanForm": {

@@ -1,7 +1,7 @@
 // src/lib/services/bankService.ts
 // Service for bank interest rates and loan products management
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/lib/supabase/types'
 
 type InterestRateRow = Database['public']['Tables']['bank_interest_rates']['Row']
@@ -60,7 +60,7 @@ export interface InterestRateHistory {
 }
 
 class BankService {
-  private supabase = createClientComponentClient<Database>()
+  private supabase = createClient()
 
   // Get current interest rates
   async getCurrentRates(): Promise<BankLoanProduct[]> {

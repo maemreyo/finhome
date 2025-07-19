@@ -4,7 +4,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/lib/supabase/types'
 import { toast } from 'sonner'
 
@@ -43,7 +43,7 @@ export function useProperties(initialFilters: PropertyFilters = {}): UseProperti
   const [total, setTotal] = useState(0)
   const [filters, setFilters] = useState(initialFilters)
 
-  const supabase = createClientComponentClient<Database>()
+  const supabase = createClient()
 
   const loadProperties = useCallback(async (searchFilters: PropertyFilters = filters) => {
     try {
@@ -233,7 +233,7 @@ export function useAdminProperties() {
     totalViews: 0
   })
 
-  const supabase = createClientComponentClient<Database>()
+  const supabase = createClient()
 
   const loadStats = useCallback(async () => {
     try {

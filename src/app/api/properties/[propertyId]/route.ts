@@ -2,8 +2,7 @@
 // API routes for individual property operations
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/lib/supabase/types'
 
 interface RouteParams {
@@ -17,7 +16,7 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const supabase = createRouteHandlerClient<Database>({ cookies })
+    const supabase = await createClient()
     const { propertyId } = await params
 
     if (!propertyId) {
@@ -78,7 +77,7 @@ export async function PUT(
   { params }: RouteParams
 ) {
   try {
-    const supabase = createRouteHandlerClient<Database>({ cookies })
+    const supabase = await createClient()
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -144,7 +143,7 @@ export async function DELETE(
   { params }: RouteParams
 ) {
   try {
-    const supabase = createRouteHandlerClient<Database>({ cookies })
+    const supabase = await createClient()
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()

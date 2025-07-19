@@ -4,7 +4,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { ScenarioComparison } from "@/components/scenarios/ScenarioComparison";
 import { useScenarios } from "@/hooks/useScenarios";
@@ -166,6 +166,7 @@ export default function ScenariosPage() {
     deleteScenario,
   } = useScenarios(user?.id || "");
   const t = useTranslations("Dashboard.Scenarios");
+  const locale = useLocale();
   const { rates, isLoading: ratesLoading, getRates } = useBankRates();
   const [selectedScenario, setSelectedScenario] =
     useState<FinancialScenario | null>(null);
@@ -541,7 +542,7 @@ export default function ScenariosPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {new Intl.NumberFormat(t("locale"), {
+                {new Intl.NumberFormat(locale, {
                   style: "currency",
                   currency: "VND",
                   notation: "compact",
@@ -777,7 +778,7 @@ export default function ScenariosPage() {
                         {t("selectedScenario.basicInfo.propertyPrice")}:
                       </span>
                       <span className="font-medium">
-                        {new Intl.NumberFormat(t("locale"), {
+                        {new Intl.NumberFormat(locale, {
                           style: "currency",
                           currency: "VND",
                           notation: "compact",
@@ -789,7 +790,7 @@ export default function ScenariosPage() {
                         {t("selectedScenario.basicInfo.downPayment")}:
                       </span>
                       <span className="font-medium">
-                        {new Intl.NumberFormat(t("locale"), {
+                        {new Intl.NumberFormat(locale, {
                           style: "currency",
                           currency: "VND",
                           notation: "compact",
@@ -806,7 +807,7 @@ export default function ScenariosPage() {
                     <div className="flex justify-between">
                       <span>{t("selectedScenario.basicInfo.loanAmount")}:</span>
                       <span className="font-medium">
-                        {new Intl.NumberFormat(t("locale"), {
+                        {new Intl.NumberFormat(locale, {
                           style: "currency",
                           currency: "VND",
                           notation: "compact",
@@ -849,7 +850,7 @@ export default function ScenariosPage() {
                         {t("selectedScenario.monthlyFinance.income")}:
                       </span>
                       <span className="font-medium text-green-600">
-                        {new Intl.NumberFormat(t("locale"), {
+                        {new Intl.NumberFormat(locale, {
                           style: "currency",
                           currency: "VND",
                           notation: "compact",
@@ -861,7 +862,7 @@ export default function ScenariosPage() {
                         {t("selectedScenario.monthlyFinance.expenses")}:
                       </span>
                       <span className="font-medium text-red-600">
-                        {new Intl.NumberFormat(t("locale"), {
+                        {new Intl.NumberFormat(locale, {
                           style: "currency",
                           currency: "VND",
                           notation: "compact",
@@ -876,7 +877,7 @@ export default function ScenariosPage() {
                         :
                       </span>
                       <span className="font-medium text-blue-600">
-                        {new Intl.NumberFormat(t("locale"), {
+                        {new Intl.NumberFormat(locale, {
                           style: "currency",
                           currency: "VND",
                           notation: "compact",
@@ -900,7 +901,7 @@ export default function ScenariosPage() {
                         0
                           ? "+"
                           : ""}
-                        {new Intl.NumberFormat(t("locale"), {
+                        {new Intl.NumberFormat(locale, {
                           style: "currency",
                           currency: "VND",
                           notation: "compact",

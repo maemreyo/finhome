@@ -45,11 +45,19 @@ export async function GET(request: NextRequest) {
       `)
       .eq('is_active', true)
       .eq('banks.is_active', true)
-      .order('base_rate', { ascending: true })
+      .order('interest_rate', { ascending: true })
 
     // Apply filters
     if (validatedQuery.loanType) {
-      query = query.eq('loan_type', validatedQuery.loanType)
+      // Map frontend loan types to database loan types
+      const loanTypeMapping: Record<string, string> = {
+        'home_purchase': 'home_loan',
+        'investment': 'investment_loan',
+        'commercial': 'commercial_loan',
+        'personal': 'personal_loan'
+      }
+      const dbLoanType = loanTypeMapping[validatedQuery.loanType] || validatedQuery.loanType
+      query = query.eq('loan_type', dbLoanType)
     }
 
     if (validatedQuery.bankId) {
@@ -57,11 +65,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (validatedQuery.minAmount) {
-      query = query.lte('min_amount', validatedQuery.minAmount)
+      query = query.lte('min_loan_amount', validatedQuery.minAmount)
     }
 
     if (validatedQuery.maxAmount) {
-      query = query.gte('max_amount', validatedQuery.maxAmount)
+      query = query.gte('max_loan_amount', validatedQuery.maxAmount)
     }
 
     if (validatedQuery.termMonths) {
@@ -112,6 +120,15 @@ export async function POST(request: NextRequest) {
     
     const supabase = await createClient()
 
+    // Map frontend loan types to database loan types
+    const loanTypeMapping: Record<string, string> = {
+      'home_purchase': 'home_loan',
+      'investment': 'investment_loan',
+      'commercial': 'commercial_loan',
+      'personal': 'personal_loan'
+    }
+    const dbLoanType = loanTypeMapping[validatedData.loanType] || validatedData.loanType
+
     // Get all applicable rates for the loan
     const { data: rates, error } = await supabase
       .from('bank_interest_rates')
@@ -126,14 +143,14 @@ export async function POST(request: NextRequest) {
           is_active
         )
       `)
-      .eq('loan_type', validatedData.loanType)
+      .eq('loan_type', dbLoanType)
       .eq('is_active', true)
       .eq('banks.is_active', true)
-      .lte('min_amount', validatedData.loanAmount)
-      .gte('max_amount', validatedData.loanAmount)
+      .lte('min_loan_amount', validatedData.loanAmount)
+      .gte('max_loan_amount', validatedData.loanAmount)
       .lte('min_term_months', validatedData.termMonths)
       .gte('max_term_months', validatedData.termMonths)
-      .order('base_rate', { ascending: true })
+      .order('interest_rate', { ascending: true })
 
     if (error) {
       console.error('Database error:', error)
@@ -242,7 +259,7 @@ async function handleCompareRates(supabase: any, validatedQuery: any) {
       `)
       .eq('is_active', true)
       .eq('banks.is_active', true)
-      .order('base_rate', { ascending: true })
+      .order('interest_rate', { ascending: true })
 
     if (error) {
       console.error('Database error:', error)
@@ -264,7 +281,7 @@ async function handleCompareRates(supabase: any, validatedQuery: any) {
     // Calculate market statistics
     const marketStats = Object.keys(ratesByType).reduce((stats: any, loanType: string) => {
       const typeRates = ratesByType[loanType]
-      const baseRates = typeRates.map((r: any) => r.base_rate)
+      const baseRates = typeRates.map((r: any) => r.interest_rate)
       
       stats[loanType] = {
         averageRate: baseRates.reduce((sum: number, rate: number) => sum + rate, 0) / baseRates.length,

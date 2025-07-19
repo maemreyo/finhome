@@ -1,7 +1,7 @@
 // src/lib/services/scenarioService.ts
 // Service for financial scenario management and analysis
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/lib/supabase/types'
 import type {
   FinancialScenario,
@@ -45,7 +45,7 @@ export interface ScenarioStats {
 }
 
 class ScenarioService {
-  private supabase = createClientComponentClient<Database>()
+  private supabase = createClient()
 
   /**
    * Get all scenarios for a user with optional filtering
@@ -84,7 +84,7 @@ class ScenarioService {
       throw new Error(`Error fetching user scenarios: ${error.message}`)
     }
 
-    return (data || []).map(this.mapToFinancialScenario)
+    return (data || []).map(item => this.mapToFinancialScenario(item))
   }
 
   /**
@@ -358,7 +358,7 @@ class ScenarioService {
       throw new Error(`Error fetching scenario stats: ${error.message}`)
     }
 
-    const scenarios = (data || []).map(this.mapToFinancialScenario)
+    const scenarios = (data || []).map(item => this.mapToFinancialScenario(item))
     
     const totalScenarios = scenarios.length
     const activeScenarios = scenarios.filter(s => s.status === 'active').length
