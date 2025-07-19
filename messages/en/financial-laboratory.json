@@ -1,0 +1,88 @@
+{
+  "FinancialLaboratory": {
+    "header": {
+      "title": "Financial Laboratory",
+      "description": "Simulate \"What if?\" scenarios to optimize your financial plan"
+    },
+    "currentLoan": {
+      "title": "Current Loan Information",
+      "principal": "Loan Amount",
+      "interestRate": "Interest Rate",
+      "loanTerm": "Loan Term",
+      "loanTermValue": "{years} years",
+      "monthlyPayment": "Monthly Payment"
+    },
+    "tabs": {
+      "prepayment": "Early Repayment",
+      "refinance": "Refinancing",
+      "stressTest": "Stress Test"
+    },
+    "prepayment": {
+      "title": "Early Repayment Simulation",
+      "description": "See the impact of paying extra monthly or making one-time payments",
+      "monthlyExtra": "Extra Monthly Payment",
+      "oneTimePayment": "One-time Payment",
+      "paymentMonth": "Payment Month",
+      "simulationResults": "Simulation Results",
+      "newLoanTerm": "New loan term",
+      "timeReduction": "Time reduction",
+      "interestSaved": "Interest saved",
+      "totalSaved": "Total saved",
+      "loanTermFormat": "{years} years {months} months",
+      "effectivenessEvaluation": "Effectiveness Evaluation",
+      "interestSavingPercentage": "Save {percentage}% of total interest",
+      "timeReductionPercentage": "Reduce {percentage}% of loan term"
+    },
+    "refinance": {
+      "title": "Refinancing Analysis",
+      "description": "Evaluate the effectiveness of refinancing with a new interest rate",
+      "newInterestRate": "New Interest Rate (%)",
+      "closingCosts": "Refinancing Costs",
+      "rateComparison": "Rate Comparison",
+      "currentRate": "Current rate",
+      "newRate": "New rate",
+      "rateDifference": "Difference",
+      "worthRefinancing": "Worth Refinancing",
+      "notWorthRefinancing": "Not Worth Refinancing",
+      "oldMonthlyPayment": "Old monthly payment",
+      "newMonthlyPayment": "New monthly payment",
+      "monthlySavings": "Monthly savings",
+      "breakEvenAfter": "Break even after",
+      "breakEvenMonths": "{months} months",
+      "totalSavings": "Total savings",
+      "recommendation": "Recommendation",
+      "recommendations": {
+        "significantSavings": "Refinancing will provide significant savings",
+        "reasonableBreakEven": "Break-even time is reasonable",
+        "highCosts": "Refinancing costs are higher than benefits",
+        "waitForBetterRates": "Should wait for further rate decreases"
+      }
+    },
+    "stressTest": {
+      "title": "Market Stress Test",
+      "description": "Assess payment capacity when interest rates change",
+      "scenarios": {
+        "mildIncrease": "Mild Increase",
+        "moderateIncrease": "Moderate Increase",
+        "severeIncrease": "Severe Increase",
+        "mildDecrease": "Mild Decrease",
+        "severeDecrease": "Severe Decrease"
+      },
+      "riskLevels": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "results": {
+        "newRate": "New rate",
+        "monthlyPayment": "Monthly payment",
+        "change": "Change"
+      },
+      "riskDescriptions": {
+        "low": "Good payment capacity, no significant risks",
+        "medium": "Consider carefully, may impact budget",
+        "high": "High risk, need contingency plan"
+      }
+    }
+  }
+}

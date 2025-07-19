@@ -263,9 +263,10 @@ export default function ChartsPage() {
                   </p>
                   
                   <AmortizationChart
-                    amortizationData={mockLoanData.amortizationData}
-                    totalLoan={mockLoanData.totalLoan}
+                    loanAmount={mockLoanData.totalLoan}
                     interestRate={mockLoanData.interestRate}
+                    loanTermMonths={240}
+                    monthlyPayment={mockLoanData.totalLoan * (8.5 / 100 / 12 * Math.pow(1 + 8.5 / 100 / 12, 240)) / (Math.pow(1 + 8.5 / 100 / 12, 240) - 1)}
                   />
                 </CardContent>
               </Card>

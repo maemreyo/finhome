@@ -59,6 +59,7 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
   onChartTypeChange,
   className
 }) => {
+  const t = useTranslations('ScenarioChart')
   const selectedScenarios = useMemo(() => {
     return scenarios.filter(scenario => selectedScenarioIds.includes(scenario.id))
   }, [scenarios, selectedScenarioIds])
@@ -232,15 +233,15 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
   const getChartDescription = () => {
     switch (chartType) {
       case 'bar':
-        return 'Compare monthly payments and total interest across scenarios'
+        return t('chartDescriptions.bar')
       case 'line':
-        return 'Track cumulative interest payments over time'
+        return t('chartDescriptions.line')
       case 'pie':
-        return 'View total cost distribution across scenarios'
+        return t('chartDescriptions.pie')
       case 'area':
-        return 'Visualize cumulative interest growth over time'
+        return t('chartDescriptions.area')
       default:
-        return 'Compare scenarios visually'
+        return t('chartDescriptions.default')
     }
   }
 
@@ -250,15 +251,15 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
-            Scenario Charts
+            {t('title')}
           </CardTitle>
           <CardDescription>
-            Select scenarios to view visual comparisons
+            {t('emptyState.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <p className="text-gray-500">No scenarios selected for visualization</p>
+            <p className="text-gray-500">{t('emptyState.message')}</p>
           </div>
         </CardContent>
       </Card>
@@ -272,7 +273,7 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
           <div>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5" />
-              Scenario Charts
+              {t('title')}
             </CardTitle>
             <CardDescription>
               {getChartDescription()}
@@ -281,11 +282,11 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
               <Download className="w-4 h-4 mr-2" />
-              Export
+              {t('actions.export')}
             </Button>
             <Button variant="outline" size="sm">
               <Maximize2 className="w-4 h-4 mr-2" />
-              Fullscreen
+              {t('actions.fullscreen')}
             </Button>
           </div>
         </div>
@@ -295,19 +296,19 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="bar" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              Bar
+              {t('chartTypes.bar')}
             </TabsTrigger>
             <TabsTrigger value="line" className="flex items-center gap-2">
               <LineChartIcon className="w-4 h-4" />
-              Line
+              {t('chartTypes.line')}
             </TabsTrigger>
             <TabsTrigger value="pie" className="flex items-center gap-2">
               <PieChartIcon className="w-4 h-4" />
-              Pie
+              {t('chartTypes.pie')}
             </TabsTrigger>
             <TabsTrigger value="area" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
-              Area
+              {t('chartTypes.area')}
             </TabsTrigger>
           </TabsList>
 
@@ -340,12 +341,12 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
 
         {/* Key Insights */}
         <div className="mt-6 pt-6 border-t">
-          <h4 className="font-medium mb-3">Key Insights</h4>
+          <h4 className="font-medium mb-3">{t('insights.title')}</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-900">Lowest Cost</span>
+                <span className="text-sm font-medium text-blue-900">{t('insights.lowestCost')}</span>
               </div>
               <div className="text-sm text-blue-700">
                 {selectedScenarios.reduce((min, scenario) => 
@@ -357,7 +358,7 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-4 h-4 text-green-600" />
-                <span className="text-sm font-medium text-green-900">Shortest Duration</span>
+                <span className="text-sm font-medium text-green-900">{t('insights.shortestDuration')}</span>
               </div>
               <div className="text-sm text-green-700">
                 {selectedScenarios.reduce((min, scenario) => 
@@ -369,7 +370,7 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
             <div className="bg-purple-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-4 h-4 text-purple-600" />
-                <span className="text-sm font-medium text-purple-900">Lowest Risk</span>
+                <span className="text-sm font-medium text-purple-900">{t('insights.lowestRisk')}</span>
               </div>
               <div className="text-sm text-purple-700">
                 {selectedScenarios.find(s => s.riskLevel === 'low')?.plan_name || 

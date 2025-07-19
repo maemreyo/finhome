@@ -70,8 +70,11 @@ export default async function LocaleLayout({
   
   let messages;
   try {
-    messages = (await import(`../../../messages/${locale}.json`)).default;
+    // Use the same message loading logic as request.ts
+    const { loadMessages } = await import('@/lib/i18n-utils');
+    messages = await loadMessages(locale);
   } catch (error) {
+    console.error('Failed to load messages in layout:', error);
     notFound();
   }
   

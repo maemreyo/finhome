@@ -40,6 +40,10 @@ export const AVAILABLE_NAMESPACES: Record<string, NamespaceConfig> = {
     name: 'charts', 
     description: 'Charts and visualization content (Charts, ScenarioComparison)',
   },
+  'financial-laboratory': {
+    name: 'financial-laboratory',
+    description: 'Financial Laboratory what-if analysis tool (FinancialLaboratory)',
+  },
 };
 
 /**
@@ -50,14 +54,23 @@ export async function loadNamespaceMessages(
   namespaces: string[] = Object.keys(AVAILABLE_NAMESPACES)
 ): Promise<Record<string, any>> {
   const messages = {};
+  const loadedNamespaces: string[] = [];
+  const failedNamespaces: string[] = [];
   
   for (const namespace of namespaces) {
     try {
       const namespaceMessages = (await import(`../../messages/${locale}/${namespace}.json`)).default;
       Object.assign(messages, namespaceMessages);
+      loadedNamespaces.push(namespace);
     } catch (error) {
       console.warn(`Failed to load namespace ${namespace} for locale ${locale}:`, error);
+      failedNamespaces.push(namespace);
     }
+  }
+  
+  console.log(`Namespace loading summary for ${locale}: loaded ${loadedNamespaces.length}/${namespaces.length} (${loadedNamespaces.join(', ')})`);
+  if (failedNamespaces.length > 0) {
+    console.warn(`Failed namespaces for ${locale}: ${failedNamespaces.join(', ')}`);
   }
   
   return messages;
@@ -97,6 +110,8 @@ export function validateNamespaceMessages(
           return ['NewPlanPage', 'PlanDetailView', 'CreatePlanForm', 'PlansList'].includes(key);
         case 'charts':
           return ['Charts', 'ScenarioComparisonTable'].includes(key);
+        case 'financial-laboratory':
+          return key === 'FinancialLaboratory';
         default:
           return false;
       }
@@ -114,6 +129,54 @@ export function validateNamespaceMessages(
 }
 
 /**
+ * Centralized message loading function used by both request.ts and layout.tsx
+ */
+export async function loadMessages(locale: string): Promise<Record<string, any>> {
+  // Check if namespace loading is enabled via environment variable
+  const useNamespaces = process.env.NEXT_PUBLIC_I18N_NAMESPACES === 'true';
+  
+  if (useNamespaces) {
+    console.log(`Loading i18n with namespace mode for locale: ${locale}`);
+    
+    try {
+      // Load all namespace files
+      const namespaces = Object.keys(AVAILABLE_NAMESPACES);
+      const messages = await loadNamespaceMessages(locale, namespaces);
+      
+      // In namespace mode, check if we loaded at least some messages
+      if (Object.keys(messages).length === 0) {
+        throw new Error('No namespace messages loaded');
+      }
+      
+      // Validate namespace messages
+      const validation = validateNamespaceMessages(messages, namespaces);
+      
+      if (!validation.isValid) {
+        console.warn(`Missing namespaces for ${locale}:`, validation.missingNamespaces);
+        // Continue with partial namespace loading if we have some content
+      }
+      
+      console.log(`Successfully loaded ${namespaces.length - validation.missingNamespaces.length}/${namespaces.length} namespaces for ${locale}`);
+      return messages;
+    } catch (error) {
+      console.error(`Namespace loading failed completely for ${locale}:`, error);
+      // Namespace mode failed, but don't fall back to single files
+      throw new Error(`Namespace mode enabled but failed to load any namespaces for ${locale}`);
+    }
+  }
+  
+  try {
+    // Load the single file (default behavior)
+    const messages = (await import(`../../messages/${locale}.json`)).default;
+    console.log(`Loaded single i18n file for locale: ${locale}`);
+    return messages;
+  } catch (error) {
+    console.error(`Failed to load single file for locale ${locale}:`, error);
+    throw new Error(`Failed to load messages for locale ${locale}`);
+  }
+}
+
+/**
  * Get file size information for namespace analysis
  */
 export function getNamespaceStats(): Record<string, { description: string; estimatedSize: string }> {
@@ -126,5 +189,6 @@ export function getNamespaceStats(): Record<string, { description: string; estim
     marketing: { description: AVAILABLE_NAMESPACES.marketing.description, estimatedSize: '~16.2KB' },
     plans: { description: AVAILABLE_NAMESPACES.plans.description, estimatedSize: '~26.8KB' },
     charts: { description: AVAILABLE_NAMESPACES.charts.description, estimatedSize: '~1.9KB' },
+    'financial-laboratory': { description: AVAILABLE_NAMESPACES['financial-laboratory'].description, estimatedSize: '~2.1KB' },
   };
 }

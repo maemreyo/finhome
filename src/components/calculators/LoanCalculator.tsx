@@ -668,9 +668,10 @@ export const LoanCalculator: React.FC<LoanCalculatorProps> = ({
 
             <TabsContent value="amortization" className="space-y-4">
               <AmortizationChart
-                amortizationData={amortizationSchedule}
-                totalLoan={calculation.principal}
+                loanAmount={calculation.principal}
                 interestRate={calculation.interestRate}
+                loanTermMonths={calculation.termMonths}
+                monthlyPayment={calculation.monthlyPayment}
               />
               
               <Card>

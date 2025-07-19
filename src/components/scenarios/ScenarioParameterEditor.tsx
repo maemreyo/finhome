@@ -198,24 +198,24 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
     const errors: string[] = []
 
     if (parameters.purchasePrice <= 0) {
-      errors.push('Purchase price must be greater than 0')
+      errors.push(t('validation.purchasePriceRequired'))
     }
 
     if (parameters.downPayment >= parameters.purchasePrice) {
-      errors.push('Down payment must be less than purchase price')
+      errors.push(t('validation.downPaymentTooHigh'))
     }
 
     if (parameters.interestRate <= 0 || parameters.interestRate > 30) {
-      errors.push('Interest rate must be between 0% and 30%')
+      errors.push(t('validation.interestRateRange'))
     }
 
     if (parameters.loanTermYears < 1 || parameters.loanTermYears > 30) {
-      errors.push('Loan term must be between 1 and 30 years')
+      errors.push(t('validation.loanTermRange'))
     }
 
     const dtiRatio = (calculatedScenario.calculatedMetrics?.monthlyPayment || 0) / parameters.monthlyIncome * 100
     if (dtiRatio > 50) {
-      errors.push('Debt-to-income ratio exceeds 50% - this may not be feasible')
+      errors.push(t('validation.dtiTooHigh'))
     }
 
     setValidationErrors(errors)
@@ -310,10 +310,10 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
           <div>
             <CardTitle className="flex items-center gap-2">
               <Settings className="w-5 h-5" />
-              Scenario Parameters
+              {t('title')}
             </CardTitle>
             <CardDescription>
-              Adjust parameters to create custom scenarios
+              {t('description')}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -322,7 +322,7 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
               size="sm"
               onClick={() => setPreviewMode(!previewMode)}
             >
-              {previewMode ? 'Edit' : 'Preview'}
+              {previewMode ? t('actions.edit') : t('actions.preview')}
             </Button>
             <Button
               variant="outline"
@@ -331,14 +331,14 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
               disabled={isCalculating}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              Reset
+              {t('actions.reset')}
             </Button>
             <Button
               onClick={handleSave}
               disabled={validationErrors.length > 0 || isCalculating}
             >
               <Save className="w-4 h-4 mr-2" />
-              Save
+              {t('actions.save')}
             </Button>
           </div>
         </div>
@@ -355,19 +355,19 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
             >
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Monthly Payment</Label>
+                  <Label className="text-sm font-medium">{t('preview.monthlyPayment')}</Label>
                   <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}</div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Total Interest</Label>
+                  <Label className="text-sm font-medium">{t('preview.totalInterest')}</Label>
                   <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}</div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Total Cost</Label>
+                  <Label className="text-sm font-medium">{t('preview.totalCost')}</Label>
                   <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.calculatedMetrics?.totalCost || 0)}</div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Risk Level</Label>
+                  <Label className="text-sm font-medium">{t('preview.riskLevel')}</Label>
                   <Badge className={cn('text-sm', getRiskLevelColor(calculatedScenario.riskLevel))}>
                     {calculatedScenario.riskLevel.toUpperCase()}
                   </Badge>
@@ -375,16 +375,16 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
               </div>
               
               <div className="pt-4 border-t">
-                <h4 className="font-medium mb-2">Key Metrics</h4>
+                <h4 className="font-medium mb-2">{t('preview.keyMetrics')}</h4>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600">Monthly Payment:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}
+                    <span className="text-gray-600">{t('preview.monthlyPayment')}:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}
                   </div>
                   <div>
-                    <span className="text-gray-600">Total Interest:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}
+                    <span className="text-gray-600">{t('preview.totalInterest')}:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}
                   </div>
                   <div>
-                    <span className="text-gray-600">Total Cost:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalCost || 0)}
+                    <span className="text-gray-600">{t('preview.totalCost')}:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalCost || 0)}
                   </div>
                 </div>
               </div>
@@ -398,35 +398,35 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
             >
               <Tabs defaultValue="basic" className="w-full">
                 <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="basic">Basic</TabsTrigger>
-                  <TabsTrigger value="loan">Loan</TabsTrigger>
-                  <TabsTrigger value="income">Income</TabsTrigger>
-                  <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                  <TabsTrigger value="basic">{t('tabs.basic')}</TabsTrigger>
+                  <TabsTrigger value="loan">{t('tabs.loan')}</TabsTrigger>
+                  <TabsTrigger value="income">{t('tabs.income')}</TabsTrigger>
+                  <TabsTrigger value="advanced">{t('tabs.advanced')}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="basic" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Scenario Name</Label>
+                      <Label htmlFor="name">{t('fields.scenarioName')}</Label>
                       <Input
                         id="name"
                         value={parameters.name}
                         onChange={(e) => handleParameterChange('name', e.target.value)}
-                        placeholder="Enter scenario name"
+                        placeholder={t('fields.scenarioNamePlaceholder')}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="type">Scenario Type</Label>
+                      <Label htmlFor="type">{t('fields.scenarioType')}</Label>
                       <Select value={parameters.type} onValueChange={(value) => handleParameterChange('type', value)}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="baseline">Baseline</SelectItem>
-                          <SelectItem value="optimistic">Optimistic</SelectItem>
-                          <SelectItem value="pessimistic">Pessimistic</SelectItem>
-                          <SelectItem value="alternative">Alternative</SelectItem>
-                          <SelectItem value="stress_test">Stress Test</SelectItem>
+                          <SelectItem value="baseline">{t('scenarioTypes.baseline')}</SelectItem>
+                          <SelectItem value="optimistic">{t('scenarioTypes.optimistic')}</SelectItem>
+                          <SelectItem value="pessimistic">{t('scenarioTypes.pessimistic')}</SelectItem>
+                          <SelectItem value="alternative">{t('scenarioTypes.alternative')}</SelectItem>
+                          <SelectItem value="stress_test">{t('scenarioTypes.stressTest')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -434,53 +434,53 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="purchasePrice">Purchase Price</Label>
+                      <Label htmlFor="purchasePrice">{t('fields.purchasePrice')}</Label>
                       <Input
                         id="purchasePrice"
                         type="number"
                         value={parameters.purchasePrice}
                         onChange={(e) => handleParameterChange('purchasePrice', Number(e.target.value))}
-                        placeholder="Enter purchase price"
+                        placeholder={t('fields.purchasePricePlaceholder')}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="downPayment">Down Payment</Label>
+                      <Label htmlFor="downPayment">{t('fields.downPayment')}</Label>
                       <Input
                         id="downPayment"
                         type="number"
                         value={parameters.downPayment}
                         onChange={(e) => handleParameterChange('downPayment', Number(e.target.value))}
-                        placeholder="Enter down payment"
+                        placeholder={t('fields.downPaymentPlaceholder')}
                       />
                       <div className="text-sm text-gray-600">
-                        {((parameters.downPayment / parameters.purchasePrice) * 100).toFixed(1)}% of purchase price
+                        {t('fields.downPaymentPercentage', { percentage: ((parameters.downPayment / parameters.purchasePrice) * 100).toFixed(1) })}
                       </div>
                     </div>
                   </div>
 
                   <div className="pt-4 border-t">
-                    <h4 className="font-medium mb-3">Quick Presets</h4>
+                    <h4 className="font-medium mb-3">{t('presets.title')}</h4>
                     <div className="grid grid-cols-3 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handlePresetScenario('conservative')}
                       >
-                        Conservative
+                        {t('presets.conservative')}
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handlePresetScenario('moderate')}
                       >
-                        Moderate
+                        {t('presets.moderate')}
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handlePresetScenario('aggressive')}
                       >
-                        Aggressive
+                        {t('presets.aggressive')}
                       </Button>
                     </div>
                   </div>
@@ -489,7 +489,7 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                 <TabsContent value="loan" className="space-y-4">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="interestRate">Interest Rate (%)</Label>
+                      <Label htmlFor="interestRate">{t('fields.interestRate')}</Label>
                       <div className="px-3">
                         <Slider
                           value={[parameters.interestRate]}
@@ -501,11 +501,11 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                         />
                       </div>
                       <div className="text-sm text-gray-600">
-                        Current: {parameters.interestRate.toFixed(1)}%
+                        {t('fields.currentValue', { value: `${parameters.interestRate.toFixed(1)}%` })}
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="loanTermYears">Loan Term (Years)</Label>
+                      <Label htmlFor="loanTermYears">{t('fields.loanTerm')}</Label>
                       <div className="px-3">
                         <Slider
                           value={[parameters.loanTermYears]}
@@ -517,11 +517,11 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                         />
                       </div>
                       <div className="text-sm text-gray-600">
-                        Current: {parameters.loanTermYears} years
+                        {t('fields.currentValue', { value: `${parameters.loanTermYears} ${t('fields.years')}` })}
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>Loan Amount (Calculated)</Label>
+                      <Label>{t('fields.loanAmount')}</Label>
                       <div className="p-3 bg-gray-50 rounded-md">
                         {formatCurrency(parameters.loanAmount)}
                       </div>
@@ -532,34 +532,34 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                 <TabsContent value="income" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="monthlyIncome">Monthly Income</Label>
+                      <Label htmlFor="monthlyIncome">{t('fields.monthlyIncome')}</Label>
                       <Input
                         id="monthlyIncome"
                         type="number"
                         value={parameters.monthlyIncome}
                         onChange={(e) => handleParameterChange('monthlyIncome', Number(e.target.value))}
-                        placeholder="Enter monthly income"
+                        placeholder={t('fields.monthlyIncomePlaceholder')}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="monthlyExpenses">Monthly Expenses</Label>
+                      <Label htmlFor="monthlyExpenses">{t('fields.monthlyExpenses')}</Label>
                       <Input
                         id="monthlyExpenses"
                         type="number"
                         value={parameters.monthlyExpenses}
                         onChange={(e) => handleParameterChange('monthlyExpenses', Number(e.target.value))}
-                        placeholder="Enter monthly expenses"
+                        placeholder={t('fields.monthlyExpensesPlaceholder')}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="expectedRentalIncome">Expected Rental Income</Label>
+                    <Label htmlFor="expectedRentalIncome">{t('fields.expectedRentalIncome')}</Label>
                     <Input
                       id="expectedRentalIncome"
                       type="number"
                       value={parameters.expectedRentalIncome}
                       onChange={(e) => handleParameterChange('expectedRentalIncome', Number(e.target.value))}
-                      placeholder="Enter expected rental income"
+                      placeholder={t('fields.expectedRentalIncomePlaceholder')}
                     />
                   </div>
                 </TabsContent>
@@ -567,7 +567,7 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                 <TabsContent value="advanced" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="propertyAppreciationRate">Property Appreciation Rate (%)</Label>
+                      <Label htmlFor="propertyAppreciationRate">{t('fields.propertyAppreciationRate')}</Label>
                       <div className="px-3">
                         <Slider
                           value={[parameters.propertyAppreciationRate]}
@@ -579,11 +579,11 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                         />
                       </div>
                       <div className="text-sm text-gray-600">
-                        Current: {parameters.propertyAppreciationRate}%
+                        {t('fields.currentValue', { value: `${parameters.propertyAppreciationRate}%` })}
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="rentGrowthRate">Rent Growth Rate (%)</Label>
+                      <Label htmlFor="rentGrowthRate">{t('fields.rentGrowthRate')}</Label>
                       <div className="px-3">
                         <Slider
                           value={[parameters.rentGrowthRate]}
@@ -595,13 +595,13 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                         />
                       </div>
                       <div className="text-sm text-gray-600">
-                        Current: {parameters.rentGrowthRate}%
+                        {t('fields.currentValue', { value: `${parameters.rentGrowthRate}%` })}
                       </div>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="vacancyRate">Vacancy Rate (%)</Label>
+                      <Label htmlFor="vacancyRate">{t('fields.vacancyRate')}</Label>
                       <div className="px-3">
                         <Slider
                           value={[parameters.vacancyRate]}
@@ -613,11 +613,11 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                         />
                       </div>
                       <div className="text-sm text-gray-600">
-                        Current: {parameters.vacancyRate}%
+                        {t('fields.currentValue', { value: `${parameters.vacancyRate}%` })}
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="propertyTax">Property Tax (%)</Label>
+                      <Label htmlFor="propertyTax">{t('fields.propertyTax')}</Label>
                       <div className="px-3">
                         <Slider
                           value={[parameters.propertyTax]}
@@ -629,7 +629,7 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                         />
                       </div>
                       <div className="text-sm text-gray-600">
-                        Current: {parameters.propertyTax}%
+                        {t('fields.currentValue', { value: `${parameters.propertyTax}%` })}
                       </div>
                     </div>
                   </div>

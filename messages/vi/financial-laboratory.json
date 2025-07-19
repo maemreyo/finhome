@@ -1,0 +1,88 @@
+{
+  "FinancialLaboratory": {
+    "header": {
+      "title": "Phòng Thí Nghiệm Tài Chính",
+      "description": "Mô phỏng các tình huống \"Điều gì sẽ xảy ra nếu?\" để tối ưu kế hoạch tài chính"
+    },
+    "currentLoan": {
+      "title": "Thông Tin Khoản Vay Hiện Tại",
+      "principal": "Số tiền vay",
+      "interestRate": "Lãi suất",
+      "loanTerm": "Thời gian vay",
+      "loanTermValue": "{years} năm",
+      "monthlyPayment": "Trả hàng tháng"
+    },
+    "tabs": {
+      "prepayment": "Trả Nợ Sớm",
+      "refinance": "Tái Cơ Cấu",
+      "stressTest": "Kiểm Tra Stress"
+    },
+    "prepayment": {
+      "title": "Mô Phỏng Trả Nợ Sớm",
+      "description": "Xem tác động của việc trả thêm tiền hàng tháng hoặc thanh toán một lần",
+      "monthlyExtra": "Trả thêm hàng tháng",
+      "oneTimePayment": "Thanh toán một lần",
+      "paymentMonth": "Tháng thanh toán",
+      "simulationResults": "Kết Quả Mô Phỏng",
+      "newLoanTerm": "Thời gian vay mới",
+      "timeReduction": "Rút ngắn",
+      "interestSaved": "Lãi tiết kiệm",
+      "totalSaved": "Tổng tiết kiệm",
+      "loanTermFormat": "{years} năm {months} tháng",
+      "effectivenessEvaluation": "Đánh Giá Hiệu Quả",
+      "interestSavingPercentage": "Tiết kiệm {percentage}% tổng lãi",
+      "timeReductionPercentage": "Rút ngắn {percentage}% thời gian vay"
+    },
+    "refinance": {
+      "title": "Phân Tích Tái Cơ Cấu",
+      "description": "Đánh giá hiệu quả của việc tái cơ cấu khoản vay với lãi suất mới",
+      "newInterestRate": "Lãi suất mới (%)",
+      "closingCosts": "Chi phí tái cơ cấu",
+      "rateComparison": "So Sánh Lãi Suất",
+      "currentRate": "Lãi suất hiện tại",
+      "newRate": "Lãi suất mới",
+      "rateDifference": "Chênh lệch",
+      "worthRefinancing": "Đáng Tái Cơ Cấu",
+      "notWorthRefinancing": "Không Đáng Tái Cơ Cấu",
+      "oldMonthlyPayment": "Trả hàng tháng cũ",
+      "newMonthlyPayment": "Trả hàng tháng mới",
+      "monthlySavings": "Tiết kiệm hàng tháng",
+      "breakEvenAfter": "Hòa vốn sau",
+      "breakEvenMonths": "{months} tháng",
+      "totalSavings": "Tổng tiết kiệm",
+      "recommendation": "Khuyến Nghị",
+      "recommendations": {
+        "significantSavings": "Tái cơ cấu sẽ tiết kiệm đáng kể",
+        "reasonableBreakEven": "Thời gian hòa vốn hợp lý",
+        "highCosts": "Chi phí tái cơ cấu cao hơn lợi ích",
+        "waitForBetterRates": "Nên chờ lãi suất giảm thêm"
+      }
+    },
+    "stressTest": {
+      "title": "Kiểm Tra Stress Thị Trường",
+      "description": "Đánh giá khả năng chi trả khi lãi suất thay đổi",
+      "scenarios": {
+        "mildIncrease": "Tăng nhẹ",
+        "moderateIncrease": "Tăng vừa",
+        "severeIncrease": "Tăng mạnh",
+        "mildDecrease": "Giảm nhẹ",
+        "severeDecrease": "Giảm mạnh"
+      },
+      "riskLevels": {
+        "low": "Thấp",
+        "medium": "Trung bình",
+        "high": "Cao"
+      },
+      "results": {
+        "newRate": "Lãi suất mới",
+        "monthlyPayment": "Trả hàng tháng",
+        "change": "Tăng/giảm"
+      },
+      "riskDescriptions": {
+        "low": "Khả năng chi trả tốt, không có rủi ro đáng kể",
+        "medium": "Cần cân nhắc kỹ, có thể ảnh hưởng đến ngân sách",
+        "high": "Rủi ro cao, cần chuẩn bị kế hoạch dự phòng"
+      }
+    }
+  }
+}

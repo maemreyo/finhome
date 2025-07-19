@@ -260,7 +260,7 @@ export default function AdvancedScenarioCharts({
               />
               <Tooltip 
                 formatter={(value, name) => [
-                  name === t('riskReturnAnalysis.xAxisLabel') ? t('riskReturnAnalysis.tooltipRisk', { value }) : t('riskReturnAnalysis.tooltipReturn', { value }),
+                  name === t('riskReturnAnalysis.xAxisLabel') ? t('riskReturnAnalysis.tooltipRisk', { value: String(value) }) : t('riskReturnAnalysis.tooltipReturn', { value: String(value) }),
                   name
                 ]}
                 labelFormatter={() => ''}
