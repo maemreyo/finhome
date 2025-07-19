@@ -499,6 +499,105 @@
         }
       }
     },
+    "Header": {
+      "notifications": "Notifications",
+      "defaultUser": "User",
+      "logout": "Log out"
+    },
+    "StatsCard": {
+      "fromLastMonth": "from last month"
+    },
+    "PropertyPortfolio": {
+      "title": "Property Portfolio",
+      "totalValue": "Total Value",
+      "averageROI": "Average ROI",
+      "all": "All",
+      "favorites": "Favorites",
+      "propertyTypes": {
+        "apartment": "Apartment",
+        "house": "House",
+        "villa": "Villa",
+        "townhouse": "Townhouse"
+      },
+      "status": {
+        "interested": "Interested",
+        "planning": "Planning",
+        "negotiating": "Negotiating",
+        "purchased": "Purchased"
+      },
+      "details": {
+        "type": "Type:",
+        "area": "Area:",
+        "bedrooms": "Bedrooms:",
+        "price": "Price:",
+        "pricePerSqm": "Price/m²:",
+        "expectedROI": "Expected ROI:"
+      },
+      "actions": {
+        "view": "View",
+        "createPlan": "Create Plan",
+        "findProperties": "Find Properties",
+        "viewAll": "View All Properties"
+      },
+      "empty": {
+        "noProperties": "No properties yet",
+        "noFavorites": "No favorite properties",
+        "description": "Start searching for properties that suit you",
+        "favoriteDescription": "Add properties to favorites list to track"
+      },
+      "lastViewed": "Viewed"
+    },
+    "RecentActivity": {
+      "title": "Recent Activity",
+      "newBadge": "new",
+      "achievementUnlocked": "New achievement unlocked!",
+      "planCreated": "New plan created",
+      "rateComparison": "Rate comparison completed",
+      "propertyViewed": "Property viewed",
+      "goalReached": "Goal reached",
+      "empty": {
+        "title": "No activity yet",
+        "description": "Start creating financial plans to track activity",
+        "action": "Create First Plan"
+      },
+      "actions": {
+        "viewAll": "View All Activity"
+      },
+      "timeAgo": {
+        "minutesAgo": "{minutes} minutes ago",
+        "hoursAgo": "{hours} hours ago",
+        "daysAgo": "{days} days ago"
+      }
+    },
+    "FinancialOverview": {
+      "quickStats": {
+        "plans": "Plans",
+        "expectedROI": "Expected ROI",
+        "investment": "Investment",
+        "monthlyPayment": "Monthly Payment"
+      },
+      "savingsProgress": {
+        "title": "Savings Progress",
+        "saved": "Saved:",
+        "remaining": "Remaining:",
+        "target": "Target:",
+        "estimatedCompletion": "Estimated completion:"
+      },
+      "nextMilestone": {
+        "title": "Down payment for first home",
+        "deadline": "Deadline:",
+        "completed": "completed"
+      },
+      "quickActions": {
+        "title": "Quick Actions",
+        "findProperty": "Find Property",
+        "createPlan": "Create New Plan", 
+        "compareRates": "Compare Rates",
+        "viewPortfolio": "View Portfolio",
+        "increaseSavings": "Increase Savings",
+        "recalculate": "Recalculate"
+      }
+    },
     "enhancedScenarios": {
       "title": "Enhanced Scenario Analysis",
       "description": "Advanced scenario comparison with interactive charts and analysis",

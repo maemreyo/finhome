@@ -1,5 +1,5 @@
 // src/components/dashboard/FinancialOverview.tsx
-// Comprehensive financial overview widget for the main dashboard
+// Comprehensive financial overview widget for the main dashboard with i18n support
 
 'use client'
 
@@ -17,6 +17,7 @@ import {
   ArrowRight,
   Plus
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -24,6 +25,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { formatCurrency } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { DashboardService } from '@/lib/services/dashboardService'
 
 interface FinancialMetrics {
   totalPlans: number
@@ -51,32 +53,76 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
 }) => {
   const [metrics, setMetrics] = useState<FinancialMetrics | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const t = useTranslations('Dashboard.FinancialOverview')
 
-  // Mock data - in real app, this would fetch from API
+  // Load real data from database
   useEffect(() => {
     const loadMetrics = async () => {
       setIsLoading(true)
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      const mockMetrics: FinancialMetrics = {
-        totalPlans: 3,
-        totalInvestment: 2400000000, // 2.4B VND
-        expectedROI: 8.5,
-        monthlyPayments: 18500000, // 18.5M VND
-        savingsProgress: 850000000, // 850M VND
-        savingsTarget: 1200000000, // 1.2B VND
-        nextMilestone: {
-          title: 'Vốn tự có cho căn nhà đầu tiên',
-          target: 600000000, // 600M VND
-          current: 450000000, // 450M VND
-          dueDate: '2024-12-31'
+      try {
+        if (userId) {
+          // Load real metrics from database
+          const dashboardData = await DashboardService.getDashboardMetrics(userId)
+          
+          const realMetrics: FinancialMetrics = {
+            totalPlans: dashboardData.total_plans,
+            totalInvestment: dashboardData.total_portfolio_value,
+            expectedROI: dashboardData.portfolio_roi,
+            monthlyPayments: dashboardData.monthly_rental_income,
+            savingsProgress: dashboardData.total_portfolio_value * 0.7, // Estimate current savings
+            savingsTarget: dashboardData.total_portfolio_value || 1200000000, // Default target
+            nextMilestone: {
+              title: t('nextMilestone.title'),
+              target: 600000000, // 600M VND
+              current: dashboardData.total_portfolio_value * 0.6, // Estimate milestone progress
+              dueDate: '2024-12-31'
+            }
+          }
+          
+          setMetrics(realMetrics)
+        } else {
+          // Fallback to demo data for unauthenticated users
+          const demoMetrics: FinancialMetrics = {
+            totalPlans: 3,
+            totalInvestment: 2400000000, // 2.4B VND
+            expectedROI: 8.5,
+            monthlyPayments: 18500000, // 18.5M VND
+            savingsProgress: 850000000, // 850M VND
+            savingsTarget: 1200000000, // 1.2B VND
+            nextMilestone: {
+              title: t('nextMilestone.title'),
+              target: 600000000, // 600M VND
+              current: 450000000, // 450M VND
+              dueDate: '2024-12-31'
+            }
+          }
+          
+          setMetrics(demoMetrics)
         }
+      } catch (error) {
+        console.error('Error loading dashboard metrics:', error)
+        
+        // Fallback to demo data on error
+        const fallbackMetrics: FinancialMetrics = {
+          totalPlans: 0,
+          totalInvestment: 0,
+          expectedROI: 0,
+          monthlyPayments: 0,
+          savingsProgress: 0,
+          savingsTarget: 1200000000, // Default target
+          nextMilestone: {
+            title: t('nextMilestone.title'),
+            target: 600000000,
+            current: 0,
+            dueDate: '2024-12-31'
+          }
+        }
+        
+        setMetrics(fallbackMetrics)
+      } finally {
+        setIsLoading(false)
       }
-      
-      setMetrics(mockMetrics)
-      setIsLoading(false)
     }
 
     loadMetrics()
@@ -116,7 +162,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Kế Hoạch</p>
+                  <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">{t('quickStats.plans')}</p>
                   <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{metrics.totalPlans}</p>
                 </div>
                 <div className="p-2 bg-blue-200 dark:bg-blue-800/50 rounded-lg">
@@ -136,7 +182,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-green-600 dark:text-green-400 font-medium">ROI Dự Kiến</p>
+                  <p className="text-sm text-green-600 dark:text-green-400 font-medium">{t('quickStats.expectedROI')}</p>
                   <p className="text-2xl font-bold text-green-900 dark:text-green-100">{metrics.expectedROI}%</p>
                 </div>
                 <div className="p-2 bg-green-200 dark:bg-green-800/50 rounded-lg">
@@ -156,7 +202,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Đầu Tư</p>
+                  <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">{t('quickStats.investment')}</p>
                   <p className="text-lg font-bold text-purple-900 dark:text-purple-100">
                     {formatCurrency(metrics.totalInvestment)}
                   </p>
@@ -178,7 +224,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Trả/Tháng</p>
+                  <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">{t('quickStats.monthlyPayment')}</p>
                   <p className="text-lg font-bold text-orange-900 dark:text-orange-100">
                     {formatCurrency(metrics.monthlyPayments)}
                   </p>
@@ -203,17 +249,17 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <PiggyBank className="w-5 h-5 text-green-600" />
-                Tiến Độ Tiết Kiệm
+                {t('savingsProgress.title')}
               </CardTitle>
               <Badge variant="outline">
-                {savingsPercentage.toFixed(1)}% hoàn thành
+                {savingsPercentage.toFixed(1)}% {t('nextMilestone.completed')}
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Tiến độ hiện tại</span>
+                <span>{t('savingsProgress.title')}</span>
                 <span className="font-medium">
                   {formatCurrency(metrics.savingsProgress)} / {formatCurrency(metrics.savingsTarget)}
                 </span>
@@ -224,13 +270,13 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Đã tiết kiệm:</span>
+                  <span className="text-muted-foreground">{t('savingsProgress.saved')}</span>
                   <span className="font-medium text-green-600">
                     {formatCurrency(metrics.savingsProgress)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Còn lại:</span>
+                  <span className="text-muted-foreground">{t('savingsProgress.remaining')}</span>
                   <span className="font-medium">
                     {formatCurrency(metrics.savingsTarget - metrics.savingsProgress)}
                   </span>
@@ -239,13 +285,13 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
               
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Mục tiêu:</span>
+                  <span className="text-muted-foreground">{t('savingsProgress.target')}</span>
                   <span className="font-medium">
                     {formatCurrency(metrics.savingsTarget)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Ước tính hoàn thành:</span>
+                  <span className="text-muted-foreground">{t('savingsProgress.estimatedCompletion')}</span>
                   <span className="font-medium text-blue-600">
                     {new Date(2024, 11, 31).toLocaleDateString('vi-VN')}
                   </span>
@@ -266,7 +312,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              Mục Tiêu Tiếp Theo
+              {t('nextMilestone.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -275,7 +321,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
                 {metrics.nextMilestone.title}
               </h3>
               <div className="flex items-center justify-between text-sm mb-2">
-                <span>Tiến độ</span>
+                <span>{t('savingsProgress.title')}</span>
                 <span className="font-medium">
                   {formatCurrency(metrics.nextMilestone.current)} / {formatCurrency(metrics.nextMilestone.target)}
                 </span>
@@ -284,13 +330,13 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
               
               <div className="flex items-center justify-between">
                 <div className="text-sm">
-                  <span className="text-muted-foreground">Hạn: </span>
+                  <span className="text-muted-foreground">{t('nextMilestone.deadline')} </span>
                   <span className="font-medium">
                     {new Date(metrics.nextMilestone.dueDate).toLocaleDateString('vi-VN')}
                   </span>
                 </div>
                 <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700">
-                  {milestonePercentage.toFixed(1)}% hoàn thành
+                  {milestonePercentage.toFixed(1)}% {t('nextMilestone.completed')}
                 </Badge>
               </div>
             </div>
@@ -298,11 +344,11 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <div className="flex gap-2">
               <Button size="sm" className="flex-1">
                 <Plus className="w-4 h-4 mr-1" />
-                Tăng Tiết Kiệm
+                {t('quickActions.increaseSavings')}
               </Button>
               <Button variant="outline" size="sm">
                 <Calculator className="w-4 h-4 mr-1" />
-                Tính Lại
+                {t('quickActions.recalculate')}
               </Button>
             </div>
           </CardContent>
@@ -317,25 +363,25 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
       >
         <Card>
           <CardHeader>
-            <CardTitle>Hành Động Nhanh</CardTitle>
+            <CardTitle>{t('quickActions.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
               <Button variant="outline" className="justify-start" size="sm" onClick={() => window.location.href = '/properties'}>
                 <Home className="w-4 h-4 mr-2" />
-                Tìm Bất Động Sản
+                {t('quickActions.findProperty')}
               </Button>
               <Button variant="outline" className="justify-start" size="sm" onClick={() => window.location.href = '/plans/new'}>
                 <Calculator className="w-4 h-4 mr-2" />
-                Tạo Kế Hoạch Mới
+                {t('quickActions.createPlan')}
               </Button>
               <Button variant="outline" className="justify-start" size="sm" onClick={() => window.location.href = '/banks'}>
                 <TrendingUp className="w-4 h-4 mr-2" />
-                So Sánh Lãi Suất
+                {t('quickActions.compareRates')}
               </Button>
               <Button variant="outline" className="justify-start" size="sm" onClick={() => window.location.href = '/investments'}>
                 <Target className="w-4 h-4 mr-2" />
-                Xem Danh Mục
+                {t('quickActions.viewPortfolio')}
                 <ArrowRight className="w-3 h-3 ml-auto" />
               </Button>
             </div>

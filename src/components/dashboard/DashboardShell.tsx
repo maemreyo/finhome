@@ -1,4 +1,7 @@
-// Reusable dashboard page wrapper
+// src/components/dashboard/DashboardShell.tsx
+// Reusable dashboard page wrapper with i18n support
+
+import React from 'react'
 
 interface DashboardShellProps {
   title: string

@@ -179,7 +179,7 @@ export function Sidebar({ className }: SidebarProps) {
           {/* Footer */}
           <div className="border-t p-4">
             <div className="text-xs text-muted-foreground">
-              © 2024 FinHome
+              © 2025 FinHome
             </div>
           </div>
         </div>

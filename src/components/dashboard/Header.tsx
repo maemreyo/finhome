@@ -1,4 +1,5 @@
-// Dashboard header with user menu
+// src/components/dashboard/Header.tsx
+// Dashboard header with user menu and i18n support
 
 'use client'
 
@@ -15,6 +16,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuth, useAuthActions } from '@/hooks/useAuth'
 import { User, Settings, CreditCard, LogOut, Bell, Trophy } from 'lucide-react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { LevelIndicator } from '@/components/gamification/LevelIndicator'
 import { UserProgress } from '@/lib/gamification/achievements'
@@ -28,6 +31,10 @@ interface HeaderProps {
 export function Header({ title, description, userProgress }: HeaderProps) {
   const { user } = useAuth()
   const { signOut } = useAuthActions()
+  const params = useParams()
+  const locale = params?.locale as string || 'en'
+  const t = useTranslations('Dashboard.navigation')
+  const tCommon = useTranslations('Dashboard.Header')
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -54,7 +61,7 @@ export function Header({ title, description, userProgress }: HeaderProps) {
           )}
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" title={tCommon('notifications')}>
             <Bell className="h-4 w-4" />
           </Button>
 
@@ -81,7 +88,7 @@ export function Header({ title, description, userProgress }: HeaderProps) {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
-                    {user?.user_metadata?.full_name || 'User'}
+                    {user?.user_metadata?.full_name || tCommon('defaultUser')}
                   </p>
                   <p className="text-xs leading-none text-muted-foreground">
                     {user?.email}
@@ -90,33 +97,33 @@ export function Header({ title, description, userProgress }: HeaderProps) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="profile">
+                <Link href={`/${locale}/dashboard/profile`}>
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span>{t('profile')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="billing">
+                <Link href={`/${locale}/dashboard/billing`}>
                   <CreditCard className="mr-2 h-4 w-4" />
-                  <span>Billing</span>
+                  <span>{t('billing')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="achievements">
+                <Link href={`/${locale}/dashboard/achievements`}>
                   <Trophy className="mr-2 h-4 w-4" />
-                  <span>Achievements</span>
+                  <span>{t('achievements')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="settings">
+                <Link href={`/${locale}/dashboard/settings`}>
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                  <span>{t('settings')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>{tCommon('logout')}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

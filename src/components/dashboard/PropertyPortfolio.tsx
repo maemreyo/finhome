@@ -1,5 +1,5 @@
 // src/components/dashboard/PropertyPortfolio.tsx
-// Property portfolio widget showing saved properties and investment tracking
+// Property portfolio widget showing saved properties and investment tracking with i18n support
 
 'use client'
 
@@ -18,12 +18,14 @@ import {
   Star,
   Eye
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { DashboardService } from '@/lib/services/dashboardService'
 
 interface Property {
   id: string
@@ -55,88 +57,116 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
   const [properties, setProperties] = useState<Property[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'favorites' | 'planning'>('all')
+  const t = useTranslations('Dashboard.PropertyPortfolio')
 
-  // Mock data - in real app, this would fetch from API
+  // Load real property data from financial plans
   useEffect(() => {
     const loadProperties = async () => {
       setIsLoading(true)
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800))
-      
-      const mockProperties: Property[] = [
-        {
-          id: '1',
-          name: 'Căn hộ Vinhomes Central Park',
-          type: 'apartment',
-          location: 'Quận Bình Thạnh, TP.HCM',
-          price: 3200000000,
-          pricePerSqm: 45000000,
-          area: 71,
-          bedrooms: 2,
-          status: 'planning',
-          roiProjection: 8.5,
-          priceChange: 2.3,
-          lastViewed: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          isFavorited: true
-        },
-        {
-          id: '2',
-          name: 'Nhà phố Thảo Điền',
-          type: 'townhouse',
-          location: 'Quận 2, TP.HCM',
-          price: 5800000000,
-          pricePerSqm: 85000000,
-          area: 68,
-          bedrooms: 3,
-          status: 'interested',
-          roiProjection: 7.2,
-          priceChange: -1.5,
-          lastViewed: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-          isFavorited: true
-        },
-        {
-          id: '3',
-          name: 'Biệt thự Phú Mỹ Hưng',
-          type: 'villa',
-          location: 'Quận 7, TP.HCM',
-          price: 12500000000,
-          pricePerSqm: 62500000,
-          area: 200,
-          bedrooms: 4,
-          status: 'interested',
-          roiProjection: 6.8,
-          priceChange: 3.7,
-          lastViewed: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-          isFavorited: false
+      try {
+        if (userId) {
+          // Load financial plans which represent user's property interests
+          const plans = await DashboardService.getFinancialPlans(userId)
+          
+          const realProperties: Property[] = plans.map(plan => {
+            // Convert financial plan to property format
+            const customData = plan.custom_property_data as any || {} // Type assertion for custom data
+            const propertyType = plan.target_property_type || 'apartment'
+            const purchasePrice = plan.purchase_price || 0 // Default to 0 if null
+            const area = customData.area || Math.floor(purchasePrice / 45000000) // Estimate area
+            const bedrooms = customData.bedrooms || (area > 100 ? 3 : area > 70 ? 2 : 1)
+            
+            return {
+              id: plan.id,
+              name: plan.plan_name,
+              type: propertyType as Property['type'],
+              location: plan.target_location || 'TP.HCM',
+              price: purchasePrice,
+              pricePerSqm: area ? Math.floor(purchasePrice / area) : 45000000,
+              area: area,
+              bedrooms: bedrooms,
+              status: plan.status === 'active' ? 'planning' : 
+                     plan.status === 'completed' ? 'purchased' : 'interested',
+              roiProjection: plan.expected_roi || 8.0,
+              priceChange: Math.random() * 6 - 2, // Random price change for demo
+              lastViewed: new Date(plan.updated_at),
+              isFavorited: plan.status === 'active', // Active plans are considered favorites
+            }
+          })
+          
+          setProperties(realProperties)
+        } else {
+          // Fallback to demo data for unauthenticated users
+          const demoProperties: Property[] = [
+            {
+              id: '1',
+              name: 'Căn hộ Vinhomes Central Park',
+              type: 'apartment',
+              location: 'Quận Bình Thạnh, TP.HCM',
+              price: 3200000000,
+              pricePerSqm: 45000000,
+              area: 71,
+              bedrooms: 2,
+              status: 'planning',
+              roiProjection: 8.5,
+              priceChange: 2.3,
+              lastViewed: new Date(Date.now() - 2 * 60 * 60 * 1000),
+              isFavorited: true
+            },
+            {
+              id: '2',
+              name: 'Nhà phố Thảo Điền',
+              type: 'townhouse',
+              location: 'Quận 2, TP.HCM',
+              price: 5800000000,
+              pricePerSqm: 85000000,
+              area: 68,
+              bedrooms: 3,
+              status: 'interested',
+              roiProjection: 7.2,
+              priceChange: -1.5,
+              lastViewed: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+              isFavorited: true
+            },
+            {
+              id: '3',
+              name: 'Biệt thự Phú Mỹ Hưng',
+              type: 'villa',
+              location: 'Quận 7, TP.HCM',
+              price: 12500000000,
+              pricePerSqm: 62500000,
+              area: 200,
+              bedrooms: 4,
+              status: 'interested',
+              roiProjection: 6.8,
+              priceChange: 3.7,
+              lastViewed: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+              isFavorited: false
+            }
+          ]
+          
+          setProperties(demoProperties)
         }
-      ]
-      
-      setProperties(mockProperties)
-      setIsLoading(false)
+      } catch (error) {
+        console.error('Error loading property portfolio:', error)
+        
+        // Fallback to empty properties on error
+        setProperties([])
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     loadProperties()
   }, [userId])
 
   const getTypeLabel = (type: Property['type']) => {
-    switch (type) {
-      case 'apartment': return 'Căn hộ'
-      case 'house': return 'Nhà riêng'
-      case 'villa': return 'Biệt thự'
-      case 'townhouse': return 'Nhà phố'
-      default: return type
-    }
+    return t(`propertyTypes.${type}`)
   }
 
   const getStatusLabel = (status: Property['status']) => {
-    switch (status) {
-      case 'interested': return 'Quan tâm'
-      case 'planning': return 'Đang lập kế hoạch'
-      case 'negotiating': return 'Đang thương lượng'
-      case 'purchased': return 'Đã mua'
-      default: return status
-    }
+    return t(`status.${status}`)
   }
 
   const getStatusColor = (status: Property['status']) => {
@@ -167,7 +197,7 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>Danh Mục Bất Động Sản</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -189,7 +219,7 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Home className="w-5 h-5 text-blue-600" />
-            Danh Mục Bất Động Sản
+            {t('title')}
           </CardTitle>
           <div className="flex gap-2">
             <Button
@@ -197,7 +227,7 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
               size="sm"
               onClick={() => setFilter('all')}
             >
-              Tất cả ({properties.length})
+              {t('all')} ({properties.length})
             </Button>
             <Button
               variant={filter === 'favorites' ? 'default' : 'outline'}
@@ -205,7 +235,7 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
               onClick={() => setFilter('favorites')}
             >
               <Heart className="w-3 h-3 mr-1" />
-              Yêu thích ({properties.filter(p => p.isFavorited).length})
+              {t('favorites')} ({properties.filter(p => p.isFavorited).length})
             </Button>
           </div>
         </div>
@@ -214,13 +244,13 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
         {/* Portfolio Summary */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="p-3 bg-blue-50 rounded-lg">
-            <div className="text-sm text-blue-600 font-medium">Tổng Giá Trị</div>
+            <div className="text-sm text-blue-600 font-medium">{t('totalValue')}</div>
             <div className="text-lg font-bold text-blue-900">
               {formatCurrency(totalValue)}
             </div>
           </div>
           <div className="p-3 bg-green-50 rounded-lg">
-            <div className="text-sm text-green-600 font-medium">ROI Trung Bình</div>
+            <div className="text-sm text-green-600 font-medium">{t('averageROI')}</div>
             <div className="text-lg font-bold text-green-900">
               {avgROI.toFixed(1)}%
             </div>
@@ -265,18 +295,18 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
                   <div className="grid grid-cols-2 gap-4 text-sm mb-3">
                     <div className="space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Loại:</span>
+                        <span className="text-muted-foreground">{t('details.type')}</span>
                         <span className="font-medium">{getTypeLabel(property.type)}</span>
                       </div>
                       {property.area && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Diện tích:</span>
+                          <span className="text-muted-foreground">{t('details.area')}</span>
                           <span className="font-medium">{property.area}m²</span>
                         </div>
                       )}
                       {property.bedrooms && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Phòng ngủ:</span>
+                          <span className="text-muted-foreground">{t('details.bedrooms')}</span>
                           <span className="font-medium">{property.bedrooms}</span>
                         </div>
                       )}
@@ -284,14 +314,14 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
                     
                     <div className="space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Giá:</span>
+                        <span className="text-muted-foreground">{t('details.price')}</span>
                         <span className="font-medium text-blue-600">
                           {formatCurrency(property.price)}
                         </span>
                       </div>
                       {property.pricePerSqm && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Giá/m²:</span>
+                          <span className="text-muted-foreground">{t('details.pricePerSqm')}</span>
                           <span className="font-medium">
                             {formatCurrency(property.pricePerSqm)}
                           </span>
@@ -299,7 +329,7 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
                       )}
                       {property.roiProjection && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">ROI dự kiến:</span>
+                          <span className="text-muted-foreground">{t('details.expectedROI')}</span>
                           <span className="font-medium text-green-600">
                             {property.roiProjection}%
                           </span>
@@ -325,19 +355,19 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
                         </div>
                       )}
                       <span className="text-xs text-muted-foreground">
-                        Xem {new Date(property.lastViewed).toLocaleDateString('vi-VN')}
+                        {t('lastViewed')} {new Date(property.lastViewed).toLocaleDateString('vi-VN')}
                       </span>
                     </div>
                     
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm">
                         <Eye className="w-3 h-3 mr-1" />
-                        Xem
+                        {t('actions.view')}
                       </Button>
                       {property.status === 'interested' && (
                         <Button size="sm">
                           <DollarSign className="w-3 h-3 mr-1" />
-                          Lập Kế Hoạch
+                          {t('actions.createPlan')}
                         </Button>
                       )}
                     </div>
@@ -351,17 +381,17 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
             <div className="text-center py-8">
               <Home className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">
-                {filter === 'favorites' ? 'Chưa có bất động sản yêu thích' : 'Chưa có bất động sản nào'}
+                {filter === 'favorites' ? t('empty.noFavorites') : t('empty.noProperties')}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {filter === 'favorites' 
-                  ? 'Thêm bất động sản vào danh sách yêu thích để theo dõi'
-                  : 'Bắt đầu tìm kiếm bất động sản phù hợp với bạn'
+                  ? t('empty.favoriteDescription')
+                  : t('empty.description')
                 }
               </p>
               <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />
-                Tìm Bất Động Sản
+                {t('actions.findProperties')}
               </Button>
             </div>
           )}
@@ -369,7 +399,7 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
           {properties.length > 0 && (
             <div className="pt-4 border-t">
               <Button variant="ghost" size="sm" className="w-full justify-center">
-                Xem Tất Cả Bất Động Sản
+                {t('actions.viewAll')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>

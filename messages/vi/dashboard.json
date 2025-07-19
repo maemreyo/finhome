@@ -499,6 +499,105 @@
         }
       }
     },
+    "Header": {
+      "notifications": "Thông báo",
+      "defaultUser": "Người dùng",
+      "logout": "Đăng xuất"
+    },
+    "StatsCard": {
+      "fromLastMonth": "so với tháng trước"
+    },
+    "PropertyPortfolio": {
+      "title": "Danh Mục Bất Động Sản",
+      "totalValue": "Tổng Giá Trị",
+      "averageROI": "ROI Trung Bình",
+      "all": "Tất cả",
+      "favorites": "Yêu thích",
+      "propertyTypes": {
+        "apartment": "Căn hộ",
+        "house": "Nhà riêng",
+        "villa": "Biệt thự",
+        "townhouse": "Nhà phố"
+      },
+      "status": {
+        "interested": "Quan tâm",
+        "planning": "Đang lập kế hoạch",
+        "negotiating": "Đang thương lượng",
+        "purchased": "Đã mua"
+      },
+      "details": {
+        "type": "Loại:",
+        "area": "Diện tích:",
+        "bedrooms": "Phòng ngủ:",
+        "price": "Giá:",
+        "pricePerSqm": "Giá/m²:",
+        "expectedROI": "ROI dự kiến:"
+      },
+      "actions": {
+        "view": "Xem",
+        "createPlan": "Lập Kế Hoạch",
+        "findProperties": "Tìm Bất Động Sản",
+        "viewAll": "Xem Tất Cả Bất Động Sản"
+      },
+      "empty": {
+        "noProperties": "Chưa có bất động sản nào",
+        "noFavorites": "Chưa có bất động sản yêu thích",
+        "description": "Bắt đầu tìm kiếm bất động sản phù hợp với bạn",
+        "favoriteDescription": "Thêm bất động sản vào danh sách yêu thích để theo dõi"
+      },
+      "lastViewed": "Xem"
+    },
+    "RecentActivity": {
+      "title": "Hoạt Động Gần Đây",
+      "newBadge": "mới",
+      "achievementUnlocked": "Thành tích mới đạt được!",
+      "planCreated": "Kế hoạch mới được tạo",
+      "rateComparison": "So sánh lãi suất hoàn thành",
+      "propertyViewed": "Đã xem bất động sản",
+      "goalReached": "Đạt mục tiêu",
+      "empty": {
+        "title": "Chưa có hoạt động nào",
+        "description": "Bắt đầu tạo kế hoạch tài chính để theo dõi hoạt động",
+        "action": "Tạo Kế Hoạch Đầu Tiên"
+      },
+      "actions": {
+        "viewAll": "Xem Tất Cả Hoạt Động"
+      },
+      "timeAgo": {
+        "minutesAgo": "{minutes} phút trước",
+        "hoursAgo": "{hours} giờ trước",
+        "daysAgo": "{days} ngày trước"
+      }
+    },
+    "FinancialOverview": {
+      "quickStats": {
+        "plans": "Kế Hoạch",
+        "expectedROI": "ROI Dự Kiến",
+        "investment": "Đầu Tư",
+        "monthlyPayment": "Trả/Tháng"
+      },
+      "savingsProgress": {
+        "title": "Tiến Độ Tiết Kiệm",
+        "saved": "Đã tiết kiệm:",
+        "remaining": "Còn lại:",
+        "target": "Mục tiêu:",
+        "estimatedCompletion": "Ước tính hoàn thành:"
+      },
+      "nextMilestone": {
+        "title": "Vốn tự có cho căn nhà đầu tiên",
+        "deadline": "Hạn:",
+        "completed": "hoàn thành"
+      },
+      "quickActions": {
+        "title": "Hành Động Nhanh",
+        "findProperty": "Tìm Bất Động Sản",
+        "createPlan": "Tạo Kế Hoạch Mới",
+        "compareRates": "So Sánh Lãi Suất",
+        "viewPortfolio": "Xem Danh Mục",
+        "increaseSavings": "Tăng Tiết Kiệm",
+        "recalculate": "Tính Lại"
+      }
+    },
     "enhancedScenarios": {
       "title": "Phân tích kịch bản nâng cao",
       "description": "So sánh kịch bản nâng cao với biểu đồ và phân tích tương tác",

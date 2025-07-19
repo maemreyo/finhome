@@ -1,5 +1,5 @@
 // src/components/dashboard/RecentActivity.tsx
-// Recent activity and notifications widget
+// Recent activity and notifications widget with i18n support
 
 'use client'
 
@@ -17,6 +17,7 @@ import {
   Plus,
   ArrowRight
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -24,6 +25,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatCurrency } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { DashboardService } from '@/lib/services/dashboardService'
 
 interface ActivityItem {
   id: string
@@ -53,67 +55,132 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
 }) => {
   const [activities, setActivities] = useState<ActivityItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const t = useTranslations('Dashboard.RecentActivity')
 
-  // Mock data - in real app, this would fetch from API
+  // Load real activity data from database
   useEffect(() => {
     const loadActivities = async () => {
       setIsLoading(true)
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800))
-      
-      const mockActivities: ActivityItem[] = [
-        {
-          id: '1',
-          type: 'achievement_unlocked',
-          title: 'Thành tích mới đạt được!',
-          description: 'Bạn đã mở khóa "Nhà Đầu Tư Thông Minh"',
-          timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
-          metadata: {
-            achievementName: 'Nhà Đầu Tư Thông Minh'
-          },
-          isNew: true
-        },
-        {
-          id: '2',
-          type: 'plan_created',
-          title: 'Kế hoạch mới được tạo',
-          description: 'Căn hộ Vinhomes Central Park',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-          metadata: {
-            planName: 'Căn hộ Vinhomes Central Park',
-            amount: 3200000000
-          }
-        },
-        {
-          id: '3',
-          type: 'rate_comparison',
-          title: 'So sánh lãi suất hoàn thành',
-          description: 'Tìm thấy gói vay ưu đãi từ BIDV với lãi suất 7.3%',
-          timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-        },
-        {
-          id: '4',
-          type: 'property_viewed',
-          title: 'Bất động sản mới xem',
-          description: 'Nhà phố Thảo Điền, Quận 2',
-          timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-          metadata: {
-            propertyName: 'Nhà phố Thảo Điền, Quận 2',
-            amount: 5800000000
-          }
-        },
-        {
-          id: '5',
-          type: 'goal_reached',
-          title: 'Mục tiêu đạt được',
-          description: 'Hoàn thành 75% mục tiêu tiết kiệm tháng này',
-          timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+      try {
+        if (userId) {
+          // Load real data from multiple sources
+          const [notifications, achievements, plans] = await Promise.all([
+            DashboardService.getNotifications(userId, limit),
+            DashboardService.getUserAchievements(userId),
+            DashboardService.getFinancialPlans(userId)
+          ])
+          
+          const realActivities: ActivityItem[] = []
+          
+          // Add recent notifications as activities
+          notifications.forEach(notification => {
+            const activityType = notification.type === 'achievement' ? 'achievement_unlocked' :
+                               notification.type === 'info' ? 'plan_created' :
+                               notification.type === 'success' ? 'goal_reached' :
+                               'rate_comparison'
+            
+            const metadata = notification.metadata as any || {} // Type assertion for metadata
+            
+            realActivities.push({
+              id: notification.id,
+              type: activityType,
+              title: notification.title,
+              description: notification.message,
+              timestamp: new Date(notification.created_at),
+              isNew: !notification.is_read,
+              metadata: metadata ? {
+                amount: metadata.amount,
+                planName: metadata.planName,
+                achievementName: metadata.achievementName,
+                propertyName: metadata.propertyName
+              } : undefined
+            })
+          })
+          
+          // Add recent achievements as activities
+          achievements.slice(0, 2).forEach(userAchievement => {
+            if (userAchievement.achievements) {
+              realActivities.push({
+                id: `achievement-${userAchievement.id}`,
+                type: 'achievement_unlocked',
+                title: t('achievementUnlocked'),
+                description: `${t('achievementUnlocked').split('!')[0]} "${userAchievement.achievements.name}"`,
+                timestamp: new Date(userAchievement.unlocked_at),
+                metadata: {
+                  achievementName: userAchievement.achievements.name
+                },
+                isNew: false
+              })
+            }
+          })
+          
+          // Add recent plans as activities
+          plans.slice(0, 2).forEach(plan => {
+            realActivities.push({
+              id: `plan-${plan.id}`,
+              type: 'plan_created',
+              title: t('planCreated'),
+              description: plan.plan_name,
+              timestamp: new Date(plan.created_at),
+              metadata: {
+                planName: plan.plan_name,
+                amount: plan.purchase_price || 0
+              },
+              isNew: false
+            })
+          })
+          
+          // Sort by timestamp and limit
+          const sortedActivities = realActivities
+            .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+            .slice(0, limit)
+          
+          setActivities(sortedActivities)
+        } else {
+          // Fallback to demo data for unauthenticated users
+          const demoActivities: ActivityItem[] = [
+            {
+              id: '1',
+              type: 'achievement_unlocked',
+              title: t('achievementUnlocked'),
+              description: `${t('achievementUnlocked').split('!')[0]} "Nhà Đầu Tư Thông Minh"`,
+              timestamp: new Date(Date.now() - 30 * 60 * 1000),
+              metadata: {
+                achievementName: 'Nhà Đầu Tư Thông Minh'
+              },
+              isNew: true
+            },
+            {
+              id: '2',
+              type: 'plan_created',
+              title: t('planCreated'),
+              description: 'Căn hộ Vinhomes Central Park',
+              timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+              metadata: {
+                planName: 'Căn hộ Vinhomes Central Park',
+                amount: 3200000000
+              }
+            },
+            {
+              id: '3',
+              type: 'rate_comparison',
+              title: t('rateComparison'),
+              description: 'Tìm thấy gói vay ưu đãi từ BIDV với lãi suất 7.3%',
+              timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
+            }
+          ]
+          
+          setActivities(demoActivities.slice(0, limit))
         }
-      ]
-      
-      setActivities(mockActivities.slice(0, limit))
-      setIsLoading(false)
+      } catch (error) {
+        console.error('Error loading recent activities:', error)
+        
+        // Fallback to empty or basic activities on error
+        setActivities([])
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     loadActivities()
@@ -158,13 +225,13 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
     const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60))
     
     if (diffInMinutes < 60) {
-      return `${diffInMinutes} phút trước`
+      return t('timeAgo.minutesAgo', { minutes: diffInMinutes })
     } else if (diffInMinutes < 1440) {
       const hours = Math.floor(diffInMinutes / 60)
-      return `${hours} giờ trước`
+      return t('timeAgo.hoursAgo', { hours })
     } else {
       const days = Math.floor(diffInMinutes / 1440)
-      return `${days} ngày trước`
+      return t('timeAgo.daysAgo', { days })
     }
   }
 
@@ -172,7 +239,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>Hoạt Động Gần Đây</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -197,11 +264,11 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-blue-600" />
-            Hoạt Động Gần Đây
+            {t('title')}
           </CardTitle>
           {activities.some(a => a.isNew) && (
             <Badge variant="destructive" className="text-xs">
-              {activities.filter(a => a.isNew).length} mới
+              {activities.filter(a => a.isNew).length} {t('newBadge')}
             </Badge>
           )}
         </div>
@@ -235,7 +302,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
                       {activity.title}
                       {activity.isNew && (
                         <Badge variant="destructive" className="ml-2 text-xs">
-                          Mới
+                          {t('newBadge')}
                         </Badge>
                       )}
                     </h4>
@@ -271,13 +338,13 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
           {activities.length === 0 && (
             <div className="text-center py-8">
               <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Chưa có hoạt động nào</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('empty.title')}</h3>
               <p className="text-muted-foreground mb-4">
-                Bắt đầu tạo kế hoạch tài chính để theo dõi hoạt động
+                {t('empty.description')}
               </p>
               <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />
-                Tạo Kế Hoạch Đầu Tiên
+                {t('empty.action')}
               </Button>
             </div>
           )}
@@ -285,7 +352,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
           {activities.length > 0 && (
             <div className="pt-4 border-t">
               <Button variant="ghost" size="sm" className="w-full justify-center">
-                Xem Tất Cả Hoạt Động
+                {t('actions.viewAll')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>

@@ -1,4 +1,8 @@
-// Reusable stats card component
+// src/components/dashboard/StatsCard.tsx
+// Reusable stats card component with i18n support
+
+import React from 'react'
+import { useTranslations } from 'next-intl'
 
 interface StatsCardProps {
   title: string
@@ -12,6 +16,8 @@ interface StatsCardProps {
 }
 
 export function StatsCard({ title, value, description, trend, icon }: StatsCardProps) {
+  const t = useTranslations('Dashboard.StatsCard')
+
   return (
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
       <div className="flex items-center justify-between space-y-0 pb-2">
@@ -30,7 +36,7 @@ export function StatsCard({ title, value, description, trend, icon }: StatsCardP
             <span>
               {trend.isPositive ? '+' : '-'}{Math.abs(trend.value)}%
             </span>
-            <span className="text-muted-foreground ml-1">from last month</span>
+            <span className="text-muted-foreground ml-1">{t('fromLastMonth')}</span>
           </div>
         )}
       </div>
