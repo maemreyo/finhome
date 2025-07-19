@@ -4,6 +4,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
@@ -46,72 +47,74 @@ interface SliderConfig {
   description: string
 }
 
-const SLIDER_CONFIGS: SliderConfig[] = [
+const SLIDER_CONFIGS = (
+  t: (key: string) => string
+): SliderConfig[] => [
   {
     key: 'purchasePrice',
-    label: 'Giá mua',
+    label: t('parameters.purchasePrice.label'),
     min: 500000000, // 500M VND
     max: 20000000000, // 20B VND
     step: 100000000,
     unit: 'VND',
     icon: <Home className="w-4 h-4" />,
     format: (value) => formatCurrency(value, { compact: true }),
-    description: 'Giá mua bất động sản'
+    description: t('parameters.purchasePrice.description')
   },
   {
     key: 'downPayment',
-    label: 'Tiền trả trước',
+    label: t('parameters.downPayment.label'),
     min: 0,
     max: 50, // Percentage
     step: 5,
     unit: '%',
     icon: <DollarSign className="w-4 h-4" />,
     format: (value) => `${value}%`,
-    description: 'Phần trăm tiền trả trước'
+    description: t('parameters.downPayment.description')
   },
   {
     key: 'interestRate',
-    label: 'Lãi suất',
+    label: t('parameters.interestRate.label'),
     min: 5,
     max: 15,
     step: 0.1,
     unit: '%',
     icon: <Percent className="w-4 h-4" />,
     format: (value) => `${value.toFixed(1)}%`,
-    description: 'Lãi suất vay hàng năm'
+    description: t('parameters.interestRate.description')
   },
   {
     key: 'loanTermYears',
-    label: 'Thời hạn vay',
+    label: t('parameters.loanTermYears.label'),
     min: 5,
     max: 30,
     step: 1,
-    unit: 'năm',
+    unit: t('parameters.loanTermYears.unit'),
     icon: <Calendar className="w-4 h-4" />,
-    format: (value) => `${value} năm`,
-    description: 'Thời gian vay tính bằng năm'
+    format: (value) => `${value} ${t('parameters.loanTermYears.unit')}`,
+    description: t('parameters.loanTermYears.description')
   },
   {
     key: 'monthlyIncome',
-    label: 'Thu nhập tháng',
+    label: t('parameters.monthlyIncome.label'),
     min: 10000000, // 10M VND
     max: 200000000, // 200M VND
     step: 5000000,
     unit: 'VND',
     icon: <TrendingUp className="w-4 h-4" />,
     format: (value) => formatCurrency(value, { compact: true }),
-    description: 'Thu nhập hàng tháng'
+    description: t('parameters.monthlyIncome.description')
   },
   {
     key: 'monthlyExpenses',
-    label: 'Chi phí tháng',
+    label: t('parameters.monthlyExpenses.label'),
     min: 5000000, // 5M VND
     max: 100000000, // 100M VND
     step: 2500000,
     unit: 'VND',
     icon: <TrendingDown className="w-4 h-4" />,
     format: (value) => formatCurrency(value, { compact: true }),
-    description: 'Chi phí sinh hoạt hàng tháng'
+    description: t('parameters.monthlyExpenses.description')
   }
 ]
 
@@ -122,6 +125,7 @@ export default function InteractiveParameterSliders({
   realTimeMode = true,
   className
 }: InteractiveParameterSlidersProps) {
+  const t = useTranslations('InteractiveParameterSliders')
   const [parameters, setParameters] = useState<ScenarioParameters>({
     planName: baseScenario.plan_name || 'Interactive Scenario',
     planType: baseScenario.plan_type,
@@ -148,6 +152,9 @@ export default function InteractiveParameterSliders({
   const [isAutoUpdate, setIsAutoUpdate] = useState(realTimeMode)
   const [hasChanges, setHasChanges] = useState(false)
 
+  // Get slider configurations with translations
+  const sliderConfigs = SLIDER_CONFIGS(t)
+  
   // Calculate derived values
   const calculatedLoanAmount = parameters.purchasePrice - (parameters.purchasePrice * parameters.downPayment / 100)
   const monthlyPayment = calculateMonthlyPayment(calculatedLoanAmount, parameters.interestRate, parameters.loanTermYears * 12)
@@ -235,9 +242,9 @@ export default function InteractiveParameterSliders({
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Điều chỉnh tham số kịch bản</CardTitle>
+              <CardTitle>{t('title')}</CardTitle>
               <CardDescription>
-                Thay đổi các thông số để xem tác động đến kịch bản tài chính
+                {t('description')}
               </CardDescription>
             </div>
             <div className="flex items-center gap-4">
@@ -248,20 +255,20 @@ export default function InteractiveParameterSliders({
                   id="auto-update"
                 />
                 <Label htmlFor="auto-update" className="text-sm">
-                  Cập nhật tự động
+                  {t('controls.autoUpdate')}
                 </Label>
               </div>
               
               {!isAutoUpdate && hasChanges && (
                 <Button onClick={applyChanges} size="sm">
                   <Play className="w-4 h-4 mr-2" />
-                  Áp dụng thay đổi
+                  {t('controls.applyChanges')}
                 </Button>
               )}
               
               <Button variant="outline" size="sm" onClick={resetParameters}>
                 <RotateCcw className="w-4 h-4 mr-2" />
-                Đặt lại
+                {t('controls.reset')}
               </Button>
             </div>
           </div>
@@ -271,7 +278,7 @@ export default function InteractiveParameterSliders({
       {/* Key Metrics Display */}
       <Card>
         <CardHeader>
-          <CardTitle>Chỉ số tài chính hiện tại</CardTitle>
+          <CardTitle>{t('currentMetrics.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -279,28 +286,28 @@ export default function InteractiveParameterSliders({
               <div className="text-2xl font-bold text-blue-600">
                 {formatCurrency(monthlyPayment)}
               </div>
-              <div className="text-sm text-gray-500">Thanh toán/tháng</div>
+              <div className="text-sm text-gray-500">{t('currentMetrics.monthlyPayment')}</div>
             </div>
             
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
                 {formatCurrency(calculatedLoanAmount)}
               </div>
-              <div className="text-sm text-gray-500">Số tiền vay</div>
+              <div className="text-sm text-gray-500">{t('currentMetrics.loanAmount')}</div>
             </div>
             
             <div className="text-center">
               <div className={`text-2xl font-bold ${dtiRatio > 40 ? 'text-red-600' : dtiRatio > 30 ? 'text-yellow-600' : 'text-green-600'}`}>
                 {dtiRatio.toFixed(1)}%
               </div>
-              <div className="text-sm text-gray-500">Tỷ lệ DTI</div>
+              <div className="text-sm text-gray-500">{t('currentMetrics.dtiRatio')}</div>
             </div>
             
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">
                 {Math.max(0, Math.min(100, 100 - dtiRatio)).toFixed(0)}
               </div>
-              <div className="text-sm text-gray-500">Điểm khả năng</div>
+              <div className="text-sm text-gray-500">{t('currentMetrics.affordabilityScore')}</div>
             </div>
           </div>
         </CardContent>
@@ -309,10 +316,10 @@ export default function InteractiveParameterSliders({
       {/* Parameter Sliders */}
       <Card>
         <CardHeader>
-          <CardTitle>Thông số điều chỉnh</CardTitle>
+          <CardTitle>{t('parameters.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {SLIDER_CONFIGS.map((config) => {
+          {sliderConfigs.map((config) => {
             const currentValue = parameters[config.key] as number
             
             return (
@@ -365,7 +372,7 @@ export default function InteractiveParameterSliders({
                 
                 <p className="text-xs text-gray-500">{config.description}</p>
                 
-                {config.key !== SLIDER_CONFIGS[SLIDER_CONFIGS.length - 1].key && (
+                {config.key !== sliderConfigs[sliderConfigs.length - 1].key && (
                   <Separator className="mt-4" />
                 )}
               </div>
@@ -377,16 +384,16 @@ export default function InteractiveParameterSliders({
       {/* Risk Assessment */}
       <Card>
         <CardHeader>
-          <CardTitle>Đánh giá rủi ro</CardTitle>
+          <CardTitle>{t('riskAssessment.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Tỷ lệ DTI</span>
+              <span className="text-sm font-medium">{t('riskAssessment.dtiRatioLabel')}</span>
               <div className="flex items-center gap-2">
                 <div className={`w-3 h-3 rounded-full ${dtiRatio > 40 ? 'bg-red-500' : dtiRatio > 30 ? 'bg-yellow-500' : 'bg-green-500'}`} />
                 <span className="text-sm">
-                  {dtiRatio > 40 ? 'Rủi ro cao' : dtiRatio > 30 ? 'Rủi ro trung bình' : 'Rủi ro thấp'}
+                  {dtiRatio > 40 ? t('riskAssessment.riskLevels.high') : dtiRatio > 30 ? t('riskAssessment.riskLevels.medium') : t('riskAssessment.riskLevels.low')}
                 </span>
               </div>
             </div>
@@ -401,9 +408,9 @@ export default function InteractiveParameterSliders({
             </div>
             
             <div className="grid grid-cols-3 text-xs text-gray-500">
-              <span>Thấp (&lt;30%)</span>
-              <span className="text-center">Trung bình (30-40%)</span>
-              <span className="text-right">Cao (&gt;40%)</span>
+              <span>{t('riskAssessment.ranges.low')}</span>
+              <span className="text-center">{t('riskAssessment.ranges.medium')}</span>
+              <span className="text-right">{t('riskAssessment.ranges.high')}</span>
             </div>
           </div>
         </CardContent>

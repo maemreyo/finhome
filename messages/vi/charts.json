@@ -1,0 +1,350 @@
+{
+  "Charts": {
+    "CashFlow": {
+      "tooltips": {
+        "month": "Tháng {month}"
+      },
+      "xAxis": {
+        "monthLabel": "T{month}"
+      },
+      "legend": {
+        "income": "Tổng thu nhập",
+        "expenses": "Tổng chi phí",
+        "netCashFlow": "Dòng tiền thuần",
+        "cumulativeCashFlow": "Dòng tiền tích lũy"
+      }
+    },
+    "ExpensesBreakdown": {
+      "categories": {
+        "livingExpenses": "Chi phí sinh hoạt",
+        "mortgagePayment": "Trả nợ vay nhà",
+        "additionalCosts": "Chi phí phát sinh",
+        "otherDebts": "Nợ khác"
+      },
+      "summary": {
+        "totalExpenses": "Tổng chi phí hàng tháng",
+        "largestExpense": "Khoản chi lớn nhất"
+      }
+    },
+    "Amortization": {
+      "tooltips": {
+        "year": "Năm {year}"
+      },
+      "xAxis": {
+        "yearLabel": "N{year}"
+      },
+      "legend": {
+        "principalPayment": "Trả nợ gốc",
+        "interestPayment": "Trả lãi"
+      },
+      "summary": {
+        "totalInterest": "Tổng lãi đã trả",
+        "totalPrincipal": "Tổng gốc đã trả",
+        "interestRatio": "Tỷ lệ lãi"
+      }
+    }
+  },
+  "ScenarioComparisonTable": {
+    "title": "So sánh kịch bản",
+    "descriptionNoSelection": "Chọn các kịch bản để so sánh chúng cạnh nhau",
+    "noScenariosSelected": "Chưa có kịch bản nào được chọn để so sánh",
+    "descriptionWithSelection": "So sánh {count} kịch bản",
+    "metric": "Chỉ số",
+    "monthlyPayment": "Thanh toán hàng tháng",
+    "totalInterest": "Tổng lãi",
+    "totalCost": "Tổng chi phí",
+    "loanDuration": "Thời hạn vay",
+    "months": "tháng",
+    "interestRate": "Lãi suất",
+    "riskLevel": "Mức độ rủi ro",
+    "scenarioSummary": "Tóm tắt kịch bản",
+    "totalCostLabel": "Tổng chi phí:",
+    "moreThanBestOption": "{amount} đắt hơn so với lựa chọn tốt nhất",
+    "riskLabel": "Rủi ro:",
+    "best": "Tốt nhất"
+  },
+  "AdvancedScenarioCharts": {
+    "scenarioOverview": {
+      "title": "Tổng quan so sánh kịch bản",
+      "description": "So sánh các chỉ số tài chính chính giữa các kịch bản"
+    },
+    "monthlyPaymentChart": {
+      "title": "Thanh toán hàng tháng",
+      "tooltipLabel": "Thanh toán",
+      "scenarioLabel": "Kịch bản: {type}"
+    },
+    "totalCostChart": {
+      "title": "Tổng chi phí",
+      "tooltipLabel": "Tổng chi phí",
+      "scenarioLabel": "Kịch bản: {type}"
+    },
+    "loanBalanceOverTime": {
+      "title": "Biến động số dư vay theo thời gian",
+      "description": "Theo dõi số dư còn lại của khoản vay qua các năm",
+      "xAxisLabel": "Năm {year}",
+      "tooltipLabel": "Tháng {month}",
+      "yAxisLabel": "Số dư"
+    },
+    "riskReturnAnalysis": {
+      "title": "Phân tích rủi ro - Lợi nhuận",
+      "description": "Vị trí của các kịch bản trên ma trận rủi ro và lợi nhuận",
+      "xAxisLabel": "Mức độ rủi ro",
+      "yAxisLabel": "ROI (%)",
+      "tooltipRisk": "Mức độ rủi ro: {value}/10",
+      "tooltipReturn": "Lợi nhuận: {value}%"
+    },
+    "multidimensionalAnalysis": {
+      "title": "Phân tích đa chiều",
+      "description": "So sánh toàn diện các khía cạnh của từng kịch bản",
+      "metrics": {
+        "affordability": "Khả Năng Chi Trả",
+        "roiPotential": "Tiềm Năng ROI",
+        "riskLevel": "Mức Độ Rủi Ro",
+        "monthlyPayment": "Thanh Toán Hàng Tháng",
+        "timeToPayoff": "Thời Gian Trả Hết"
+      }
+    },
+    "financialMetricsMatrix": {
+      "title": "Ma trận chỉ số tài chính",
+      "description": "Bảng nhiệt hiển thị hiệu suất của các kịch bản theo từng chỉ số",
+      "headers": {
+        "scenario": "Kịch bản",
+        "monthlyPayment": "Thanh toán/tháng",
+        "totalCost": "Tổng chi phí",
+        "affordabilityScore": "Điểm khả năng chi trả",
+        "dtiRatio": "Tỷ lệ DTI",
+        "riskLevel": "Mức rủi ro"
+      },
+      "riskLevels": {
+        "low": "Thấp",
+        "medium": "Trung bình",
+        "high": "Cao"
+      }
+    }
+  },
+  "InteractiveParameterSliders": {
+    "title": "Điều chỉnh tham số kịch bản",
+    "description": "Thay đổi các thông số để xem tác động đến kịch bản tài chính",
+    "controls": {
+      "autoUpdate": "Cập nhật tự động",
+      "applyChanges": "Áp dụng thay đổi",
+      "reset": "Đặt lại"
+    },
+    "currentMetrics": {
+      "title": "Chỉ số tài chính hiện tại",
+      "monthlyPayment": "Thanh toán/tháng",
+      "loanAmount": "Số tiền vay",
+      "dtiRatio": "Tỷ lệ DTI",
+      "affordabilityScore": "Điểm khả năng"
+    },
+    "parameters": {
+      "title": "Thông số điều chỉnh",
+      "purchasePrice": {
+        "label": "Giá mua",
+        "description": "Giá mua bất động sản"
+      },
+      "downPayment": {
+        "label": "Tiền trả trước",
+        "description": "Phần trăm tiền trả trước"
+      },
+      "interestRate": {
+        "label": "Lãi suất",
+        "description": "Lãi suất vay hàng năm"
+      },
+      "loanTermYears": {
+        "label": "Thời hạn vay",
+        "description": "Thời gian vay tính bằng năm",
+        "unit": "năm"
+      },
+      "monthlyIncome": {
+        "label": "Thu nhập tháng",
+        "description": "Thu nhập hàng tháng"
+      },
+      "monthlyExpenses": {
+        "label": "Chi phí tháng",
+        "description": "Chi phí sinh hoạt hàng tháng"
+      }
+    },
+    "riskAssessment": {
+      "title": "Đánh giá rủi ro",
+      "dtiRatioLabel": "Tỷ lệ DTI",
+      "riskLevels": {
+        "low": "Rủi ro thấp",
+        "medium": "Rủi ro trung bình",
+        "high": "Rủi ro cao"
+      },
+      "ranges": {
+        "low": "Thấp (<30%)",
+        "medium": "Trung bình (30-40%)",
+        "high": "Cao (>40%)"
+      }
+    }
+  },
+  "ScenarioComparison": {
+    "title": "So Sánh Kịch Bản",
+    "description": "Phân tích và so sánh các tùy chọn vay khác nhau",
+    "createNewScenario": "Tạo Kịch Bản Mới",
+    "viewModes": {
+      "table": "Bảng So Sánh",
+      "radar": "Biểu Đồ Radar",
+      "detailed": "Chi Tiết"
+    },
+    "directComparison": {
+      "title": "So Sánh Trực Tiếp",
+      "description": "Chọn tối đa 3 kịch bản để so sánh chi tiết",
+      "monthlyPayment": "Trả hàng tháng",
+      "netCashFlow": "Dòng tiền ròng",
+      "totalInterest": "Tổng lãi vay",
+      "riskLevel": "Mức rủi ro",
+      "selectOptimal": "Chọn Tối Ưu",
+      "selectScenario": "Chọn Kịch Bản"
+    },
+    "radarChart": {
+      "title": "Biểu Đồ Radar So Sánh",
+      "description": "Trực quan hóa các chỉ số quan trọng của từng kịch bản",
+      "metricsTitle": "Chỉ Số Đánh Giá",
+      "metrics": {
+        "affordability": {
+          "title": "Khả Năng Chi Trả",
+          "description": "Tỷ lệ thu nhập/chi phí"
+        },
+        "safety": {
+          "title": "Mức Độ An Toàn",
+          "description": "Rủi ro tài chính"
+        },
+        "accumulation": {
+          "title": "Tốc Độ Tích Lũy",
+          "description": "Xây dựng tài sản"
+        },
+        "flexibility": {
+          "title": "Tính Linh Hoạt",
+          "description": "Khả năng điều chỉnh"
+        },
+        "costEfficiency": {
+          "title": "Hiệu Quả Chi Phí",
+          "description": "Tổng chi phí thấp"
+        }
+      },
+      "metricsShort": {
+        "affordability": "Khả năng chi trả",
+        "safety": "An toàn",
+        "accumulation": "Tích lũy",
+        "flexibility": "Linh hoạt",
+        "efficiency": "Hiệu quả"
+      }
+    },
+    "recommendations": {
+      "optimal": {
+        "label": "Tối Ưu",
+        "description": "Cân bằng tốt nhất"
+      },
+      "safe": {
+        "label": "An Toàn",
+        "description": "Rủi ro thấp"
+      },
+      "aggressive": {
+        "label": "Tích Cực",
+        "description": "Tăng trưởng nhanh"
+      },
+      "risky": {
+        "label": "Rủi Ro",
+        "description": "Cần cân nhắc"
+      }
+    },
+    "riskLevels": {
+      "low": "Thấp",
+      "medium": "Trung bình",
+      "high": "Cao"
+    },
+    "detailedView": {
+      "housePrice": "Giá nhà",
+      "downPayment": "Vốn tự có",
+      "loanAmount": "Số tiền vay",
+      "interestRate": "Lãi suất",
+      "loanTerm": "Thời gian vay",
+      "totalInterest": "Tổng lãi vay",
+      "totalPayment": "Tổng thanh toán",
+      "riskAssessment": "Đánh giá rủi ro",
+      "cashFlowPositive": "dương",
+      "cashFlowNegative": "âm",
+      "downPaymentSufficient": "đủ",
+      "downPaymentLow": "thấp"
+    },
+    "years": "năm",
+    "perYear": "/năm"
+  },
+  "ScenarioParameterEditor": {
+    "title": "Trình Chỉnh Sửa Tham Số Kịch Bản",
+    "description": "Điều chỉnh tham số tương tác để tạo và chỉnh sửa kịch bản",
+    "tabs": {
+      "basic": "Cơ Bản",
+      "advanced": "Nâng Cao",
+      "preview": "Xem Trước"
+    },
+    "scenarioTypes": {
+      "baseline": "Cơ Sở",
+      "optimistic": "Lạc Quan", 
+      "pessimistic": "Bi Quan",
+      "alternative": "Thay Thế",
+      "stress_test": "Kiểm Tra Áp Lực"
+    },
+    "basicInfo": {
+      "title": "Thông Tin Cơ Bản",
+      "scenarioName": "Tên Kịch Bản",
+      "scenarioType": "Loại Kịch Bản",
+      "description": "Mô Tả"
+    },
+    "propertyDetails": {
+      "title": "Chi Tiết Bất Động Sản",
+      "purchasePrice": "Giá Mua",
+      "downPayment": "Tiền Trả Trước",
+      "loanAmount": "Số Tiền Vay"
+    },
+    "loanTerms": {
+      "title": "Điều Khoản Vay",
+      "interestRate": "Lãi Suất",
+      "loanTerm": "Thời Hạn Vay",
+      "years": "năm"
+    },
+    "personalFinances": {
+      "title": "Tài Chính Cá Nhân",
+      "monthlyIncome": "Thu Nhập Hàng Tháng",
+      "monthlyExpenses": "Chi Phí Hàng Tháng"
+    },
+    "additionalCosts": {
+      "title": "Chi Phí Bổ Sung",
+      "propertyTax": "Thuế Bất Động Sản",
+      "insurance": "Bảo Hiểm",
+      "maintenance": "Dự Phòng Bảo Trì"
+    },
+    "investmentParameters": {
+      "title": "Tham Số Đầu Tư",
+      "expectedRental": "Thu Nhập Thuê Dự Kiến",
+      "rentGrowthRate": "Tỷ Lệ Tăng Trưởng Thuê",
+      "propertyAppreciation": "Tỷ Lệ Tăng Giá BĐS",
+      "vacancyRate": "Tỷ Lệ Trống",
+      "capEx": "Chi Phí Vốn"
+    },
+    "calculatedMetrics": {
+      "title": "Chỉ Số Tính Toán",
+      "monthlyPayment": "Thanh Toán Hàng Tháng",
+      "dtiRatio": "Tỷ Lệ DTI",
+      "ltvRatio": "Tỷ Lệ LTV",
+      "totalCost": "Tổng Chi Phí",
+      "netCashFlow": "Dòng Tiền Ròng"
+    },
+    "actions": {
+      "save": "Lưu Kịch Bản",
+      "delete": "Xóa Kịch Bản",
+      "reset": "Đặt Lại Mặc Định",
+      "calculate": "Tính Toán Lại"
+    },
+    "validation": {
+      "nameRequired": "Tên kịch bản là bắt buộc",
+      "purchasePriceRequired": "Giá mua phải lớn hơn 0",
+      "downPaymentTooHigh": "Tiền trả trước không thể vượt quá giá mua",
+      "interestRateInvalid": "Lãi suất phải từ 0% đến 50%",
+      "loanTermInvalid": "Thời hạn vay phải từ 1 đến 50 năm"
+    }
+  }
+}

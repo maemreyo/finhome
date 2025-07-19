@@ -1,0 +1,47 @@
+{
+  "Index": {
+    "title": "Hello world"
+  },
+  "Layout": {
+    "metadata": {
+      "titleDefault": "FinHome",
+      "titleTemplate": "%s | FinHome",
+      "description": "Vietnamese real estate financial planning platform",
+      "openGraphTitle": "FinHome",
+      "openGraphDescription": "Vietnamese real estate financial planning platform",
+      "openGraphSiteName": "FinHome",
+      "twitterTitle": "FinHome",
+      "twitterDescription": "Vietnamese real estate financial planning platform"
+    }
+  },
+  "Toast": {
+    "paymentReminder": {
+      "title": "Payment Reminder",
+      "message": "Loan payment for {propertyName} of {amount} VND is due soon",
+      "action": "View Details"
+    },
+    "marketUpdate": {
+      "title": "Market Update",
+      "action": "View More"
+    },
+    "goalProgress": {
+      "title": "Goal Progress",
+      "message": "You have completed {percentage}% of goal \"{goalName}\"",
+      "action": "View Goal"
+    },
+    "newAchievement": {
+      "title": "New Achievement! 🏆",
+      "message": "You have unlocked the achievement \"{achievementName}\"",
+      "action": "View Achievement"
+    },
+    "propertyAlert": {
+      "title": "Property Alert",
+      "message": "Price of {propertyName} has {changeType} {changePercent}%",
+      "action": "View Details",
+      "changeTypes": {
+        "increase": "increased",
+        "decrease": "decreased"
+      }
+    }
+  }
+}

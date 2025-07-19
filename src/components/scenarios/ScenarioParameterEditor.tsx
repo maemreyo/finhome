@@ -4,6 +4,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -93,6 +94,7 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
   onDeleteScenario,
   className
 }) => {
+  const t = useTranslations('ScenarioParameterEditor')
   const [parameters, setParameters] = useState<ScenarioParameters>(() => {
     if (initialScenario) {
       return {

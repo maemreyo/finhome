@@ -1,0 +1,559 @@
+{
+  "Dashboard": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "plans": "Kế Hoạch Tài Chính",
+      "scenarios": "So Sánh Kịch Bản",
+      "laboratory": "Phòng Thí Nghiệm",
+      "profile": "Hồ Sơ",
+      "billing": "Thanh Toán",
+      "analytics": "Phân Tích",
+      "achievements": "Thành Tích",
+      "settings": "Cài Đặt",
+      "help": "Trợ Giúp"
+    },
+    "title": "Tổng Quan Tài Chính",
+    "description": "Theo dõi tiến độ và quản lý đầu tư bất động sản của bạn",
+    "lastUpdated": "Cập nhật: {time}",
+    "settings": "Cài Đặt",
+    "createPlan": "Tạo Kế Hoạch",
+    "quickActions": {
+      "title": "Hành Động Nhanh",
+      "items": {
+        "findProperty": {
+          "title": "Tìm Bất Động Sản",
+          "description": "Khám phá cơ hội đầu tư mới"
+        },
+        "newPlan": {
+          "title": "Tạo Kế Hoạch Mới",
+          "description": "Lập kế hoạch tài chính chi tiết"
+        },
+        "compareRates": {
+          "title": "So Sánh Lãi Suất",
+          "description": "Tìm gói vay ưu đãi nhất"
+        },
+        "portfolio": {
+          "title": "Danh Mục Đầu Tư",
+          "description": "Theo dõi hiệu suất đầu tư"
+        }
+      }
+    },
+    "tabs": {
+      "portfolio": "Danh Mục BĐS",
+      "analytics": "Phân Tích",
+      "schedule": "Lịch Trình"
+    },
+    "investmentAnalysis": {
+      "title": "Phân Tích Đầu Tư",
+      "placeholder": "Biểu đồ phân tích đầu tư sẽ hiển thị ở đây"
+    },
+    "financialSchedule": {
+      "title": "Lịch Trình Tài Chính",
+      "placeholder": "Lịch trình thanh toán và mục tiêu sẽ hiển thị ở đây"
+    },
+    "marketInsights": {
+      "title": "Thông Tin Thị Trường",
+      "avgPrice": "Giá TB/m²",
+      "interestRate": "Lãi Suất",
+      "promotionalRate": "Lãi suất ưu đãi",
+      "noData": "Không có dữ liệu"
+    },
+    "quickStats": {
+      "title": "Thống Kê Nhanh",
+      "totalPlans": "Tổng kế hoạch",
+      "interestedProperties": "BDS quan tâm",
+      "comparedBanks": "Ngân hàng so sánh",
+      "achievements": "Thành tích",
+      "activePlans": "Kế hoạch đang hoạt động",
+      "experience": "Kinh nghiệm",
+      "notifications": "Thông báo"
+    },
+    "Analytics": {
+      "title": "Phân Tích",
+      "description": "Theo dõi hiệu suất và xu hướng kế hoạch tài chính của bạn",
+      "comparison": "so với kỳ trước",
+      "periods": {
+        "7d": "7 ngày",
+        "30d": "30 ngày",
+        "90d": "3 tháng",
+        "1y": "1 năm"
+      },
+      "planDistribution": {
+        "title": "Phân Bố Kế Hoạch",
+        "description": "Phân tích theo loại bất động sản và khu vực",
+        "placeholder": "Biểu đồ phân bố kế hoạch sẽ hiển thị tại đây"
+      },
+      "investmentTrends": {
+        "title": "Xu Hướng Đầu Tư",
+        "description": "Theo dõi xu hướng đầu tư theo thời gian",
+        "placeholder": "Biểu đồ xu hướng đầu tư sẽ hiển thị tại đây"
+      },
+      "planPerformance": {
+        "title": "Hiệu Suất Kế Hoạch",
+        "description": "Đánh giá hiệu suất các kế hoạch tài chính",
+        "placeholder": "Bảng hiệu suất kế hoạch sẽ hiển thị tại đây"
+      },
+      "marketTrends": {
+        "title": "Xu Hướng Thị Trường",
+        "description": "Phân tích xu hướng thị trường bất động sản",
+        "placeholder": "Biểu đồ xu hướng thị trường sẽ hiển thị tại đây"
+      },
+      "financialGoals": {
+        "title": "Mục Tiêu Tài Chính",
+        "description": "Theo dõi tiến độ đạt mục tiêu tài chính",
+        "savingsGoal": "Mục tiêu tiết kiệm năm 2024",
+        "investmentGoal": "Mục tiêu đầu tư bất động sản",
+        "profitGoal": "Mục tiêu lợi nhuận tối thiểu"
+      },
+      "tabs": {
+        "overview": "Tổng Quan",
+        "performance": "Hiệu Suất",
+        "trends": "Xu Hướng",
+        "goals": "Mục Tiêu"
+      },
+      "metrics": {
+        "totalPlans": "Tổng Kế Hoạch",
+        "totalInvestment": "Tổng Đầu Tư",
+        "expectedProfit": "Lợi Nhuận Dự Kiến",
+        "activeScenarios": "Kịch Bản Hoạt Động"
+      }
+    },
+    "Achievements": {
+      "title": "Thành Tích",
+      "description": "Theo dõi tiến độ và thành tích trong hành trình đầu tư của bạn",
+      "categories": {
+        "all": "Tất cả",
+        "planning": "Kế hoạch",
+        "investment": "Đầu tư",
+        "savings": "Tiết kiệm",
+        "milestones": "Mốc quan trọng"
+      },
+      "achievements": {
+        "newInvestor": {
+          "title": "Nhà Đầu Tư Mới",
+          "description": "Tạo kế hoạch tài chính đầu tiên của bạn"
+        },
+        "strategist": {
+          "title": "Chiến Lược Gia",
+          "description": "Tạo 5 kế hoạch tài chính thành công"
+        },
+        "futureMillionaire": {
+          "title": "Triệu Phú Tương Lai",
+          "description": "Đạt mục tiêu tiết kiệm 1 tỷ đồng"
+        },
+        "analysisExpert": {
+          "title": "Chuyên Gia Phân Tích",
+          "description": "So sánh 10 kịch bản đầu tư"
+        },
+        "investmentMaster": {
+          "title": "Bậc Thầy Đầu Tư",
+          "description": "Hoàn thành 3 kế hoạch đầu tư thành công"
+        },
+        "persistent": {
+          "title": "Người Kiên Trì",
+          "description": "Sử dụng ứng dụng trong 30 ngày liên tiếp"
+        }
+      }
+    },
+    "Billing": {
+      "title": "Thanh toán",
+      "description": "Quản lý đăng ký, phương thức thanh toán và lịch sử thanh toán của bạn",
+      "viewAllPlans": "Xem tất cả các gói"
+    },
+    "Settings": {
+      "title": "Cài Đặt",
+      "description": "Quản lý tùy chọn tài khoản và ứng dụng của bạn",
+      "tabs": {
+        "general": "Chung",
+        "notifications": "Thông báo",
+        "security": "Bảo mật",
+        "preferences": "Tùy chọn",
+        "account": "Tài khoản"
+      },
+      "general": {
+        "title": "Cài Đặt Chung",
+        "description": "Quản lý thông tin cơ bản và tùy chọn hiển thị",
+        "language": "Ngôn ngữ",
+        "selectLanguage": "Chọn ngôn ngữ",
+        "languages": {
+          "vietnamese": "Tiếng Việt",
+          "english": "English"
+        },
+        "currency": "Đơn vị tiền tệ",
+        "selectCurrency": "Chọn đơn vị tiền tệ",
+        "currencies": {
+          "vnd": "VND (Việt Nam Đồng)",
+          "usd": "USD (Đô la Mỹ)"
+        },
+        "timezone": "Múi giờ",
+        "selectTimezone": "Chọn múi giờ",
+        "timezones": {
+          "vietnam": "Việt Nam (UTC+7)",
+          "bangkok": "Bangkok (UTC+7)",
+          "singapore": "Singapore (UTC+8)"
+        },
+        "theme": "Giao diện",
+        "selectTheme": "Chọn giao diện",
+        "themes": {
+          "light": "Sáng",
+          "dark": "Tối",
+          "system": "Theo hệ thống"
+        },
+        "saveChanges": "Lưu thay đổi"
+      },
+      "notifications": {
+        "title": "Cài Đặt Thông Báo",
+        "description": "Chọn loại thông báo bạn muốn nhận",
+        "emailNotifications": "Thông báo email",
+        "emailDescription": "Nhận thông báo về kế hoạch và cập nhật tài khoản",
+        "pushNotifications": "Thông báo đẩy",
+        "pushDescription": "Nhận thông báo trên thiết bị di động",
+        "marketingEmails": "Email tiếp thị",
+        "marketingDescription": "Nhận thông tin về tính năng mới và ưu đãi",
+        "saveChanges": "Lưu thay đổi"
+      },
+      "security": {
+        "title": "Bảo Mật Tài Khoản",
+        "description": "Quản lý mật khẩu và cài đặt bảo mật",
+        "currentPassword": "Mật khẩu hiện tại",
+        "newPassword": "Mật khẩu mới",
+        "confirmNewPassword": "Xác nhận mật khẩu mới",
+        "twoFactorAuth": "Xác thực hai yếu tố",
+        "twoFactorDescription": "Thêm lớp bảo mật bổ sung cho tài khoản",
+        "enable": "Kích hoạt",
+        "loginSessions": "Phiên đăng nhập",
+        "loginSessionsDescription": "Quản lý các thiết bị đã đăng nhập",
+        "viewDetails": "Xem chi tiết",
+        "updatePassword": "Cập nhật mật khẩu"
+      },
+      "preferences": {
+        "title": "Tùy Chọn Cá Nhân",
+        "description": "Tùy chỉnh trải nghiệm sử dụng ứng dụng",
+        "showHints": "Hiển thị gợi ý",
+        "showHintsDescription": "Hiển thị gợi ý và mẹo khi sử dụng",
+        "autoSave": "Tự động lưu kế hoạch",
+        "autoSaveDescription": "Tự động lưu các thay đổi trong kế hoạch",
+        "showAdvancedCharts": "Hiển thị biểu đồ nâng cao",
+        "showAdvancedChartsDescription": "Hiển thị các biểu đồ phân tích chi tiết",
+        "savePreferences": "Lưu tùy chọn"
+      },
+      "account": {
+        "title": "Quản Lý Tài Khoản",
+        "description": "Xuất dữ liệu và quản lý tài khoản",
+        "exportData": "Xuất dữ liệu",
+        "exportDataDescription": "Tải xuống bản sao dữ liệu tài khoản của bạn",
+        "exportDataButton": "Xuất dữ liệu",
+        "dangerZone": "Vùng nguy hiểm",
+        "deleteAccount": "Xóa tài khoản",
+        "deleteAccountDescription": "Xóa vĩnh viễn tài khoản và toàn bộ dữ liệu",
+        "deleteAccountButton": "Xóa tài khoản"
+      }
+    },
+    "Help": {
+      "title": "Trợ Giúp",
+      "description": "Tìm câu trả lời cho câu hỏi và nhận hỗ trợ kỹ thuật",
+      "locale": "vi-VN",
+      "search": {
+        "title": "Tìm Kiếm Hỗ Trợ",
+        "placeholder": "Tìm kiếm câu hỏi thường gặp..."
+      },
+      "faq": {
+        "title": "Câu Hỏi Thường Gặp",
+        "description": "Tìm câu trả lời cho những câu hỏi phổ biến nhất",
+        "q1": "Làm thế nào để tạo kế hoạch tài chính đầu tiên?",
+        "a1": "Để tạo kế hoạch tài chính mới, hãy vào mục \"Kế Hoạch Tài Chính\" ở menu bên trái và nhấp vào \"Tạo Kế Hoạch Mới\". Bạn sẽ được hướng dẫn qua từng bước để nhập thông tin về mục tiêu đầu tư, nguồn lực tài chính và thời gian.",
+        "q2": "Làm thế nào để so sánh nhiều kịch bản đầu tư?",
+        "a2": "Sử dụng tính năng \"So Sánh Kịch Bản\" để phân tích các phương án đầu tư khác nhau. Bạn có thể điều chỉnh các thông số như lãi suất, thời hạn vay và thuế suất để xem tác động đến lợi nhuận dự kiến.",
+        "q3": "Tính năng Phòng Thí Nghiệm hoạt động như thế nào?",
+        "a3": "Phòng Thí Nghiệm cho phép bạn thử nghiệm các thông số đầu tư trong một môi trường an toàn. Bạn có thể thay đổi giá trị các biến và xem ngay tác động đến kết quả tài chính mà không ảnh hưởng đến các kế hoạch chính của bạn.",
+        "q4": "Làm thế nào để cập nhật thông tin cá nhân?",
+        "a4": "Vào mục \"Hồ Sơ\" trong menu thanh bên để cập nhật thông tin cá nhân như tên, email, số điện thoại và các chi tiết khác. Hãy nhớ nhấp vào \"Lưu Thay Đổi\" sau khi chỉnh sửa.",
+        "q5": "Dữ liệu của tôi có an toàn không?",
+        "a5": "Chúng tôi sử dụng các biện pháp bảo mật hàng đầu để bảo vệ dữ liệu của bạn. Mọi thông tin đều được mã hóa trong quá trình truyền và lưu trữ. Bạn có thể xem chi tiết về chính sách bảo mật của chúng tôi trong phần Cài đặt.",
+        "q6": "Tôi có thể xuất dữ liệu kế hoạch tài chính không?",
+        "a6": "Có, bạn có thể xuất dữ liệu kế hoạch tài chính dưới dạng tệp Excel hoặc PDF. Hãy vào chi tiết kế hoạch và nhấp vào nút \"Xuất Dữ Liệu\" để tải xuống."
+      },
+      "quickLinks": {
+        "userGuide": {
+          "title": "Hướng Dẫn Sử Dụng",
+          "description": "Tài liệu chi tiết về các tính năng"
+        },
+        "videoTutorials": {
+          "title": "Video Hướng Dẫn",
+          "description": "Xem video học cách sử dụng"
+        },
+        "community": {
+          "title": "Cộng Đồng",
+          "description": "Thảo luận với người dùng khác"
+        },
+        "updates": {
+          "title": "Cập Nhật",
+          "description": "Thông tin về phiên bản mới"
+        }
+      },
+      "quickStart": {
+        "title": "Hướng Dẫn Nhanh",
+        "description": "Các bước cơ bản để bắt đầu sử dụng FinHome",
+        "step1": {
+          "title": "Hoàn thành hồ sơ cá nhân",
+          "description": "Cập nhật thông tin cá nhân và tùy chọn cá nhân hóa"
+        },
+        "step2": {
+          "title": "Tạo kế hoạch tài chính đầu tiên",
+          "description": "Sử dụng wizard tạo kế hoạch để thiết lập mục tiêu đầu tư"
+        },
+        "step3": {
+          "title": "Khám phá tính năng so sánh kịch bản",
+          "description": "Phân tích các phương án đầu tư khác nhau"
+        },
+        "step4": {
+          "title": "Thử nghiệm trong Phòng Thí Nghiệm",
+          "description": "Điều chỉnh các thông số để tối ưu hóa kế hoạch"
+        }
+      },
+      "supportForm": {
+        "title": "Gửi Yêu Cầu Hỗ Trợ",
+        "description": "Mô tả vấn đề bạn gặp phải và chúng tôi sẽ hỗ trợ bạn",
+        "subject": "Tiêu đề",
+        "subjectPlaceholder": "Mô tả ngắn gọn vấn đề...",
+        "message": "Nội dung",
+        "messagePlaceholder": "Mô tả chi tiết vấn đề bạn gặp phải...",
+        "submit": "Gửi yêu cầu"
+      },
+      "tickets": {
+        "title": "Yêu Cầu Hỗ Trợ Của Bạn",
+        "description": "Theo dõi trạng thái các yêu cầu hỗ trợ",
+        "details": "Chi tiết",
+        "status": {
+          "resolved": "Đã giải quyết",
+          "pending": "Đang chờ",
+          "in_progress": "Đang xử lý"
+        },
+        "t1": {
+          "subject": "Lỗi tính toán lãi suất"
+        },
+        "t2": {
+          "subject": "Cần hỗ trợ tạo kế hoạch"
+        },
+        "t3": {
+          "subject": "Câu hỏi về tính năng xuất dữ liệu"
+        }
+      },
+      "tabs": {
+        "faq": "Câu Hỏi Thường Gặp",
+        "guides": "Hướng Dẫn",
+        "contact": "Liên Hệ",
+        "tickets": "Yêu Cầu Hỗ Trợ"
+      },
+      "contact": {
+        "email": "Email",
+        "phone": "Điện thoại",
+        "chat": "Live Chat"
+      }
+    },
+    "Laboratory": {
+      "title": "Phòng Thí Nghiệm Tài Chính",
+      "description": "Mô phỏng các tình huống để tối ưu kế hoạch tài chính",
+      "whatIfDescription": "Mô phỏng các tình huống \"Điều gì sẽ xảy ra nếu? \" để tối ưu kế hoạch tài chính",
+      "locale": "vi-VN",
+      "planSelection": {
+        "title": "Chọn Kế Hoạch Tài Chính",
+        "description": "Chọn kế hoạch tài chính để thực hiện phân tích what-if",
+        "placeholder": "Chọn kế hoạch tài chính",
+        "newPlanButton": "Tạo Kế Hoạch Mới"
+      },
+      "quickStats": {
+        "plan": "Kế Hoạch",
+        "loanAmount": "Số Tiền Vay",
+        "monthlyPayment": "Trả Hàng Tháng",
+        "netCashFlow": "Dòng Tiền Ròng",
+        "years": "{count, plural, one {# năm} other {# năm}}",
+        "incomePercentage": "{percentage}% thu nhập",
+        "positive": "Dương tính",
+        "negative": "Âm tính"
+      },
+      "planTypes": {
+        "home_purchase": "Mua nhà ở",
+        "investment": "Đầu tư",
+        "other": "Khác"
+      },
+      "noPlan": {
+        "title": "Không có kế hoạch tài chính",
+        "description": "Bạn cần tạo ít nhất một kế hoạch tài chính để sử dụng phòng thí nghiệm",
+        "createButton": "Tạo Kế Hoạch Tài Chính Đầu Tiên"
+      },
+      "usageGuide": {
+        "title": "Hướng Dẫn Sử Dụng",
+        "earlyRepayment": {
+          "title": "Trả Nợ Sớm",
+          "description": "Mô phỏng tác động của việc trả thêm tiền hàng tháng hoặc thanh toán một lần. Xem được tiết kiệm bao nhiều lãi và rút ngắn thời gian vay."
+        },
+        "refinancing": {
+          "title": "Tái Cơ Cấu",
+          "description": "Phân tích hiệu quả khi tái cơ cấu khoản vay với lãi suất thấp hơn. Tính toán thời gian hòa vốn và tổng tiết kiệm."
+        },
+        "stressTest": {
+          "title": "Kiểm Tra Stress",
+          "description": "Đánh giá khả năng chi trả khi lãi suất tăng/giảm. Chuẩn bị kế hoạch dự phòng cho các tình huống bất lợi."
+        }
+      }
+    },
+    "Profile": {
+      "title": "Hồ sơ",
+      "description": "Quản lý cài đặt tài khoản và thông tin cá nhân của bạn",
+      "picture": {
+        "title": "Ảnh hồ sơ",
+        "description": "Cập nhật ảnh hồ sơ của bạn để cá nhân hóa tài khoản của bạn",
+        "upload": "Tải ảnh lên",
+        "comingSoon": "Sắp có: Tải lên ảnh hồ sơ tùy chỉnh"
+      },
+      "info": {
+        "title": "Thông tin hồ sơ",
+        "description": "Cập nhật chi tiết và sở thích cá nhân của bạn",
+        "name": "Họ và tên",
+        "namePlaceholder": "Nhập họ và tên của bạn",
+        "email": "Email",
+        "emailDescription": "Liên hệ với bộ phận hỗ trợ để thay đổi địa chỉ email của bạn",
+        "company": "Công ty",
+        "companyPlaceholder": "Nhập tên công ty của bạn",
+        "location": "Vị trí",
+        "locationPlaceholder": "Nhập vị trí của bạn",
+        "website": "Trang web",
+        "bio": "Tiểu sử",
+        "bioPlaceholder": "Hãy cho chúng tôi biết về bạn...",
+        "bioDescription": "Mô tả ngắn gọn cho hồ sơ của bạn. Tối đa 160 ký tự.",
+        "save": "Lưu thay đổi"
+      },
+      "account": {
+        "title": "Thông tin tài khoản",
+        "description": "Xem chi tiết tài khoản và ngày tạo của bạn",
+        "created": "Tài khoản được tạo",
+        "userId": "ID người dùng",
+        "unknown": "Không xác định"
+      }
+    },
+    "Scenarios": {
+      "title": "So Sánh Kịch Bản",
+      "description": "So sánh các kịch bản tài chính khác nhau để đưa ra quyết định sáng suốt",
+      "createScenarioButton": "Tạo Kịch Bản Mới",
+      "smartGenerateButton": "Tạo Thông Minh",
+      "generatedScenarioName": "Trả trước {downPaymentPercent}%, {loanTermYears} năm",
+      "generationSuccess": "Tạo thành công {count} kịch bản",
+      "generationError": "Không thể tạo kịch bản",
+      "availableRates": "{count} lãi suất có sẵn",
+      "demoMode": {
+        "strong": "Chế Độ Demo:",
+        "text": "Đăng nhập để truy cập kịch bản cá nhân và lưu công việc của bạn."
+      },
+      "summary": {
+        "totalScenarios": "Tổng Số Kịch Bản",
+        "optimalScenarios": "Kịch Bản Tối Ưu",
+        "averagePayment": "Thanh Toán Trung Bình",
+        "actions": "Hành Động",
+        "optionsCreated": "tùy chọn đã tạo",
+        "bestRated": "được đánh giá tốt nhất",
+        "monthly": "hàng tháng"
+      },
+      "smartGenerateModal": {
+        "title": "Trình Tạo Kịch Bản Thông Minh",
+        "description": "Tạo nhiều kịch bản dựa trên tình hình tài chính của bạn",
+        "propertyPrice": "Giá Bất Động Sản (VND)",
+        "monthlyIncome": "Thu Nhập Hàng Tháng (VND)",
+        "monthlyExpenses": "Chi Phí Hàng Tháng (VND)",
+        "loanType": "Loại Vay",
+        "loanTypes": {
+          "homePurchase": "Mua Nhà",
+          "investment": "Đầu Tư",
+          "commercial": "Thương Mại"
+        },
+        "loadingRates": "Đang tải lãi suất hiện tại...",
+        "ratesFound": "Tìm thấy {count} lãi suất phù hợp",
+        "cancel": "Hủy",
+        "generating": "Đang tạo...",
+        "generateButton": "Tạo Kịch Bản"
+      },
+      "noScenario": {
+        "title": "Không Có Kịch Bản",
+        "description": "Tạo kịch bản đầu tiên để bắt đầu so sánh các tùy chọn",
+        "createButton": "Tạo Kịch Bản Đầu Tiên"
+      },
+      "selectedScenario": {
+        "title": "Chi Tiết Kịch Bản Đã Chọn",
+        "description": "Thông tin chi tiết cho {planName}",
+        "basicInfo": {
+          "title": "Thông Tin Cơ Bản",
+          "propertyPrice": "Giá Bất Động Sản",
+          "downPayment": "Tiền Đặt Cọc",
+          "loanAmount": "Số Tiền Vay",
+          "loanTerm": "Thời Hạn Vay",
+          "interestRate": "Lãi Suất",
+          "years": "năm",
+          "perYear": "mỗi năm"
+        },
+        "monthlyFinance": {
+          "title": "Tài Chính Hàng Tháng",
+          "income": "Thu Nhập",
+          "expenses": "Chi Phí",
+          "monthlyLoanPayment": "Thanh Toán Vay Hàng Tháng",
+          "netCashFlow": "Dòng Tiền Ròng"
+        }
+      }
+    },
+    "enhancedScenarios": {
+      "title": "Phân tích kịch bản nâng cao",
+      "description": "So sánh kịch bản nâng cao với biểu đồ và phân tích tương tác",
+      "generateSmartScenarios": "Tạo kịch bản thông minh",
+      "export": "Xuất",
+      "createScenario": "Tạo kịch bản",
+      "editScenario": "Chỉnh sửa kịch bản",
+      "createNewScenario": "Tạo kịch bản mới",
+      "filtersAndSelection": "Bộ lọc & Lựa chọn",
+      "riskLevel": "Mức độ rủi ro:",
+      "all": "Tất cả",
+      "low": "Thấp",
+      "medium": "Trung bình",
+      "high": "Cao",
+      "type": "Loại:",
+      "baseline": "Cơ sở",
+      "optimistic": "Lạc quan",
+      "pessimistic": "Bi quan",
+      "alternative": "Thay thế",
+      "stressTest": "Kiểm tra căng thẳng",
+      "monthly": "Hàng tháng:",
+      "totalCost": "Tổng chi phí:",
+      "comparisonTable": "Bảng so sánh",
+      "visualCharts": "Biểu đồ trực quan",
+      "advancedCharts": "Biểu đồ nâng cao",
+      "interactiveSliders": "Thanh trượt tương tác",
+      "analysis": "Phân tích",
+      "selectScenariosForAdvancedCharts": "Chọn kịch bản để xem biểu đồ nâng cao",
+      "selectScenariosForInteractiveSliders": "Chọn ít nhất một kịch bản để sử dụng thanh trượt tương tác",
+      "riskAnalysis": "Phân tích rủi ro",
+      "duration": "Thời lượng:",
+      "months": "tháng",
+      "monthlySavings": "Tiết kiệm hàng tháng:",
+      "none": "Không có",
+      "recommendations": "Đề xuất",
+      "selectScenariosForRecommendations": "Chọn kịch bản để xem đề xuất",
+      "recommended": "Đề xuất",
+      "moreExpensive": "Đắt hơn {amount}",
+      "lowestCostRecommendation": "Tổng chi phí thấp nhất với mức độ rủi ro chấp nhận được",
+      "toasts": {
+        "scenarioUpdated": "Kịch bản đã được cập nhật thành công",
+        "scenarioCreated": "Kịch bản đã được tạo thành công",
+        "scenarioDeleted": "Kịch bản đã được xóa thành công",
+        "smartScenariosGenerated": "Kịch bản thông minh đã được tạo thành công",
+        "failedToGenerateSmartScenarios": "Không thể tạo kịch bản thông minh",
+        "scenariosExported": "Kịch bản đã được xuất thành công"
+      },
+      "mockScenarios": {
+        "aiRecommendedConservative": "AI Đề xuất - Thận trọng",
+        "aiGeneratedDescription": "Kịch bản do AI tạo dựa trên hồ sơ tài chính của bạn",
+        "demoPlanName": "Kế hoạch mẫu",
+        "demoPlanDescription": "Kế hoạch mẫu cho người dùng chưa xác thực",
+        "noDescriptionAvailable": "Không có mô tả"
+      },
+      "loadingScenarios": "Đang tải kịch bản..."
+    }
+  }
+}

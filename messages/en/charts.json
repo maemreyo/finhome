@@ -1,0 +1,350 @@
+{
+  "Charts": {
+    "CashFlow": {
+      "tooltips": {
+        "month": "Month {month}"
+      },
+      "xAxis": {
+        "monthLabel": "M{month}"
+      },
+      "legend": {
+        "income": "Total Income",
+        "expenses": "Total Expenses",
+        "netCashFlow": "Net Cash Flow",
+        "cumulativeCashFlow": "Cumulative Cash Flow"
+      }
+    },
+    "ExpensesBreakdown": {
+      "categories": {
+        "livingExpenses": "Living Expenses",
+        "mortgagePayment": "Mortgage Payment",
+        "additionalCosts": "Additional Costs",
+        "otherDebts": "Other Debts"
+      },
+      "summary": {
+        "totalExpenses": "Total Monthly Expenses",
+        "largestExpense": "Largest Expense Category"
+      }
+    },
+    "Amortization": {
+      "tooltips": {
+        "year": "Year {year}"
+      },
+      "xAxis": {
+        "yearLabel": "Y{year}"
+      },
+      "legend": {
+        "principalPayment": "Principal Payment",
+        "interestPayment": "Interest Payment"
+      },
+      "summary": {
+        "totalInterest": "Total Interest Paid",
+        "totalPrincipal": "Total Principal Paid",
+        "interestRatio": "Interest Ratio"
+      }
+    }
+  },
+  "ScenarioComparisonTable": {
+    "title": "Scenario Comparison",
+    "descriptionNoSelection": "Select scenarios to compare them side by side",
+    "noScenariosSelected": "No scenarios selected for comparison",
+    "descriptionWithSelection": "Compare {count} scenario{count, plural, one {} other {s}} side by side",
+    "metric": "Metric",
+    "monthlyPayment": "Monthly Payment",
+    "totalInterest": "Total Interest",
+    "totalCost": "Total Cost",
+    "loanDuration": "Loan Duration",
+    "months": "months",
+    "interestRate": "Interest Rate",
+    "riskLevel": "Risk Level",
+    "scenarioSummary": "Scenario Summary",
+    "totalCostLabel": "Total Cost:",
+    "moreThanBestOption": "{amount} more than best option",
+    "riskLabel": "Risk:",
+    "best": "Best"
+  },
+  "AdvancedScenarioCharts": {
+    "scenarioOverview": {
+      "title": "Scenario Comparison Overview",
+      "description": "Compare key financial metrics across scenarios"
+    },
+    "monthlyPaymentChart": {
+      "title": "Monthly Payment",
+      "tooltipLabel": "Payment",
+      "scenarioLabel": "Scenario: {type}"
+    },
+    "totalCostChart": {
+      "title": "Total Cost",
+      "tooltipLabel": "Total Cost",
+      "scenarioLabel": "Scenario: {type}"
+    },
+    "loanBalanceOverTime": {
+      "title": "Loan Balance Over Time",
+      "description": "Track remaining loan balance over the years",
+      "xAxisLabel": "Year {year}",
+      "tooltipLabel": "Month {month}",
+      "yAxisLabel": "Balance"
+    },
+    "riskReturnAnalysis": {
+      "title": "Risk - Return Analysis",
+      "description": "Position of scenarios on risk and return matrix",
+      "xAxisLabel": "Risk Level",
+      "yAxisLabel": "ROI (%)",
+      "tooltipRisk": "Risk: {value}/10",
+      "tooltipReturn": "Return: {value}%"
+    },
+    "multidimensionalAnalysis": {
+      "title": "Multi-dimensional Analysis",
+      "description": "Comprehensive comparison of scenario aspects",
+      "metrics": {
+        "affordability": "Affordability",
+        "roiPotential": "ROI Potential",
+        "riskLevel": "Risk Level",
+        "monthlyPayment": "Monthly Payment",
+        "timeToPayoff": "Time to Payoff"
+      }
+    },
+    "financialMetricsMatrix": {
+      "title": "Financial Metrics Matrix",
+      "description": "Heatmap showing scenario performance by metrics",
+      "headers": {
+        "scenario": "Scenario",
+        "monthlyPayment": "Monthly Payment",
+        "totalCost": "Total Cost",
+        "affordabilityScore": "Affordability Score",
+        "dtiRatio": "DTI Ratio",
+        "riskLevel": "Risk Level"
+      },
+      "riskLevels": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      }
+    }
+  },
+  "InteractiveParameterSliders": {
+    "title": "Scenario Parameter Adjustment",
+    "description": "Change parameters to see impact on financial scenario",
+    "controls": {
+      "autoUpdate": "Auto Update",
+      "applyChanges": "Apply Changes",
+      "reset": "Reset"
+    },
+    "currentMetrics": {
+      "title": "Current Financial Metrics",
+      "monthlyPayment": "Monthly Payment",
+      "loanAmount": "Loan Amount",
+      "dtiRatio": "DTI Ratio",
+      "affordabilityScore": "Affordability Score"
+    },
+    "parameters": {
+      "title": "Adjustment Parameters",
+      "purchasePrice": {
+        "label": "Purchase Price",
+        "description": "Real estate purchase price"
+      },
+      "downPayment": {
+        "label": "Down Payment",
+        "description": "Down payment percentage"
+      },
+      "interestRate": {
+        "label": "Interest Rate",
+        "description": "Annual loan interest rate"
+      },
+      "loanTermYears": {
+        "label": "Loan Term",
+        "description": "Loan duration in years",
+        "unit": "years"
+      },
+      "monthlyIncome": {
+        "label": "Monthly Income",
+        "description": "Monthly income"
+      },
+      "monthlyExpenses": {
+        "label": "Monthly Expenses",
+        "description": "Monthly living expenses"
+      }
+    },
+    "riskAssessment": {
+      "title": "Risk Assessment",
+      "dtiRatioLabel": "DTI Ratio",
+      "riskLevels": {
+        "low": "Low Risk",
+        "medium": "Medium Risk",
+        "high": "High Risk"
+      },
+      "ranges": {
+        "low": "Low (<30%)",
+        "medium": "Medium (30-40%)",
+        "high": "High (>40%)"
+      }
+    }
+  },
+  "ScenarioComparison": {
+    "title": "Scenario Comparison",
+    "description": "Analyze and compare different loan options",
+    "createNewScenario": "Create New Scenario",
+    "viewModes": {
+      "table": "Comparison Table",
+      "radar": "Radar Chart",
+      "detailed": "Detailed"
+    },
+    "directComparison": {
+      "title": "Direct Comparison",
+      "description": "Select up to 3 scenarios for detailed comparison",
+      "monthlyPayment": "Monthly Payment",
+      "netCashFlow": "Net Cash Flow",
+      "totalInterest": "Total Interest",
+      "riskLevel": "Risk Level",
+      "selectOptimal": "Select Optimal",
+      "selectScenario": "Select Scenario"
+    },
+    "radarChart": {
+      "title": "Radar Chart Comparison",
+      "description": "Visualize important metrics for each scenario",
+      "metricsTitle": "Assessment Metrics",
+      "metrics": {
+        "affordability": {
+          "title": "Affordability",
+          "description": "Income/expense ratio"
+        },
+        "safety": {
+          "title": "Safety Level",
+          "description": "Financial risk"
+        },
+        "accumulation": {
+          "title": "Accumulation Speed",
+          "description": "Asset building"
+        },
+        "flexibility": {
+          "title": "Flexibility",
+          "description": "Adjustment capability"
+        },
+        "costEfficiency": {
+          "title": "Cost Efficiency",
+          "description": "Low total cost"
+        }
+      },
+      "metricsShort": {
+        "affordability": "Affordability",
+        "safety": "Safety",
+        "accumulation": "Accumulation",
+        "flexibility": "Flexibility",
+        "efficiency": "Efficiency"
+      }
+    },
+    "recommendations": {
+      "optimal": {
+        "label": "Optimal",
+        "description": "Best balance"
+      },
+      "safe": {
+        "label": "Safe",
+        "description": "Low risk"
+      },
+      "aggressive": {
+        "label": "Aggressive",
+        "description": "Fast growth"
+      },
+      "risky": {
+        "label": "Risky",
+        "description": "Consider carefully"
+      }
+    },
+    "riskLevels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "detailedView": {
+      "housePrice": "House Price",
+      "downPayment": "Down Payment",
+      "loanAmount": "Loan Amount",
+      "interestRate": "Interest Rate",
+      "loanTerm": "Loan Term",
+      "totalInterest": "Total Interest",
+      "totalPayment": "Total Payment",
+      "riskAssessment": "Risk Assessment",
+      "cashFlowPositive": "positive",
+      "cashFlowNegative": "negative",
+      "downPaymentSufficient": "sufficient",
+      "downPaymentLow": "low"
+    },
+    "years": "years",
+    "perYear": "/year"
+  },
+  "ScenarioParameterEditor": {
+    "title": "Scenario Parameter Editor",
+    "description": "Interactive parameter adjustment for scenario creation and modification",
+    "tabs": {
+      "basic": "Basic",
+      "advanced": "Advanced",
+      "preview": "Preview"
+    },
+    "scenarioTypes": {
+      "baseline": "Baseline",
+      "optimistic": "Optimistic", 
+      "pessimistic": "Pessimistic",
+      "alternative": "Alternative",
+      "stress_test": "Stress Test"
+    },
+    "basicInfo": {
+      "title": "Basic Information",
+      "scenarioName": "Scenario Name",
+      "scenarioType": "Scenario Type",
+      "description": "Description"
+    },
+    "propertyDetails": {
+      "title": "Property Details",
+      "purchasePrice": "Purchase Price",
+      "downPayment": "Down Payment",
+      "loanAmount": "Loan Amount"
+    },
+    "loanTerms": {
+      "title": "Loan Terms",
+      "interestRate": "Interest Rate",
+      "loanTerm": "Loan Term",
+      "years": "years"
+    },
+    "personalFinances": {
+      "title": "Personal Finances",
+      "monthlyIncome": "Monthly Income",
+      "monthlyExpenses": "Monthly Expenses"
+    },
+    "additionalCosts": {
+      "title": "Additional Costs",
+      "propertyTax": "Property Tax",
+      "insurance": "Insurance",
+      "maintenance": "Maintenance Reserve"
+    },
+    "investmentParameters": {
+      "title": "Investment Parameters",
+      "expectedRental": "Expected Rental Income",
+      "rentGrowthRate": "Rent Growth Rate",
+      "propertyAppreciation": "Property Appreciation Rate",
+      "vacancyRate": "Vacancy Rate",
+      "capEx": "Capital Expenditure"
+    },
+    "calculatedMetrics": {
+      "title": "Calculated Metrics",
+      "monthlyPayment": "Monthly Payment",
+      "dtiRatio": "DTI Ratio",
+      "ltvRatio": "LTV Ratio",
+      "totalCost": "Total Cost",
+      "netCashFlow": "Net Cash Flow"
+    },
+    "actions": {
+      "save": "Save Scenario",
+      "delete": "Delete Scenario",
+      "reset": "Reset to Default",
+      "calculate": "Recalculate"
+    },
+    "validation": {
+      "nameRequired": "Scenario name is required",
+      "purchasePriceRequired": "Purchase price must be greater than 0",
+      "downPaymentTooHigh": "Down payment cannot exceed purchase price",
+      "interestRateInvalid": "Interest rate must be between 0% and 50%",
+      "loanTermInvalid": "Loan term must be between 1 and 50 years"
+    }
+  }
+}

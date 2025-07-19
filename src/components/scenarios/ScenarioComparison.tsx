@@ -4,6 +4,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -46,6 +47,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
   onCreateNewScenario,
   className
 }) => {
+  const t = useTranslations('ScenarioComparison')
   const [selectedScenarios, setSelectedScenarios] = useState<string[]>(
     scenarios.slice(0, 3).map(s => s.id)
   )
@@ -116,29 +118,29 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
         return {
           icon: Target,
           color: 'bg-green-100 text-green-800 border-green-200',
-          label: 'Tối Ưu',
-          description: 'Cân bằng tốt nhất'
+          label: t('recommendations.optimal.label'),
+          description: t('recommendations.optimal.description')
         }
       case 'safe':
         return {
           icon: Shield,
           color: 'bg-blue-100 text-blue-800 border-blue-200',
-          label: 'An Toàn',
-          description: 'Rủi ro thấp'
+          label: t('recommendations.safe.label'),
+          description: t('recommendations.safe.description')
         }
       case 'aggressive':
         return {
           icon: Zap,
           color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-          label: 'Tích Cực',
-          description: 'Tăng trưởng nhanh'
+          label: t('recommendations.aggressive.label'),
+          description: t('recommendations.aggressive.description')
         }
       case 'risky':
         return {
           icon: AlertTriangle,
           color: 'bg-red-100 text-red-800 border-red-200',
-          label: 'Rủi Ro',
-          description: 'Cần cân nhắc'
+          label: t('recommendations.risky.label'),
+          description: t('recommendations.risky.description')
         }
     }
   }
@@ -153,6 +155,17 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
         return 'text-red-600'
     }
   }
+  
+  const getRiskLevelText = (riskLevel: 'low' | 'medium' | 'high') => {
+    switch (riskLevel) {
+      case 'low':
+        return t('riskLevels.low')
+      case 'medium':
+        return t('riskLevels.medium')
+      case 'high':
+        return t('riskLevels.high')
+    }
+  }
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -160,34 +173,34 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            So Sánh Kịch Bản
+            {t('title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Phân tích và so sánh các tùy chọn vay khác nhau
+            {t('description')}
           </p>
         </div>
         
         <Button onClick={onCreateNewScenario} className="flex items-center gap-2">
           <Calculator className="w-4 h-4" />
-          Tạo Kịch Bản Mới
+          {t('createNewScenario')}
         </Button>
       </div>
 
       {/* View Mode Selector */}
       <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as any)}>
         <TabsList>
-          <TabsTrigger value="table">Bảng So Sánh</TabsTrigger>
-          <TabsTrigger value="radar">Biểu Đồ Radar</TabsTrigger>
-          <TabsTrigger value="detailed">Chi Tiết</TabsTrigger>
+          <TabsTrigger value="table">{t('viewModes.table')}</TabsTrigger>
+          <TabsTrigger value="radar">{t('viewModes.radar')}</TabsTrigger>
+          <TabsTrigger value="detailed">{t('viewModes.detailed')}</TabsTrigger>
         </TabsList>
 
         {/* Table View */}
         <TabsContent value="table" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>So Sánh Trực Tiếp</CardTitle>
+              <CardTitle>{t('directComparison.title')}</CardTitle>
               <CardDescription>
-                Chọn tối đa 3 kịch bản để so sánh chi tiết
+                {t('directComparison.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -211,7 +224,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                       <div className="text-center">
                         <h3 className="font-semibold text-lg">{scenario.plan_name}</h3>
                         <p className="text-sm text-gray-600">
-                          {Math.round(((scenario.down_payment || 0) / (scenario.purchase_price || 1)) * 100)}% - {Math.round((scenario.loanCalculations?.[0]?.loan_term_months || 240) / 12)} năm
+                          {Math.round(((scenario.down_payment || 0) / (scenario.purchase_price || 1)) * 100)}% - {Math.round((scenario.loanCalculations?.[0]?.loan_term_months || 240) / 12)} {t('years')}
                         </p>
                       </div>
 
@@ -220,7 +233,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                         <div className="text-2xl font-bold text-blue-600">
                           {formatCurrency(scenario.calculatedMetrics?.monthlyPayment || 0)}
                         </div>
-                        <p className="text-sm text-gray-600">Trả hàng tháng</p>
+                        <p className="text-sm text-gray-600">{t('directComparison.monthlyPayment')}</p>
                       </div>
 
                       {/* Cash Flow */}
@@ -232,7 +245,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                           {((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0)) >= 0 ? '+' : ''}
                           {formatCurrency((scenario.monthly_income || 0) - (scenario.monthly_expenses || 0) - (scenario.calculatedMetrics?.monthlyPayment || 0))}
                         </div>
-                        <p className="text-sm text-gray-600">Dòng tiền ròng</p>
+                        <p className="text-sm text-gray-600">{t('directComparison.netCashFlow')}</p>
                       </div>
 
                       {/* Recommendation Badge */}
@@ -249,14 +262,13 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                       {/* Key Metrics */}
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span>Tổng lãi vay:</span>
+                          <span>{t('directComparison.totalInterest')}:</span>
                           <span className="font-medium">{formatCurrency(scenario.calculatedMetrics?.totalInterest || 0)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Mức rủi ro:</span>
+                          <span>{t('directComparison.riskLevel')}:</span>
                           <span className={cn("font-medium", getRiskLevelColor(scenario.riskLevel))}>
-                            {scenario.riskLevel === 'low' ? 'Thấp' : 
-                             scenario.riskLevel === 'medium' ? 'Trung bình' : 'Cao'}
+                            {getRiskLevelText(scenario.riskLevel)}
                           </span>
                         </div>
                       </div>
@@ -267,7 +279,7 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                         className="w-full"
                         variant={scenario.scenarioType === 'baseline' ? 'default' : 'outline'}
                       >
-                        {scenario.scenarioType === 'baseline' ? 'Chọn Tối Ưu' : 'Chọn Kịch Bản'}
+                        {scenario.scenarioType === 'baseline' ? t('directComparison.selectOptimal') : t('directComparison.selectScenario')}
                       </Button>
                     </motion.div>
                   )
@@ -281,50 +293,50 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
         <TabsContent value="radar" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Biểu Đồ Radar So Sánh</CardTitle>
+              <CardTitle>{t('radarChart.title')}</CardTitle>
               <CardDescription>
-                Trực quan hóa các chỉ số quan trọng của từng kịch bản
+                {t('radarChart.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Metrics Legend */}
                 <div className="space-y-4">
-                  <h4 className="font-semibold">Chỉ Số Đánh Giá</h4>
+                  <h4 className="font-semibold">{t('radarChart.metricsTitle')}</h4>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 bg-blue-500 rounded"></div>
                       <div>
-                        <div className="font-medium">Khả Năng Chi Trả</div>
-                        <div className="text-sm text-gray-600">Tỷ lệ thu nhập/chi phí</div>
+                        <div className="font-medium">{t('radarChart.metrics.affordability.title')}</div>
+                        <div className="text-sm text-gray-600">{t('radarChart.metrics.affordability.description')}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 bg-green-500 rounded"></div>
                       <div>
-                        <div className="font-medium">Mức Độ An Toàn</div>
-                        <div className="text-sm text-gray-600">Rủi ro tài chính</div>
+                        <div className="font-medium">{t('radarChart.metrics.safety.title')}</div>
+                        <div className="text-sm text-gray-600">{t('radarChart.metrics.safety.description')}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 bg-purple-500 rounded"></div>
                       <div>
-                        <div className="font-medium">Tốc Độ Tích Lũy</div>
-                        <div className="text-sm text-gray-600">Xây dựng tài sản</div>
+                        <div className="font-medium">{t('radarChart.metrics.accumulation.title')}</div>
+                        <div className="text-sm text-gray-600">{t('radarChart.metrics.accumulation.description')}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 bg-orange-500 rounded"></div>
                       <div>
-                        <div className="font-medium">Tính Linh Hoạt</div>
-                        <div className="text-sm text-gray-600">Khả năng điều chỉnh</div>
+                        <div className="font-medium">{t('radarChart.metrics.flexibility.title')}</div>
+                        <div className="text-sm text-gray-600">{t('radarChart.metrics.flexibility.description')}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 bg-red-500 rounded"></div>
                       <div>
-                        <div className="font-medium">Hiệu Quả Chi Phí</div>
-                        <div className="text-sm text-gray-600">Tổng chi phí thấp</div>
+                        <div className="font-medium">{t('radarChart.metrics.costEfficiency.title')}</div>
+                        <div className="text-sm text-gray-600">{t('radarChart.metrics.costEfficiency.description')}</div>
                       </div>
                     </div>
                   </div>
@@ -340,27 +352,27 @@ export const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                         <h4 className="font-semibold">{scenario.plan_name}</h4>
                         <div className="space-y-2">
                           <div className="flex items-center gap-3">
-                            <div className="w-20 text-sm">Khả năng chi trả</div>
+                            <div className="w-20 text-sm">{t('radarChart.metricsShort.affordability')}</div>
                             <Progress value={metrics.affordability} className="flex-1" />
                             <div className="w-12 text-sm text-right">{Math.round(metrics.affordability)}%</div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-20 text-sm">An toàn</div>
+                            <div className="w-20 text-sm">{t('radarChart.metricsShort.safety')}</div>
                             <Progress value={metrics.riskLevel} className="flex-1" />
                             <div className="w-12 text-sm text-right">{Math.round(metrics.riskLevel)}%</div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-20 text-sm">Tích lũy</div>
+                            <div className="w-20 text-sm">{t('radarChart.metricsShort.accumulation')}</div>
                             <Progress value={metrics.equityBuildingSpeed} className="flex-1" />
                             <div className="w-12 text-sm text-right">{Math.round(metrics.equityBuildingSpeed)}%</div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-20 text-sm">Linh hoạt</div>
+                            <div className="w-20 text-sm">{t('radarChart.metricsShort.flexibility')}</div>
                             <Progress value={metrics.flexibility} className="flex-1" />
                             <div className="w-12 text-sm text-right">{Math.round(metrics.flexibility)}%</div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-20 text-sm">Hiệu quả</div>
+                            <div className="w-20 text-sm">{t('radarChart.metricsShort.efficiency')}</div>
                             <Progress value={metrics.totalCost} className="flex-1" />
                             <div className="w-12 text-sm text-right">{Math.round(metrics.totalCost)}%</div>
                           </div>

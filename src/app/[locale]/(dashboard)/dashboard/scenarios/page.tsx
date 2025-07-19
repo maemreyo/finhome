@@ -1,925 +1,699 @@
 // src/app/[locale]/dashboard/scenarios/page.tsx
-// Scenario comparison and management page with i18n support
+// Enhanced scenario comparison dashboard with new components
 
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { useTranslations, useLocale } from "next-intl";
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { ScenarioComparison } from "@/components/scenarios/ScenarioComparison";
-import { useScenarios } from "@/hooks/useScenarios";
-import { useAuth } from "@/hooks/useAuth";
-import type { FinancialScenario } from "@/types/scenario";
-import { useBankRates } from "@/hooks/useBankRates";
-import { DashboardService } from "@/lib/services/dashboardService";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Plus,
-  TrendingUp,
-  Calculator,
-  AlertCircle,
-  Sparkles,
+import React, { useState, useEffect, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
+import { motion } from 'framer-motion'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { 
+  Plus, 
+  Calculator, 
+  TrendingUp, 
+  BarChart3, 
+  Settings, 
+  Download,
+  Filter,
   RefreshCw,
-} from "lucide-react";
-import { toast } from "sonner";
-import { formatCurrency } from "@/lib/utils";
-import { calculateMonthlyPayment } from "@/lib/financial/calculations";
+  Sparkles,
+  AlertTriangle,
+  CheckCircle,
+  Edit,
+  Trash2
+} from 'lucide-react'
+import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
+import { formatCurrency } from '@/lib/utils'
 
-// Helper function to create mock financial scenarios
-const createMockScenario = (params: {
-  id: string;
-  name: string;
-  scenarioType:
-    | "baseline"
-    | "optimistic"
-    | "pessimistic"
-    | "alternative"
-    | "stress_test";
-  purchasePrice: number;
-  downPayment: number;
-  loanAmount: number;
-  interestRate: number;
-  loanTermYears: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  riskLevel: "low" | "medium" | "high";
-}): FinancialScenario => {
-  const monthlyPayment = calculateMonthlyPayment({
-    principal: params.loanAmount,
-    annualRate: params.interestRate,
-    termMonths: params.loanTermYears * 12,
-  });
-  const totalInterest =
-    monthlyPayment * params.loanTermYears * 12 - params.loanAmount;
-  const totalCost = params.purchasePrice + totalInterest;
-  const dtiRatio = (monthlyPayment / params.monthlyIncome) * 100;
-  const ltvRatio = (params.loanAmount / params.purchasePrice) * 100;
+// Import our new components
+import ScenarioComparisonTable from '@/components/scenarios/ScenarioComparisonTable'
+import ScenarioChart from '@/components/scenarios/ScenarioChart'
+import ScenarioParameterEditor from '@/components/scenarios/ScenarioParameterEditor'
+import AdvancedScenarioCharts from '@/components/scenarios/AdvancedScenarioCharts'
+import InteractiveParameterSliders from '@/components/scenarios/InteractiveParameterSliders'
+import { ErrorBoundary } from '@/components/common/ErrorBoundary'
+import LoadingStates from '@/components/common/LoadingStates'
+import type { TimelineScenario } from '@/components/timeline/TimelineVisualization'
+import { DashboardService } from '@/lib/services/dashboardService'
+import { useAuth } from '@/hooks/useAuth'
+import type { FinancialScenario, ScenarioParameters } from '@/types/scenario'
 
-  return {
-    // Base FinancialPlan fields
-    id: params.id,
-    user_id: "demo-user",
-    plan_name: params.name,
-    description: `Mock ${params.scenarioType} scenario`,
-    plan_type: "home_purchase",
-    status: "draft",
-    property_id: null,
-    custom_property_data: null,
-    target_age: null,
-    current_monthly_income: params.monthlyIncome,
-    monthly_income: params.monthlyIncome,
-    current_monthly_expenses: params.monthlyExpenses,
-    monthly_expenses: params.monthlyExpenses,
-    current_savings: null,
-    dependents: 0,
-    purchase_price: params.purchasePrice,
-    down_payment: params.downPayment,
-    additional_costs: 0,
-    other_debts: 0,
-    target_property_type: null,
-    target_location: null,
-    target_budget: null,
-    target_timeframe_months: params.loanTermYears * 12,
-    investment_purpose: null,
-    desired_features: {},
-    down_payment_target: null,
-    risk_tolerance: "moderate",
-    investment_horizon_months: null,
-    expected_roi: 10.5,
-    preferred_banks: null,
-    expected_rental_income: null,
-    expected_appreciation_rate: null,
-    emergency_fund_target: null,
-    education_fund_target: null,
-    retirement_fund_target: null,
-    other_goals: {},
-    feasibility_score: null,
-    recommended_adjustments: {},
-    is_public: false,
-    view_count: 0,
-    cached_calculations: null,
-    calculations_last_updated: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    completed_at: null,
+// Create a helper function to generate mock scenarios
+const createMockScenario = (
+  id: string,
+  name: string,
+  type: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test',
+  description: string,
+  monthlyPayment: number,
+  totalInterest: number,
+  totalCost: number,
+  duration: number,
+  riskLevel: 'low' | 'medium' | 'high'
+): TimelineScenario => ({
+  id,
+  plan_name: name,
+  scenarioType: type,
+  description,
+  riskLevel,
+  events: [],
+  user_id: 'demo-user-id',
+  plan_type: 'home_purchase',
+  status: 'draft',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  property_id: null,
+  custom_property_data: null,
+  target_age: null,
+  current_monthly_income: null,
+  purchase_price: 3000000000,
+  down_payment: 600000000,
+  additional_costs: 0,
+  other_debts: 0,
+  monthly_income: 50000000,
+  current_monthly_expenses: null,
+  monthly_expenses: 30000000,
+  current_savings: null,
+  target_timeframe_months: duration,
+  expected_roi: 10.5,
+  risk_tolerance: 'moderate',
+  expected_rental_income: null,
+  expected_appreciation_rate: null,
+  emergency_fund_target: null,
+  dependents: 0,
+  target_property_type: null,
+  target_location: null,
+  target_budget: null,
+  investment_purpose: null,
+  desired_features: {},
+  down_payment_target: null,
+  investment_horizon_months: null,
+  preferred_banks: null,
+  education_fund_target: null,
+  retirement_fund_target: null,
+  other_goals: {},
+  feasibility_score: null,
+  recommended_adjustments: {},
+  is_public: false,
+  view_count: 0,
+  cached_calculations: null,
+  calculations_last_updated: null,
+  completed_at: null,
+  calculatedMetrics: {
+    monthlyPayment,
+    totalInterest,
+    totalCost,
+    dtiRatio: 35,
+    ltvRatio: 80,
+    affordabilityScore: 7,
+    payoffTimeMonths: duration,
+    monthlySavings: 0
+  }
+})
 
-    // Scenario-specific properties
-    scenarioType: params.scenarioType,
-    riskLevel: params.riskLevel,
+// Mock scenarios data will be created inside the component where t is available
 
-    // Calculated metrics
-    calculatedMetrics: {
-      monthlyPayment,
-      totalInterest,
-      totalCost,
-      dtiRatio,
-      ltvRatio,
-      affordabilityScore: 7,
-      payoffTimeMonths: params.loanTermYears * 12,
-    },
-  };
-};
+const EnhancedScenariosPage: React.FC = () => {
+  const t = useTranslations('Dashboard.enhancedScenarios')
+  const { user } = useAuth()
+  const [scenarios, setScenarios] = useState<TimelineScenario[]>([])
+  const [selectedScenarioIds, setSelectedScenarioIds] = useState<string[]>(['scenario-baseline'])
+  const [chartType, setChartType] = useState<'bar' | 'line' | 'pie' | 'area'>('bar')
+  const [filterRiskLevel, setFilterRiskLevel] = useState<'all' | 'low' | 'medium' | 'high'>('all')
+  const [filterType, setFilterType] = useState<'all' | 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test'>('all')
+  const [isLoading, setIsLoading] = useState(false)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [editingScenario, setEditingScenario] = useState<TimelineScenario | null>(null)
+  const [smartScenariosLoading, setSmartScenariosLoading] = useState(false)
+  const [baseScenario, setBaseScenario] = useState<FinancialScenario | null>(null)
+  const [dbScenarios, setDbScenarios] = useState<any[]>([])
+  const [isLoadingDb, setIsLoadingDb] = useState(true)
 
-interface ScenarioGeneratorForm {
-  propertyPrice: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  loanType: "home_purchase" | "investment" | "commercial";
-}
+  // Demo scenarios data for unauthenticated users (minimal fallback)
+  const demoScenarios: TimelineScenario[] = useMemo(() => [
+    createMockScenario(
+      'demo-scenario-1',
+      t('mockScenarios.demoPlanName'),
+      'baseline',
+      t('mockScenarios.demoPlanDescription'),
+      20500000,
+      2920000000,
+      5420000000,
+      240,
+      'medium'
+    )
+  ], [])
 
-export default function ScenariosPage() {
-  const { user } = useAuth();
-  const {
-    scenarios,
-    loading,
-    error,
-    createScenario,
-    updateScenario,
-    deleteScenario,
-  } = useScenarios(user?.id || "");
-  const t = useTranslations("Dashboard.Scenarios");
-  const locale = useLocale();
-  const { rates, isLoading: ratesLoading, getRates } = useBankRates();
-  const [selectedScenario, setSelectedScenario] =
-    useState<FinancialScenario | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [generatorForm, setGeneratorForm] = useState<ScenarioGeneratorForm>({
-    propertyPrice: 2500000000,
-    monthlyIncome: 45000000,
-    monthlyExpenses: 18000000,
-    loanType: "home_purchase",
-  });
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedScenarios, setGeneratedScenarios] = useState<
-    FinancialScenario[]
-  >([]);
-  const [dbScenarios, setDbScenarios] = useState<any[]>([]);
-  const [isLoadingDb, setIsLoadingDb] = useState(true);
+  // Initialize scenarios with demo data only for unauthenticated users
+  useEffect(() => {
+    if (!user && scenarios.length === 0) {
+      setScenarios(demoScenarios)
+    }
+  }, [user, demoScenarios, scenarios.length])
+
+  // Filtered scenarios based on filters
+  const filteredScenarios = useMemo(() => {
+    return scenarios.filter(scenario => {
+      const matchesRisk = filterRiskLevel === 'all' || scenario.riskLevel === filterRiskLevel
+      const matchesType = filterType === 'all' || scenario.scenarioType === filterType
+      return matchesRisk && matchesType
+    })
+  }, [scenarios, filterRiskLevel, filterType])
 
   // Load database scenarios
   useEffect(() => {
     const loadDbScenarios = async () => {
       try {
-        setIsLoadingDb(true);
-        const scenarios = await DashboardService.getFinancialScenarios(user?.id || '');
-        setDbScenarios(scenarios);
-      } catch (error) {
-        console.error('Error loading database scenarios:', error);
-      } finally {
-        setIsLoadingDb(false);
-      }
-    };
-
-    if (user) {
-      loadDbScenarios();
-    } else {
-      setIsLoadingDb(false);
-    }
-  }, [user]);
-
-  // Convert database scenarios to FinancialScenario format
-  const convertDbScenario = (dbScenario: any): FinancialScenario => {
-    return {
-      id: dbScenario.id,
-      user_id: dbScenario.user_id,
-      plan_name: dbScenario.scenario_name,
-      description: dbScenario.description,
-      plan_type: 'home_purchase',
-      status: 'draft',
-      property_id: null,
-      custom_property_data: null,
-      target_age: null,
-      current_monthly_income: dbScenario.monthly_income,
-      monthly_income: dbScenario.monthly_income,
-      current_monthly_expenses: dbScenario.monthly_expenses,
-      monthly_expenses: dbScenario.monthly_expenses,
-      current_savings: null,
-      dependents: 0,
-      purchase_price: dbScenario.property_price,
-      down_payment: dbScenario.down_payment,
-      additional_costs: 0,
-      other_debts: 0,
-      target_property_type: null,
-      target_location: null,
-      target_budget: null,
-      target_timeframe_months: null,
-      investment_purpose: null,
-      desired_features: {},
-      down_payment_target: null,
-      risk_tolerance: 'moderate',
-      investment_horizon_months: null,
-      expected_roi: null,
-      preferred_banks: null,
-      expected_rental_income: null,
-      expected_appreciation_rate: null,
-      emergency_fund_target: null,
-      education_fund_target: null,
-      retirement_fund_target: null,
-      other_goals: {},
-      feasibility_score: null,
-      recommended_adjustments: {},
-      is_public: false,
-      view_count: 0,
-      cached_calculations: null,
-      calculations_last_updated: null,
-      created_at: dbScenario.created_at,
-      updated_at: dbScenario.updated_at,
-      completed_at: null,
-      calculatedMetrics: {
-        monthlyPayment: dbScenario.monthly_payment,
-        totalInterest: dbScenario.total_interest,
-        totalCost: dbScenario.total_cost,
-        dtiRatio: dbScenario.debt_to_income_ratio,
-        ltvRatio: dbScenario.loan_to_value_ratio,
-        affordabilityScore: 0,
-        payoffTimeMonths: dbScenario.loan_term_months
-      },
-      riskLevel: dbScenario.risk_level,
-      scenarioType: dbScenario.scenario_type
-    };
-  };
-
-  // Demo scenarios for unauthenticated users (minimal fallback)
-  const demoScenarios: FinancialScenario[] = [
-    createMockScenario({
-      id: "demo-scenario-1",
-      name: "Kế hoạch mẫu cơ bản",
-      scenarioType: "baseline",
-      purchasePrice: 2500000000,
-      downPayment: 500000000,
-      loanAmount: 2000000000,
-      interestRate: 8.5,
-      loanTermYears: 20,
-      monthlyIncome: 45000000,
-      monthlyExpenses: 18000000,
-      riskLevel: "medium",
-    }),
-  ];
-
-  const handleScenarioSelect = (scenario: FinancialScenario) => {
-    setSelectedScenario(scenario);
-    // In a real app, this would navigate to a detailed view or apply the scenario
-    console.log("Selected scenario:", scenario);
-  };
-
-  const handleCreateNewScenario = () => {
-    setShowCreateModal(true);
-    // Load latest bank rates when opening the modal
-    getRates({ loanType: generatorForm.loanType, isActive: true });
-  };
-
-  const generateSmartScenarios = async () => {
-    setIsGenerating(true);
-    try {
-      // Get current bank rates for the loan type
-      await getRates({
-        loanType: generatorForm.loanType,
-        isActive: true,
-        minAmount: generatorForm.propertyPrice * 0.7, // Assume 70% loan amount
-        maxAmount: generatorForm.propertyPrice * 0.9, // Max 90% loan amount
-      });
-
-      // Create scenarios with different down payment percentages
-      const downPaymentOptions = [10, 15, 20, 25, 30];
-      const loanTermOptions = [15, 20, 25, 30];
-
-      const generatedScenarios: FinancialScenario[] = [];
-      let scenarioId = 1;
-
-      for (const downPaymentPercent of downPaymentOptions) {
-        for (const loanTermYears of loanTermOptions) {
-          if (generatedScenarios.length >= 6) break; // Limit to 6 scenarios
-
-          const downPayment = Math.round(
-            generatorForm.propertyPrice * (downPaymentPercent / 100)
-          );
-          const loanAmount = generatorForm.propertyPrice - downPayment;
-
-          // Use rates from bank data or fallback to market average
-          const applicableRates = rates.filter(
-            (rate) =>
-              (rate.min_amount || 0) <= loanAmount &&
-              (rate.max_amount || Infinity) >= loanAmount &&
-              (rate.min_term_months || 0) <= loanTermYears * 12 &&
-              (rate.max_term_months || Infinity) >= loanTermYears * 12
-          );
-
-          const bestRate =
-            applicableRates.length > 0
-              ? Math.min(
-                  ...applicableRates.map(
-                    (r) => r.promotional_rate || r.base_rate
-                  )
-                )
-              : 8.5 +
-                (loanTermYears > 20 ? 1.0 : 0) +
-                (downPaymentPercent < 20 ? 0.5 : 0);
-
-          const monthlyPayment = calculateMonthlyPayment({
-            principal: loanAmount,
-            annualRate: bestRate,
-            termMonths: loanTermYears * 12,
-          });
-
-          const totalPayment = monthlyPayment * loanTermYears * 12;
-          const totalInterest = totalPayment - loanAmount;
-          const netCashFlow =
-            generatorForm.monthlyIncome -
-            generatorForm.monthlyExpenses -
-            monthlyPayment;
-
-          // Determine risk level and recommendation
-          const debtToIncomeRatio =
-            (monthlyPayment / generatorForm.monthlyIncome) * 100;
-          let riskLevel: "low" | "medium" | "high" = "low";
-          let recommendation: "optimal" | "safe" | "aggressive" | "risky" =
-            "safe";
-
-          if (
-            debtToIncomeRatio > 45 ||
-            netCashFlow < 0 ||
-            downPaymentPercent < 15
-          ) {
-            riskLevel = "high";
-            recommendation = "risky";
-          } else if (debtToIncomeRatio > 35 || downPaymentPercent < 20) {
-            riskLevel = "medium";
-            recommendation = "aggressive";
-          } else if (
-            debtToIncomeRatio <= 30 &&
-            downPaymentPercent >= 20 &&
-            netCashFlow > 5000000
-          ) {
-            recommendation = "optimal";
+        setIsLoadingDb(true)
+        if (user?.id) {
+          const dbData = await DashboardService.getFinancialScenarios(user.id)
+          setDbScenarios(dbData)
+          
+          // Convert database scenarios to TimelineScenario format
+          if (dbData.length > 0) {
+            const convertedScenarios = dbData.map(dbScenario => {
+              return createMockScenario(
+                dbScenario.id,
+                dbScenario.scenario_name,
+                dbScenario.scenario_type,
+                dbScenario.description || t('mockScenarios.noDescriptionAvailable'),
+                dbScenario.monthly_payment,
+                dbScenario.total_interest,
+                dbScenario.total_cost,
+                dbScenario.loan_term_months,
+                dbScenario.risk_level
+              )
+            })
+            setScenarios(convertedScenarios)
+          } else {
+            // Use demo scenarios if no database data for authenticated users
+            setScenarios(demoScenarios)
           }
-
-          const scenario: FinancialScenario = createMockScenario({
-            id: `generated-${scenarioId++}`,
-            name: t("generatedScenarioName", {
-              downPaymentPercent,
-              loanTermYears,
-            }),
-            scenarioType:
-              riskLevel === "low"
-                ? "baseline"
-                : riskLevel === "medium"
-                  ? "alternative"
-                  : "stress_test",
-            purchasePrice: generatorForm.propertyPrice,
-            downPayment,
-            loanAmount,
-            interestRate: bestRate,
-            loanTermYears,
-            monthlyIncome: generatorForm.monthlyIncome,
-            monthlyExpenses: generatorForm.monthlyExpenses,
-            riskLevel,
-          });
-
-          generatedScenarios.push(scenario);
         }
-        if (generatedScenarios.length >= 6) break;
+      } catch (error) {
+        console.error('Error loading database scenarios:', error)
+      } finally {
+        setIsLoadingDb(false)
       }
-
-      // Sort by risk level priority and add to scenarios
-      const sortedScenarios = generatedScenarios.sort((a, b) => {
-        const priority = { low: 3, medium: 2, high: 1 };
-        return priority[b.riskLevel] - priority[a.riskLevel];
-      });
-
-      // Note: In a real implementation, you would use the createScenario function
-      // from the useScenarios hook to save these to the database
-      setGeneratedScenarios(sortedScenarios);
-
-      setShowCreateModal(false);
-      toast.success(t("generationSuccess", { count: sortedScenarios.length }));
-    } catch (error) {
-      console.error("Error generating scenarios:", error);
-      toast.error(t("generationError"));
-    } finally {
-      setIsGenerating(false);
     }
-  };
 
-  // Load bank rates on component mount
-  useEffect(() => {
-    getRates({ loanType: "home_purchase", isActive: true });
-  }, []);
+    loadDbScenarios()
+  }, [user])
 
-  // Use database scenarios first, then hook scenarios, then demo data as fallback
-  const displayScenarios = user 
-    ? (dbScenarios.length > 0 ? dbScenarios.map(convertDbScenario) : scenarios.length > 0 ? scenarios : demoScenarios)
-    : demoScenarios;
-  const lowRiskScenarios = displayScenarios.filter(
-    (s) => s.riskLevel === "low"
-  );
-  const totalScenarios = displayScenarios.length;
-  const avgMonthlyPayment =
-    displayScenarios.reduce(
-      (sum, s) => sum + (s.calculatedMetrics?.monthlyPayment || 0),
-      0
-    ) / totalScenarios;
+  // Convert TimelineScenario to FinancialScenario for charts
+  const chartScenarios: FinancialScenario[] = useMemo(() => {
+    return scenarios.map(scenario => ({
+      ...scenario,
+      riskLevel: scenario.riskLevel,
+      calculatedMetrics: scenario.calculatedMetrics
+    } as FinancialScenario))
+  }, [scenarios])
 
-  if ((loading || isLoadingDb) && user) {
-    return (
-      <DashboardShell title={t("title")} description={t("description")}>
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Skeleton className="h-32" />
-            <Skeleton className="h-32" />
-            <Skeleton className="h-32" />
-          </div>
-          <Skeleton className="h-96" />
-        </div>
-      </DashboardShell>
-    );
+  // Handle parameter changes for interactive sliders
+  const handleParametersChange = (parameters: ScenarioParameters) => {
+    // Update base scenario with new parameters
+    console.log('Parameters changed:', parameters)
   }
 
-  if (error && user) {
-    return (
-      <DashboardShell title={t("title")} description={t("description")}>
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </DashboardShell>
-    );
+  const handleScenarioUpdate = (scenario: FinancialScenario) => {
+    // Update the scenario in our list
+    const updatedScenarios = scenarios.map(s => 
+      s.id === scenario.id ? { ...s, ...scenario } : s
+    )
+    setScenarios(updatedScenarios)
+  }
+
+  // Handle scenario selection
+  const handleScenarioSelect = (scenarioId: string) => {
+    setSelectedScenarioIds(prev => {
+      if (prev.includes(scenarioId)) {
+        return prev.filter(id => id !== scenarioId)
+      } else {
+        return [...prev, scenarioId]
+      }
+    })
+  }
+
+  // Handle scenario creation/editing
+  const handleScenarioChange = (scenario: TimelineScenario) => {
+    // This is called during editing - we could show a live preview here
+  }
+
+  const handleSaveScenario = (scenario: TimelineScenario) => {
+    if (editingScenario) {
+      // Update existing scenario
+      setScenarios(prev => prev.map(s => s.id === scenario.id ? scenario : s))
+      toast.success(t('toasts.scenarioUpdated'))
+    } else {
+      // Create new scenario
+      setScenarios(prev => [...prev, scenario])
+      toast.success(t('toasts.scenarioCreated'))
+    }
+    
+    setIsCreateDialogOpen(false)
+    setEditingScenario(null)
+  }
+
+  const handleDeleteScenario = (scenarioId: string) => {
+    setScenarios(prev => prev.filter(s => s.id !== scenarioId))
+    setSelectedScenarioIds(prev => prev.filter(id => id !== scenarioId))
+    toast.success(t('toasts.scenarioDeleted'))
+  }
+
+  const handleGenerateSmartScenarios = async () => {
+    setSmartScenariosLoading(true)
+    try {
+      // Simulate API call to generate smart scenarios
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Add some smart scenarios
+      const smartScenarios: TimelineScenario[] = [
+        createMockScenario(
+          `smart-scenario-${Date.now()}`,
+          t('mockScenarios.aiRecommendedConservative'),
+          'alternative',
+          t('mockScenarios.aiGeneratedDescription'),
+          22800000,
+          2472000000,
+          5472000000,
+          240,
+          'low'
+        )
+      ]
+      
+      setScenarios(prev => [...prev, ...smartScenarios])
+      toast.success(t('toasts.smartScenariosGenerated'))
+    } catch (error) {
+      toast.error(t('toasts.failedToGenerateSmartScenarios'))
+    } finally {
+      setSmartScenariosLoading(false)
+    }
+  }
+
+  const handleExportScenarios = () => {
+    // Export selected scenarios to CSV or PDF
+    const selectedScenarios = scenarios.filter(s => selectedScenarioIds.includes(s.id))
+    const csvData = selectedScenarios.map(s => ({
+      name: s.plan_name,
+      type: s.scenarioType,
+      monthlyPayment: s.calculatedMetrics?.monthlyPayment || 0,
+      totalInterest: s.calculatedMetrics?.totalInterest || 0,
+      totalCost: s.calculatedMetrics?.totalCost || 0,
+      riskLevel: s.riskLevel
+    }))
+    
+    // Simple CSV export
+    const csvContent = [
+      Object.keys(csvData[0]).join(','),
+      ...csvData.map(row => Object.values(row).join(','))
+    ].join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'scenarios-comparison.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+    
+    toast.success(t('toasts.scenariosExported'))
+  }
+
+  const getRiskLevelColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'low':
+        return 'bg-green-100 text-green-800'
+      case 'medium':
+        return 'bg-amber-100 text-amber-800'
+      case 'high':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'baseline':
+        return 'bg-blue-100 text-blue-800'
+      case 'optimistic':
+        return 'bg-green-100 text-green-800'
+      case 'pessimistic':
+        return 'bg-red-100 text-red-800'
+      case 'alternative':
+        return 'bg-purple-100 text-purple-800'
+      case 'stress_test':
+        return 'bg-orange-100 text-orange-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  if (isLoading) {
+    return <LoadingStates.Content title={t('loadingScenarios')} />
   }
 
   return (
-    <DashboardShell
-      title={t("title")}
-      description={t("description")}
-      headerAction={
-        <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              {t("createScenarioButton")}
-            </Button>
-          </DialogTrigger>
-        </Dialog>
-      }
-    >
-      <div className="space-y-6">
-        {/* Demo Alert for Non-Authenticated Users */}
-        {!user && (
-          <Alert className="border-blue-200 bg-blue-50">
-            <AlertCircle className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-blue-800">
-              <strong>{t("demoMode.strong")}</strong> {t("demoMode.text")}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t("summary.totalScenarios")}
-              </CardTitle>
-              <Calculator className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalScenarios}</div>
-              <p className="text-xs text-muted-foreground">
-                {t("summary.optionsCreated")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t("summary.optimalScenarios")}
-              </CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {lowRiskScenarios.length}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t("summary.bestRated")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t("summary.averagePayment")}
-              </CardTitle>
-              <Calculator className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {new Intl.NumberFormat(locale, {
-                  style: "currency",
-                  currency: "VND",
-                  notation: "compact",
-                  maximumFractionDigits: 1,
-                }).format(avgMonthlyPayment)}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t("summary.monthly")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t("summary.actions")}
-              </CardTitle>
-              <Plus className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-                <DialogTrigger asChild>
-                  <Button
-                    onClick={handleCreateNewScenario}
-                    className="w-full"
-                    size="sm"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    {t("smartGenerateButton")}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-blue-600" />
-                      {t("smartGenerateModal.title")}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {t("smartGenerateModal.description")}
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="propertyPrice">
-                        {t("smartGenerateModal.propertyPrice")}
-                      </Label>
-                      <Input
-                        id="propertyPrice"
-                        type="number"
-                        value={generatorForm.propertyPrice}
-                        onChange={(e) =>
-                          setGeneratorForm((prev) => ({
-                            ...prev,
-                            propertyPrice: Number(e.target.value),
-                          }))
-                        }
-                        placeholder="2,500,000,000"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="monthlyIncome">
-                        {t("smartGenerateModal.monthlyIncome")}
-                      </Label>
-                      <Input
-                        id="monthlyIncome"
-                        type="number"
-                        value={generatorForm.monthlyIncome}
-                        onChange={(e) =>
-                          setGeneratorForm((prev) => ({
-                            ...prev,
-                            monthlyIncome: Number(e.target.value),
-                          }))
-                        }
-                        placeholder="45,000,000"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="monthlyExpenses">
-                        {t("smartGenerateModal.monthlyExpenses")}
-                      </Label>
-                      <Input
-                        id="monthlyExpenses"
-                        type="number"
-                        value={generatorForm.monthlyExpenses}
-                        onChange={(e) =>
-                          setGeneratorForm((prev) => ({
-                            ...prev,
-                            monthlyExpenses: Number(e.target.value),
-                          }))
-                        }
-                        placeholder="18,000,000"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="loanType">
-                        {t("smartGenerateModal.loanType")}
-                      </Label>
-                      <Select
-                        value={generatorForm.loanType}
-                        onValueChange={(value: any) =>
-                          setGeneratorForm((prev) => ({
-                            ...prev,
-                            loanType: value,
-                          }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="home_purchase">
-                            {t("smartGenerateModal.loanTypes.homePurchase")}
-                          </SelectItem>
-                          <SelectItem value="investment">
-                            {t("smartGenerateModal.loanTypes.investment")}
-                          </SelectItem>
-                          <SelectItem value="commercial">
-                            {t("smartGenerateModal.loanTypes.commercial")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {ratesLoading && (
-                      <Alert>
-                        <RefreshCw className="h-4 w-4 animate-spin" />
-                        <AlertDescription>
-                          {t("smartGenerateModal.loadingRates")}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    {rates.length > 0 && (
-                      <Alert>
-                        <TrendingUp className="h-4 w-4" />
-                        <AlertDescription>
-                          {t("smartGenerateModal.ratesFound", {
-                            count: rates.length,
-                          })}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={() => setShowCreateModal(false)}
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      {t("smartGenerateModal.cancel")}
-                    </Button>
-                    <Button
-                      onClick={generateSmartScenarios}
-                      disabled={isGenerating || ratesLoading}
-                      className="flex-1"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                          {t("smartGenerateModal.generating")}
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-4 w-4 mr-2" />
-                          {t("smartGenerateModal.generateButton")}
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              <Badge
-                variant="outline"
-                className="w-full justify-center text-xs"
-              >
-                {t("availableRates", { count: rates.length })}
-              </Badge>
-            </CardContent>
-          </Card>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-gray-600 mt-2">
+            {t('description')}
+          </p>
         </div>
-
-        {/* Scenario Comparison Component */}
-        {displayScenarios.length > 0 ? (
-          <ScenarioComparison
-            scenarios={displayScenarios}
-            onScenarioSelect={handleScenarioSelect}
-            onCreateNewScenario={handleCreateNewScenario}
-          />
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("noScenario.title")}</CardTitle>
-              <CardDescription>{t("noScenario.description")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                onClick={handleCreateNewScenario}
-                className="flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                {t("noScenario.createButton")}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={handleGenerateSmartScenarios}
+            disabled={smartScenariosLoading}
+          >
+            {smartScenariosLoading ? (
+              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4 mr-2" />
+            )}
+            {t('generateSmartScenarios')}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleExportScenarios}
+            disabled={selectedScenarioIds.length === 0}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {t('export')}
+          </Button>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                {t('createScenario')}
               </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Selected Scenario Details */}
-        {selectedScenario && (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("selectedScenario.title")}</CardTitle>
-              <CardDescription>
-                {t("selectedScenario.description", {
-                  planName: selectedScenario.plan_name,
-                })}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-medium mb-2">
-                    {t("selectedScenario.basicInfo.title")}
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>
-                        {t("selectedScenario.basicInfo.propertyPrice")}:
-                      </span>
-                      <span className="font-medium">
-                        {new Intl.NumberFormat(locale, {
-                          style: "currency",
-                          currency: "VND",
-                          notation: "compact",
-                        }).format(selectedScenario.purchase_price || 0)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>
-                        {t("selectedScenario.basicInfo.downPayment")}:
-                      </span>
-                      <span className="font-medium">
-                        {new Intl.NumberFormat(locale, {
-                          style: "currency",
-                          currency: "VND",
-                          notation: "compact",
-                        }).format(selectedScenario.down_payment || 0)}{" "}
-                        (
-                        {Math.round(
-                          ((selectedScenario.down_payment || 0) /
-                            (selectedScenario.purchase_price || 1)) *
-                            100
-                        )}
-                        %)
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{t("selectedScenario.basicInfo.loanAmount")}:</span>
-                      <span className="font-medium">
-                        {new Intl.NumberFormat(locale, {
-                          style: "currency",
-                          currency: "VND",
-                          notation: "compact",
-                        }).format(
-                          (selectedScenario.purchase_price || 0) -
-                            (selectedScenario.down_payment || 0)
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{t("selectedScenario.basicInfo.loanTerm")}:</span>
-                      <span className="font-medium">
-                        {Math.round(
-                          (selectedScenario.loanCalculations?.[0]
-                            ?.loan_term_months || 0) / 12
-                        )}{" "}
-                        {t("selectedScenario.basicInfo.years")}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>
-                        {t("selectedScenario.basicInfo.interestRate")}:
-                      </span>
-                      <span className="font-medium">
-                        {selectedScenario.loanCalculations?.[0]
-                          ?.interest_rate || 0}
-                        %/{t("selectedScenario.basicInfo.perYear")}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium mb-2">
-                    {t("selectedScenario.monthlyFinance.title")}
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>
-                        {t("selectedScenario.monthlyFinance.income")}:
-                      </span>
-                      <span className="font-medium text-green-600">
-                        {new Intl.NumberFormat(locale, {
-                          style: "currency",
-                          currency: "VND",
-                          notation: "compact",
-                        }).format(selectedScenario.monthly_income || 0)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>
-                        {t("selectedScenario.monthlyFinance.expenses")}:
-                      </span>
-                      <span className="font-medium text-red-600">
-                        {new Intl.NumberFormat(locale, {
-                          style: "currency",
-                          currency: "VND",
-                          notation: "compact",
-                        }).format(selectedScenario.monthly_expenses || 0)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>
-                        {t(
-                          "selectedScenario.monthlyFinance.monthlyLoanPayment"
-                        )}
-                        :
-                      </span>
-                      <span className="font-medium text-blue-600">
-                        {new Intl.NumberFormat(locale, {
-                          style: "currency",
-                          currency: "VND",
-                          notation: "compact",
-                        }).format(
-                          selectedScenario.calculatedMetrics?.monthlyPayment ||
-                            0
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between border-t pt-2">
-                      <span className="font-medium">
-                        {t("selectedScenario.monthlyFinance.netCashFlow")}:
-                      </span>
-                      <span
-                        className={`font-bold ${(selectedScenario.monthly_income || 0) - (selectedScenario.monthly_expenses || 0) - (selectedScenario.calculatedMetrics?.monthlyPayment || 0) >= 0 ? "text-green-600" : "text-red-600"}`}
-                      >
-                        {(selectedScenario.monthly_income || 0) -
-                          (selectedScenario.monthly_expenses || 0) -
-                          (selectedScenario.calculatedMetrics?.monthlyPayment ||
-                            0) >=
-                        0
-                          ? "+"
-                          : ""}
-                        {new Intl.NumberFormat(locale, {
-                          style: "currency",
-                          currency: "VND",
-                          notation: "compact",
-                        }).format(
-                          (selectedScenario.monthly_income || 0) -
-                            (selectedScenario.monthly_expenses || 0) -
-                            (selectedScenario.calculatedMetrics
-                              ?.monthlyPayment || 0)
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingScenario ? t('editScenario') : t('createNewScenario')}
+                </DialogTitle>
+              </DialogHeader>
+              <ErrorBoundary>
+                <ScenarioParameterEditor
+                  initialScenario={editingScenario || undefined}
+                  onScenarioChange={handleScenarioChange}
+                  onSaveScenario={handleSaveScenario}
+                  onDeleteScenario={editingScenario ? handleDeleteScenario : undefined}
+                />
+              </ErrorBoundary>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
-    </DashboardShell>
-  );
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="w-5 h-5" />
+            {t('filtersAndSelection')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="risk-filter">{t('riskLevel')}</Label>
+              <Select value={filterRiskLevel} onValueChange={(value: any) => setFilterRiskLevel(value)}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('all')}</SelectItem>
+                  <SelectItem value="low">{t('low')}</SelectItem>
+                  <SelectItem value="medium">{t('medium')}</SelectItem>
+                  <SelectItem value="high">{t('high')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="type-filter">{t('type')}</Label>
+              <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('all')}</SelectItem>
+                  <SelectItem value="baseline">{t('baseline')}</SelectItem>
+                  <SelectItem value="optimistic">{t('optimistic')}</SelectItem>
+                  <SelectItem value="pessimistic">{t('pessimistic')}</SelectItem>
+                  <SelectItem value="alternative">{t('alternative')}</SelectItem>
+                  <SelectItem value="stress_test">{t('stressTest')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Scenario Selection */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredScenarios.map((scenario) => (
+              <motion.div
+                key={scenario.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn(
+                  'p-4 border rounded-lg cursor-pointer transition-all',
+                  selectedScenarioIds.includes(scenario.id)
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                )}
+                onClick={() => handleScenarioSelect(scenario.id)}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <Checkbox
+                    checked={selectedScenarioIds.includes(scenario.id)}
+                    onChange={() => handleScenarioSelect(scenario.id)}
+                  />
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditingScenario(scenario)
+                        setIsCreateDialogOpen(true)
+                      }}
+                    >
+                      <Edit className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteScenario(scenario.id)
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+                <h3 className="font-medium text-sm">{scenario.plan_name}</h3>
+                <p className="text-xs text-gray-600 mb-2">{scenario.description}</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className={cn('text-xs', getTypeColor(scenario.scenarioType))}>
+                    {scenario.scenarioType}
+                  </Badge>
+                  <Badge variant="outline" className={cn('text-xs', getRiskLevelColor(scenario.riskLevel))}>
+                    {scenario.riskLevel}
+                  </Badge>
+                </div>
+                <div className="text-sm space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">{t('monthly')}</span>
+                    <span className="font-medium">{formatCurrency(scenario.calculatedMetrics?.monthlyPayment || 0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">{t('totalCost')}</span>
+                    <span className="font-medium">{formatCurrency(scenario.calculatedMetrics?.totalCost || 0)}</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Main Content */}
+      <Tabs defaultValue="comparison" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="comparison">{t('comparisonTable')}</TabsTrigger>
+          <TabsTrigger value="charts">{t('visualCharts')}</TabsTrigger>
+          <TabsTrigger value="advanced">{t('advancedCharts')}</TabsTrigger>
+          <TabsTrigger value="interactive">{t('interactiveSliders')}</TabsTrigger>
+          <TabsTrigger value="analysis">{t('analysis')}</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="comparison" className="space-y-6">
+          <ErrorBoundary>
+            <ScenarioComparisonTable
+              scenarios={scenarios}
+              selectedScenarioIds={selectedScenarioIds}
+              onScenarioSelect={handleScenarioSelect}
+            />
+          </ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="charts" className="space-y-6">
+          <ErrorBoundary>
+            <ScenarioChart
+              scenarios={scenarios}
+              selectedScenarioIds={selectedScenarioIds}
+              chartType={chartType}
+              onChartTypeChange={setChartType}
+            />
+          </ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="advanced" className="space-y-6">
+          <ErrorBoundary>
+            {chartScenarios.length > 0 ? (
+              <AdvancedScenarioCharts
+                scenarios={chartScenarios.filter(s => selectedScenarioIds.includes(s.id))}
+                selectedMetrics={['monthlyPayment', 'totalCost', 'dtiRatio', 'affordabilityScore']}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-8">
+                  <p className="text-center text-gray-500">{t('selectScenariosForAdvancedCharts')}</p>
+                </CardContent>
+              </Card>
+            )}
+          </ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="interactive" className="space-y-6">
+          <ErrorBoundary>
+            {chartScenarios.length > 0 && selectedScenarioIds.length > 0 ? (
+              <InteractiveParameterSliders
+                baseScenario={chartScenarios.find(s => selectedScenarioIds.includes(s.id)) || chartScenarios[0]}
+                onParametersChange={handleParametersChange}
+                onScenarioUpdate={handleScenarioUpdate}
+                realTimeMode={true}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-8">
+                  <p className="text-center text-gray-500">{t('selectScenariosForInteractiveSliders')}</p>
+                </CardContent>
+              </Card>
+            )}
+          </ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="analysis" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  {t('riskAnalysis')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {scenarios.filter(s => selectedScenarioIds.includes(s.id)).map((scenario) => (
+                    <div key={scenario.id} className="p-4 border rounded-lg">
+                      <h4 className="font-medium mb-2">{scenario.plan_name}</h4>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-600">{t('duration')}</span>
+                          <div className="font-medium">
+                            {scenario.calculatedMetrics?.payoffTimeMonths || 0} {t('months')}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">{t('monthlySavings')}</span>
+                          <div className={cn(
+                            'font-medium',
+                            scenario.calculatedMetrics?.monthlySavings && scenario.calculatedMetrics.monthlySavings > 0 ? 'text-green-600' : 
+                            scenario.calculatedMetrics?.monthlySavings && scenario.calculatedMetrics.monthlySavings < 0 ? 'text-red-600' : 'text-gray-600'
+                          )}>
+                            {scenario.calculatedMetrics?.monthlySavings ? formatCurrency(scenario.calculatedMetrics.monthlySavings) : t('none')}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="w-5 h-5" />
+                  {t('recommendations')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {selectedScenarioIds.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">
+                      {t('selectScenariosForRecommendations')}
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {scenarios
+                        .filter(s => selectedScenarioIds.includes(s.id))
+                        .sort((a, b) => (a.calculatedMetrics?.totalCost || 0) - (b.calculatedMetrics?.totalCost || 0))
+                        .map((scenario, index) => (
+                          <div
+                            key={scenario.id}
+                            className={cn(
+                              'p-3 rounded-lg border',
+                              index === 0 ? 'border-green-500 bg-green-50' : 'border-gray-200'
+                            )}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-medium">{scenario.plan_name}</span>
+                              {index === 0 && (
+                                <Badge className="bg-green-600 text-white">
+                                  <CheckCircle className="w-3 h-3 mr-1" />
+                                  {t('recommended')}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {index === 0 ? (
+                                t('lowestCostRecommendation')
+                              ) : (
+                                `${formatCurrency((scenario.calculatedMetrics?.totalCost || 0) - (scenarios.filter(s => selectedScenarioIds.includes(s.id)).sort((a, b) => (a.calculatedMetrics?.totalCost || 0) - (b.calculatedMetrics?.totalCost || 0))[0].calculatedMetrics?.totalCost || 0))} ${t('moreExpensive')}`
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
 }
+
+export default EnhancedScenariosPage

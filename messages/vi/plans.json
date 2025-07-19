@@ -1,0 +1,1016 @@
+{
+  "NewPlanPage": {
+    "title": "Tạo Kế Hoạch Tài Chính Mới",
+    "description": "Bắt đầu hành trình tự do tài chính của bạn với một kế hoạch mới",
+    "actions": {
+      "backToPlans": "Quay lại danh sách kế hoạch"
+    },
+    "badges": {
+      "smartWizard": "Thuật sĩ thông minh",
+      "roiAnalysis": "Phân tích ROI",
+      "accurateCalculation": "Tính toán chính xác"
+    },
+    "notifications": {
+      "planCreated": "Đã tạo kế hoạch",
+      "planSaved": "Kế hoạch tài chính mới của bạn \"{planName}\" đã được lưu."
+    },
+    "achievements": {
+      "planner": "Người lập kế hoạch"
+    },
+    "toasts": {
+      "planComplete": "Hoàn thành kế hoạch!",
+      "planCompleteDesc": "Bạn đã tạo thành công một kế hoạch tài chính mới."
+    }
+  },
+  "PlansPage": {
+    "title": "Kế Hoạch Tài Chính",
+    "description": "Quản lý và theo dõi các kế hoạch tài chính bất động sản của bạn",
+    "actions": {
+      "createNew": "Tạo Kế Hoạch Mới",
+      "copy": "Sao chép",
+      "tryAgain": "Thử lại",
+      "refreshPage": "Tải lại trang",
+      "signIn": "Đăng nhập",
+      "createFirstPlan": "Tạo kế hoạch đầu tiên của bạn"
+    },
+    "errors": {
+      "loadFailed": "Không thể tải kế hoạch tài chính",
+      "deleteError": "Không thể xóa kế hoạch. Vui lòng thử lại.",
+      "duplicateError": "Không thể sao chép kế hoạch. Vui lòng thử lại.",
+      "statusUpdateError": "Không thể cập nhật trạng thái kế hoạch"
+    },
+    "messages": {
+      "createSuccess": "Tạo kế hoạch tài chính thành công!",
+      "createError": "Không thể tạo kế hoạch tài chính",
+      "editComingSoon": "Chức năng chỉnh sửa sắp ra mắt",
+      "deleteSuccess": "Xóa kế hoạch tài chính thành công",
+      "duplicateSuccess": "Sao chép kế hoạch tài chính thành công",
+      "shareComingSoon": "Chức năng chia sẻ sắp ra mắt",
+      "downloadComingSoon": "Chức năng tải xuống sắp ra mắt",
+      "deleteConfirmation": "Bạn có chắc chắn muốn xóa kế hoạch này không? Hành động này không thể hoàn tác.",
+      "demoMode": {
+        "manage": "Chế độ demo: Đăng nhập để quản lý kế hoạch tài chính thực",
+        "save": "Chế độ demo: Đăng nhập để lưu kế hoạch tài chính thực",
+        "view": "Bạn đang xem dữ liệu demo.",
+        "suffix": "để tạo và quản lý các kế hoạch tài chính thực."
+      },
+      "plansFound": "{count, plural, =0 {Không tìm thấy kế hoạch nào} one {Tìm thấy # kế hoạch} other {Tìm thấy # kế hoạch}}",
+      "noPlans": {
+        "title": "Chưa có kế hoạch tài chính nào",
+        "description": "Tạo kế hoạch tài chính đầu tiên của bạn để bắt đầu hành trình đầu tư."
+      },
+      "favoriteComingSoon": "Chức năng yêu thích sắp ra mắt",
+      "statusUpdateSuccess": "Trạng thái kế hoạch được cập nhật thành {status}",
+      "bestRateFound": "Tìm thấy lãi suất tốt nhất: {rate}%"
+    },
+    "scenarios": {
+      "baseline": {
+        "name": "Kịch Bản Cơ Bản",
+        "description": "Kế hoạch tài chính tiêu chuẩn với điều kiện thị trường hiện tại"
+      }
+    }
+  },
+  "PlanDetailView": {
+    "editTitle": "Chỉnh sửa kế hoạch tài chính",
+    "createdOn": "Tạo ngày",
+    "buttons": {
+      "edit": "Chỉnh sửa",
+      "share": "Chia sẻ",
+      "export": "Xuất",
+      "download": "Tải xuống"
+    },
+    "status": {
+      "draft": "Bản nháp",
+      "active": "Hoạt động",
+      "completed": "Hoàn thành",
+      "archived": "Lưu trữ",
+      "unknown": "Không xác định"
+    },
+    "types": {
+      "homePurchase": "Mua nhà",
+      "investment": "Đầu tư",
+      "upgrade": "Nâng cấp",
+      "refinance": "Tái cấp vốn",
+      "unknown": "Không xác định"
+    },
+    "metrics": {
+      "purchasePrice": "Giá mua",
+      "downPayment": "Tiền đặt cọc",
+      "monthlyPayment": "Thanh toán hàng tháng",
+      "netCashFlow": "Dòng tiền ròng"
+    },
+    "loanDetails": {
+      "title": "Chi tiết khoản vay",
+      "description": "Thông tin chi tiết về khoản vay và điều khoản",
+      "loanAmount": "Số tiền vay",
+      "loanTerm": "Thời hạn vay",
+      "loanTermValue": "20 năm",
+      "interestRate": "Lãi suất",
+      "interestRateValue": "8.5%",
+      "bank": "Ngân hàng",
+      "bankValue": "Chưa chọn"
+    },
+    "financialSummary": {
+      "title": "Tổng quan tài chính",
+      "description": "Tóm tắt thu nhập, chi phí và dòng tiền hàng tháng",
+      "income": {
+        "title": "Thu nhập",
+        "basicSalary": "Lương cơ bản",
+        "rental": "Thu nhập cho thuê",
+        "total": "Tổng thu nhập"
+      },
+      "expenses": {
+        "title": "Chi phí",
+        "living": "Chi phí sinh hoạt",
+        "mortgage": "Trả góp nhà",
+        "total": "Tổng chi phí"
+      },
+      "netCashFlow": "Dòng tiền ròng hàng tháng",
+      "positiveFlow": "Dòng tiền tích cực - kế hoạch khả thi",
+      "negativeFlow": "Dòng tiền âm - cần điều chỉnh kế hoạch"
+    },
+    "timeline": {
+      "title": "Lịch trình thực hiện",
+      "description": "Theo dõi tiến độ và mốc thời gian quan trọng",
+      "placeholder": "Biểu đồ lịch trình sẽ được hiển thị ở đây"
+    },
+    "charts": {
+      "cashFlow": {
+        "title": "Biểu đồ dòng tiền",
+        "description": "Trực quan hóa dòng tiền theo thời gian",
+        "placeholder": "Biểu đồ dòng tiền sẽ được hiển thị ở đây"
+      },
+      "expenses": {
+        "title": "Phân tích chi phí",
+        "description": "Phân tích chi tiết các khoản chi phí",
+        "placeholder": "Biểu đồ chi phí sẽ được hiển thị ở đây"
+      }
+    }
+  },
+  "PlanProgressDashboard": {
+    "title": "Bảng điều khiển tiến độ kế hoạch",
+    "subtitle": "Tổng quan về tiến độ và trạng thái kế hoạch tài chính",
+    "overallProgress": "Tiến độ tổng thể",
+    "savingsProgress": "Tiến độ tiết kiệm",
+    "milestones": "Mốc thời gian",
+    "healthScore": "Điểm số sức khỏe",
+    "currentStatus": "Trạng thái hiện tại",
+    "lastUpdated": "Cập nhật lần cuối",
+    "plan": "Kế hoạch",
+    "milestonesOverdue": "{count, plural, =0 {Không có mốc thời gian nào quá hạn} =1 {# mốc thời gian quá hạn} other {# mốc thời gian quá hạn}}",
+    "savingsBehindSchedule": "Tiết kiệm chậm hơn so với kế hoạch",
+    "excellentProgress": "Tiến độ xuất sắc!",
+    "keyDates": "Ngày quan trọng",
+    "estimatedCompletion": "Hoàn thành dự kiến",
+    "monthsToTarget": "Tháng để đạt mục tiêu",
+    "nextMilestone": "Mốc thời gian tiếp theo",
+    "none": "Không có",
+    "statusManagement": "Quản lý trạng thái",
+    "progressTracking": "Theo dõi tiến độ",
+    "analytics": "Phân tích",
+    "progressAnalytics": "Phân tích tiến độ",
+    "financialProgress": "Tiến độ tài chính",
+    "milestoneCompletion": "Hoàn thành mốc thời gian",
+    "overallHealth": "Sức khỏe tổng thể",
+    "financialBreakdown": "Phân tích tài chính",
+    "currentSavings": "Tiết kiệm hiện tại",
+    "targetAmount": "Số tiền mục tiêu",
+    "monthlyContribution": "Đóng góp hàng tháng",
+    "remaining": "Còn lại"
+  },
+  "PlanProgressTracker": {
+    "title": "Theo dõi tiến độ kế hoạch",
+    "subtitle": "Quản lý các cột mốc và theo dõi tiến độ tài chính",
+    "completedMilestones": "Cột mốc đã hoàn thành",
+    "totalMilestones": "Tổng cột mốc",
+    "milestonesOverdue": "cột mốc quá hạn",
+    "savingsBehindSchedule": "Tiết kiệm chậm so với kế hoạch",
+    "excellentProgress": "Tiến độ xuất sắc!",
+    "healthScore": "Điểm sức khỏe",
+    "currentStatus": "Trạng thái hiện tại",
+    "lastUpdated": "Cập nhật lần cuối",
+    "plan": "Kế hoạch",
+    "keyDates": "Các ngày quan trọng",
+    "monthsToTarget": "Tháng đến mục tiêu",
+    "nextMilestone": "Cột mốc tiếp theo",
+    "none": "Không có",
+    "statusManagement": "Quản lý trạng thái",
+    "progressTracking": "Theo dõi tiến độ",
+    "analytics": "Phân tích",
+    "progressAnalytics": "Phân tích tiến độ",
+    "financialProgress": "Tiến độ tài chính",
+    "milestoneCompletion": "Hoàn thành cột mốc",
+    "overallHealth": "Sức khỏe tổng thể",
+    "financialBreakdown": "Phân tích tài chính",
+    "remaining": "Còn lại",
+    "milestoneManagement": "Quản lý cột mốc",
+    "addMilestone": "Thêm cột mốc",
+    "editMilestone": "Chỉnh sửa cột mốc",
+    "deleteMilestone": "Xóa cột mốc",
+    "milestoneTitle": "Tiêu đề cột mốc",
+    "milestoneDescription": "Mô tả cột mốc",
+    "targetDate": "Ngày mục tiêu",
+    "category": "Danh mục",
+    "priority": "Ưu tiên",
+    "status": "Trạng thái",
+    "requiredAmount": "Số tiền cần thiết",
+    "currentAmount": "Số tiền hiện tại",
+    "savingsGoal": "Mục tiêu tiết kiệm",
+    "savingsGoalSubtitle": "Theo dõi tiến độ tiết kiệm của bạn",
+    "monthlyContributions": "Đóng góp hàng tháng",
+    "contributionHistory": "Lịch sử đóng góp",
+    "updateContribution": "Cập nhật đóng góp",
+    "newContribution": "Đóng góp mới",
+    "contributionAmount": "Số tiền đóng góp",
+    "contributionDate": "Ngày đóng góp",
+    "contributionNotes": "Ghi chú đóng góp",
+    "priorities": {
+      "high": "Cao",
+      "medium": "Trung bình",
+      "low": "Thấp"
+    },
+    "statuses": {
+      "pending": "Chờ xử lý",
+      "in_progress": "Đang thực hiện",
+      "completed": "Hoàn thành",
+      "overdue": "Quá hạn"
+    },
+    "progressTracker": "Theo dõi tiến độ",
+    "trackDescription": "Theo dõi các mốc thời gian và giám sát tiến độ kế hoạch tài chính của bạn",
+    "overallProgress": "Tiến độ tổng thể",
+    "currentSavings": "Tiết kiệm hiện tại",
+    "targetAmount": "Số tiền mục tiêu",
+    "monthlyContribution": "Đóng góp hàng tháng",
+    "daysToTarget": "Ngày để đạt mục tiêu",
+    "overview": "Tổng quan",
+    "milestones": "Mốc thời gian",
+    "financial": "Tài chính",
+    "history": "Lịch sử",
+    "progressByCategory": "Tiến độ theo danh mục",
+    "quickActions": "Hành động nhanh",
+    "planIsActive": "Kế hoạch đang hoạt động",
+    "startPlan": "Bắt đầu kế hoạch",
+    "pausePlan": "Tạm dừng kế hoạch",
+    "increaseContribution": "Tăng đóng góp hàng tháng",
+    "recentMilestones": "Mốc thời gian gần đây",
+    "target": "Mục tiêu",
+    "categories": {
+      "financial": "Tài chính",
+      "legal": "Pháp lý",
+      "property": "Bất động sản",
+      "admin": "Thủ tục"
+    },
+    "milestoneActions": {
+      "markComplete": "Đánh dấu hoàn thành",
+      "markIncomplete": "Đánh dấu chưa hoàn thành",
+      "startWorking": "Bắt đầu làm việc"
+    },
+    "savingsProgress": "Tiến độ tiết kiệm",
+    "financialMetrics": "Chỉ số tài chính",
+    "monthlyProgressRate": "Tỷ lệ tiến độ hàng tháng",
+    "planAffordabilityScore": "Điểm khả năng chi trả",
+    "riskLevel": "Mức độ rủi ro",
+    "statusHistory": "Lịch sử trạng thái",
+    "monthlyContributionLabel": "Đóng góp hàng tháng:",
+    "remainingAmount": "Số tiền còn lại:",
+    "estimatedCompletion": "Hoàn thành dự kiến:",
+    "overdue": "Quá hạn",
+    "progress": "Tiến độ",
+    "statusLabels": {
+      "draft": "Nháp",
+      "active": "Đang thực hiện",
+      "archived": "Lưu trữ",
+      "completed": "Hoàn thành"
+    }
+  },
+  "PlanStatusManager": {
+    "archiveReason": "Lý do lưu trữ",
+    "completedOn": "Hoàn thành vào",
+    "completion": {
+      "notSet": "Chưa đặt",
+      "overdue": "Quá hạn"
+    },
+    "validation": {
+      "archiveReasonRequired": "Vui lòng cung cấp lý do lưu trữ kế hoạch này"
+    },
+    "messages": {
+      "statusChanged": "Trạng thái kế hoạch đã chuyển thành {status}"
+    },
+    "dialog": {
+      "changeStatusTo": "Chuyển trạng thái thành",
+      "reason": "Lý do",
+      "reasonPlaceholder": "Vui lòng cung cấp lý do cho {status}...",
+      "additionalNotes": "Ghi chú thêm",
+      "notesPlaceholder": "Bất kỳ ghi chú hoặc bình luận nào...",
+      "cancel": "Hủy",
+      "confirm": "Xác nhận thay đổi"
+    },
+    "currentStatus": "Trạng thái hiện tại",
+    "currentStatusDescription": "Quản lý trạng thái của kế hoạch {planName}",
+    "lastUpdated": "Cập nhật lần cuối",
+    "availableActions": "Hành động khả dụng",
+    "availableActionsDescription": "Chọn một hành động để thay đổi trạng thái kế hoạch",
+    "statusHistory": "Lịch sử trạng thái",
+    "statusHistoryDescription": "Theo dõi tất cả các thay đổi trạng thái",
+    "confirmStatusChange": "Xác nhận thay đổi trạng thái",
+    "confirmStatusChangeDescription": "Bạn có chắc muốn thay đổi trạng thái kế hoạch '{planName}' thành {status}?",
+    "reason": "Lý do",
+    "reasonPlaceholder": "Nhập lý do thay đổi trạng thái",
+    "notes": "Ghi chú",
+    "notesPlaceholder": "Thêm ghi chú chi tiết (tùy chọn)",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "status": {
+      "draft": "Bản nháp",
+      "active": "Hoạt động",
+      "completed": "Hoàn thành",
+      "archived": "Lưu trữ",
+      "unknown": "Không xác định"
+    },
+    "description": {
+      "draft": "Kế hoạch đang được soạn thảo",
+      "active": "Kế hoạch đang được thực hiện",
+      "completed": "Kế hoạch đã hoàn thành",
+      "archived": "Kế hoạch đã được lưu trữ",
+      "unknown": "Trạng thái không xác định"
+    },
+    "title": "Quản lý trạng thái kế hoạch",
+    "subtitle": "Theo dõi và quản lý trạng thái của kế hoạch tài chính",
+    "progress": "Tiến độ",
+    "estimatedCompletion": "Hoàn thành dự kiến",
+    "never": "Chưa có",
+    "time": {
+      "for": "trong",
+      "days": "ngày",
+      "hours": "giờ",
+      "minutes": "phút"
+    },
+    "history": {
+      "title": "Lịch sử",
+      "viewAll": "Xem tất cả",
+      "noHistory": "Chưa có lịch sử thay đổi trạng thái"
+    },
+    "actions": {
+      "activate": "Kích hoạt",
+      "complete": "Hoàn thành",
+      "archive": "Lưu trữ",
+      "restore": "Khôi phục"
+    }
+  },
+  "Plans": {
+    "title": "Kế Hoạch Tài Chính",
+    "description": "Quản lý và theo dõi các kế hoạch tài chính bất động sản của bạn",
+    "loading": "Đang tải...",
+    "createNewPlan": "Tạo Kế Hoạch Mới",
+    "newPlan": {
+      "title": "Tạo Kế Hoạch Tài Chính Mới",
+      "description": "Bắt đầu hành trình mua nhà của bạn với kế hoạch tài chính chi tiết"
+    },
+    "detail": {
+      "status": {
+        "draft": "Bản nháp",
+        "active": "Hoạt động",
+        "completed": "Hoàn thành",
+        "archived": "Lưu trữ"
+      },
+      "type": {
+        "home_purchase": "Mua nhà",
+        "investment": "Đầu tư",
+        "upgrade": "Nâng cấp",
+        "refinance": "Tái cấp vốn"
+      },
+      "createdAt": "Tạo vào ngày {date}",
+      "edit": "Chỉnh sửa",
+      "exportFile": "Xuất tệp",
+      "share": "Chia sẻ",
+      "keyMetrics": {
+        "purchasePrice": "Giá mua",
+        "downPayment": "Thanh toán trước",
+        "monthlyPayment": "Thanh toán hàng tháng",
+        "netCashFlow": "Dòng tiền ròng"
+      },
+      "loanDetails": {
+        "title": "Chi tiết khoản vay",
+        "description": "Thông tin về điều kiện vay và lãi suất",
+        "loanAmount": "Số tiền vay",
+        "loanTerm": "Kỳ hạn vay",
+        "years": "{count} năm",
+        "interestRate": "Lãi suất",
+        "perYear": "{rate}% / năm",
+        "bank": "Ngân hàng",
+        "notSelected": "Chưa chọn"
+      },
+      "financialSummary": {
+        "title": "Tóm tắt tài chính",
+        "description": "Phân tích thu nhập, chi phí và khả năng chi trả",
+        "income": "Thu nhập",
+        "basicSalary": "Lương cơ bản",
+        "rentalIncome": "Thu nhập cho thuê",
+        "totalIncome": "Tổng thu nhập",
+        "expenses": "Chi phí",
+        "livingExpenses": "Chi phí sinh hoạt",
+        "homeInstallment": "Trả góp nhà",
+        "totalExpenses": "Tổng chi phí",
+        "monthlyNetCashFlow": "Dòng tiền ròng hàng tháng",
+        "positiveCashFlow": "Dòng tiền dương - Tình hình tài chính ổn định",
+        "negativeCashFlow": "Dòng tiền âm - Cần xem xét lại kế hoạch"
+      },
+      "timeline": {
+        "title": "Lịch trình hoàn thành",
+        "description": "Lộ trình thực hiện kế hoạch theo thời gian",
+        "placeholder": "Lịch trình sẽ được hiển thị ở đây"
+      },
+      "charts": {
+        "cashFlowChart": {
+          "title": "Biểu đồ dòng tiền",
+          "description": "Dự báo dòng tiền hàng tháng",
+          "placeholder": "Biểu đồ dòng tiền sẽ được hiển thị ở đây"
+        },
+        "expenseAllocation": {
+          "title": "Phân bổ chi phí",
+          "description": "Tỷ trọng các khoản chi phí hàng tháng",
+          "placeholder": "Biểu đồ phân bổ chi phí sẽ được hiển thị ở đây"
+        }
+      }
+    }
+  },
+  "CreatePlanForm": {
+    "title": "Tạo Kế Hoạch Tài Chính",
+    "description": "Tạo kế hoạch tài chính cho bất động sản của bạn",
+    "propertyInfo": {
+      "title": "Thông tin bất động sản đã chọn",
+      "from": "Từ Tìm Kiếm Bất Động Sản",
+      "price": "Giá",
+      "area": "Diện tích",
+      "bedrooms": "Phòng ngủ"
+    },
+    "tabs": {
+      "basic": "Thông tin cơ bản",
+      "financial": "Tài chính cá nhân",
+      "advanced": "Nâng cao"
+    },
+    "basicInfo": {
+      "title": "Thông tin kế hoạch",
+      "description": "Nhập thông tin cơ bản về kế hoạch tài chính của bạn",
+      "planName": {
+        "label": "Tên kế hoạch",
+        "placeholder": "VD: Mua căn hộ chung cư Q7"
+      },
+      "planType": {
+        "label": "Loại kế hoạch",
+        "placeholder": "Chọn loại kế hoạch",
+        "options": {
+          "homePurchase": "Mua nhà ở",
+          "investment": "Đầu tư",
+          "upgrade": "Nâng cấp",
+          "refinance": "Tái cấu trúc"
+        }
+      },
+      "purchasePrice": {
+        "label": "Giá mua (VNĐ)",
+        "placeholder": "2.500.000.000 ₫",
+        "description": "Giá mua dự kiến của bất động sản (VD: 2.5 tỷ = 2,500,000,000)"
+      },
+      "downPayment": {
+        "label": "Vốn tự có (VNĐ)",
+        "placeholder": "800.000.000 ₫",
+        "description": "Số tiền bạn có sẵn để trả trước (VD: 800 triệu = 800,000,000)"
+      },
+      "planDescription": {
+        "label": "Mô tả (tùy chọn)",
+        "placeholder": "Mô tả chi tiết về kế hoạch của bạn..."
+      }
+    },
+    "financialInfo": {
+      "title": "Tình hình tài chính",
+      "description": "Thông tin về thu chi hàng tháng và tài sản hiện tại",
+      "monthlyIncome": {
+        "label": "Thu nhập hàng tháng (VNĐ)",
+        "placeholder": "25.000.000 ₫",
+        "description": "Thu nhập ròng hàng tháng (VD: 25 triệu = 25,000,000)"
+      },
+      "monthlyExpenses": {
+        "label": "Chi phí sinh hoạt hàng tháng (VNĐ)",
+        "placeholder": "13.000.000 ₫",
+        "description": "Chi phí sinh hoạt, ăn uống, di chuyển (VD: 13 triệu = 13,000,000)"
+      },
+      "currentSavings": {
+        "label": "Tiết kiệm hiện tại (VNĐ)",
+        "placeholder": "100.000.000 ₫",
+        "description": "Số tiền tiết kiệm có sẵn (VD: 100 triệu = 100,000,000)"
+      },
+      "otherDebts": {
+        "label": "Nợ khác (VNĐ)",
+        "placeholder": "0 ₫",
+        "description": "Tổng số nợ khác hiện tại (thẻ tín dụng, vay cá nhân, v.v.)"
+      }
+    },
+    "advancedOptions": {
+      "title": "Tùy chọn nâng cao",
+      "description": "Các thông tin bổ sung cho kế hoạch đầu tư",
+      "additionalCosts": {
+        "label": "Chi phí phát sinh (VNĐ)",
+        "placeholder": "50.000.000 ₫",
+        "description": "Phí môi giới, thuế, phí làm sổ, nội thất (VD: 50 triệu = 50,000,000)"
+      },
+      "expectedRentalIncome": {
+        "label": "Thu nhập cho thuê dự kiến (VNĐ/tháng)",
+        "placeholder": "4.000.000 ₫",
+        "description": "Chỉ áp dụng cho bất động sản đầu tư (VD: 4 triệu = 4,000,000)"
+      },
+      "expectedAppreciationRate": {
+        "label": "Tỷ lệ tăng giá dự kiến (%/năm)",
+        "placeholder": "5.0"
+      },
+      "investmentHorizonYears": {
+        "label": "Thời gian đầu tư (năm)",
+        "placeholder": "10"
+      }
+    },
+    "validation": {
+      "planNameRequired": "Tên kế hoạch không được để trống",
+      "purchasePriceMin": "Giá mua phải ít nhất 100 triệu VNĐ",
+      "downPaymentMin": "Vốn tự có phải ít nhất 10 triệu VNĐ",
+      "downPaymentMax": "Vốn tự có không thể lớn hơn hoặc bằng giá mua",
+      "monthlyIncomeMin": "Thu nhập hàng tháng phải ít nhất 5 triệu VNĐ",
+      "monthlyExpensesMin": "Chi phí hàng tháng phải ít nhất 1 triệu VNĐ",
+      "expensesLessThanIncome": "Chi phí không thể lớn hơn hoặc bằng thu nhập",
+      "fixErrorsBeforeContinue": "Vui lòng kiểm tra và sửa các lỗi trước khi tiếp tục",
+      "fixErrorsInForm": "Vui lòng kiểm tra và sửa các lỗi trong form"
+    },
+    "buttons": {
+      "create": "Tạo Kế Hoạch",
+      "creating": "Đang tạo...",
+      "cancel": "Hủy"
+    },
+    "messages": {
+      "success": "Kế hoạch đã được tạo thành công!",
+      "error": "Có lỗi xảy ra",
+      "propertyLoaded": "Thông tin bất động sản đã được tải thành công!",
+      "propertyLoadError": "Không thể tải thông tin bất động sản"
+    }
+  },
+  "FinancialPlanningWizard": {
+    "title": "Tạo Kế Hoạch Tài Chính",
+    "subtitle": "Hướng dẫn từng bước để tạo kế hoạch tài chính hoàn hảo",
+    "steps": {
+      "personalInfo": {
+        "title": "Thông Tin Cá Nhân",
+        "description": "Cung cấp thông tin tài chính cơ bản của bạn",
+        "fields": {
+          "name": {
+            "label": "Họ và tên",
+            "placeholder": "Nhập họ và tên"
+          },
+          "age": {
+            "label": "Tuổi"
+          },
+          "monthlyIncome": {
+            "label": "Thu nhập hàng tháng (VND)",
+            "placeholder": "50,000,000"
+          },
+          "monthlyExpenses": {
+            "label": "Chi phí hàng tháng (VND)",
+            "placeholder": "25,000,000"
+          },
+          "currentSavings": {
+            "label": "Tiết kiệm hiện có (VND)",
+            "placeholder": "200,000,000"
+          },
+          "dependents": {
+            "label": "Số người phụ thuộc",
+            "placeholder": "0"
+          }
+        },
+        "summary": {
+          "netIncome": "Thu nhập ròng",
+          "savingsRate": "Tỷ lệ tiết kiệm",
+          "monthlyAvailable": "Tiết kiệm/tháng"
+        }
+      },
+      "propertyGoals": {
+        "title": "Mục Tiêu Bất Động Sản",
+        "description": "Loại bất động sản mong muốn",
+        "fields": {
+          "propertyType": {
+            "label": "Loại bất động sản",
+            "options": {
+              "apartment": "Chung cư",
+              "house": "Nhà riêng",
+              "villa": "Biệt thự",
+              "townhouse": "Nhà liền kề"
+            }
+          },
+          "location": {
+            "label": "Vị trí mong muốn",
+            "placeholder": "VD: Quận 7, TP.HCM"
+          },
+          "budget": {
+            "label": "Ngân sách dự kiến",
+            "placeholder": "3,000,000,000"
+          },
+          "timeframe": {
+            "label": "Thời gian mong muốn (tháng)",
+            "placeholder": "24"
+          },
+          "purpose": {
+            "label": "Mục đích",
+            "options": {
+              "primary": "Ở chính",
+              "investment": "Đầu tư",
+              "upgrade": "Nâng cấp"
+            }
+          },
+          "features": {
+            "label": "Tiện ích mong muốn",
+            "options": {
+              "parking": "Chỗ đậu xe",
+              "gym": "Phòng gym",
+              "pool": "Hồ bơi",
+              "security": "An ninh 24/7",
+              "elevator": "Thang máy",
+              "garden": "Vườn/Ban công"
+            }
+          }
+        },
+        "summary": {
+          "type": "Loại",
+          "budget": "Ngân sách",
+          "downPayment": "Trả trước",
+          "loanAmount": "Số tiền vay"
+        }
+      },
+      "financialStrategy": {
+        "title": "Chiến Lược Tài Chính",
+        "description": "Xác định chiến lược đầu tư phù hợp",
+        "fields": {
+          "downPaymentTarget": {
+            "label": "Tỷ lệ trả trước mong muốn (%)",
+            "description": "Phần trăm giá trị BDS bạn muốn trả trước"
+          },
+          "riskTolerance": {
+            "label": "Khả năng chấp nhận rủi ro",
+            "options": {
+              "conservative": "Bảo thủ (5-7% ROI)",
+              "moderate": "Ôn hòa (7-10% ROI)",
+              "aggressive": "Tích cực (10%+ ROI)"
+            }
+          },
+          "investmentHorizon": {
+            "label": "Thời gian đầu tư (năm)",
+            "placeholder": "20"
+          },
+          "expectedROI": {
+            "label": "ROI mong đợi (%/năm)",
+            "placeholder": "8"
+          },
+          "bankPreference": {
+            "label": "Ngân hàng ưu tiên",
+            "options": {
+              "vietcombank": "Vietcombank",
+              "techcombank": "Techcombank",
+              "bidv": "BIDV",
+              "vietinbank": "VietinBank",
+              "acb": "ACB",
+              "mb": "MB Bank"
+            }
+          }
+        }
+      },
+      "additionalGoals": {
+        "title": "Mục Tiêu Bổ Sung",
+        "description": "Các mục tiêu tài chính khác",
+        "fields": {
+          "emergencyFund": {
+            "label": "Quỹ dự phòng khẩn cấp (VND)",
+            "placeholder": "150,000,000",
+            "description": "Nên bằng 3-6 tháng chi phí sinh hoạt"
+          },
+          "education": {
+            "label": "Quỹ giáo dục (VND)",
+            "placeholder": "0"
+          },
+          "retirement": {
+            "label": "Quỹ nghỉ hưu (VND)",
+            "placeholder": "0"
+          },
+          "other": {
+            "label": "Mục tiêu khác",
+            "addButton": "Thêm mục tiêu",
+            "namePlaceholder": "Tên mục tiêu",
+            "amountPlaceholder": "Số tiền",
+            "timeframePlaceholder": "Thời gian (tháng)"
+          }
+        }
+      },
+      "summary": {
+        "title": "Tổng Kết Kế Hoạch",
+        "description": "Xem lại và xác nhận kế hoạch tài chính của bạn",
+        "sections": {
+          "personalInfo": "Thông tin cá nhân",
+          "propertyGoals": "Mục tiêu bất động sản",
+          "financialStrategy": "Chiến lược tài chính",
+          "additionalGoals": "Mục tiêu bổ sung"
+        },
+        "calculations": {
+          "title": "Tính Toán Tài Chính",
+          "monthlyPayment": "Thanh toán hàng tháng",
+          "totalLoan": "Tổng tiền vay",
+          "totalInterest": "Tổng lãi suất",
+          "loanTerm": "Thời hạn vay",
+          "monthlyAfterLoan": "Còn lại sau thanh toán"
+        }
+      }
+    },
+    "navigation": {
+      "next": "Tiếp theo",
+      "previous": "Trước",
+      "complete": "Hoàn thành",
+      "step": "Bước",
+      "of": "của"
+    },
+    "validation": {
+      "nameRequired": "Vui lòng nhập họ và tên",
+      "incomeRequired": "Thu nhập phải lớn hơn 0",
+      "expensesGreaterThanIncome": "Chi phí không được lớn hơn thu nhập",
+      "budgetRequired": "Ngân sách phải lớn hơn 0",
+      "locationRequired": "Vui lòng nhập vị trí mong muốn"
+    },
+    "messages": {
+      "calculatingPlan": "Đang tính toán kế hoạch...",
+      "planCreated": "Kế hoạch đã được tạo thành công!",
+      "error": "Có lỗi xảy ra khi tạo kế hoạch"
+    }
+  },
+  "PlansList": {
+    "status": {
+      "draft": "Bản nháp",
+      "active": "Đang hoạt động",
+      "completed": "Hoàn thành",
+      "archived": "Lưu trữ",
+      "unknown": "Không rõ"
+    },
+    "types": {
+      "homePurchase": "Mua nhà ở",
+      "investment": "Đầu tư",
+      "upgrade": "Nâng cấp",
+      "refinance": "Tái cấu trúc",
+      "unknown": "Không rõ"
+    },
+    "empty": {
+      "title": "Chưa có kế hoạch nào",
+      "description": "Bắt đầu tạo kế hoạch tài chính đầu tiên của bạn",
+      "createButton": "Tạo Kế Hoạch Đầu Tiên"
+    },
+    "details": {
+      "purchasePrice": "Giá mua",
+      "downPayment": "Vốn tự có",
+      "monthlyIncome": "Thu nhập",
+      "month": "tháng"
+    },
+    "actions": {
+      "view": "Xem",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa"
+    }
+  },
+  "SharePlanDialog": {
+    "title": "Chia sẻ kế hoạch",
+    "buttons": {
+      "share": "Chia sẻ"
+    },
+    "visibility": {
+      "public": "Công khai",
+      "private": "Riêng tư"
+    },
+    "info": {
+      "views": "{count} lượt xem"
+    },
+    "privacy": {
+      "title": "Cài đặt quyền riêng tư",
+      "description": "Quyết định ai có thể xem kế hoạch của bạn",
+      "makePublic": "Công khai kế hoạch",
+      "publicDescription": "Bất kỳ ai có liên kết đều có thể xem",
+      "privateDescription": "Chỉ những người bạn chia sẻ mới có thể xem"
+    },
+    "tabs": {
+      "link": "Liên kết",
+      "email": "Email",
+      "social": "Mạng xã hội"
+    },
+    "link": {
+      "shareUrl": "Liên kết chia sẻ",
+      "generating": "Đang tạo liên kết...",
+      "copy": "Sao chép",
+      "copied": "Đã sao chép",
+      "publicNote": "Liên kết này có thể được truy cập bởi bất kỳ ai",
+      "privateNote": "Liên kết này chỉ hoạt động cho những người bạn chia sẻ",
+      "qrCode": "Mã QR sẽ được hiển thị ở đây"
+    },
+    "email": {
+      "recipients": "Người nhận",
+      "recipientsPlaceholder": "email1@example.com, email2@example.com",
+      "recipientsNote": "Nhập nhiều địa chỉ email, cách nhau bằng dấu phẩy",
+      "message": "Tin nhắn",
+      "messagePlaceholder": "Thêm tin nhắn cá nhân (tùy chọn)",
+      "send": "Gửi email",
+      "sending": "Đang gửi..."
+    },
+    "social": {
+      "note": "Chia sẻ kế hoạch của bạn trên các nền tảng mạng xã hội"
+    },
+    "socialShare": {
+      "title": "Xem kế hoạch tài chính: {planName}",
+      "description": "Kế hoạch tài chính chi tiết với phân tích ROI và dòng tiền"
+    },
+    "validation": {
+      "emailRequired": "Vui lòng nhập ít nhất một địa chỉ email"
+    },
+    "messages": {
+      "madePublic": "Kế hoạch đã được công khai",
+      "madePrivate": "Kế hoạch đã được chuyển thành riêng tư",
+      "visibilityError": "Lỗi cập nhật quyền riêng tư",
+      "linkCopied": "Liên kết đã được sao chép",
+      "copyError": "Không thể sao chép liên kết",
+      "emailSent": "Email đã được gửi thành công",
+      "emailError": "Lỗi gửi email"
+    }
+  },
+  "ExportPlanDialog": {
+    "title": "Xuất kế hoạch",
+    "buttons": {
+      "export": "Xuất file",
+      "exporting": "Đang xuất...",
+      "cancel": "Hủy"
+    },
+    "planInfo": {
+      "purchasePrice": "Giá mua",
+      "downPayment": "Vốn tự có"
+    },
+    "tabs": {
+      "format": "Định dạng",
+      "content": "Nội dung",
+      "settings": "Cài đặt"
+    },
+    "format": {
+      "title": "Chọn định dạng xuất",
+      "pdf": {
+        "description": "Tài liệu PDF chất lượng cao"
+      },
+      "excel": {
+        "description": "Bảng tính Excel có thể chỉnh sửa"
+      },
+      "csv": {
+        "description": "Dữ liệu dạng bảng thuần túy"
+      }
+    },
+    "templates": {
+      "title": "Mẫu xuất",
+      "detailed": {
+        "title": "Chi tiết",
+        "description": "Báo cáo đầy đủ với tất cả thông tin và biểu đồ"
+      },
+      "summary": {
+        "title": "Tóm tắt",
+        "description": "Báo cáo ngắn gọn với các thông tin chính"
+      },
+      "presentation": {
+        "title": "Thuyết trình",
+        "description": "Định dạng phù hợp cho thuyết trình"
+      }
+    },
+    "content": {
+      "title": "Nội dung được bao gồm",
+      "includeCharts": "Bao gồm biểu đồ",
+      "includeCalculations": "Bao gồm các tính toán",
+      "includeLoanDetails": "Bao gồm chi tiết khoản vay",
+      "includeTimeline": "Bao gồm timeline",
+      "includePersonalInfo": "Bao gồm thông tin cá nhân",
+      "personalInfoWarning": "Chỉ bao gồm thông tin cá nhân nếu bạn tin tưởng người nhận"
+    },
+    "settings": {
+      "language": "Ngôn ngữ",
+      "estimatedSize": "Kích thước ước tính",
+      "fileSizeEstimate": "Kích thước file ước tính: {size} MB",
+      "processingNote": "Quá trình xuất có thể mất vài giây tùy theo độ phức tạp"
+    },
+    "progress": {
+      "title": "Tiến độ xuất"
+    },
+    "messages": {
+      "exportSuccess": "Xuất kế hoạch thành công!",
+      "exportError": "Lỗi xuất kế hoạch"
+    }
+  },
+  "DashboardPlansPage": {
+    "title": "Kế Hoạch Tài Chính",
+    "description": "Quản lý và theo dõi các kế hoạch mua nhà của bạn",
+    "createButton": "Tạo Kế Hoạch Mới",
+    "loading": "Đang tải..."
+  },
+  "EditPlanForm": {
+    "tabs": {
+      "basic": "Cơ bản",
+      "financial": "Tài chính",
+      "advanced": "Nâng cao"
+    },
+    "basicInfo": {
+      "title": "Thông tin kế hoạch",
+      "description": "Cập nhật thông tin cơ bản của kế hoạch tài chính",
+      "planName": {
+        "label": "Tên kế hoạch",
+        "placeholder": "VD: Mua căn hộ chung cư Q7"
+      },
+      "planType": {
+        "label": "Loại kế hoạch",
+        "placeholder": "Chọn loại kế hoạch",
+        "options": {
+          "homePurchase": "Mua nhà ở",
+          "investment": "Đầu tư",
+          "upgrade": "Nâng cấp",
+          "refinance": "Tái cấu trúc"
+        }
+      },
+      "purchasePrice": {
+        "label": "Giá mua",
+        "placeholder": "VD: 2.000.000.000",
+        "description": "Giá mua dự kiến của bất động sản"
+      },
+      "downPayment": {
+        "label": "Vốn tự có",
+        "placeholder": "VD: 400.000.000",
+        "description": "Số tiền bạn có thể thanh toán trước"
+      },
+      "planDescription": {
+        "label": "Mô tả kế hoạch",
+        "placeholder": "Mô tả chi tiết về kế hoạch của bạn..."
+      }
+    },
+    "financialInfo": {
+      "title": "Thông tin tài chính",
+      "description": "Cập nhật thông tin thu nhập và chi phí hàng tháng",
+      "monthlyIncome": {
+        "label": "Thu nhập hàng tháng",
+        "placeholder": "VD: 50.000.000",
+        "description": "Tổng thu nhập ròng hàng tháng của bạn"
+      },
+      "monthlyExpenses": {
+        "label": "Chi phí sinh hoạt",
+        "placeholder": "VD: 20.000.000",
+        "description": "Chi phí cố định hàng tháng (ăn, ở, di chuyển...)"
+      },
+      "currentSavings": {
+        "label": "Tiền tiết kiệm hiện tại",
+        "placeholder": "VD: 100.000.000",
+        "description": "Số tiền bạn đã tiết kiệm được"
+      },
+      "otherDebts": {
+        "label": "Nợ khác",
+        "placeholder": "VD: 10.000.000",
+        "description": "Tổng các khoản nợ khác đang có"
+      }
+    },
+    "advancedOptions": {
+      "title": "Tùy chọn nâng cao",
+      "description": "Cập nhật các thông tin chi tiết và dự báo",
+      "additionalCosts": {
+        "label": "Chi phí phát sinh",
+        "placeholder": "VD: 50.000.000",
+        "description": "Phí môi giới, thuế, sửa chữa... (khoảng 5-10% giá mua)"
+      },
+      "expectedRentalIncome": {
+        "label": "Thu nhập cho thuê dự kiến",
+        "placeholder": "VD: 15.000.000",
+        "description": "Nếu có kế hoạch cho thuê (chỉ áp dụng với đầu tư)"
+      },
+      "expectedAppreciationRate": {
+        "label": "Tỷ lệ tăng giá dự kiến (%/năm)",
+        "placeholder": "VD: 8"
+      },
+      "investmentHorizonMonths": {
+        "label": "Thời gian đầu tư (tháng)",
+        "placeholder": "VD: 120"
+      }
+    },
+    "validation": {
+      "planNameRequired": "Vui lòng nhập tên kế hoạch",
+      "purchasePriceMin": "Giá mua phải ít nhất 100 triệu VND",
+      "downPaymentMin": "Vốn tự có phải ít nhất 10 triệu VND",
+      "downPaymentMax": "Vốn tự có không thể bằng hoặc lớn hơn giá mua",
+      "monthlyIncomeMin": "Thu nhập hàng tháng phải ít nhất 5 triệu VND",
+      "monthlyExpensesMin": "Chi phí sinh hoạt phải ít nhất 1 triệu VND",
+      "expensesLessThanIncome": "Chi phí sinh hoạt phải nhỏ hơn thu nhập",
+      "fixErrorsBeforeContinue": "Vui lòng sửa các lỗi trước khi tiếp tục",
+      "fixErrorsInForm": "Vui lòng kiểm tra và sửa các lỗi trong form"
+    },
+    "buttons": {
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu...",
+      "cancel": "Hủy"
+    },
+    "messages": {
+      "success": "Cập nhật kế hoạch thành công!",
+      "error": "Có lỗi xảy ra, vui lòng thử lại"
+    }
+  }
+}

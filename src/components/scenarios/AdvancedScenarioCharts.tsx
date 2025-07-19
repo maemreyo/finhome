@@ -4,6 +4,7 @@
 'use client'
 
 import React, { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   LineChart,
   Line,
@@ -58,6 +59,7 @@ export default function AdvancedScenarioCharts({
   selectedMetrics = ['monthlyPayment', 'totalCost', 'roi', 'riskScore'],
   className
 }: AdvancedScenarioChartsProps) {
+  const t = useTranslations('AdvancedScenarioCharts')
   
   // Prepare data for various chart types
   const chartData = useMemo(() => {
@@ -109,11 +111,11 @@ export default function AdvancedScenarioCharts({
   // Radar chart data for multi-dimensional comparison
   const radarData = useMemo(() => {
     const metrics = [
-      'Affordability',
-      'ROI Potential', 
-      'Risk Level',
-      'Monthly Payment',
-      'Time to Payoff'
+      t('multidimensionalAnalysis.metrics.affordability'),
+      t('multidimensionalAnalysis.metrics.roiPotential'), 
+      t('multidimensionalAnalysis.metrics.riskLevel'),
+      t('multidimensionalAnalysis.metrics.monthlyPayment'),
+      t('multidimensionalAnalysis.metrics.timeToPayoff')
     ]
     
     return metrics.map(metric => {
@@ -122,20 +124,20 @@ export default function AdvancedScenarioCharts({
       scenarios.forEach(scenario => {
         let value = 0
         switch (metric) {
-          case 'Affordability':
+          case t('multidimensionalAnalysis.metrics.affordability'):
             value = scenario.calculatedMetrics?.affordabilityScore || 0
             break
-          case 'ROI Potential':
+          case t('multidimensionalAnalysis.metrics.roiPotential'):
             value = 65 // Mock value
             break
-          case 'Risk Level':
+          case t('multidimensionalAnalysis.metrics.riskLevel'):
             value = 100 - (scenario.riskLevel === 'low' ? 20 : scenario.riskLevel === 'medium' ? 50 : 80)
             break
-          case 'Monthly Payment':
+          case t('multidimensionalAnalysis.metrics.monthlyPayment'):
             const maxPayment = Math.max(...chartData.map(s => s.monthlyPayment))
             value = 100 - ((scenario.calculatedMetrics?.monthlyPayment || 0) / maxPayment * 100)
             break
-          case 'Time to Payoff':
+          case t('multidimensionalAnalysis.metrics.timeToPayoff'):
             value = 100 - ((scenario.calculatedMetrics?.payoffTimeMonths || 240) / 240 * 100)
             break
         }
@@ -151,24 +153,24 @@ export default function AdvancedScenarioCharts({
       {/* Scenario Overview Bar Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Tổng quan so sánh kịch bản</CardTitle>
+          <CardTitle>{t('scenarioOverview.title')}</CardTitle>
           <CardDescription>
-            So sánh các chỉ số tài chính chính giữa các kịch bản
+            {t('scenarioOverview.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Monthly Payment Comparison */}
             <div>
-              <h4 className="text-sm font-medium mb-3">Thanh toán hàng tháng</h4>
+              <h4 className="text-sm font-medium mb-3">{t('monthlyPaymentChart.title')}</h4>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="scenarioType" />
                   <YAxis tickFormatter={(value) => formatCurrency(value, { compact: true })} />
                   <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Thanh toán']}
-                    labelFormatter={(label) => `Kịch bản: ${label}`}
+                    formatter={(value: number) => [formatCurrency(value), t('monthlyPaymentChart.tooltipLabel')]}
+                    labelFormatter={(label) => t('monthlyPaymentChart.scenarioLabel', { type: label })}
                   />
                   <Bar dataKey="monthlyPayment" fill={CHART_THEMES.primary} />
                 </BarChart>
@@ -177,15 +179,15 @@ export default function AdvancedScenarioCharts({
 
             {/* Total Cost Comparison */}
             <div>
-              <h4 className="text-sm font-medium mb-3">Tổng chi phí</h4>
+              <h4 className="text-sm font-medium mb-3">{t('totalCostChart.title')}</h4>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="scenarioType" />
                   <YAxis tickFormatter={(value) => formatCurrency(value, { compact: true })} />
                   <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Tổng chi phí']}
-                    labelFormatter={(label) => `Kịch bản: ${label}`}
+                    formatter={(value: number) => [formatCurrency(value), t('totalCostChart.tooltipLabel')]}
+                    labelFormatter={(label) => t('totalCostChart.scenarioLabel', { type: label })}
                   />
                   <Bar dataKey="totalCost" fill={CHART_THEMES.success} />
                 </BarChart>
@@ -198,9 +200,9 @@ export default function AdvancedScenarioCharts({
       {/* Loan Balance Over Time */}
       <Card>
         <CardHeader>
-          <CardTitle>Biến động số dư vay theo thời gian</CardTitle>
+          <CardTitle>{t('loanBalanceOverTime.title')}</CardTitle>
           <CardDescription>
-            Theo dõi số dư còn lại của khoản vay qua các năm
+            {t('loanBalanceOverTime.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -209,12 +211,12 @@ export default function AdvancedScenarioCharts({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="month" 
-                tickFormatter={(value) => `Năm ${Math.floor(value / 12)}`}
+                tickFormatter={(value) => t('loanBalanceOverTime.xAxisLabel', { year: Math.floor(value / 12) })}
               />
               <YAxis tickFormatter={(value) => formatCurrency(value, { compact: true })} />
               <Tooltip 
-                formatter={(value: number) => [formatCurrency(value), 'Số dư']}
-                labelFormatter={(label) => `Tháng ${label}`}
+                formatter={(value: number) => [formatCurrency(value), t('loanBalanceOverTime.yAxisLabel')]}
+                labelFormatter={(label) => t('loanBalanceOverTime.tooltipLabel', { month: label })}
               />
               {scenarios.map((scenario, index) => (
                 <Area
@@ -235,9 +237,9 @@ export default function AdvancedScenarioCharts({
       {/* Risk vs Return Scatter Plot */}
       <Card>
         <CardHeader>
-          <CardTitle>Phân tích rủi ro - Lợi nhuận</CardTitle>
+          <CardTitle>{t('riskReturnAnalysis.title')}</CardTitle>
           <CardDescription>
-            Vị trí của các kịch bản trên ma trận rủi ro và lợi nhuận
+            {t('riskReturnAnalysis.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -247,18 +249,18 @@ export default function AdvancedScenarioCharts({
               <XAxis 
                 type="number" 
                 dataKey="x" 
-                name="Mức độ rủi ro"
+                name={t('riskReturnAnalysis.xAxisLabel')}
                 domain={[0, 10]}
               />
               <YAxis 
                 type="number" 
                 dataKey="y" 
-                name="ROI (%)"
+                name={t('riskReturnAnalysis.yAxisLabel')}
                 domain={[0, 15]}
               />
               <Tooltip 
                 formatter={(value, name) => [
-                  name === 'Mức độ rủi ro' ? `${value}/10` : `${value}%`,
+                  name === t('riskReturnAnalysis.xAxisLabel') ? t('riskReturnAnalysis.tooltipRisk', { value }) : t('riskReturnAnalysis.tooltipReturn', { value }),
                   name
                 ]}
                 labelFormatter={() => ''}
@@ -279,9 +281,9 @@ export default function AdvancedScenarioCharts({
       {/* Multi-dimensional Radar Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Phân tích đa chiều</CardTitle>
+          <CardTitle>{t('multidimensionalAnalysis.title')}</CardTitle>
           <CardDescription>
-            So sánh toàn diện các khía cạnh của từng kịch bản
+            {t('multidimensionalAnalysis.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -325,9 +327,9 @@ export default function AdvancedScenarioCharts({
       {/* Financial Metrics Heatmap */}
       <Card>
         <CardHeader>
-          <CardTitle>Ma trận chỉ số tài chính</CardTitle>
+          <CardTitle>{t('financialMetricsMatrix.title')}</CardTitle>
           <CardDescription>
-            Bảng nhiệt hiển thị hiệu suất của các kịch bản theo từng chỉ số
+            {t('financialMetricsMatrix.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -335,12 +337,12 @@ export default function AdvancedScenarioCharts({
             <table className="w-full border-collapse">
               <thead>
                 <tr>
-                  <th className="text-left p-3 border-b">Kịch bản</th>
-                  <th className="text-right p-3 border-b">Thanh toán/tháng</th>
-                  <th className="text-right p-3 border-b">Tổng chi phí</th>
-                  <th className="text-right p-3 border-b">Điểm khả năng chi trả</th>
-                  <th className="text-right p-3 border-b">Tỷ lệ DTI</th>
-                  <th className="text-center p-3 border-b">Mức rủi ro</th>
+                  <th className="text-left p-3 border-b">{t('financialMetricsMatrix.headers.scenario')}</th>
+                  <th className="text-right p-3 border-b">{t('financialMetricsMatrix.headers.monthlyPayment')}</th>
+                  <th className="text-right p-3 border-b">{t('financialMetricsMatrix.headers.totalCost')}</th>
+                  <th className="text-right p-3 border-b">{t('financialMetricsMatrix.headers.affordabilityScore')}</th>
+                  <th className="text-right p-3 border-b">{t('financialMetricsMatrix.headers.dtiRatio')}</th>
+                  <th className="text-center p-3 border-b">{t('financialMetricsMatrix.headers.riskLevel')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -385,8 +387,8 @@ export default function AdvancedScenarioCharts({
                           'destructive'
                         }
                       >
-                        {scenario.riskScore <= 3 ? 'Thấp' : 
-                         scenario.riskScore <= 6 ? 'Trung bình' : 'Cao'}
+                        {scenario.riskScore <= 3 ? t('financialMetricsMatrix.riskLevels.low') : 
+                         scenario.riskScore <= 6 ? t('financialMetricsMatrix.riskLevels.medium') : t('financialMetricsMatrix.riskLevels.high')}
                       </Badge>
                     </td>
                   </tr>

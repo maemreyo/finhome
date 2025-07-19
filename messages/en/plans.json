@@ -1,0 +1,812 @@
+{
+  "NewPlanPage": {
+    "title": "Create New Financial Plan",
+    "description": "Start your journey to financial freedom with a new plan",
+    "actions": {
+      "backToPlans": "Back to Plans"
+    },
+    "badges": {
+      "smartWizard": "Smart Wizard",
+      "roiAnalysis": "ROI Analysis",
+      "accurateCalculation": "Accurate Calculation"
+    },
+    "notifications": {
+      "planCreated": "Plan Created",
+      "planSaved": "Your new financial plan \"{planName}\" has been saved."
+    },
+    "achievements": {
+      "planner": "Planner"
+    },
+    "toasts": {
+      "planComplete": "Plan Complete!",
+      "planCompleteDesc": "You have successfully created a new financial plan."
+    }
+  },
+  "PlanDetailView": {
+    "editTitle": "Edit Financial Plan",
+    "createdOn": "Created on",
+    "buttons": {
+      "edit": "Edit",
+      "share": "Share",
+      "export": "Export",
+      "download": "Download"
+    },
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived",
+      "unknown": "Unknown"
+    },
+    "types": {
+      "homePurchase": "Home Purchase",
+      "investment": "Investment",
+      "upgrade": "Upgrade",
+      "refinance": "Refinance",
+      "unknown": "Unknown"
+    },
+    "metrics": {
+      "purchasePrice": "Purchase Price",
+      "downPayment": "Down Payment",
+      "monthlyPayment": "Monthly Payment",
+      "netCashFlow": "Net Cash Flow"
+    },
+    "loanDetails": {
+      "title": "Loan Details",
+      "description": "Detailed information about loan terms and conditions",
+      "loanAmount": "Loan Amount",
+      "loanTerm": "Loan Term",
+      "loanTermValue": "20 years",
+      "interestRate": "Interest Rate",
+      "interestRateValue": "8.5%",
+      "bank": "Bank",
+      "bankValue": "Not selected"
+    },
+    "financialSummary": {
+      "title": "Financial Summary",
+      "description": "Summary of monthly income, expenses and cash flow",
+      "income": {
+        "title": "Income",
+        "basicSalary": "Basic Salary",
+        "rental": "Rental Income",
+        "total": "Total Income"
+      },
+      "expenses": {
+        "title": "Expenses",
+        "living": "Living Expenses",
+        "mortgage": "Mortgage Payment",
+        "total": "Total Expenses"
+      },
+      "netCashFlow": "Monthly Net Cash Flow",
+      "positiveFlow": "Positive cash flow - plan is viable",
+      "negativeFlow": "Negative cash flow - plan needs adjustment"
+    },
+    "timeline": {
+      "title": "Implementation Timeline",
+      "description": "Track progress and important milestones",
+      "placeholder": "Timeline chart will be displayed here"
+    },
+    "charts": {
+      "cashFlow": {
+        "title": "Cash Flow Chart",
+        "description": "Visualize cash flow over time",
+        "placeholder": "Cash flow chart will be displayed here"
+      },
+      "expenses": {
+        "title": "Expense Analysis",
+        "description": "Detailed breakdown of expenses",
+        "placeholder": "Expense chart will be displayed here"
+      }
+    }
+  },
+  "PlanProgressDashboard": {
+    "overallProgress": "Overall Progress",
+    "savingsProgress": "Savings Progress",
+    "milestones": "Milestones",
+    "healthScore": "Health Score",
+    "currentStatus": "Current Status",
+    "lastUpdated": "Last Updated",
+    "plan": "Plan",
+    "milestonesOverdue": "{count, plural, =0 {No milestones overdue} =1 {# milestone overdue} other {# milestones overdue}}",
+    "savingsBehindSchedule": "Savings behind schedule",
+    "excellentProgress": "Excellent progress!",
+    "keyDates": "Key Dates",
+    "estimatedCompletion": "Estimated Completion",
+    "monthsToTarget": "Months to Target",
+    "nextMilestone": "Next Milestone",
+    "none": "None",
+    "statusManagement": "Status Management",
+    "progressTracking": "Progress Tracking",
+    "analytics": "Analytics",
+    "progressAnalytics": "Progress Analytics",
+    "financialProgress": "Financial Progress",
+    "milestoneCompletion": "Milestone Completion",
+    "overallHealth": "Overall Health",
+    "financialBreakdown": "Financial Breakdown",
+    "currentSavings": "Current Savings",
+    "targetAmount": "Target Amount",
+    "monthlyContribution": "Monthly Contribution",
+    "remaining": "Remaining"
+  },
+  "PlanProgressTracker": {
+    "progressTracker": "Progress Tracker",
+    "trackDescription": "Track milestones and monitor your financial plan progress",
+    "overallProgress": "Overall Progress",
+    "currentSavings": "Current Savings",
+    "targetAmount": "Target Amount",
+    "monthlyContribution": "Monthly Contribution",
+    "daysToTarget": "Days to Target",
+    "overview": "Overview",
+    "milestones": "Milestones",
+    "financial": "Financial",
+    "history": "History",
+    "progressByCategory": "Progress by Category",
+    "quickActions": "Quick Actions",
+    "planIsActive": "Plan is Active",
+    "startPlan": "Start Plan",
+    "pausePlan": "Pause Plan",
+    "increaseContribution": "Increase Monthly Contribution",
+    "recentMilestones": "Recent Milestones",
+    "target": "Target",
+    "categories": {
+      "financial": "Financial",
+      "legal": "Legal",
+      "property": "Property",
+      "admin": "Administrative"
+    },
+    "milestoneActions": {
+      "markComplete": "Mark Complete",
+      "markIncomplete": "Mark Incomplete",
+      "startWorking": "Start Working"
+    },
+    "savingsProgress": "Savings Progress",
+    "financialMetrics": "Financial Metrics",
+    "monthlyProgressRate": "Monthly Progress Rate",
+    "planAffordabilityScore": "Plan Affordability Score",
+    "riskLevel": "Risk Level",
+    "statusHistory": "Status History",
+    "monthlyContributionLabel": "Monthly contribution:",
+    "remainingAmount": "Remaining amount:",
+    "estimatedCompletion": "Estimated completion:",
+    "overdue": "Overdue",
+    "progress": "Progress",
+    "statusLabels": {
+      "draft": "Draft",
+      "active": "Active",
+      "archived": "Archived",
+      "completed": "Completed"
+    }
+  },
+  "PlanStatusManager": {
+    "currentStatus": "Current Status",
+    "currentStatusDescription": "Manage the status of plan {planName}",
+    "lastUpdated": "Last Updated",
+    "availableActions": "Available Actions",
+    "availableActionsDescription": "Choose an action to change the plan status",
+    "statusHistory": "Status History",
+    "statusHistoryDescription": "Track all status changes",
+    "confirmStatusChange": "Confirm Status Change",
+    "confirmStatusChangeDescription": "Are you sure you want to change plan '{planName}' status to {status}?",
+    "reason": "Reason",
+    "reasonPlaceholder": "Enter reason for status change",
+    "notes": "Notes",
+    "notesPlaceholder": "Add detailed notes (optional)",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived",
+      "unknown": "Unknown"
+    },
+    "description": {
+      "draft": "Plan is being drafted",
+      "active": "Plan is being executed",
+      "completed": "Plan has been completed",
+      "archived": "Plan has been archived",
+      "unknown": "Unknown status"
+    },
+    "title": "Plan Status Management",
+    "subtitle": "Track and manage the status of your financial plan",
+    "progress": "Progress",
+    "estimatedCompletion": "Estimated Completion",
+    "never": "Never",
+    "time": {
+      "for": "for",
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes"
+    },
+    "history": {
+      "title": "History",
+      "viewAll": "View All",
+      "noHistory": "No status change history"
+    },
+    "actions": {
+      "activate": "Activate",
+      "complete": "Complete",
+      "archive": "Archive",
+      "restore": "Restore"
+    }
+  },
+  "CreatePlanForm": {
+    "title": "Create Financial Plan",
+    "description": "Create a financial plan for your real estate",
+    "propertyInfo": {
+      "title": "Selected property information",
+      "from": "From Property Search",
+      "price": "Price",
+      "area": "Area",
+      "bedrooms": "Bedrooms"
+    },
+    "tabs": {
+      "basic": "Basic Information",
+      "financial": "Personal Finance",
+      "advanced": "Advanced"
+    },
+    "basicInfo": {
+      "title": "Plan Information",
+      "description": "Enter basic information about your financial plan",
+      "planName": {
+        "label": "Plan Name",
+        "placeholder": "e.g., Buy District 7 Apartment"
+      },
+      "planType": {
+        "label": "Plan Type",
+        "placeholder": "Select plan type",
+        "options": {
+          "homePurchase": "Home Purchase",
+          "investment": "Investment",
+          "upgrade": "Upgrade",
+          "refinance": "Refinance"
+        }
+      },
+      "purchasePrice": {
+        "label": "Purchase Price (VND)",
+        "placeholder": "2,500,000,000 ₫",
+        "description": "Expected purchase price of the property (e.g., 2.5 billion = 2,500,000,000)"
+      },
+      "downPayment": {
+        "label": "Down Payment (VND)",
+        "placeholder": "800,000,000 ₫",
+        "description": "Amount you have available for down payment (e.g., 800 million = 800,000,000)"
+      },
+      "planDescription": {
+        "label": "Description (optional)",
+        "placeholder": "Detailed description of your plan..."
+      }
+    },
+    "financialInfo": {
+      "title": "Financial Situation",
+      "description": "Information about monthly income and expenses and current assets",
+      "monthlyIncome": {
+        "label": "Monthly Income (VND)",
+        "placeholder": "25,000,000 ₫",
+        "description": "Net monthly income (e.g., 25 million = 25,000,000)"
+      },
+      "monthlyExpenses": {
+        "label": "Monthly Living Expenses (VND)",
+        "placeholder": "13,000,000 ₫",
+        "description": "Living expenses, food, transportation (e.g., 13 million = 13,000,000)"
+      },
+      "currentSavings": {
+        "label": "Current Savings (VND)",
+        "placeholder": "100,000,000 ₫",
+        "description": "Available savings amount (e.g., 100 million = 100,000,000)"
+      },
+      "otherDebts": {
+        "label": "Other Debts (VND)",
+        "placeholder": "0 ₫",
+        "description": "Total other current debts (credit cards, personal loans, etc.)"
+      }
+    },
+    "advancedOptions": {
+      "title": "Advanced Options",
+      "description": "Additional information for investment planning",
+      "additionalCosts": {
+        "label": "Additional Costs (VND)",
+        "placeholder": "50,000,000 ₫",
+        "description": "Broker fees, taxes, registration fees, furniture (e.g., 50 million = 50,000,000)"
+      },
+      "expectedRentalIncome": {
+        "label": "Expected Rental Income (VND/month)",
+        "placeholder": "4,000,000 ₫",
+        "description": "For investment properties only (e.g., 4 million = 4,000,000)"
+      },
+      "expectedAppreciationRate": {
+        "label": "Expected Appreciation Rate (%/year)",
+        "placeholder": "5.0"
+      },
+      "investmentHorizonYears": {
+        "label": "Investment Horizon (years)",
+        "placeholder": "10"
+      }
+    },
+    "validation": {
+      "planNameRequired": "Plan name is required",
+      "purchasePriceMin": "Purchase price must be at least 100 million VND",
+      "downPaymentMin": "Down payment must be at least 10 million VND",
+      "downPaymentMax": "Down payment cannot be greater than or equal to purchase price",
+      "monthlyIncomeMin": "Monthly income must be at least 5 million VND",
+      "monthlyExpensesMin": "Monthly expenses must be at least 1 million VND",
+      "expensesLessThanIncome": "Expenses cannot be greater than or equal to income",
+      "fixErrorsBeforeContinue": "Please check and fix errors before continuing",
+      "fixErrorsInForm": "Please check and fix errors in the form"
+    },
+    "buttons": {
+      "create": "Create Plan",
+      "creating": "Creating...",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "success": "Plan created successfully!",
+      "error": "An error occurred",
+      "propertyLoaded": "Property information loaded successfully!",
+      "propertyLoadError": "Failed to load property information"
+    }
+  },
+  "FinancialPlanningWizard": {
+    "title": "Create Financial Plan",
+    "subtitle": "Step-by-step guide to create the perfect financial plan",
+    "steps": {
+      "personalInfo": {
+        "title": "Personal Information",
+        "description": "Provide your basic financial information",
+        "fields": {
+          "name": {
+            "label": "Full Name",
+            "placeholder": "Enter your full name"
+          },
+          "age": {
+            "label": "Age"
+          },
+          "monthlyIncome": {
+            "label": "Monthly Income (VND)",
+            "placeholder": "50,000,000"
+          },
+          "monthlyExpenses": {
+            "label": "Monthly Expenses (VND)",
+            "placeholder": "25,000,000"
+          },
+          "currentSavings": {
+            "label": "Current Savings (VND)",
+            "placeholder": "200,000,000"
+          },
+          "dependents": {
+            "label": "Number of Dependents",
+            "placeholder": "0"
+          }
+        },
+        "summary": {
+          "netIncome": "Net Income",
+          "savingsRate": "Savings Rate",
+          "monthlyAvailable": "Monthly Savings"
+        }
+      },
+      "propertyGoals": {
+        "title": "Property Goals",
+        "description": "Desired property type",
+        "fields": {
+          "propertyType": {
+            "label": "Property Type",
+            "options": {
+              "apartment": "Apartment",
+              "house": "House",
+              "villa": "Villa",
+              "townhouse": "Townhouse"
+            }
+          },
+          "location": {
+            "label": "Desired Location",
+            "placeholder": "e.g., District 7, Ho Chi Minh City"
+          },
+          "budget": {
+            "label": "Expected Budget",
+            "placeholder": "3,000,000,000"
+          },
+          "timeframe": {
+            "label": "Desired Timeframe (months)",
+            "placeholder": "24"
+          },
+          "purpose": {
+            "label": "Purpose",
+            "options": {
+              "primary": "Primary Residence",
+              "investment": "Investment",
+              "upgrade": "Upgrade"
+            }
+          },
+          "features": {
+            "label": "Desired Features",
+            "options": {
+              "parking": "Parking",
+              "gym": "Gym",
+              "pool": "Swimming Pool",
+              "security": "24/7 Security",
+              "elevator": "Elevator",
+              "garden": "Garden/Balcony"
+            }
+          }
+        },
+        "summary": {
+          "type": "Type",
+          "budget": "Budget",
+          "downPayment": "Down Payment",
+          "loanAmount": "Loan Amount"
+        }
+      },
+      "financialStrategy": {
+        "title": "Financial Strategy",
+        "description": "Define your suitable investment strategy",
+        "fields": {
+          "downPaymentTarget": {
+            "label": "Desired Down Payment Ratio (%)",
+            "description": "Percentage of property value you want to pay upfront"
+          },
+          "riskTolerance": {
+            "label": "Risk Tolerance",
+            "options": {
+              "conservative": "Conservative (5-7% ROI)",
+              "moderate": "Moderate (7-10% ROI)",
+              "aggressive": "Aggressive (10%+ ROI)"
+            }
+          },
+          "investmentHorizon": {
+            "label": "Investment Horizon (years)",
+            "placeholder": "20"
+          },
+          "expectedROI": {
+            "label": "Expected ROI (%/year)",
+            "placeholder": "8"
+          },
+          "bankPreference": {
+            "label": "Preferred Banks",
+            "options": {
+              "vietcombank": "Vietcombank",
+              "techcombank": "Techcombank",
+              "bidv": "BIDV",
+              "vietinbank": "VietinBank",
+              "acb": "ACB",
+              "mb": "MB Bank"
+            }
+          }
+        }
+      },
+      "additionalGoals": {
+        "title": "Additional Goals",
+        "description": "Other financial goals",
+        "fields": {
+          "emergencyFund": {
+            "label": "Emergency Fund (VND)",
+            "placeholder": "150,000,000",
+            "description": "Should equal 3-6 months of living expenses"
+          },
+          "education": {
+            "label": "Education Fund (VND)",
+            "placeholder": "0"
+          },
+          "retirement": {
+            "label": "Retirement Fund (VND)",
+            "placeholder": "0"
+          },
+          "other": {
+            "label": "Other Goals",
+            "addButton": "Add Goal",
+            "namePlaceholder": "Goal Name",
+            "amountPlaceholder": "Amount",
+            "timeframePlaceholder": "Timeframe (months)"
+          }
+        }
+      },
+      "summary": {
+        "title": "Plan Summary",
+        "description": "Review and confirm your financial plan",
+        "sections": {
+          "personalInfo": "Personal Information",
+          "propertyGoals": "Property Goals",
+          "financialStrategy": "Financial Strategy",
+          "additionalGoals": "Additional Goals"
+        },
+        "calculations": {
+          "title": "Financial Calculations",
+          "monthlyPayment": "Monthly Payment",
+          "totalLoan": "Total Loan",
+          "totalInterest": "Total Interest",
+          "loanTerm": "Loan Term",
+          "monthlyAfterLoan": "Remaining After Payment"
+        }
+      }
+    },
+    "navigation": {
+      "next": "Next",
+      "previous": "Previous",
+      "complete": "Complete",
+      "step": "Step",
+      "of": "of"
+    },
+    "validation": {
+      "nameRequired": "Please enter your full name",
+      "incomeRequired": "Income must be greater than 0",
+      "expensesGreaterThanIncome": "Expenses cannot be greater than income",
+      "budgetRequired": "Budget must be greater than 0",
+      "locationRequired": "Please enter desired location"
+    },
+    "messages": {
+      "calculatingPlan": "Calculating plan...",
+      "planCreated": "Plan created successfully!",
+      "error": "An error occurred while creating the plan"
+    }
+  },
+  "PlansList": {
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived",
+      "unknown": "Unknown"
+    },
+    "types": {
+      "homePurchase": "Home Purchase",
+      "investment": "Investment",
+      "upgrade": "Upgrade",
+      "refinance": "Refinance",
+      "unknown": "Unknown"
+    },
+    "empty": {
+      "title": "No plans yet",
+      "description": "Start creating your first financial plan",
+      "createButton": "Create First Plan"
+    },
+    "details": {
+      "purchasePrice": "Purchase Price",
+      "downPayment": "Down Payment",
+      "monthlyIncome": "Monthly Income",
+      "month": "month"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "SharePlanDialog": {
+    "title": "Share Plan",
+    "buttons": {
+      "share": "Share"
+    },
+    "visibility": {
+      "public": "Public",
+      "private": "Private"
+    },
+    "info": {
+      "views": "{count} views"
+    },
+    "privacy": {
+      "title": "Privacy Settings",
+      "description": "Control who can view your plan",
+      "makePublic": "Make plan public",
+      "publicDescription": "Anyone with the link can view",
+      "privateDescription": "Only people you share with can view"
+    },
+    "tabs": {
+      "link": "Link",
+      "email": "Email",
+      "social": "Social"
+    },
+    "link": {
+      "shareUrl": "Share URL",
+      "generating": "Generating link...",
+      "copy": "Copy",
+      "copied": "Copied",
+      "publicNote": "This link can be accessed by anyone",
+      "privateNote": "This link only works for people you share it with",
+      "qrCode": "QR Code will be displayed here"
+    },
+    "email": {
+      "recipients": "Recipients",
+      "recipientsPlaceholder": "email1@example.com, email2@example.com",
+      "recipientsNote": "Enter multiple email addresses, separated by commas",
+      "message": "Message",
+      "messagePlaceholder": "Add a personal message (optional)",
+      "send": "Send Email",
+      "sending": "Sending..."
+    },
+    "social": {
+      "note": "Share your plan on social media platforms"
+    },
+    "socialShare": {
+      "title": "Check out this financial plan: {planName}",
+      "description": "Detailed financial plan with ROI analysis and cash flow projections"
+    },
+    "validation": {
+      "emailRequired": "Please enter at least one email address"
+    },
+    "messages": {
+      "madePublic": "Plan has been made public",
+      "madePrivate": "Plan has been made private",
+      "visibilityError": "Error updating privacy settings",
+      "linkCopied": "Link copied to clipboard",
+      "copyError": "Failed to copy link",
+      "emailSent": "Email sent successfully",
+      "emailError": "Error sending email"
+    }
+  },
+  "ExportPlanDialog": {
+    "title": "Export Plan",
+    "buttons": {
+      "export": "Export",
+      "exporting": "Exporting...",
+      "cancel": "Cancel"
+    },
+    "planInfo": {
+      "purchasePrice": "Purchase Price",
+      "downPayment": "Down Payment"
+    },
+    "tabs": {
+      "format": "Format",
+      "content": "Content",
+      "settings": "Settings"
+    },
+    "format": {
+      "title": "Choose export format",
+      "pdf": {
+        "description": "High-quality PDF document"
+      },
+      "excel": {
+        "description": "Editable Excel spreadsheet"
+      },
+      "csv": {
+        "description": "Plain text data table"
+      }
+    },
+    "templates": {
+      "title": "Export Template",
+      "detailed": {
+        "title": "Detailed",
+        "description": "Comprehensive report with all information and charts"
+      },
+      "summary": {
+        "title": "Summary",
+        "description": "Concise report with key information only"
+      },
+      "presentation": {
+        "title": "Presentation",
+        "description": "Format suitable for presentations"
+      }
+    },
+    "content": {
+      "title": "Content to include",
+      "includeCharts": "Include charts",
+      "includeCalculations": "Include calculations",
+      "includeLoanDetails": "Include loan details",
+      "includeTimeline": "Include timeline",
+      "includePersonalInfo": "Include personal information",
+      "personalInfoWarning": "Only include personal information if you trust the recipient"
+    },
+    "settings": {
+      "language": "Language",
+      "estimatedSize": "Estimated Size",
+      "fileSizeEstimate": "Estimated file size: {size} MB",
+      "processingNote": "Export processing may take a few seconds depending on complexity"
+    },
+    "progress": {
+      "title": "Export Progress"
+    },
+    "messages": {
+      "exportSuccess": "Plan exported successfully!",
+      "exportError": "Error exporting plan"
+    }
+  },
+  "DashboardPlansPage": {
+    "title": "Financial Plans",
+    "description": "Manage and track your home buying plans",
+    "createButton": "Create New Plan",
+    "loading": "Loading..."
+  },
+  "EditPlanForm": {
+    "tabs": {
+      "basic": "Basic",
+      "financial": "Financial",
+      "advanced": "Advanced"
+    },
+    "basicInfo": {
+      "title": "Plan Information",
+      "description": "Update basic information for your financial plan",
+      "planName": {
+        "label": "Plan Name",
+        "placeholder": "e.g., Buy District 7 Apartment"
+      },
+      "planType": {
+        "label": "Plan Type",
+        "placeholder": "Select plan type",
+        "options": {
+          "homePurchase": "Home Purchase",
+          "investment": "Investment",
+          "upgrade": "Upgrade",
+          "refinance": "Refinance"
+        }
+      },
+      "purchasePrice": {
+        "label": "Purchase Price",
+        "placeholder": "e.g., 2,000,000,000",
+        "description": "Expected purchase price of the property"
+      },
+      "downPayment": {
+        "label": "Down Payment",
+        "placeholder": "e.g., 400,000,000",
+        "description": "Amount you can pay upfront"
+      },
+      "planDescription": {
+        "label": "Plan Description",
+        "placeholder": "Describe your plan in detail..."
+      }
+    },
+    "financialInfo": {
+      "title": "Financial Information",
+      "description": "Update your monthly income and expenses",
+      "monthlyIncome": {
+        "label": "Monthly Income",
+        "placeholder": "e.g., 50,000,000",
+        "description": "Your total monthly net income"
+      },
+      "monthlyExpenses": {
+        "label": "Living Expenses",
+        "placeholder": "e.g., 20,000,000",
+        "description": "Monthly fixed expenses (food, housing, transport...)"
+      },
+      "currentSavings": {
+        "label": "Current Savings",
+        "placeholder": "e.g., 100,000,000",
+        "description": "Amount you have saved so far"
+      },
+      "otherDebts": {
+        "label": "Other Debts",
+        "placeholder": "e.g., 10,000,000",
+        "description": "Total other existing debts"
+      }
+    },
+    "advancedOptions": {
+      "title": "Advanced Options",
+      "description": "Update detailed information and projections",
+      "additionalCosts": {
+        "label": "Additional Costs",
+        "placeholder": "e.g., 50,000,000",
+        "description": "Broker fees, taxes, repairs... (about 5-10% of purchase price)"
+      },
+      "expectedRentalIncome": {
+        "label": "Expected Rental Income",
+        "placeholder": "e.g., 15,000,000",
+        "description": "If planning to rent out (investment plans only)"
+      },
+      "expectedAppreciationRate": {
+        "label": "Expected Appreciation Rate (%/year)",
+        "placeholder": "e.g., 8"
+      },
+      "investmentHorizonMonths": {
+        "label": "Investment Horizon (months)",
+        "placeholder": "e.g., 120"
+      }
+    },
+    "validation": {
+      "planNameRequired": "Please enter a plan name",
+      "purchasePriceMin": "Purchase price must be at least 100 million VND",
+      "downPaymentMin": "Down payment must be at least 10 million VND",
+      "downPaymentMax": "Down payment cannot be equal to or greater than purchase price",
+      "monthlyIncomeMin": "Monthly income must be at least 5 million VND",
+      "monthlyExpensesMin": "Living expenses must be at least 1 million VND",
+      "expensesLessThanIncome": "Living expenses must be less than income",
+      "fixErrorsBeforeContinue": "Please fix errors before continuing",
+      "fixErrorsInForm": "Please check and fix errors in the form"
+    },
+    "buttons": {
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "success": "Plan updated successfully!",
+      "error": "An error occurred, please try again"
+    }
+  }
+}

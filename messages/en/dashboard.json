@@ -1,0 +1,559 @@
+{
+  "Dashboard": {
+    "title": "Financial Overview",
+    "description": "Track progress and manage your real estate investments",
+    "navigation": {
+      "dashboard": "Dashboard",
+      "plans": "Financial Plans",
+      "scenarios": "Scenario Comparison",
+      "laboratory": "Laboratory",
+      "profile": "Profile",
+      "billing": "Billing",
+      "analytics": "Analytics",
+      "achievements": "Achievements",
+      "settings": "Settings",
+      "help": "Help"
+    },
+    "lastUpdated": "Updated: {time}",
+    "settings": "Settings",
+    "createPlan": "Create Plan",
+    "quickActions": {
+      "title": "Quick Actions",
+      "items": {
+        "findProperty": {
+          "title": "Find Property",
+          "description": "Discover new investment opportunities"
+        },
+        "newPlan": {
+          "title": "New Plan",
+          "description": "Create a detailed financial plan"
+        },
+        "compareRates": {
+          "title": "Compare Rates",
+          "description": "Find the best loan packages"
+        },
+        "portfolio": {
+          "title": "Portfolio",
+          "description": "Track your investment performance"
+        }
+      }
+    },
+    "tabs": {
+      "portfolio": "Portfolio",
+      "analytics": "Analytics",
+      "schedule": "Schedule"
+    },
+    "investmentAnalysis": {
+      "title": "Investment Analysis",
+      "placeholder": "Investment analysis chart will be displayed here"
+    },
+    "financialSchedule": {
+      "title": "Financial Schedule",
+      "placeholder": "Payment schedule and goals will be displayed here"
+    },
+    "marketInsights": {
+      "title": "Market Insights",
+      "avgPrice": "Avg Price/m²",
+      "interestRate": "Interest Rate",
+      "promotionalRate": "Promotional rate",
+      "noData": "No data available"
+    },
+    "quickStats": {
+      "title": "Quick Stats",
+      "totalPlans": "Total plans",
+      "interestedProperties": "Interested properties",
+      "comparedBanks": "Compared banks",
+      "achievements": "Achievements",
+      "activePlans": "Active Plans",
+      "experience": "Experience",
+      "notifications": "Notifications"
+    },
+    "Analytics": {
+      "title": "Analytics",
+      "description": "Track performance and trends of your financial plans",
+      "comparison": "compared to last period",
+      "periods": {
+        "7d": "7 days",
+        "30d": "30 days",
+        "90d": "3 months",
+        "1y": "1 year"
+      },
+      "planDistribution": {
+        "title": "Plan Distribution",
+        "description": "Analysis by property type and region",
+        "placeholder": "Plan distribution chart will be displayed here"
+      },
+      "investmentTrends": {
+        "title": "Investment Trends",
+        "description": "Track investment trends over time",
+        "placeholder": "Investment trends chart will be displayed here"
+      },
+      "planPerformance": {
+        "title": "Plan Performance",
+        "description": "Evaluate the performance of financial plans",
+        "placeholder": "Plan performance table will be displayed here"
+      },
+      "marketTrends": {
+        "title": "Market Trends",
+        "description": "Analyze real estate market trends",
+        "placeholder": "Market trends chart will be displayed here"
+      },
+      "financialGoals": {
+        "title": "Financial Goals",
+        "description": "Track progress towards financial goals",
+        "savingsGoal": "2024 Savings Goal",
+        "investmentGoal": "Real Estate Investment Goal",
+        "profitGoal": "Minimum Profit Goal"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "performance": "Performance",
+        "trends": "Trends",
+        "goals": "Goals"
+      },
+      "metrics": {
+        "totalPlans": "Total Plans",
+        "totalInvestment": "Total Investment",
+        "expectedProfit": "Expected Profit",
+        "activeScenarios": "Active Scenarios"
+      }
+    },
+    "Achievements": {
+      "title": "Achievements",
+      "description": "Track your progress and achievements in your investment journey",
+      "categories": {
+        "all": "All",
+        "planning": "Planning",
+        "investment": "Investment",
+        "savings": "Savings",
+        "milestones": "Milestones"
+      },
+      "achievements": {
+        "newInvestor": {
+          "title": "New Investor",
+          "description": "Create your first financial plan"
+        },
+        "strategist": {
+          "title": "Strategist",
+          "description": "Create 5 successful financial plans"
+        },
+        "futureMillionaire": {
+          "title": "Future Millionaire",
+          "description": "Reach savings goal of 1 billion VND"
+        },
+        "analysisExpert": {
+          "title": "Analysis Expert",
+          "description": "Compare 10 investment scenarios"
+        },
+        "investmentMaster": {
+          "title": "Investment Master",
+          "description": "Complete 3 successful investment plans"
+        },
+        "persistent": {
+          "title": "Persistent",
+          "description": "Use the app for 30 consecutive days"
+        }
+      }
+    },
+    "Billing": {
+      "title": "Billing",
+      "description": "Manage your subscription, payment methods, and billing history",
+      "viewAllPlans": "View All Plans"
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Manage your account settings and application preferences",
+      "tabs": {
+        "general": "General",
+        "notifications": "Notifications",
+        "security": "Security",
+        "preferences": "Preferences",
+        "account": "Account"
+      },
+      "general": {
+        "title": "General Settings",
+        "description": "Manage basic information and display options",
+        "language": "Language",
+        "selectLanguage": "Select language",
+        "languages": {
+          "vietnamese": "Tiếng Việt",
+          "english": "English"
+        },
+        "currency": "Currency",
+        "selectCurrency": "Select currency",
+        "currencies": {
+          "vnd": "VND (Vietnamese Dong)",
+          "usd": "USD (US Dollar)"
+        },
+        "timezone": "Timezone",
+        "selectTimezone": "Select timezone",
+        "timezones": {
+          "vietnam": "Vietnam (UTC+7)",
+          "bangkok": "Bangkok (UTC+7)",
+          "singapore": "Singapore (UTC+8)"
+        },
+        "theme": "Theme",
+        "selectTheme": "Select theme",
+        "themes": {
+          "light": "Light",
+          "dark": "Dark",
+          "system": "System"
+        },
+        "saveChanges": "Save changes"
+      },
+      "notifications": {
+        "title": "Notification Settings",
+        "description": "Choose the types of notifications you want to receive",
+        "emailNotifications": "Email notifications",
+        "emailDescription": "Receive notifications about plans and account updates",
+        "pushNotifications": "Push notifications",
+        "pushDescription": "Receive notifications on mobile devices",
+        "marketingEmails": "Marketing emails",
+        "marketingDescription": "Receive information about new features and offers",
+        "saveChanges": "Save changes"
+      },
+      "security": {
+        "title": "Account Security",
+        "description": "Manage passwords and security settings",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmNewPassword": "Confirm new password",
+        "twoFactorAuth": "Two-factor authentication",
+        "twoFactorDescription": "Add an extra layer of security to your account",
+        "enable": "Enable",
+        "loginSessions": "Login sessions",
+        "loginSessionsDescription": "Manage logged-in devices",
+        "viewDetails": "View details",
+        "updatePassword": "Update password"
+      },
+      "preferences": {
+        "title": "Personal Preferences",
+        "description": "Customize your application experience",
+        "showHints": "Show hints",
+        "showHintsDescription": "Display hints and tips when using",
+        "autoSave": "Auto-save plans",
+        "autoSaveDescription": "Automatically save changes in plans",
+        "showAdvancedCharts": "Show advanced charts",
+        "showAdvancedChartsDescription": "Display detailed analytical charts",
+        "savePreferences": "Save preferences"
+      },
+      "account": {
+        "title": "Account Management",
+        "description": "Export data and manage account",
+        "exportData": "Export data",
+        "exportDataDescription": "Download a copy of your account data",
+        "exportDataButton": "Export data",
+        "dangerZone": "Danger Zone",
+        "deleteAccount": "Delete account",
+        "deleteAccountDescription": "Permanently delete account and all data",
+        "deleteAccountButton": "Delete account"
+      }
+    },
+    "Help": {
+      "title": "Help",
+      "description": "Find answers to your questions and get technical support",
+      "locale": "en-US",
+      "search": {
+        "title": "Search Support",
+        "placeholder": "Search frequently asked questions..."
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "description": "Find answers to the most common questions",
+        "q1": "How to create your first financial plan?",
+        "a1": "To create a new financial plan, go to \"Financial Plans\" in the left menu and click \"Create New Plan\". You will be guided through each step to enter information about your investment goals, financial resources and timeline.",
+        "q2": "How to compare multiple investment scenarios?",
+        "a2": "Use the \"Scenario Comparison\" feature to analyze different investment options. You can adjust parameters like interest rates, loan terms, and tax rates to see the impact on expected returns.",
+        "q3": "How does the Laboratory feature work?",
+        "a3": "The Laboratory allows you to experiment with investment parameters in a safe environment. You can change variable values and see immediate impact on financial results without affecting your main plans.",
+        "q4": "How to update personal information?",
+        "a4": "Go to \"Profile\" in the sidebar menu to update personal information like name, email, phone number and other details. Remember to click \"Save Changes\" after editing.",
+        "q5": "Is my data secure?",
+        "a5": "We use leading security measures to protect your data. All information is encrypted during transmission and storage. You can view details about our security policy in the Settings section.",
+        "q6": "Can I export financial plan data?",
+        "a6": "Yes, you can export financial plan data as Excel or PDF files. Go to plan details and click the \"Export Data\" button to download."
+      },
+      "quickLinks": {
+        "userGuide": {
+          "title": "User Guide",
+          "description": "Detailed documentation about features"
+        },
+        "videoTutorials": {
+          "title": "Video Tutorials",
+          "description": "Watch videos to learn how to use"
+        },
+        "community": {
+          "title": "Community",
+          "description": "Discuss with other users"
+        },
+        "updates": {
+          "title": "Updates",
+          "description": "Information about new versions"
+        }
+      },
+      "quickStart": {
+        "title": "Quick Start",
+        "description": "Basic steps to start using FinHome",
+        "step1": {
+          "title": "Complete your profile",
+          "description": "Update personal information and customize options"
+        },
+        "step2": {
+          "title": "Create your first financial plan",
+          "description": "Use the plan creation wizard to set investment goals"
+        },
+        "step3": {
+          "title": "Explore the scenario comparison feature",
+          "description": "Analyze different investment options"
+        },
+        "step4": {
+          "title": "Experiment in the Laboratory",
+          "description": "Adjust parameters to optimize your plan"
+        }
+      },
+      "supportForm": {
+        "title": "Submit a Support Request",
+        "description": "Describe the issue you are facing and we will assist you",
+        "subject": "Subject",
+        "subjectPlaceholder": "Briefly describe the issue...",
+        "message": "Message",
+        "messagePlaceholder": "Describe the issue you are facing in detail...",
+        "submit": "Submit Request"
+      },
+      "tickets": {
+        "title": "Your Support Requests",
+        "description": "Track the status of your support requests",
+        "details": "Details",
+        "status": {
+          "resolved": "Resolved",
+          "pending": "Pending",
+          "in_progress": "In Progress"
+        },
+        "t1": {
+          "subject": "Interest calculation error"
+        },
+        "t2": {
+          "subject": "Need help creating a plan"
+        },
+        "t3": {
+          "subject": "Question about data export feature"
+        }
+      },
+      "tabs": {
+        "faq": "FAQ",
+        "guides": "Guides",
+        "contact": "Contact",
+        "tickets": "Support Tickets"
+      },
+      "contact": {
+        "email": "Email",
+        "phone": "Phone",
+        "chat": "Live Chat"
+      }
+    },
+    "Laboratory": {
+      "title": "Financial Laboratory",
+      "description": "Simulate scenarios to optimize your financial plan",
+      "whatIfDescription": "Simulate \"What if?\" scenarios to optimize your financial plan",
+      "locale": "en-US",
+      "planSelection": {
+        "title": "Select Financial Plan",
+        "description": "Select a financial plan to perform what-if analysis",
+        "placeholder": "Select a financial plan",
+        "newPlanButton": "Create New Plan"
+      },
+      "quickStats": {
+        "plan": "Plan",
+        "loanAmount": "Loan Amount",
+        "monthlyPayment": "Monthly Payment",
+        "netCashFlow": "Net Cash Flow",
+        "years": "{count, plural, one {# year} other {# years}}",
+        "incomePercentage": "{percentage}% of income",
+        "positive": "Positive",
+        "negative": "Negative"
+      },
+      "planTypes": {
+        "home_purchase": "Home Purchase",
+        "investment": "Investment",
+        "other": "Other"
+      },
+      "noPlan": {
+        "title": "No financial plan",
+        "description": "You need to create at least one financial plan to use the laboratory",
+        "createButton": "Create Your First Financial Plan"
+      },
+      "usageGuide": {
+        "title": "Usage Guide",
+        "earlyRepayment": {
+          "title": "Early Repayment",
+          "description": "Simulate the impact of making extra monthly payments or a lump sum payment. See how much interest you can save and how much you can shorten the loan term."
+        },
+        "refinancing": {
+          "title": "Refinancing",
+          "description": "Analyze the effectiveness of refinancing your loan with a lower interest rate. Calculate the break-even point and total savings."
+        },
+        "stressTest": {
+          "title": "Stress Test",
+          "description": "Assess your ability to pay when interest rates rise/fall. Prepare a backup plan for adverse situations."
+        }
+      }
+    },
+    "Profile": {
+      "title": "Profile",
+      "description": "Manage your account settings and personal information",
+      "picture": {
+        "title": "Profile Picture",
+        "description": "Update your profile picture to personalize your account",
+        "upload": "Upload Image",
+        "comingSoon": "Coming soon: Upload custom profile pictures"
+      },
+      "info": {
+        "title": "Profile Information",
+        "description": "Update your personal details and preferences",
+        "name": "Full Name",
+        "namePlaceholder": "Enter your full name",
+        "email": "Email",
+        "emailDescription": "Contact support to change your email address",
+        "company": "Company",
+        "companyPlaceholder": "Enter your company name",
+        "location": "Location",
+        "locationPlaceholder": "Enter your location",
+        "website": "Website",
+        "bio": "Bio",
+        "bioPlaceholder": "Tell us about yourself...",
+        "bioDescription": "Brief description for your profile. Maximum 160 characters.",
+        "save": "Save Changes"
+      },
+      "account": {
+        "title": "Account Information",
+        "description": "View your account details and creation date",
+        "created": "Account Created",
+        "userId": "User ID",
+        "unknown": "Unknown"
+      }
+    },
+    "Scenarios": {
+      "title": "Scenario Comparison",
+      "description": "Compare different financial scenarios to make informed decisions",
+      "createScenarioButton": "Create New Scenario",
+      "smartGenerateButton": "Smart Generate",
+      "generatedScenarioName": "{downPaymentPercent}% down, {loanTermYears} years",
+      "generationSuccess": "Successfully generated {count} scenarios",
+      "generationError": "Failed to generate scenarios",
+      "availableRates": "{count} available rates",
+      "demoMode": {
+        "strong": "Demo Mode:",
+        "text": "Sign in to access your personal scenarios and save your work."
+      },
+      "summary": {
+        "totalScenarios": "Total Scenarios",
+        "optimalScenarios": "Optimal Scenarios",
+        "averagePayment": "Average Payment",
+        "actions": "Actions",
+        "optionsCreated": "options created",
+        "bestRated": "best rated",
+        "monthly": "monthly"
+      },
+      "smartGenerateModal": {
+        "title": "Smart Scenario Generator",
+        "description": "Generate multiple scenarios based on your financial situation",
+        "propertyPrice": "Property Price (VND)",
+        "monthlyIncome": "Monthly Income (VND)",
+        "monthlyExpenses": "Monthly Expenses (VND)",
+        "loanType": "Loan Type",
+        "loanTypes": {
+          "homePurchase": "Home Purchase",
+          "investment": "Investment",
+          "commercial": "Commercial"
+        },
+        "loadingRates": "Loading current rates...",
+        "ratesFound": "Found {count} applicable rates",
+        "cancel": "Cancel",
+        "generating": "Generating...",
+        "generateButton": "Generate Scenarios"
+      },
+      "noScenario": {
+        "title": "No Scenarios Available",
+        "description": "Create your first scenario to start comparing options",
+        "createButton": "Create First Scenario"
+      },
+      "selectedScenario": {
+        "title": "Selected Scenario Details",
+        "description": "Detailed information for {planName}",
+        "basicInfo": {
+          "title": "Basic Information",
+          "propertyPrice": "Property Price",
+          "downPayment": "Down Payment",
+          "loanAmount": "Loan Amount",
+          "loanTerm": "Loan Term",
+          "interestRate": "Interest Rate",
+          "years": "years",
+          "perYear": "per year"
+        },
+        "monthlyFinance": {
+          "title": "Monthly Finances",
+          "income": "Income",
+          "expenses": "Expenses",
+          "monthlyLoanPayment": "Monthly Loan Payment",
+          "netCashFlow": "Net Cash Flow"
+        }
+      }
+    },
+    "enhancedScenarios": {
+      "title": "Enhanced Scenario Analysis",
+      "description": "Advanced scenario comparison with interactive charts and analysis",
+      "generateSmartScenarios": "Generate Smart Scenarios",
+      "export": "Export",
+      "createScenario": "Create Scenario",
+      "editScenario": "Edit Scenario",
+      "createNewScenario": "Create New Scenario",
+      "filtersAndSelection": "Filters & Selection",
+      "riskLevel": "Risk Level:",
+      "all": "All",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "type": "Type:",
+      "baseline": "Baseline",
+      "optimistic": "Optimistic",
+      "pessimistic": "Pessimistic",
+      "alternative": "Alternative",
+      "stressTest": "Stress Test",
+      "monthly": "Monthly:",
+      "totalCost": "Total Cost:",
+      "comparisonTable": "Comparison Table",
+      "visualCharts": "Visual Charts",
+      "advancedCharts": "Advanced Charts",
+      "interactiveSliders": "Interactive Sliders",
+      "analysis": "Analysis",
+      "selectScenariosForAdvancedCharts": "Select scenarios to view advanced charts",
+      "selectScenariosForInteractiveSliders": "Select at least one scenario to use interactive sliders",
+      "riskAnalysis": "Risk Analysis",
+      "duration": "Duration:",
+      "months": "months",
+      "monthlySavings": "Monthly Savings:",
+      "none": "None",
+      "recommendations": "Recommendations",
+      "selectScenariosForRecommendations": "Select scenarios to see recommendations",
+      "recommended": "Recommended",
+      "moreExpensive": "{amount} more expensive",
+      "lowestCostRecommendation": "Lowest total cost with acceptable risk level",
+      "toasts": {
+        "scenarioUpdated": "Scenario updated successfully",
+        "scenarioCreated": "Scenario created successfully",
+        "scenarioDeleted": "Scenario deleted successfully",
+        "smartScenariosGenerated": "Smart scenarios generated successfully",
+        "failedToGenerateSmartScenarios": "Failed to generate smart scenarios",
+        "scenariosExported": "Scenarios exported successfully"
+      },
+      "mockScenarios": {
+        "aiRecommendedConservative": "AI Recommended - Conservative",
+        "aiGeneratedDescription": "AI-generated scenario based on your financial profile",
+        "demoPlanName": "Sample Plan",
+        "demoPlanDescription": "Sample plan for unauthenticated users",
+        "noDescriptionAvailable": "No description available"
+      },
+      "loadingScenarios": "Loading scenarios..."
+    }
+  }
+}

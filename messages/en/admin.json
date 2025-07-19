@@ -1,0 +1,81 @@
+{
+  "Admin": {
+    "metadata": {
+      "title": "Admin Dashboard - FinHome",
+      "description": "Admin dashboard for managing FinHome application"
+    },
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "description": "Manage your FinHome application from this central hub",
+      "systemOnline": "System Online",
+      "totalUsers": "Total Users",
+      "activeBanks": "Active Banks",
+      "achievements": "Achievements",
+      "interestRates": "Interest Rates",
+      "recentActivities": "Recent Admin Activities",
+      "quickActions": "Quick Actions",
+      "systemStatus": "System Status",
+      "quickStats": "Quick Stats",
+      "totalBanks": "Total Banks",
+      "notifications": "Notifications",
+      "pendingNotifications": "pending notifications"
+    },
+    "banks": {
+      "title": "Bank Management",
+      "description": "Manage Vietnamese banks and their loan products",
+      "activeBanks": "Active Banks",
+      "allBanks": "All Banks",
+      "export": "Export",
+      "import": "Import",
+      "addBank": "Add Bank"
+    },
+    "rates": {
+      "title": "Interest Rate Management",
+      "description": "Manage bank interest rates and loan products",
+      "currentRates": "Current Rates",
+      "allRates": "All Rates",
+      "export": "Export",
+      "import": "Import",
+      "addRate": "Add Rate"
+    },
+    "achievements": {
+      "title": "Achievement Management",
+      "description": "Manage user achievements and milestones",
+      "activeAchievements": "Active Achievements",
+      "allAchievements": "All Achievements",
+      "export": "Export",
+      "import": "Import",
+      "addAchievement": "Add Achievement"
+    },
+    "notifications": {
+      "title": "Notification Management",
+      "description": "Manage system notifications and announcements",
+      "activeNotifications": "Active Notifications",
+      "allNotifications": "All Notifications",
+      "export": "Export",
+      "import": "Import",
+      "addNotification": "Add Notification"
+    },
+    "users": {
+      "title": "User Management",
+      "description": "Manage registered users and their profiles",
+      "totalUsers": "Total Users",
+      "allUsers": "All Users",
+      "export": "Export",
+      "import": "Import",
+      "addUser": "Add User"
+    },
+    "navigation": {
+      "dashboard": "Dashboard",
+      "banks": "Banks",
+      "rates": "Interest Rates",
+      "achievements": "Achievements",
+      "notifications": "Notifications",
+      "users": "Users",
+      "analytics": "Analytics",
+      "content": "Content",
+      "system": "System",
+      "settings": "Settings"
+    }
+  }
+}
