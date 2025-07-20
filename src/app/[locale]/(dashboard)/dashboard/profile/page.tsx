@@ -12,10 +12,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useTranslations } from 'next-intl';
 import { useAuth, useProfile } from '@/hooks/useAuth'
-import { Loader2, Upload } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { AvatarUpload } from '@/components/profile/AvatarUpload'
 
 const profileSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -93,24 +93,7 @@ export default function ProfilePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center space-x-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage 
-                  src={user?.user_metadata?.avatar_url} 
-                  alt={profile?.full_name || user?.email || 'User'} 
-                />
-                <AvatarFallback className="text-lg">
-                  {profile?.full_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <Button variant="outline" disabled>
-                <Upload className="mr-2 h-4 w-4" />
-                {t('picture.upload')}
-              </Button>
-              <p className="text-sm text-muted-foreground">
-                {t('picture.comingSoon')}
-              </p>
-            </div>
+            <AvatarUpload size="lg" />
           </CardContent>
         </Card>
 

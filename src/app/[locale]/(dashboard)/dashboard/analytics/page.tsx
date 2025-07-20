@@ -32,10 +32,10 @@ export default function AnalyticsPage() {
   const [dashboardMetrics, setDashboardMetrics] = useState<any>(null)
 
   const periods = [
-    { value: '7d', label: '7 days' },
-    { value: '30d', label: '30 days' },
-    { value: '90d', label: '3 months' },
-    { value: '1y', label: '1 year' },
+    { value: '7d', label: t('periods.7d') },
+    { value: '30d', label: t('periods.30d') },
+    { value: '90d', label: t('periods.90d') },
+    { value: '1y', label: t('periods.1y') },
   ]
 
   // Load analytics data
@@ -146,7 +146,7 @@ export default function AnalyticsPage() {
                   <span className={metric.trend === 'up' ? 'text-green-600' : 'text-red-600'}>
                     {metric.change}
                   </span>
-                  {' '}so với kỳ trước
+                  {' '}{t('comparison')}
                 </p>
               </CardContent>
             </Card>
@@ -314,37 +314,37 @@ export default function AnalyticsPage() {
                           <div className="text-xl font-bold text-green-600">
                             +{((Math.random() * 5) + 2).toFixed(1)}%
                           </div>
-                          <div className="text-sm text-green-700 dark:text-green-300">Giá BDS Q3</div>
+                          <div className="text-sm text-green-700 dark:text-green-300">Real Estate Q3</div>
                         </div>
                         <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                           <div className="text-xl font-bold text-blue-600">
                             {(Math.random() * 2 + 7).toFixed(1)}%
                           </div>
-                          <div className="text-sm text-blue-700 dark:text-blue-300">Lãi suất TB</div>
+                          <div className="text-sm text-blue-700 dark:text-blue-300">Avg Interest Rate</div>
                         </div>
                       </div>
                       
                       {/* Trend Analysis */}
                       <div className="space-y-3">
                         <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                          <span className="text-sm font-medium">Thị trường căn hộ</span>
+                          <span className="text-sm font-medium">Apartment Market</span>
                           <div className="flex items-center gap-1 text-green-600">
                             <TrendingUp className="w-4 h-4" />
-                            <span className="text-sm font-bold">Tăng</span>
+                            <span className="text-sm font-bold">Rising</span>
                           </div>
                         </div>
                         <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                          <span className="text-sm font-medium">Thị trường nhà phố</span>
+                          <span className="text-sm font-medium">Townhouse Market</span>
                           <div className="flex items-center gap-1 text-orange-600">
                             <TrendingUp className="w-4 h-4" />
-                            <span className="text-sm font-bold">Ổn định</span>
+                            <span className="text-sm font-bold">Stable</span>
                           </div>
                         </div>
                         <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                          <span className="text-sm font-medium">Lãi suất vay</span>
+                          <span className="text-sm font-medium">Loan Interest Rate</span>
                           <div className="flex items-center gap-1 text-blue-600">
                             <TrendingDown className="w-4 h-4" />
-                            <span className="text-sm font-bold">Giảm nhẹ</span>
+                            <span className="text-sm font-bold">Slight Decrease</span>
                           </div>
                         </div>
                       </div>
@@ -357,10 +357,10 @@ export default function AnalyticsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5" />
-                    Xu hướng theo khu vực
+                    Regional Trends
                   </CardTitle>
                   <CardDescription>
-                    Biến động giá theo quận/huyện TP.HCM
+                    Price changes by district in Ho Chi Minh City
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -371,11 +371,11 @@ export default function AnalyticsPage() {
                   ) : (
                     <div className="space-y-3">
                       {[
-                        { area: 'Quận 1', change: 8.5, price: '120-200M/m²' },
-                        { area: 'Quận 2', change: 6.2, price: '80-150M/m²' },
-                        { area: 'Quận 7', change: 4.8, price: '60-120M/m²' },
-                        { area: 'Bình Thạnh', change: 3.5, price: '45-80M/m²' },
-                        { area: 'Thủ Đức', change: 12.1, price: '35-60M/m²' }
+                        { area: 'District 1', change: 8.5, price: '120-200M VND/m²' },
+                        { area: 'District 2', change: 6.2, price: '80-150M VND/m²' },
+                        { area: 'District 7', change: 4.8, price: '60-120M VND/m²' },
+                        { area: 'Binh Thanh', change: 3.5, price: '45-80M VND/m²' },
+                        { area: 'Thu Duc', change: 12.1, price: '35-60M VND/m²' }
                       ].map((item, index) => (
                         <div key={index} className="flex justify-between items-center p-3 border rounded-lg">
                           <div>
@@ -417,7 +417,7 @@ export default function AnalyticsPage() {
                       {/* Portfolio Value Goal */}
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">Giá trị danh mục đầu tư</span>
+                          <span className="text-sm font-medium">Portfolio Value</span>
                           <span className="text-sm text-muted-foreground">
                             {dashboardMetrics?.total_portfolio_value ? 
                               Math.min(100, (dashboardMetrics.total_portfolio_value / 5000000000) * 100).toFixed(1) 
@@ -443,7 +443,7 @@ export default function AnalyticsPage() {
                       {/* Monthly Income Goal */}
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">Thu nhập hàng tháng</span>
+                          <span className="text-sm font-medium">Monthly Income</span>
                           <span className="text-sm text-muted-foreground">
                             {dashboardMetrics?.monthly_rental_income ? 
                               Math.min(100, (dashboardMetrics.monthly_rental_income / 30000000) * 100).toFixed(1) 
@@ -469,7 +469,7 @@ export default function AnalyticsPage() {
                       {/* Plans Count Goal */}
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">Số kế hoạch đầu tư</span>
+                          <span className="text-sm font-medium">Investment Plans</span>
                           <span className="text-sm text-muted-foreground">
                             {dashboardMetrics?.total_plans ? 
                               Math.min(100, (dashboardMetrics.total_plans / 10) * 100).toFixed(1) 
@@ -487,8 +487,8 @@ export default function AnalyticsPage() {
                           ></div>
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>{dashboardMetrics?.total_plans || 0} kế hoạch</span>
-                          <span>10 kế hoạch</span>
+                          <span>{dashboardMetrics?.total_plans || 0} plans</span>
+                          <span>10 plans</span>
                         </div>
                       </div>
                     </div>
@@ -500,10 +500,10 @@ export default function AnalyticsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <DollarSign className="h-5 w-5" />
-                    Mục tiêu chi tiết
+                    Detailed Goals
                   </CardTitle>
                   <CardDescription>
-                    Các cột mốc quan trọng cần đạt được
+                    Important milestones to achieve
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -516,13 +516,13 @@ export default function AnalyticsPage() {
                       {/* Goal milestones */}
                       <div className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-sm">Căn nhà đầu tiên</span>
+                          <span className="font-medium text-sm">First Property</span>
                           <span className="text-xs text-green-600 font-medium">
-                            {dashboardMetrics?.total_plans && dashboardMetrics.total_plans > 0 ? 'Đang thực hiện' : 'Chưa bắt đầu'}
+                            {dashboardMetrics?.total_plans && dashboardMetrics.total_plans > 0 ? 'In Progress' : 'Not Started'}
                           </span>
                         </div>
                         <div className="text-xs text-muted-foreground mb-2">
-                          Mục tiêu: {formatCurrency(2000000000)}
+                          Target: {formatCurrency(2000000000)}
                         </div>
                         <div className="w-full bg-secondary rounded-full h-2">
                           <div 
@@ -538,13 +538,13 @@ export default function AnalyticsPage() {
 
                       <div className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-sm">Thu nhập thụ động</span>
+                          <span className="font-medium text-sm">Passive Income</span>
                           <span className="text-xs text-blue-600 font-medium">
-                            {dashboardMetrics?.monthly_rental_income && dashboardMetrics.monthly_rental_income > 5000000 ? 'Đang tiến triển' : 'Cần cải thiện'}
+                            {dashboardMetrics?.monthly_rental_income && dashboardMetrics.monthly_rental_income > 5000000 ? 'Progressing' : 'Needs Improvement'}
                           </span>
                         </div>
                         <div className="text-xs text-muted-foreground mb-2">
-                          Mục tiêu: {formatCurrency(15000000)}/tháng
+                          Target: {formatCurrency(15000000)}/month
                         </div>
                         <div className="w-full bg-secondary rounded-full h-2">
                           <div 
@@ -560,13 +560,13 @@ export default function AnalyticsPage() {
 
                       <div className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-sm">Danh mục đa dạng</span>
+                          <span className="font-medium text-sm">Diversified Portfolio</span>
                           <span className="text-xs text-purple-600 font-medium">
-                            {dashboardMetrics?.active_plans && dashboardMetrics.active_plans >= 3 ? 'Đạt mục tiêu' : 'Đang phát triển'}
+                            {dashboardMetrics?.active_plans && dashboardMetrics.active_plans >= 3 ? 'Target Achieved' : 'Developing'}
                           </span>
                         </div>
                         <div className="text-xs text-muted-foreground mb-2">
-                          Mục tiêu: 5 kế hoạch đầu tư
+                          Target: 5 investment plans
                         </div>
                         <div className="w-full bg-secondary rounded-full h-2">
                           <div 

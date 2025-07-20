@@ -52,88 +52,128 @@ import { DashboardService } from '@/lib/services/dashboardService'
 import { useAuth } from '@/hooks/useAuth'
 import type { FinancialScenario, ScenarioParameters } from '@/types/scenario'
 
-// Create a helper function to generate mock scenarios
-const createMockScenario = (
+// Calculate real financial metrics based on scenario parameters
+const calculateScenarioMetrics = (
+  purchasePrice: number,
+  downPayment: number,
+  interestRate: number,
+  termMonths: number,
+  monthlyIncome: number,
+  monthlyExpenses: number
+) => {
+  const principal = purchasePrice - downPayment
+  const monthlyRate = interestRate / 100 / 12
+  const monthlyPayment = principal > 0 ? 
+    (principal * monthlyRate * Math.pow(1 + monthlyRate, termMonths)) /
+    (Math.pow(1 + monthlyRate, termMonths) - 1) : 0
+  const totalPayment = monthlyPayment * termMonths
+  const totalInterest = totalPayment - principal
+  const totalCost = purchasePrice + totalInterest
+  const dtiRatio = monthlyIncome > 0 ? (monthlyPayment / monthlyIncome) * 100 : 0
+  const ltvRatio = purchasePrice > 0 ? (principal / purchasePrice) * 100 : 0
+  const monthlySavings = monthlyIncome - monthlyExpenses - monthlyPayment
+  const affordabilityScore = Math.max(1, Math.min(10, 
+    10 - (dtiRatio / 5) + (monthlySavings > 0 ? 2 : -2)
+  ))
+
+  return {
+    monthlyPayment,
+    totalInterest,
+    totalCost,
+    dtiRatio,
+    ltvRatio,
+    affordabilityScore,
+    payoffTimeMonths: termMonths,
+    monthlySavings
+  }
+}
+
+// Create scenario from database data or baseline parameters
+const createScenarioFromData = (
   id: string,
   name: string,
   type: 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test',
   description: string,
-  monthlyPayment: number,
-  totalInterest: number,
-  totalCost: number,
-  duration: number,
-  riskLevel: 'low' | 'medium' | 'high'
-): TimelineScenario => ({
-  id,
-  plan_name: name,
-  scenarioType: type,
-  description,
-  riskLevel,
-  events: [],
-  user_id: 'demo-user-id',
-  plan_type: 'home_purchase',
-  status: 'draft',
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  property_id: null,
-  custom_property_data: null,
-  target_age: null,
-  current_monthly_income: null,
-  purchase_price: 3000000000,
-  down_payment: 600000000,
-  additional_costs: 0,
-  other_debts: 0,
-  monthly_income: 50000000,
-  current_monthly_expenses: null,
-  monthly_expenses: 30000000,
-  current_savings: null,
-  target_timeframe_months: duration,
-  expected_roi: 10.5,
-  risk_tolerance: 'moderate',
-  expected_rental_income: null,
-  expected_appreciation_rate: null,
-  emergency_fund_target: null,
-  dependents: 0,
-  target_property_type: null,
-  target_location: null,
-  target_budget: null,
-  investment_purpose: null,
-  desired_features: {},
-  down_payment_target: null,
-  investment_horizon_months: null,
-  preferred_banks: null,
-  education_fund_target: null,
-  retirement_fund_target: null,
-  other_goals: {},
-  feasibility_score: null,
-  recommended_adjustments: {},
-  is_public: false,
-  view_count: 0,
-  cached_calculations: null,
-  calculations_last_updated: null,
-  completed_at: null,
-  // New required fields
-  is_favorite: false,
-  roi: 8.5,
-  total_progress: 0,
-  financial_progress: 0,
-  monthly_contribution: 0,
-  estimated_completion_date: null,
-  risk_level: riskLevel,
-  tags: [],
-  notes: null,
-  shared_with: [],
-  calculatedMetrics: {
-    monthlyPayment,
-    totalInterest,
-    totalCost,
-    dtiRatio: 35,
-    ltvRatio: 80,
-    affordabilityScore: 7,
-    payoffTimeMonths: duration,
-    monthlySavings: 0
+  riskLevel: 'low' | 'medium' | 'high',
+  purchasePrice: number = 3000000000,
+  downPayment: number = 600000000,
+  interestRate: number = 8.5,
+  termMonths: number = 240,
+  monthlyIncome: number = 50000000,
+  monthlyExpenses: number = 30000000
+): TimelineScenario => {
+  const calculatedMetrics = calculateScenarioMetrics(
+    purchasePrice,
+    downPayment,
+    interestRate,
+    termMonths,
+    monthlyIncome,
+    monthlyExpenses
+  )
+
+  return {
+    id,
+    plan_name: name,
+    scenarioType: type,
+    description,
+    riskLevel,
+    events: [],
+    user_id: 'demo-user-id',
+    plan_type: 'home_purchase',
+    status: 'draft',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    property_id: null,
+    custom_property_data: null,
+    target_age: null,
+    current_monthly_income: null,
+    purchase_price: purchasePrice,
+    down_payment: downPayment,
+    additional_costs: 0,
+    other_debts: 0,
+    monthly_income: monthlyIncome,
+    current_monthly_expenses: null,
+    monthly_expenses: monthlyExpenses,
+    current_savings: null,
+    target_timeframe_months: termMonths,
+    expected_roi: interestRate,
+    risk_tolerance: 'moderate',
+    expected_rental_income: null,
+    expected_appreciation_rate: null,
+    emergency_fund_target: null,
+    dependents: 0,
+    target_property_type: null,
+    target_location: null,
+    target_budget: null,
+    investment_purpose: null,
+    desired_features: {},
+    down_payment_target: null,
+    investment_horizon_months: null,
+    preferred_banks: null,
+    education_fund_target: null,
+    retirement_fund_target: null,
+    other_goals: {},
+    feasibility_score: null,
+    recommended_adjustments: {},
+    is_public: false,
+    view_count: 0,
+    cached_calculations: null,
+    calculations_last_updated: null,
+    completed_at: null,
+    // New required fields
+    is_favorite: false,
+    roi: interestRate,
+    total_progress: 0,
+    financial_progress: 0,
+    monthly_contribution: 0,
+    estimated_completion_date: null,
+    risk_level: riskLevel,
+    tags: [],
+    notes: null,
+    shared_with: [],
+    calculatedMetrics
   }
-})
+}
 
 // Mock scenarios data will be created inside the component where t is available
 
@@ -155,18 +195,14 @@ const EnhancedScenariosPage: React.FC = () => {
 
   // Demo scenarios data for unauthenticated users (minimal fallback)
   const demoScenarios: TimelineScenario[] = useMemo(() => [
-    createMockScenario(
+    createScenarioFromData(
       'demo-scenario-1',
       t('mockScenarios.demoPlanName'),
       'baseline',
       t('mockScenarios.demoPlanDescription'),
-      20500000,
-      2920000000,
-      5420000000,
-      240,
       'medium'
     )
-  ], [])
+  ], [t])
 
   // Initialize scenarios with demo data only for unauthenticated users
   useEffect(() => {
@@ -196,16 +232,18 @@ const EnhancedScenariosPage: React.FC = () => {
           // Convert database scenarios to TimelineScenario format
           if (dbData.length > 0) {
             const convertedScenarios = dbData.map(dbScenario => {
-              return createMockScenario(
+              return createScenarioFromData(
                 dbScenario.id,
                 dbScenario.scenario_name,
                 dbScenario.scenario_type,
                 dbScenario.description || t('mockScenarios.noDescriptionAvailable'),
-                dbScenario.monthly_payment,
-                dbScenario.total_interest,
-                dbScenario.total_cost,
-                dbScenario.loan_term_months,
-                dbScenario.risk_level
+                dbScenario.risk_level,
+                3000000000, // Default purchase price
+                600000000,  // Default down payment
+                dbScenario.interest_rate || 8.5,
+                dbScenario.loan_term_months || 240,
+                50000000,   // Default monthly income
+                30000000    // Default monthly expenses
               )
             })
             setScenarios(convertedScenarios)
@@ -290,18 +328,21 @@ const EnhancedScenariosPage: React.FC = () => {
       // Simulate API call to generate smart scenarios
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      // Add some smart scenarios
+      // Add some smart scenarios based on current user scenarios
+      const baseScenario = scenarios[0]
       const smartScenarios: TimelineScenario[] = [
-        createMockScenario(
+        createScenarioFromData(
           `smart-scenario-${Date.now()}`,
           t('mockScenarios.aiRecommendedConservative'),
           'alternative',
           t('mockScenarios.aiGeneratedDescription'),
-          22800000,
-          2472000000,
-          5472000000,
+          'low',
+          baseScenario?.purchase_price || 3000000000,
+          (baseScenario?.down_payment || 600000000) * 1.25, // Increase down payment by 25%
+          7.5, // Lower interest rate
           240,
-          'low'
+          baseScenario?.monthly_income || 50000000,
+          baseScenario?.monthly_expenses || 30000000
         )
       ]
       

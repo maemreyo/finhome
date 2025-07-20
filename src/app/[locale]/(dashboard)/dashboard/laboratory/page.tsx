@@ -40,8 +40,8 @@ const demoPlans: FinancialPlanWithMetrics[] = [
   {
     id: "demo-1",
     user_id: "demo-user",
-    plan_name: "Kế hoạch mẫu",
-    description: "Kế hoạch mẫu cho người chưa đăng nhập",
+    plan_name: "Sample Plan",
+    description: "Sample plan for demo purposes",
     plan_type: "home_purchase",
     status: "active",
     property_id: null,
@@ -91,7 +91,7 @@ const demoPlans: FinancialPlanWithMetrics[] = [
     monthly_contribution: 5000000,
     estimated_completion_date: "2026-12-31T00:00:00Z",
     risk_level: "medium",
-    tags: ["gia-dinh", "nha-o"],
+    tags: ["family", "housing"],
     notes: null,
     shared_with: [],
     calculatedMetrics: {
@@ -104,17 +104,19 @@ const demoPlans: FinancialPlanWithMetrics[] = [
   },
 ];
 
-// Calculate loan details from plan
+// Calculate loan details from plan using dynamic parameters
 const calculateLoanDetails = (plan: FinancialPlanWithMetrics) => {
   const principal = (plan.purchase_price || 0) - (plan.down_payment || 0);
-  const interestRate = 8.5; // Default rate
-  const termYears = 20; // Default term
+  
+  // Try to get dynamic values from plan, fallback to defaults
+  const interestRate = plan.expected_roi || 8.5; // Use plan's expected ROI or default
+  const termYears = Math.round((plan.investment_horizon_months || 240) / 12); // Convert months to years or default to 20
 
   const monthlyRate = interestRate / 100 / 12;
   const totalMonths = termYears * 12;
-  const monthlyPayment =
+  const monthlyPayment = principal > 0 ?
     (principal * monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) /
-    (Math.pow(1 + monthlyRate, totalMonths) - 1);
+    (Math.pow(1 + monthlyRate, totalMonths) - 1) : 0;
   const totalPayment = monthlyPayment * totalMonths;
   const totalInterest = totalPayment - principal;
 
@@ -247,7 +249,7 @@ export default function LaboratoryPage() {
 
   const handleCreateNewPlan = () => {
     // Navigate to create new plan page
-    console.log("Navigate to create new plan");
+    window.location.href = '/dashboard/plans/new';
   };
 
   if (loading) {

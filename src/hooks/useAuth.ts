@@ -299,7 +299,7 @@ export function useProfile() {
 
   const updateProfile = async (updates: Partial<{
     full_name: string
-    avatar_url: string
+    avatar_url: string | null
     website: string
     bio: string
     company: string
@@ -308,6 +308,7 @@ export function useProfile() {
     if (!user) return { error: 'No user found' }
 
     try {
+      // First try to update existing profile
       const { data, error } = await supabase
         .from('user_profiles')
         .update(updates)
@@ -315,13 +316,37 @@ export function useProfile() {
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        // If profile doesn't exist, create it
+        if (error.code === 'PGRST116') {
+          const newProfile = {
+            id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || '',
+            ...updates
+          }
+          
+          const { data: createdData, error: createError } = await supabase
+            .from('user_profiles')
+            .insert(newProfile)
+            .select()
+            .single()
+
+          if (createError) throw createError
+          
+          setProfile(createdData)
+          toast.success('Profile created successfully!')
+          return { data: createdData, error: null }
+        }
+        throw error
+      }
 
       setProfile(data)
       toast.success('Profile updated successfully!')
       
       return { data, error: null }
     } catch (error) {
+      console.error('Profile update error:', error)
       toast.error('Failed to update profile')
       return { data: null, error }
     }

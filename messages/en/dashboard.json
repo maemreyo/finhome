@@ -123,10 +123,33 @@
       "description": "Track your progress and achievements in your investment journey",
       "categories": {
         "all": "All",
-        "planning": "Planning",
-        "investment": "Investment",
-        "savings": "Savings",
-        "milestones": "Milestones"
+        "milestone": "Milestones",
+        "usage": "Usage",
+        "financial": "Financial",
+        "social": "Social",
+        "learning": "Learning"
+      },
+      "summary": {
+        "achievementsEarned": "Achievements Earned",
+        "experiencePoints": "Experience Points",
+        "currentLevel": "Current Level",
+        "outOfTotal": "/ {total} total",
+        "accumulatedXP": "XP accumulated",
+        "level": "Level {level}",
+        "nextLevelProgress": "{xp} XP to level {nextLevel}",
+        "experiencedInvestor": "Experienced investor"
+      },
+      "achievement": {
+        "progress": "Progress",
+        "completedOn": "Completed on {date}",
+        "xpReward": "+{xp} XP",
+        "locked": "Not unlocked"
+      },
+      "progress": {
+        "title": "Overall Progress",
+        "description": "View your achievement completion progress",
+        "completedAchievements": "Completed achievements",
+        "completionRate": "{completed}/{total} ({percentage}%)"
       },
       "achievements": {
         "newInvestor": {
@@ -199,7 +222,11 @@
           "dark": "Dark",
           "system": "System"
         },
-        "saveChanges": "Save changes"
+        "saving": "Saving...",
+        "saveChanges": "Save changes",
+        "saveSuccess": "General settings saved successfully!",
+        "loadError": "Error loading settings. Please try again.",
+        "saveError": "Error saving settings. Please try again."
       },
       "notifications": {
         "title": "Notification Settings",
@@ -208,9 +235,15 @@
         "emailDescription": "Receive notifications about plans and account updates",
         "pushNotifications": "Push notifications",
         "pushDescription": "Receive notifications on mobile devices",
+        "achievementNotifications": "Achievement notifications",
+        "achievementDescription": "Receive notifications when you earn new achievements",
+        "marketNotifications": "Market notifications",
+        "marketDescription": "Receive real estate market updates and insights",
         "marketingEmails": "Marketing emails",
         "marketingDescription": "Receive information about new features and offers",
-        "saveChanges": "Save changes"
+        "saving": "Saving...",
+        "saveChanges": "Save changes",
+        "saveSuccess": "Notification settings saved successfully!"
       },
       "security": {
         "title": "Account Security",
@@ -229,13 +262,26 @@
       "preferences": {
         "title": "Personal Preferences",
         "description": "Customize your application experience",
+        "dashboardLayout": "Dashboard layout",
+        "dashboardLayoutDescription": "Choose how to display the dashboard",
+        "layoutGrid": "Grid",
+        "layoutList": "List",
+        "profileVisibility": "Profile visibility",
+        "profileVisibilityDescription": "Who can view your profile",
+        "visibilityPrivate": "Private",
+        "visibilityFriends": "Friends",
+        "visibilityPublic": "Public",
+        "dataSharing": "Data sharing",
+        "dataSharingDescription": "Allow data sharing to improve services",
         "showHints": "Show hints",
         "showHintsDescription": "Display hints and tips when using",
         "autoSave": "Auto-save plans",
         "autoSaveDescription": "Automatically save changes in plans",
         "showAdvancedCharts": "Show advanced charts",
         "showAdvancedChartsDescription": "Display detailed analytical charts",
-        "savePreferences": "Save preferences"
+        "saving": "Saving...",
+        "savePreferences": "Save preferences",
+        "saveSuccess": "Personal preferences saved successfully!"
       },
       "account": {
         "title": "Account Management",
@@ -246,7 +292,40 @@
         "dangerZone": "Danger Zone",
         "deleteAccount": "Delete account",
         "deleteAccountDescription": "Permanently delete account and all data",
-        "deleteAccountButton": "Delete account"
+        "deleteAccountButton": "Delete account",
+        "exportDialog": {
+          "title": "Export Your Data",
+          "description": "Choose what data to include in your export and the file format.",
+          "formatLabel": "Export Format",
+          "formatPlaceholder": "Select format",
+          "dataToInclude": "Data to Include",
+          "profileInformation": "Profile Information",
+          "financialPlans": "Financial Plans",
+          "preferencesSettings": "Preferences & Settings",
+          "activityHistory": "Activity History",
+          "achievements": "Achievements",
+          "cancel": "Cancel",
+          "exportData": "Export Data"
+        },
+        "deleteDialog": {
+          "title": "Delete Account",
+          "description": "This action will permanently delete your account and all associated data, including:",
+          "dataList": {
+            "plans": "All financial plans and calculations",
+            "profile": "Profile information and preferences", 
+            "achievements": "Achievement progress and history",
+            "favorites": "Property favorites and notes",
+            "activities": "Activity logs and analytics"
+          },
+          "permanentWarning": "This action cannot be undone.",
+          "confirmationLabel": "Type DELETE to confirm:",
+          "confirmationPlaceholder": "Type DELETE here",
+          "understandLabel": "I understand that this action is permanent and cannot be undone",
+          "cancel": "Cancel",
+          "deleteAccount": "Delete Account"
+        },
+        "deleteSuccess": "Account deleted successfully",
+        "deleteError": "Failed to delete account. Please contact support."
       }
     },
     "Help": {
@@ -337,7 +416,8 @@
         },
         "t3": {
           "subject": "Question about data export feature"
-        }
+        },
+        "noTickets": "No support tickets yet. Submit a support request to get started."
       },
       "tabs": {
         "faq": "FAQ",
@@ -346,9 +426,24 @@
         "tickets": "Support Tickets"
       },
       "contact": {
-        "email": "Email",
-        "phone": "Phone",
-        "chat": "Live Chat"
+        "email": "support@finhome.com",
+        "phone": "+1 (555) 123-4567",
+        "chat": {
+          "title": "Live Chat",
+          "description": "Get instant help from our support team",
+          "button": "Start Chat",
+          "availability": "Available 24/7"
+        },
+        "email": {
+          "title": "Email Support",
+          "description": "Send us an email and we'll respond within 24 hours",
+          "response": "Response within 24 hours"
+        },
+        "phone": {
+          "title": "Phone Support", 
+          "description": "Speak directly with our support team",
+          "hours": "Mon-Fri 9AM-6PM EST"
+        }
       }
     },
     "Laboratory": {
@@ -405,7 +500,15 @@
         "title": "Profile Picture",
         "description": "Update your profile picture to personalize your account",
         "upload": "Upload Image",
-        "comingSoon": "Coming soon: Upload custom profile pictures"
+        "uploading": "Uploading...",
+        "requirements": "JPG, PNG or GIF. Max 5MB.",
+        "dragDropHint": "You can also drag and drop an image here",
+        "deleteDialog": {
+          "title": "Delete Avatar",
+          "description": "Are you sure you want to delete your profile picture? This action cannot be undone.",
+          "cancel": "Cancel",
+          "confirm": "Delete"
+        }
       },
       "info": {
         "title": "Profile Information",

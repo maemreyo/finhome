@@ -27,6 +27,9 @@ import {
   Trash2,
   AlertTriangle
 } from 'lucide-react'
+import { PasswordChangeForm } from '@/components/settings/PasswordChangeForm'
+import { ExportDataDialog } from '@/components/settings/ExportDataDialog'
+import { DeleteAccountDialog } from '@/components/settings/DeleteAccountDialog'
 
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.Settings')
@@ -95,7 +98,7 @@ export default function SettingsPage() {
         setAddress(profile.address || '')
       } catch (error) {
         console.error('Error loading settings:', error)
-        toast.error('Lỗi tải cài đặt. Vui lòng thử lại.')
+        toast.error(t('general.loadError'))
       } finally {
         setLoading(false)
       }
@@ -124,10 +127,10 @@ export default function SettingsPage() {
         address
       })
 
-      toast.success('Đã lưu cài đặt chung thành công!')
+      toast.success(t('general.saveSuccess'))
     } catch (error) {
       console.error('Error saving general settings:', error)
-      toast.error('Lỗi lưu cài đặt. Vui lòng thử lại.')
+      toast.error(t('general.saveError'))
     } finally {
       setSaving(false)
     }
@@ -147,10 +150,10 @@ export default function SettingsPage() {
         market_update_notifications: marketUpdateNotifications
       })
 
-      toast.success('Đã lưu cài đặt thông báo thành công!')
+      toast.success(t('notifications.saveSuccess'))
     } catch (error) {
       console.error('Error saving notification settings:', error)
-      toast.error('Lỗi lưu cài đặt. Vui lòng thử lại.')
+      toast.error(t('general.saveError'))
     } finally {
       setSaving(false)
     }
@@ -170,10 +173,10 @@ export default function SettingsPage() {
         allow_data_sharing: allowDataSharing
       })
 
-      toast.success('Đã lưu tùy chọn cá nhân thành công!')
+      toast.success(t('preferences.saveSuccess'))
     } catch (error) {
       console.error('Error saving preference settings:', error)
-      toast.error('Lỗi lưu cài đặt. Vui lòng thử lại.')
+      toast.error(t('general.saveError'))
     } finally {
       setSaving(false)
     }
@@ -217,62 +220,62 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="language">Ngôn ngữ</Label>
+                  <Label htmlFor="language">{t('general.language')}</Label>
                   <Select value={language} onValueChange={setLanguage}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Chọn ngôn ngữ" />
+                      <SelectValue placeholder={t('general.selectLanguage')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="vi">Tiếng Việt</SelectItem>
-                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="vi">{t('general.languages.vietnamese')}</SelectItem>
+                      <SelectItem value="en">{t('general.languages.english')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="currency">Đơn vị tiền tệ</Label>
+                  <Label htmlFor="currency">{t('general.currency')}</Label>
                   <Select value={currency} onValueChange={setCurrency}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Chọn đơn vị tiền tệ" />
+                      <SelectValue placeholder={t('general.selectCurrency')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="VND">VND (Việt Nam Đồng)</SelectItem>
-                      <SelectItem value="USD">USD (US Dollar)</SelectItem>
+                      <SelectItem value="VND">{t('general.currencies.vnd')}</SelectItem>
+                      <SelectItem value="USD">{t('general.currencies.usd')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="timezone">Múi giờ</Label>
+                <Label htmlFor="timezone">{t('general.timezone')}</Label>
                 <Select value={timezone} onValueChange={setTimezone}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Chọn múi giờ" />
+                    <SelectValue placeholder={t('general.selectTimezone')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Asia/Ho_Chi_Minh">Việt Nam (UTC+7)</SelectItem>
-                    <SelectItem value="Asia/Bangkok">Bangkok (UTC+7)</SelectItem>
+                    <SelectItem value="Asia/Ho_Chi_Minh">{t('general.timezones.vietnam')}</SelectItem>
+                    <SelectItem value="Asia/Bangkok">{t('general.timezones.bangkok')}</SelectItem>
                     <SelectItem value="Asia/Singapore">{t('general.timezones.singapore')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="theme">Giao diện</Label>
+                <Label htmlFor="theme">{t('general.theme')}</Label>
                 <Select value={theme} onValueChange={(value: 'light' | 'dark') => setTheme(value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Chọn giao diện" />
+                    <SelectValue placeholder={t('general.selectTheme')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="light">Sáng</SelectItem>
-                    <SelectItem value="dark">Tối</SelectItem>
+                    <SelectItem value="light">{t('general.themes.light')}</SelectItem>
+                    <SelectItem value="dark">{t('general.themes.dark')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex justify-end">
                 <Button onClick={saveGeneralSettings} disabled={saving}>
-                  {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                  {saving ? t('general.saving') : t('general.saveChanges')}
                 </Button>
               </div>
             </CardContent>
@@ -284,19 +287,19 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Cài Đặt Thông Báo
+                {t('notifications.title')}
               </CardTitle>
               <CardDescription>
-                Chọn loại thông báo bạn muốn nhận
+                {t('notifications.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="email-notifications">Thông báo email</Label>
+                    <Label htmlFor="email-notifications">{t('notifications.emailNotifications')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Nhận thông báo về kế hoạch và cập nhật tài khoản
+                      {t('notifications.emailDescription')}
                     </p>
                   </div>
                   <Switch
@@ -310,9 +313,9 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="push-notifications">Thông báo đẩy</Label>
+                    <Label htmlFor="push-notifications">{t('notifications.pushNotifications')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Nhận thông báo trên thiết bị di động
+                      {t('notifications.pushDescription')}
                     </p>
                   </div>
                   <Switch
@@ -326,9 +329,9 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="achievement-notifications">Thông báo thành tích</Label>
+                    <Label htmlFor="achievement-notifications">{t('notifications.achievementNotifications')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Nhận thông báo khi đạt được thành tích mới
+                      {t('notifications.achievementDescription')}
                     </p>
                   </div>
                   <Switch
@@ -342,9 +345,9 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="market-notifications">Thông báo thị trường</Label>
+                    <Label htmlFor="market-notifications">{t('notifications.marketNotifications')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Nhận thông tin cập nhật về thị trường bất động sản
+                      {t('notifications.marketDescription')}
                     </p>
                   </div>
                   <Switch
@@ -357,7 +360,7 @@ export default function SettingsPage() {
 
               <div className="flex justify-end">
                 <Button onClick={saveNotificationSettings} disabled={saving}>
-                  {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                  {saving ? t('notifications.saving') : t('notifications.saveChanges')}
                 </Button>
               </div>
             </CardContent>
@@ -369,56 +372,41 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Bảo Mật Tài Khoản
+                {t('security.title')}
               </CardTitle>
               <CardDescription>
-                Quản lý mật khẩu và cài đặt bảo mật
+                {t('security.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="current-password">Mật khẩu hiện tại</Label>
-                  <Input id="current-password" type="password" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="new-password">Mật khẩu mới</Label>
-                  <Input id="new-password" type="password" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Xác nhận mật khẩu mới</Label>
-                  <Input id="confirm-password" type="password" />
-                </div>
-              </div>
+              <PasswordChangeForm />
 
               <Separator />
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Xác thực hai yếu tố</Label>
+                    <Label>{t('security.twoFactorAuth')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Thêm lớp bảo mật bổ sung cho tài khoản
+                      {t('security.twoFactorDescription')}
                     </p>
                   </div>
-                  <Button variant="outline">Kích hoạt</Button>
+                  <Button variant="outline" disabled>
+                    {t('security.enable')}
+                  </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Phiên đăng nhập</Label>
+                    <Label>{t('security.loginSessions')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Quản lý các thiết bị đã đăng nhập
+                      {t('security.loginSessionsDescription')}
                     </p>
                   </div>
-                  <Button variant="outline">Xem chi tiết</Button>
+                  <Button variant="outline" disabled>
+                    {t('security.viewDetails')}
+                  </Button>
                 </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button>Cập nhật mật khẩu</Button>
               </div>
             </CardContent>
           </Card>
@@ -429,19 +417,19 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Palette className="h-5 w-5" />
-                Tùy Chọn Cá Nhân
+                {t('preferences.title')}
               </CardTitle>
               <CardDescription>
-                Tùy chỉnh trải nghiệm sử dụng ứng dụng
+                {t('preferences.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Bố cục dashboard</Label>
+                    <Label>{t('preferences.dashboardLayout')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Chọn cách hiển thị dashboard
+                      {t('preferences.dashboardLayoutDescription')}
                     </p>
                   </div>
                   <Select value={dashboardLayout} onValueChange={(value: 'grid' | 'list') => setDashboardLayout(value)}>
@@ -449,8 +437,8 @@ export default function SettingsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="grid">Lưới</SelectItem>
-                      <SelectItem value="list">Danh sách</SelectItem>
+                      <SelectItem value="grid">{t('preferences.layoutGrid')}</SelectItem>
+                      <SelectItem value="list">{t('preferences.layoutList')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -459,9 +447,9 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Hiển thị hồ sơ</Label>
+                    <Label>{t('preferences.profileVisibility')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Ai có thể xem hồ sơ của bạn
+                      {t('preferences.profileVisibilityDescription')}
                     </p>
                   </div>
                   <Select value={profileVisibility} onValueChange={(value: 'public' | 'private' | 'friends') => setProfileVisibility(value)}>
@@ -469,9 +457,9 @@ export default function SettingsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="private">Riêng tư</SelectItem>
-                      <SelectItem value="friends">Bạn bè</SelectItem>
-                      <SelectItem value="public">Công khai</SelectItem>
+                      <SelectItem value="private">{t('preferences.visibilityPrivate')}</SelectItem>
+                      <SelectItem value="friends">{t('preferences.visibilityFriends')}</SelectItem>
+                      <SelectItem value="public">{t('preferences.visibilityPublic')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -480,9 +468,9 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Chia sẻ dữ liệu</Label>
+                    <Label>{t('preferences.dataSharing')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Cho phép chia sẻ dữ liệu để cải thiện dịch vụ
+                      {t('preferences.dataSharingDescription')}
                     </p>
                   </div>
                   <Switch
@@ -494,7 +482,7 @@ export default function SettingsPage() {
 
               <div className="flex justify-end">
                 <Button onClick={savePreferenceSettings} disabled={saving}>
-                  {saving ? 'Đang lưu...' : 'Lưu tùy chọn'}
+                  {saving ? t('preferences.saving') : t('preferences.savePreferences')}
                 </Button>
               </div>
             </CardContent>
@@ -506,7 +494,7 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
-                Quản Lý Tài Khoản
+{t('account.title')}
               </CardTitle>
               <CardDescription>
                 {t('account.description')}
@@ -521,10 +509,7 @@ export default function SettingsPage() {
                       {t('account.exportDataDescription')}
                     </p>
                   </div>
-                  <Button variant="outline">
-                    <Download className="mr-2 h-4 w-4" />
-                    {t('account.exportDataButton')}
-                  </Button>
+                  <ExportDataDialog />
                 </div>
 
                 <Separator />
@@ -542,10 +527,7 @@ export default function SettingsPage() {
                         {t('account.deleteAccountDescription')}
                       </p>
                     </div>
-                    <Button variant="destructive">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      {t('account.deleteAccountButton')}
-                    </Button>
+                    <DeleteAccountDialog />
                   </div>
                 </div>
               </div>

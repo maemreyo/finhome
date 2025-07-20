@@ -123,10 +123,33 @@
       "description": "Theo dõi tiến độ và thành tích trong hành trình đầu tư của bạn",
       "categories": {
         "all": "Tất cả",
-        "planning": "Kế hoạch",
-        "investment": "Đầu tư",
-        "savings": "Tiết kiệm",
-        "milestones": "Mốc quan trọng"
+        "milestone": "Mốc quan trọng",
+        "usage": "Sử dụng",
+        "financial": "Tài chính",
+        "social": "Xã hội",
+        "learning": "Học tập"
+      },
+      "summary": {
+        "achievementsEarned": "Thành Tích Đạt Được",
+        "experiencePoints": "Điểm Kinh Nghiệm",
+        "currentLevel": "Cấp Độ Hiện Tại",
+        "outOfTotal": "/ {total} tổng cộng",
+        "accumulatedXP": "XP tích lũy",
+        "level": "Level {level}",
+        "nextLevelProgress": "Còn {xp} XP để lên cấp {nextLevel}",
+        "experiencedInvestor": "Nhà đầu tư có kinh nghiệm"
+      },
+      "achievement": {
+        "progress": "Tiến độ",
+        "completedOn": "Hoàn thành vào {date}",
+        "xpReward": "+{xp} XP",
+        "locked": "Chưa mở khóa"
+      },
+      "progress": {
+        "title": "Tiến Độ Tổng Quan",
+        "description": "Xem tiến độ hoàn thành thành tích của bạn",
+        "completedAchievements": "Hoàn thành thành tích",
+        "completionRate": "{completed}/{total} ({percentage}%)"
       },
       "achievements": {
         "newInvestor": {
@@ -199,7 +222,11 @@
           "dark": "Tối",
           "system": "Theo hệ thống"
         },
-        "saveChanges": "Lưu thay đổi"
+        "saving": "Đang lưu...",
+        "saveChanges": "Lưu thay đổi",
+        "saveSuccess": "Đã lưu cài đặt chung thành công!",
+        "loadError": "Lỗi tải cài đặt. Vui lòng thử lại.",
+        "saveError": "Lỗi lưu cài đặt. Vui lòng thử lại."
       },
       "notifications": {
         "title": "Cài Đặt Thông Báo",
@@ -208,9 +235,15 @@
         "emailDescription": "Nhận thông báo về kế hoạch và cập nhật tài khoản",
         "pushNotifications": "Thông báo đẩy",
         "pushDescription": "Nhận thông báo trên thiết bị di động",
+        "achievementNotifications": "Thông báo thành tích",
+        "achievementDescription": "Nhận thông báo khi đạt được thành tích mới",
+        "marketNotifications": "Thông báo thị trường",
+        "marketDescription": "Nhận thông tin cập nhật về thị trường bất động sản",
         "marketingEmails": "Email tiếp thị",
         "marketingDescription": "Nhận thông tin về tính năng mới và ưu đãi",
-        "saveChanges": "Lưu thay đổi"
+        "saving": "Đang lưu...",
+        "saveChanges": "Lưu thay đổi",
+        "saveSuccess": "Đã lưu cài đặt thông báo thành công!"
       },
       "security": {
         "title": "Bảo Mật Tài Khoản",
@@ -229,13 +262,26 @@
       "preferences": {
         "title": "Tùy Chọn Cá Nhân",
         "description": "Tùy chỉnh trải nghiệm sử dụng ứng dụng",
+        "dashboardLayout": "Bố cục dashboard",
+        "dashboardLayoutDescription": "Chọn cách hiển thị dashboard",
+        "layoutGrid": "Lưới",
+        "layoutList": "Danh sách",
+        "profileVisibility": "Hiển thị hồ sơ",
+        "profileVisibilityDescription": "Ai có thể xem hồ sơ của bạn",
+        "visibilityPrivate": "Riêng tư",
+        "visibilityFriends": "Bạn bè",
+        "visibilityPublic": "Công khai",
+        "dataSharing": "Chia sẻ dữ liệu",
+        "dataSharingDescription": "Cho phép chia sẻ dữ liệu để cải thiện dịch vụ",
         "showHints": "Hiển thị gợi ý",
         "showHintsDescription": "Hiển thị gợi ý và mẹo khi sử dụng",
         "autoSave": "Tự động lưu kế hoạch",
         "autoSaveDescription": "Tự động lưu các thay đổi trong kế hoạch",
         "showAdvancedCharts": "Hiển thị biểu đồ nâng cao",
         "showAdvancedChartsDescription": "Hiển thị các biểu đồ phân tích chi tiết",
-        "savePreferences": "Lưu tùy chọn"
+        "saving": "Đang lưu...",
+        "savePreferences": "Lưu tùy chọn",
+        "saveSuccess": "Đã lưu tùy chọn cá nhân thành công!"
       },
       "account": {
         "title": "Quản Lý Tài Khoản",
@@ -246,7 +292,40 @@
         "dangerZone": "Vùng nguy hiểm",
         "deleteAccount": "Xóa tài khoản",
         "deleteAccountDescription": "Xóa vĩnh viễn tài khoản và toàn bộ dữ liệu",
-        "deleteAccountButton": "Xóa tài khoản"
+        "deleteAccountButton": "Xóa tài khoản",
+        "exportDialog": {
+          "title": "Xuất Dữ Liệu Của Bạn",
+          "description": "Chọn dữ liệu cần bao gồm trong file xuất và định dạng file.",
+          "formatLabel": "Định Dạng Xuất",
+          "formatPlaceholder": "Chọn định dạng",
+          "dataToInclude": "Dữ Liệu Bao Gồm",
+          "profileInformation": "Thông Tin Hồ Sơ",
+          "financialPlans": "Kế Hoạch Tài Chính",
+          "preferencesSettings": "Tùy Chọn & Cài Đặt",
+          "activityHistory": "Lịch Sử Hoạt Động",
+          "achievements": "Thành Tích",
+          "cancel": "Hủy",
+          "exportData": "Xuất Dữ Liệu"
+        },
+        "deleteDialog": {
+          "title": "Xóa Tài Khoản",
+          "description": "Hành động này sẽ xóa vĩnh viễn tài khoản và toàn bộ dữ liệu liên quan, bao gồm:",
+          "dataList": {
+            "plans": "Tất cả kế hoạch tài chính và tính toán",
+            "profile": "Thông tin hồ sơ và tùy chọn",
+            "achievements": "Tiến độ và lịch sử thành tích",
+            "favorites": "Bất động sản yêu thích và ghi chú",
+            "activities": "Nhật ký hoạt động và phân tích"
+          },
+          "permanentWarning": "Hành động này không thể hoàn tác.",
+          "confirmationLabel": "Gõ DELETE để xác nhận:",
+          "confirmationPlaceholder": "Gõ DELETE ở đây",
+          "understandLabel": "Tôi hiểu rằng hành động này là vĩnh viễn và không thể hoàn tác",
+          "cancel": "Hủy",
+          "deleteAccount": "Xóa Tài Khoản"
+        },
+        "deleteSuccess": "Đã xóa tài khoản thành công",
+        "deleteError": "Không thể xóa tài khoản. Vui lòng liên hệ hỗ trợ."
       }
     },
     "Help": {
@@ -337,7 +416,8 @@
         },
         "t3": {
           "subject": "Câu hỏi về tính năng xuất dữ liệu"
-        }
+        },
+        "noTickets": "Chưa có yêu cầu hỗ trợ nào. Gửi yêu cầu hỗ trợ để bắt đầu."
       },
       "tabs": {
         "faq": "Câu Hỏi Thường Gặp",
@@ -346,9 +426,24 @@
         "tickets": "Yêu Cầu Hỗ Trợ"
       },
       "contact": {
-        "email": "Email",
-        "phone": "Điện thoại",
-        "chat": "Live Chat"
+        "email": "support@finhome.vn",
+        "phone": "1900 1234",
+        "chat": {
+          "title": "Live Chat",
+          "description": "Nhận hỗ trợ tức thì từ đội ngũ hỗ trợ",
+          "button": "Bắt Đầu Chat",
+          "availability": "Có sẵn 24/7"
+        },
+        "email": {
+          "title": "Hỗ Trợ Email",
+          "description": "Gửi email cho chúng tôi và chúng tôi sẽ phản hồi trong vòng 24 giờ",
+          "response": "Phản hồi trong vòng 24 giờ"
+        },
+        "phone": {
+          "title": "Hỗ Trợ Điện Thoại",
+          "description": "Nói chuyện trực tiếp với đội ngũ hỗ trợ",
+          "hours": "Thứ 2-6, 8h-17h"
+        }
       }
     },
     "Laboratory": {
@@ -405,7 +500,15 @@
         "title": "Ảnh hồ sơ",
         "description": "Cập nhật ảnh hồ sơ của bạn để cá nhân hóa tài khoản của bạn",
         "upload": "Tải ảnh lên",
-        "comingSoon": "Sắp có: Tải lên ảnh hồ sơ tùy chỉnh"
+        "uploading": "Đang tải lên...",
+        "requirements": "JPG, PNG hoặc GIF. Tối đa 5MB.",
+        "dragDropHint": "Bạn cũng có thể kéo và thả ảnh vào đây",
+        "deleteDialog": {
+          "title": "Xóa ảnh đại diện",
+          "description": "Bạn có chắc chắn muốn xóa ảnh hồ sơ của mình không? Hành động này không thể hoàn tác.",
+          "cancel": "Hủy",
+          "confirm": "Xóa"
+        }
       },
       "info": {
         "title": "Thông tin hồ sơ",

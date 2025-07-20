@@ -1,25 +1,30 @@
 // src/components/plans/PlansList.tsx
 'use client'
 
+import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { formatCurrency } from '@/lib/utils'
 import { Eye, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { Database } from '@/lib/supabase/types'
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 
 type FinancialPlan = Database['public']['Tables']['financial_plans']['Row']
 
 interface PlansListProps {
   plans: FinancialPlan[]
+  onPlanDeleted?: (planId: string) => void
 }
 
 // Status and type maps will be replaced with translation keys
 
-export function PlansList({ plans }: PlansListProps) {
+export function PlansList({ plans, onPlanDeleted }: PlansListProps) {
   const t = useTranslations('PlansList')
+  const [deletingPlanId, setDeletingPlanId] = useState<string | null>(null)
 
   const getStatusLabel = (status: string) => {
     switch (status) {
@@ -48,6 +53,29 @@ export function PlansList({ plans }: PlansListProps) {
       case 'upgrade': return t('types.upgrade')
       case 'refinance': return t('types.refinance')
       default: return t('types.unknown')
+    }
+  }
+
+  const handleDeletePlan = async (planId: string) => {
+    try {
+      setDeletingPlanId(planId)
+      
+      // Call API to delete the plan
+      const response = await fetch(`/api/financial-plans/${planId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete plan')
+      }
+
+      toast.success(t('deleteSuccess'))
+      onPlanDeleted?.(planId)
+    } catch (error) {
+      console.error('Error deleting plan:', error)
+      toast.error(t('deleteError'))
+    } finally {
+      setDeletingPlanId(null)
     }
   }
 
@@ -110,9 +138,30 @@ export function PlansList({ plans }: PlansListProps) {
                   <Edit className="w-4 h-4" />
                 </Button>
               </Link>
-              <Button variant="outline" size="sm">
-                <Trash2 className="w-4 h-4" />
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" disabled={deletingPlanId === plan.id}>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t('deleteDialog.description', { planName: plan.plan_name })}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleDeletePlan(plan.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      {t('deleteDialog.confirm')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </CardContent>
         </Card>

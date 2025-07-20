@@ -70,59 +70,59 @@ export default function HelpPage() {
 
   const faqItems = [
     {
-      question: 'How to create your first financial plan?',
-      answer: 'To create a new financial plan, go to "Financial Plans" in the left menu and click "Create New Plan". You will be guided through each step to enter information about your investment goals, financial resources and timeline.',
+      question: t('faq.q1'),
+      answer: t('faq.a1'),
       category: 'planning'
     },
     {
-      question: 'How to compare multiple investment scenarios?',
-      answer: 'Use the "Scenario Comparison" feature to analyze different investment options. You can adjust parameters like interest rates, loan terms, and tax rates to see the impact on expected returns.',
+      question: t('faq.q2'),
+      answer: t('faq.a2'),
       category: 'scenarios'
     },
     {
-      question: 'How does the Laboratory feature work?',
-      answer: 'The Laboratory allows you to experiment with investment parameters in a safe environment. You can change variable values and see immediate impact on financial results without affecting your main plans.',
+      question: t('faq.q3'),
+      answer: t('faq.a3'),
       category: 'laboratory'
     },
     {
-      question: 'How to update personal information?',
-      answer: 'Go to "Profile" in the sidebar menu to update personal information like name, email, phone number and other details. Remember to click "Save Changes" after editing.',
+      question: t('faq.q4'),
+      answer: t('faq.a4'),
       category: 'profile'
     },
     {
-      question: 'Is my data secure?',
-      answer: 'We use leading security measures to protect your data. All information is encrypted during transmission and storage. You can view details about our security policy in the Settings section.',
+      question: t('faq.q5'),
+      answer: t('faq.a5'),
       category: 'security'
     },
     {
-      question: 'Can I export financial plan data?',
-      answer: 'Yes, you can export financial plan data as Excel or PDF files. Go to plan details and click the "Export Data" button to download.',
+      question: t('faq.q6'),
+      answer: t('faq.a6'),
       category: 'export'
     }
   ]
 
   const quickLinks = [
     {
-      title: 'Hướng Dẫn Sử Dụng',
-      description: 'Tài liệu chi tiết về các tính năng',
+      title: t('quickLinks.userGuide.title'),
+      description: t('quickLinks.userGuide.description'),
       icon: Book,
       href: '/docs/user-guide'
     },
     {
-      title: 'Video Hướng Dẫn',
-      description: 'Xem video học cách sử dụng',
+      title: t('quickLinks.videoTutorials.title'),
+      description: t('quickLinks.videoTutorials.description'),
       icon: Video,
       href: '/docs/videos'
     },
     {
-      title: 'Cộng Đồng',
-      description: 'Thảo luận với người dùng khác',
+      title: t('quickLinks.community.title'),
+      description: t('quickLinks.community.description'),
       icon: MessageSquare,
       href: '/community'
     },
     {
-      title: 'Cập Nhật',
-      description: 'Thông tin về phiên bản mới',
+      title: t('quickLinks.updates.title'),
+      description: t('quickLinks.updates.description'),
       icon: FileText,
       href: '/docs/changelog'
     }
@@ -131,21 +131,21 @@ export default function HelpPage() {
   const supportTickets = [
     {
       id: 'TK-001',
-      subject: 'Lỗi tính toán lãi suất',
+      subject: t('tickets.t1.subject'),
       status: 'resolved',
       created: '2024-01-15',
       category: 'technical'
     },
     {
       id: 'TK-002',
-      subject: 'Cần hỗ trợ tạo kế hoạch',
+      subject: t('tickets.t2.subject'),
       status: 'pending',
       created: '2024-01-18',
       category: 'guidance'
     },
     {
       id: 'TK-003',
-      subject: 'Câu hỏi về tính năng xuất dữ liệu',
+      subject: t('tickets.t3.subject'),
       status: 'in_progress',
       created: '2024-01-20',
       category: 'feature'
@@ -373,7 +373,7 @@ export default function HelpPage() {
                   <p className="text-sm text-muted-foreground mb-2">
                     {t('contact.email.description')}
                   </p>
-                  <p className="font-medium">support@finhome.vn</p>
+                  <p className="font-medium">{t('contact.email')}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {t('contact.email.response')}
                   </p>
@@ -391,7 +391,7 @@ export default function HelpPage() {
                   <p className="text-sm text-muted-foreground mb-2">
                     {t('contact.phone.description')}
                   </p>
-                  <p className="font-medium">1900 1234</p>
+                  <p className="font-medium">{t('contact.phone')}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {t('contact.phone.hours')}
                   </p>
@@ -506,7 +506,7 @@ export default function HelpPage() {
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
                     <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No support tickets yet. Submit a support request to get started.</p>
+                    <p>{t('tickets.noTickets')}</p>
                   </div>
                 )}
               </CardContent>

@@ -694,7 +694,15 @@
       "view": "View",
       "edit": "Edit",
       "delete": "Delete"
-    }
+    },
+    "deleteDialog": {
+      "title": "Delete Plan",
+      "description": "Are you sure you want to delete '{planName}'? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "deleteSuccess": "Plan deleted successfully",
+    "deleteError": "Failed to delete plan"
   },
   "SharePlanDialog": {
     "title": "Share Plan",

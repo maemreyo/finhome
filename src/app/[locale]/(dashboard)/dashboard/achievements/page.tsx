@@ -36,10 +36,11 @@ export default function AchievementsPage() {
 
   const categories = [
     { value: 'all', label: t('categories.all') },
-    { value: 'planning', label: t('categories.planning') },
-    { value: 'investment', label: t('categories.investment') },
-    { value: 'savings', label: t('categories.savings') },
-    { value: 'milestones', label: t('categories.milestones') },
+    { value: 'milestone', label: t('categories.milestone') },
+    { value: 'usage', label: t('categories.usage') },
+    { value: 'financial', label: t('categories.financial') },
+    { value: 'social', label: t('categories.social') },
+    { value: 'learning', label: t('categories.learning') },
   ]
 
   // Load achievements data
@@ -68,82 +69,17 @@ export default function AchievementsPage() {
     loadAchievementsData()
   }, [isAuthenticated, user])
 
-  const achievements = [
-    {
-      id: 1,
-      title: t('achievements.newInvestor.title'),
-      description: t('achievements.newInvestor.description'),
-      icon: Home,
-      category: 'planning',
-      status: 'completed',
-      completedAt: '2024-01-15',
-      xp: 100,
-      rarity: 'common'
-    },
-    {
-      id: 2,
-      title: t('achievements.strategist.title'),
-      description: t('achievements.strategist.description'),
-      icon: Target,
-      category: 'planning',
-      status: 'completed',
-      completedAt: '2024-02-28',
-      xp: 250,
-      rarity: 'uncommon'
-    },
-    {
-      id: 3,
-      title: t('achievements.futureMillionaire.title'),
-      description: t('achievements.futureMillionaire.description'),
-      icon: Crown,
-      category: 'savings',
-      status: 'in_progress',
-      progress: 75,
-      target: 1000000000,
-      current: 750000000,
-      xp: 500,
-      rarity: 'rare'
-    },
-    {
-      id: 4,
-      title: t('achievements.analysisExpert.title'),
-      description: t('achievements.analysisExpert.description'),
-      icon: BarChart3,
-      category: 'investment',
-      status: 'in_progress',
-      progress: 60,
-      target: 10,
-      current: 6,
-      xp: 300,
-      rarity: 'uncommon'
-    },
-    {
-      id: 5,
-      title: t('achievements.investmentMaster.title'),
-      description: t('achievements.investmentMaster.description'),
-      icon: Trophy,
-      category: 'investment',
-      status: 'locked',
-      progress: 0,
-      target: 3,
-      current: 0,
-      xp: 1000,
-      rarity: 'legendary'
-    },
-    {
-      id: 6,
-      title: t('achievements.persistent.title'),
-      description: t('achievements.persistent.description'),
-      icon: Zap,
-      category: 'milestones',
-      status: 'in_progress',
-      progress: 80,
-      target: 30,
-      current: 24,
-      xp: 200,
-      rarity: 'common'
+  // Dynamic icon mapping based on achievement type
+  const getAchievementIcon = (achievementType: string) => {
+    switch (achievementType) {
+      case 'milestone': return Target
+      case 'usage': return Zap
+      case 'financial': return Crown
+      case 'social': return Medal
+      case 'learning': return BarChart3
+      default: return Trophy
     }
-  ]
+  }
 
   const rarityColors = {
     common: 'bg-gray-100 text-gray-800',
@@ -159,30 +95,29 @@ export default function AchievementsPage() {
     locked: 'text-gray-400'
   }
 
-  // Merge database achievements with available achievements
-  const mergedAchievements = availableAchievements.map(achievement => {
-    const userAchievement = userAchievements.find(ua => ua.achievements?.id === achievement.id)
+  // Merge database achievements with user progress
+  const displayAchievements = availableAchievements.map(achievement => {
+    const userAchievement = userAchievements.find(ua => ua.achievement_id === achievement.id)
     const isCompleted = !!userAchievement
     
     return {
       id: achievement.id,
       title: achievement.name,
       description: achievement.description,
-      icon: achievement.category === 'planning' ? Home : 
-            achievement.category === 'investment' ? BarChart3 :
-            achievement.category === 'savings' ? Crown :
-            achievement.category === 'milestones' ? Zap : Trophy,
-      category: achievement.category,
+      icon: getAchievementIcon(achievement.achievement_type),
+      category: achievement.achievement_type,
       status: isCompleted ? 'completed' : 'locked',
       completedAt: userAchievement?.unlocked_at,
       progress: userAchievement?.progress_data?.progress || 0,
-      xp: achievement.points,
-      rarity: achievement.rarity || 'common'
+      target: achievement.required_value || 100,
+      current: userAchievement?.progress_data?.current || 0,
+      xp: achievement.experience_points,
+      rarity: achievement.badge_color === '#FFD700' ? 'legendary' :
+              achievement.badge_color === '#800080' ? 'epic' :
+              achievement.badge_color === '#0000FF' ? 'rare' :
+              achievement.badge_color === '#008000' ? 'uncommon' : 'common'
     }
   })
-
-  // Use mock data as fallback if no database data
-  const displayAchievements = mergedAchievements.length > 0 ? mergedAchievements : achievements
 
   const filteredAchievements = selectedCategory === 'all' 
     ? displayAchievements 
@@ -201,7 +136,7 @@ export default function AchievementsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Thành Tích Đạt Được</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('summary.achievementsEarned')}</CardTitle>
               <Trophy className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
@@ -209,14 +144,14 @@ export default function AchievementsPage() {
                 {isLoading ? '...' : completedCount}
               </div>
               <p className="text-xs text-muted-foreground">
-                / {displayAchievements.length} tổng cộng
+                {t('summary.outOfTotal', { total: displayAchievements.length })}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Điểm Kinh Nghiệm</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('summary.experiencePoints')}</CardTitle>
               <Star className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
@@ -224,24 +159,27 @@ export default function AchievementsPage() {
                 {isLoading ? '...' : (userExperience?.total_experience || totalXP).toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">
-                XP tích lũy
+                {t('summary.accumulatedXP')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Cấp Độ Hiện Tại</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('summary.currentLevel')}</CardTitle>
               <Award className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {isLoading ? '...' : `Level ${userExperience?.current_level || Math.floor(totalXP / 500) + 1}`}
+                {isLoading ? '...' : t('summary.level', { level: userExperience?.current_level || Math.floor(totalXP / 500) + 1 })}
               </div>
               <p className="text-xs text-muted-foreground">
                 {userExperience?.experience_to_next_level 
-                  ? `Còn ${userExperience.experience_to_next_level} XP để lên cấp ${userExperience.current_level + 1}`
-                  : 'Nhà đầu tư có kinh nghiệm'}
+                  ? t('summary.nextLevelProgress', { 
+                      xp: userExperience.experience_to_next_level, 
+                      nextLevel: userExperience.current_level + 1 
+                    })
+                  : t('summary.experiencedInvestor')}
               </p>
             </CardContent>
           </Card>
@@ -289,8 +227,8 @@ export default function AchievementsPage() {
                 {achievement.status === 'in_progress' && (
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
-                      <span>Tiến độ</span>
-                      <span>{(achievement as any).current || 0}/{(achievement as any).target || 0}</span>
+                      <span>{t('achievement.progress')}</span>
+                      <span>{achievement.current || 0}/{achievement.target || 0}</span>
                     </div>
                     <Progress value={achievement.progress} className="h-2" />
                   </div>
@@ -298,17 +236,19 @@ export default function AchievementsPage() {
                 
                 {achievement.status === 'completed' && (
                   <p className="text-xs text-green-600">
-                    Hoàn thành vào {new Date(achievement.completedAt || '').toLocaleDateString('vi-VN')}
+                    {t('achievement.completedOn', { 
+                      date: new Date(achievement.completedAt || '').toLocaleDateString()
+                    })}
                   </p>
                 )}
                 
                 <div className="flex justify-between items-center pt-2">
                   <span className="text-xs text-muted-foreground">
-                    +{achievement.xp} XP
+                    {t('achievement.xpReward', { xp: achievement.xp })}
                   </span>
                   {achievement.status === 'locked' && (
                     <span className="text-xs text-muted-foreground">
-                      Chưa mở khóa
+                      {t('achievement.locked')}
                     </span>
                   )}
                 </div>
@@ -320,24 +260,28 @@ export default function AchievementsPage() {
         {/* Progress Section */}
         <Card>
           <CardHeader>
-            <CardTitle>Tiến Độ Tổng Quan</CardTitle>
+            <CardTitle>{t('progress.title')}</CardTitle>
             <CardDescription>
-              Xem tiến độ hoàn thành thành tích của bạn
+              {t('progress.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-sm font-medium">Hoàn thành thành tích</span>
+                <span className="text-sm font-medium">{t('progress.completedAchievements')}</span>
                 <span className="text-sm text-muted-foreground">
-                  {completedCount}/{achievements.length} ({Math.round(completedCount / achievements.length * 100)}%)
+                  {t('progress.completionRate', { 
+                    completed: completedCount, 
+                    total: displayAchievements.length, 
+                    percentage: Math.round(completedCount / Math.max(displayAchievements.length, 1) * 100)
+                  })}
                 </span>
               </div>
-              <Progress value={completedCount / achievements.length * 100} className="h-2" />
+              <Progress value={completedCount / Math.max(displayAchievements.length, 1) * 100} className="h-2" />
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
                 {categories.slice(1).map((category) => {
-                  const categoryAchievements = achievements.filter(a => a.category === category.value)
+                  const categoryAchievements = displayAchievements.filter(a => a.category === category.value)
                   const categoryCompleted = categoryAchievements.filter(a => a.status === 'completed').length
                   const categoryProgress = categoryAchievements.length > 0 ? categoryCompleted / categoryAchievements.length * 100 : 0
                   

@@ -898,7 +898,15 @@
       "view": "Xem",
       "edit": "Chỉnh sửa",
       "delete": "Xóa"
-    }
+    },
+    "deleteDialog": {
+      "title": "Xóa kế hoạch",
+      "description": "Bạn có chắc chắn muốn xóa '{planName}'? Hành động này không thể hoàn tác.",
+      "cancel": "Hủy",
+      "confirm": "Xóa"
+    },
+    "deleteSuccess": "Kế hoạch đã được xóa thành công",
+    "deleteError": "Không thể xóa kế hoạch"
   },
   "SharePlanDialog": {
     "title": "Chia sẻ kế hoạch",
