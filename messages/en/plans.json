@@ -831,6 +831,11 @@
     "loading": "Loading..."
   },
   "EditPlanForm": {
+    "header": {
+      "title": "Edit Financial Plan",
+      "description": "Update your financial plan details",
+      "backButton": "Back to Plan"
+    },
     "tabs": {
       "basic": "Basic",
       "financial": "Financial",

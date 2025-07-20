@@ -1035,6 +1035,11 @@
     "loading": "Đang tải..."
   },
   "EditPlanForm": {
+    "header": {
+      "title": "Chỉnh sửa kế hoạch tài chính",
+      "description": "Cập nhật thông tin chi tiết kế hoạch tài chính của bạn",
+      "backButton": "Quay lại kế hoạch"
+    },
     "tabs": {
       "basic": "Cơ bản",
       "financial": "Tài chính",
