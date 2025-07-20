@@ -59,6 +59,24 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       )
     }
 
+    // Create status history entry first
+    const { error: historyError } = await supabase
+      .from('plan_status_history')
+      .insert({
+        plan_id: planId,
+        status: status,
+        changed_by: user.id,
+        note: `Status changed from ${plan.status} to ${status}`
+      })
+
+    if (historyError) {
+      console.error('Failed to create status history:', historyError)
+      return NextResponse.json(
+        { error: 'Failed to record status change history' },
+        { status: 500 }
+      )
+    }
+
     // Update plan status
     const updateData: any = {
       status,
