@@ -233,6 +233,19 @@
   "CreatePlanForm": {
     "title": "Create Financial Plan",
     "description": "Create a financial plan for your real estate",
+    "progress": {
+      "completion": "Form Completion",
+      "description": "Complete all required fields to create your plan"
+    },
+    "navigation": {
+      "next": "Next",
+      "previous": "Previous"
+    },
+    "submission": {
+      "requiredFieldsMessage": "Please complete all required sections before submitting:",
+      "completeBasicTab": "Complete Basic Information tab",
+      "completeFinancialTab": "Complete Financial Information tab"
+    },
     "propertyInfo": {
       "title": "Selected property information",
       "from": "From Property Search",
@@ -343,7 +356,120 @@
       "success": "Plan created successfully!",
       "error": "An error occurred",
       "propertyLoaded": "Property information loaded successfully!",
-      "propertyLoadError": "Failed to load property information"
+      "propertyLoadError": "Failed to load property information",
+      "draftRestored": "Draft restored from auto-save",
+      "draftCleared": "Draft cleared"
+    },
+    "autoSave": {
+      "savedJustNow": "Saved just now",
+      "savedMinutesAgo": "Saved {minutes} minute{plural} ago",
+      "savedHoursAgo": "Saved {hours} hour{plural} ago",
+      "savedOn": "Saved {date}",
+      "clearDraft": "Clear Draft"
+    },
+    "enhancedInput": {
+      "suggestions": "Suggestions:",
+      "quickAdjustments": {
+        "half": "÷2",
+        "decrease20": "-20%",
+        "increase20": "+20%",
+        "double": "×2"
+      },
+      "marketInfo": {
+        "average": "Avg: {amount}",
+        "range": "Range: {min} - {max}",
+        "trend": {
+          "up": "Rising",
+          "down": "Falling",
+          "stable": "Stable"
+        }
+      },
+      "validation": {
+        "excellent": "Excellent",
+        "good": "Good", 
+        "warning": "Needs attention",
+        "error": "Please fix"
+      }
+    },
+    "financialPreview": {
+      "title": "Financial Preview",
+      "emptyState": "Enter purchase price, down payment, and income to see analysis",
+      "affordabilityAnalysis": {
+        "title": "Affordability Analysis",
+        "score": {
+          "excellent": "Excellent",
+          "good": "Good",
+          "acceptable": "Acceptable", 
+          "risky": "Risky",
+          "unaffordable": "Unaffordable"
+        },
+        "debtToIncomeRatio": "Debt-to-Income: {ratio}%",
+        "monthlyLeftover": "Monthly leftover",
+        "safeLimit": "Safe limit: 30%"
+      },
+      "loanSummary": {
+        "title": "Loan Summary",
+        "loanAmount": "Loan Amount",
+        "interestRate": "Interest Rate", 
+        "monthlyPayment": "Monthly Payment",
+        "loanTerm": "Loan Term",
+        "years": "years",
+        "totalInterest": "Total Interest"
+      },
+      "upfrontInvestment": {
+        "title": "Upfront Investment",
+        "downPayment": "Down Payment",
+        "additionalCosts": "Additional Costs",
+        "totalRequired": "Total Required",
+        "availableSavings": "Available Savings",
+        "remainingAfterPurchase": "Remaining After Purchase"
+      },
+      "financialHealth": {
+        "title": "Financial Health",
+        "emergencyFund": "Emergency Fund",
+        "months": "months",
+        "savingsRate": "Savings Rate"
+      },
+      "investmentReturns": {
+        "title": "Investment Returns",
+        "annualCashFlow": "Annual Cash Flow",
+        "projectedROI": "Projected ROI", 
+        "capitalGains": "Capital Gains",
+        "totalReturn": "Total Return"
+      },
+      "recommendations": {
+        "excellentPosition": "Excellent financial position for this purchase",
+        "considerInvesting": "Consider investing surplus income for better returns",
+        "goodPosition": "Good financial position with manageable payments",
+        "maintainEmergencyFund": "Maintain emergency fund of 3-6 months expenses",
+        "acceptableBudget": "Acceptable but tight budget - monitor expenses carefully",
+        "considerIncreasing": "Consider increasing income or reducing other debts",
+        "highDebtRatio": "High debt-to-income ratio - consider lower purchase price",
+        "banksRequireDocumentation": "Banks may require additional documentation or higher down payment",
+        "exceedsSafeLimits": "This purchase exceeds safe borrowing limits",
+        "maximumRecommended": "Maximum recommended price: {amount}",
+        "littleBuffer": "Very little buffer for unexpected expenses",
+        "buildEmergencyFund": "Build emergency fund before purchase"
+      }
+    },
+    "smartSuggestions": {
+      "downPayment": {
+        "consider20Percent": "Consider 20% ({amount}) to avoid PMI",
+        "highDownPayment": "High down payment - consider investment opportunities for excess cash",
+        "currentPercentage": "Current: {percentage}% of purchase price"
+      },
+      "additionalCosts": {
+        "typicalRange": "Typical range: 5-10% of purchase price", 
+        "recommended": "Recommended: {amount}"
+      },
+      "expectedRentalIncome": {
+        "marketAverage": "Market average: {amount}/month",
+        "grossYield": "Gross yield: 5-8% annually typical in major cities"
+      },
+      "monthlyExpenses": {
+        "recommended": "Recommended: 40-60% of income",
+        "target": "Target: {amount}/month"
+      }
     }
   },
   "FinancialPlanningWizard": {

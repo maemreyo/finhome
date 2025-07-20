@@ -437,6 +437,19 @@
   "CreatePlanForm": {
     "title": "Tạo Kế Hoạch Tài Chính",
     "description": "Tạo kế hoạch tài chính cho bất động sản của bạn",
+    "progress": {
+      "completion": "Tiến độ hoàn thành",
+      "description": "Hoàn thành tất cả các trường bắt buộc để tạo kế hoạch"
+    },
+    "navigation": {
+      "next": "Tiếp theo",
+      "previous": "Trước"
+    },
+    "submission": {
+      "requiredFieldsMessage": "Vui lòng hoàn thành tất cả các phần bắt buộc trước khi gửi:",
+      "completeBasicTab": "Hoàn thành tab Thông tin cơ bản",
+      "completeFinancialTab": "Hoàn thành tab Thông tin tài chính"
+    },
     "propertyInfo": {
       "title": "Thông tin bất động sản đã chọn",
       "from": "Từ Tìm Kiếm Bất Động Sản",
@@ -547,7 +560,120 @@
       "success": "Kế hoạch đã được tạo thành công!",
       "error": "Có lỗi xảy ra",
       "propertyLoaded": "Thông tin bất động sản đã được tải thành công!",
-      "propertyLoadError": "Không thể tải thông tin bất động sản"
+      "propertyLoadError": "Không thể tải thông tin bất động sản",
+      "draftRestored": "Bản nháp đã được khôi phục từ tự động lưu",
+      "draftCleared": "Bản nháp đã được xóa"
+    },
+    "autoSave": {
+      "savedJustNow": "Vừa lưu xong",
+      "savedMinutesAgo": "Đã lưu {minutes} phút trước",
+      "savedHoursAgo": "Đã lưu {hours} giờ trước", 
+      "savedOn": "Đã lưu {date}",
+      "clearDraft": "Xóa bản nháp"
+    },
+    "enhancedInput": {
+      "suggestions": "Gợi ý:",
+      "quickAdjustments": {
+        "half": "÷2",
+        "decrease20": "-20%",
+        "increase20": "+20%",
+        "double": "×2"
+      },
+      "marketInfo": {
+        "average": "TB: {amount}",
+        "range": "Khoảng: {min} - {max}",
+        "trend": {
+          "up": "Tăng",
+          "down": "Giảm",
+          "stable": "Ổn định"
+        }
+      },
+      "validation": {
+        "excellent": "Xuất sắc",
+        "good": "Tốt",
+        "warning": "Cần chú ý",
+        "error": "Cần sửa"
+      }
+    },
+    "financialPreview": {
+      "title": "Xem trước tài chính",
+      "emptyState": "Nhập giá mua, vốn tự có và thu nhập để xem phân tích",
+      "affordabilityAnalysis": {
+        "title": "Phân tích khả năng chi trả",
+        "score": {
+          "excellent": "Xuất sắc",
+          "good": "Tốt",
+          "acceptable": "Chấp nhận được",
+          "risky": "Rủi ro",
+          "unaffordable": "Không khả thi"
+        },
+        "debtToIncomeRatio": "Tỷ lệ nợ/thu nhập: {ratio}%",
+        "monthlyLeftover": "Tiền dư hàng tháng",
+        "safeLimit": "Giới hạn an toàn: 30%"
+      },
+      "loanSummary": {
+        "title": "Tóm tắt khoản vay",
+        "loanAmount": "Số tiền vay",
+        "interestRate": "Lãi suất",
+        "monthlyPayment": "Trả góp hàng tháng",
+        "loanTerm": "Thời hạn vay",
+        "years": "năm",
+        "totalInterest": "Tổng lãi suất"
+      },
+      "upfrontInvestment": {
+        "title": "Đầu tư ban đầu",
+        "downPayment": "Vốn tự có",
+        "additionalCosts": "Chi phí phát sinh",
+        "totalRequired": "Tổng cần thiết",
+        "availableSavings": "Tiết kiệm hiện có",
+        "remainingAfterPurchase": "Còn lại sau mua"
+      },
+      "financialHealth": {
+        "title": "Sức khỏe tài chính",
+        "emergencyFund": "Quỹ dự phòng",
+        "months": "tháng",
+        "savingsRate": "Tỷ lệ tiết kiệm"
+      },
+      "investmentReturns": {
+        "title": "Lợi nhuận đầu tư",
+        "annualCashFlow": "Dòng tiền hàng năm",
+        "projectedROI": "ROI dự kiến",
+        "capitalGains": "Lãi vốn",
+        "totalReturn": "Tổng lợi nhuận"
+      },
+      "recommendations": {
+        "excellentPosition": "Tình hình tài chính xuất sắc cho việc mua này",
+        "considerInvesting": "Cân nhắc đầu tư số tiền thừa để có lợi nhuận tốt hơn",
+        "goodPosition": "Tình hình tài chính tốt với khả năng thanh toán hợp lý",
+        "maintainEmergencyFund": "Duy trì quỹ dự phòng 3-6 tháng chi phí",
+        "acceptableBudget": "Ngân sách chấp nhận được nhưng hạn hẹp - theo dõi chi phí cẩn thận",
+        "considerIncreasing": "Cân nhắc tăng thu nhập hoặc giảm các khoản nợ khác",
+        "highDebtRatio": "Tỷ lệ nợ/thu nhập cao - cân nhắc giá mua thấp hơn",
+        "banksRequireDocumentation": "Ngân hàng có thể yêu cầu thêm giấy tờ hoặc vốn tự có cao hơn",
+        "exceedsSafeLimits": "Việc mua này vượt quá giới hạn vay an toàn",
+        "maximumRecommended": "Giá tối đa khuyến nghị: {amount}",
+        "littleBuffer": "Rất ít dự phòng cho chi phí bất ngờ",
+        "buildEmergencyFund": "Xây dựng quỹ dự phòng trước khi mua"
+      }
+    },
+    "smartSuggestions": {
+      "downPayment": {
+        "consider20Percent": "Cân nhắc 20% ({amount}) để tránh PMI",
+        "highDownPayment": "Vốn tự có cao - cân nhắc cơ hội đầu tư cho tiền thừa",
+        "currentPercentage": "Hiện tại: {percentage}% giá mua"
+      },
+      "additionalCosts": {
+        "typicalRange": "Khoảng thông thường: 5-10% giá mua",
+        "recommended": "Khuyến nghị: {amount}"
+      },
+      "expectedRentalIncome": {
+        "marketAverage": "Trung bình thị trường: {amount}/tháng",
+        "grossYield": "Lợi suất gộp: 5-8% hàng năm điển hình ở các thành phố lớn"
+      },
+      "monthlyExpenses": {
+        "recommended": "Khuyến nghị: 40-60% thu nhập",
+        "target": "Mục tiêu: {amount}/tháng"
+      }
     }
   },
   "FinancialPlanningWizard": {
