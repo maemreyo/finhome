@@ -1480,6 +1480,53 @@ export interface Database {
           }
         ]
       }
+      plan_shares: {
+        Row: {
+          id: string
+          plan_id: string
+          shared_by: string
+          shared_with: string[]
+          share_method: string
+          share_url: string
+          personal_message: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          plan_id: string
+          shared_by: string
+          shared_with: string[]
+          share_method?: string
+          share_url: string
+          personal_message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          plan_id?: string
+          shared_by?: string
+          shared_with?: string[]
+          share_method?: string
+          share_url?: string
+          personal_message?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_shares_plan_id_fkey"
+            columns: ["plan_id"]
+            referencedRelation: "financial_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_shares_shared_by_fkey"
+            columns: ["shared_by"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       user_favorites: {
         Row: {
           id: string
@@ -1633,6 +1680,7 @@ export type MarketInsight = Database['public']['Tables']['market_insights']['Row
 export type UserExperience = Database['public']['Tables']['user_experience']['Row']
 export type PlanMilestone = Database['public']['Tables']['plan_milestones']['Row']
 export type PlanStatusHistory = Database['public']['Tables']['plan_status_history']['Row']
+export type PlanShare = Database['public']['Tables']['plan_shares']['Row']
 export type UserFavorite = Database['public']['Tables']['user_favorites']['Row']
 
 // Enum types
@@ -1655,4 +1703,6 @@ export type NotificationInsert = Database['public']['Tables']['notifications']['
 export type PlanMilestoneInsert = Database['public']['Tables']['plan_milestones']['Insert']
 export type PlanMilestoneUpdate = Database['public']['Tables']['plan_milestones']['Update']
 export type PlanStatusHistoryInsert = Database['public']['Tables']['plan_status_history']['Insert']
+export type PlanShareInsert = Database['public']['Tables']['plan_shares']['Insert']
+export type PlanShareUpdate = Database['public']['Tables']['plan_shares']['Update']
 export type UserFavoriteInsert = Database['public']['Tables']['user_favorites']['Insert']

@@ -30,9 +30,20 @@ export const AdminHeader: React.FC = () => {
     window.location.reload()
   }
 
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    console.log('Logout clicked')
+  const handleLogout = async () => {
+    try {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      
+      await supabase.auth.signOut()
+      
+      // Redirect to login page
+      window.location.href = '/auth/login'
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Fallback: force redirect even if logout fails
+      window.location.href = '/auth/login'
+    }
   }
 
   return (

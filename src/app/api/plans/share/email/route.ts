@@ -78,28 +78,51 @@ export async function POST(request: NextRequest) {
       <p><small>This plan was shared via FinHome - Your Financial Planning Platform</small></p>
     `
 
-    // TODO: Implement actual email sending
-    // For now, we'll simulate success
+    // Save share activity to database
+    const { data: shareRecord, error: shareError } = await supabase
+      .from('plan_shares')
+      .insert({
+        plan_id: planId,
+        shared_by: user.id,
+        shared_with: recipients,
+        share_method: 'email',
+        share_url: shareUrl,
+        personal_message: message
+      })
+      .select()
+      .single()
+
+    if (shareError) {
+      console.error('Error saving share record:', shareError)
+      return NextResponse.json({ error: 'Failed to save share record' }, { status: 500 })
+    }
+
+    // TODO: Implement actual email sending service integration
+    // For production, integrate with SendGrid, Resend, or similar service
+    // Example with Resend:
+    // const resend = new Resend(process.env.RESEND_API_KEY)
+    // const emailResults = await Promise.all(
+    //   recipients.map(async (email) => {
+    //     try {
+    //       const result = await resend.emails.send({
+    //         from: 'FinHome <noreply@finhome.app>',
+    //         to: email,
+    //         subject: `${userProfile?.full_name || 'Someone'} shared a financial plan with you`,
+    //         html: emailTemplate
+    //       })
+    //       return { email, status: 'sent', messageId: result.id }
+    //     } catch (error) {
+    //       return { email, status: 'failed', error: error.message }
+    //     }
+    //   })
+    // )
+
+    // For now, simulate email sending
     const emailResults = recipients.map(email => ({
       email,
       status: 'sent',
       messageId: `mock-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     }))
-
-    // Log share activity (optional - for analytics)
-    // TODO: Add plan_shares table to database schema
-    // await supabase
-    //   .from('plan_shares')
-    //   .insert({
-    //     plan_id: planId,
-    //     shared_by: user.id,
-    //     shared_with: recipients,
-    //     share_method: 'email',
-    //     share_url: shareUrl,
-    //     personal_message: message,
-    //     created_at: new Date().toISOString()
-    //   })
-      // .select()
 
     return NextResponse.json({ 
       success: true,

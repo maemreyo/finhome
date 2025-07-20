@@ -109,7 +109,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
               previousStatus: index < progressData.statusHistory.length - 1 ? 
                 progressData.statusHistory[index + 1].status as PlanStatus : 'draft',
               newStatus: h.status as PlanStatus,
-              changedBy: 'User', // TODO: Add user tracking to database
+              changedBy: h.changed_by || 'System',
               changedAt: new Date(h.created_at),
               reason: h.note || 'Status updated',
               notes: h.note || ''
@@ -151,7 +151,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
                 id: 'status-initial',
                 previousStatus: 'draft',
                 newStatus: plan.planStatus,
-                changedBy: 'User',
+                changedBy: 'System',
                 changedAt: plan.createdAt,
                 reason: 'Plan created',
                 notes: ''
@@ -226,7 +226,7 @@ const PlanProgressDashboard: React.FC<PlanProgressDashboardProps> = ({
         id: `status-${Date.now()}`,
         previousStatus: statusInfo.status,
         newStatus,
-        changedBy: 'User',
+        changedBy: 'Current User',
         changedAt: new Date(),
         reason,
         notes
