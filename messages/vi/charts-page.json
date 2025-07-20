@@ -1,0 +1,90 @@
+{
+  "ChartsPage": {
+    "title": "Biểu Đồ & Phân Tích Tài Chính",
+    "description": "Khám phá trực quan hóa dữ liệu tài chính toàn diện và công cụ phân tích đầu tư",
+    "badges": {
+      "trendAnalysis": "Phân Tích Xu Hướng",
+      "portfolioAllocation": "Phân Bổ Danh Mục",
+      "roiCalculation": "Tính Toán ROI", 
+      "realTimeInteraction": "Tương Tác Thời Gian Thực"
+    },
+    "tabs": {
+      "loanAnalysis": "Phân Tích Khoản Vay",
+      "portfolio": "Danh Mục Đầu Tư",
+      "roiComparison": "So Sánh ROI"
+    },
+    "actions": {
+      "interact": "Tương Tác"
+    },
+    "loan": {
+      "title": "Phân Tích Bảng Trả Nợ",
+      "description": "Trực quan hóa lịch thanh toán, phân tích lãi suất và gốc, và tổng chi phí vay theo thời gian.",
+      "interactionType": "Phân Tích Khoản Vay"
+    },
+    "portfolio": {
+      "title": "Hiệu Suất Danh Mục Đầu Tư",
+      "description": "Theo dõi giá trị danh mục, thu nhập cho thuê và hiệu suất bất động sản trong các khoản đầu tư của bạn.",
+      "interactionType": "Phân Tích Danh Mục",
+      "properties": {
+        "apartment": "Căn Hộ Cao Cấp",
+        "townhouse": "Nhà Phố Hiện Đại",
+        "villa": "Biệt Thự Hạng Sang"
+      },
+      "locations": {
+        "district1": "Quận 1, TP. Hồ Chí Minh",
+        "district2": "Quận 2, TP. Hồ Chí Minh", 
+        "diamond": "Đảo Kim Cương, Quận 2"
+      }
+    },
+    "roi": {
+      "title": "Phân Tích So Sánh ROI",
+      "description": "So sánh lợi nhuận đầu tư giữa các loại tài sản và chiến lược đầu tư khác nhau.",
+      "interactionType": "Phân Tích ROI",
+      "scenarios": {
+        "property": {
+          "name": "Bất Động Sản TP.HCM",
+          "description": "Đầu tư bất động sản cho thuê tại vị trí đắc địa"
+        },
+        "stocks": {
+          "name": "Quỹ Chỉ Số VN30",
+          "description": "Đầu tư đa dạng vào thị trường chứng khoán Việt Nam"
+        },
+        "bonds": {
+          "name": "Trái Phiếu Chính Phủ",
+          "description": "Chứng khoán được đảm bảo bởi chính phủ"
+        },
+        "savings": {
+          "name": "Tiền Gửi Có Kỳ Hạn",
+          "description": "Tài khoản tiết kiệm lãi suất cố định bảo thủ"
+        }
+      }
+    },
+    "interactions": {
+      "demo": "Tương Tác Demo",
+      "demoMessage": "Đã phân tích dữ liệu và xu hướng biểu đồ {type}"
+    },
+    "notifications": {
+      "chartViewed": "Đã Xem Biểu Đồ",
+      "chartAnalyzed": "Đã phân tích thành công dữ liệu {type} và tạo insights"
+    },
+    "benefits": {
+      "title": "Lợi Ích Tích Hợp",
+      "trendAnalysis": {
+        "title": "Phân Tích Xu Hướng",
+        "description": "Xác định các mẫu và xu hướng trong dữ liệu tài chính để đưa ra quyết định sáng suốt"
+      },
+      "dataVisualization": {
+        "title": "Trực Quan Hóa Dữ Liệu",
+        "description": "Chuyển đổi dữ liệu tài chính phức tạp thành những insight trực quan rõ ràng, khả thi"
+      },
+      "accurateCalculation": {
+        "title": "Tính Toán Chính Xác",
+        "description": "Mô hình tài chính và tính toán chính xác cho kế hoạch đáng tin cậy"
+      },
+      "realTimeInteraction": {
+        "title": "Tương Tác Thời Gian Thực",
+        "description": "Biểu đồ tương tác phản hồi với đầu vào và kịch bản của bạn ngay lập tức"
+      }
+    }
+  }
+}

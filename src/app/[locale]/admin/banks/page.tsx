@@ -4,10 +4,9 @@
 import React from 'react'
 import { getTranslations } from 'next-intl/server'
 import { BankManagementTableConnected } from '@/components/admin/BankManagementTableConnected'
+import { AdminPageActions } from '@/components/admin/AdminPageActions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Building2, Plus, Download, Upload } from 'lucide-react'
+import { Building2 } from 'lucide-react'
 import { requireAdmin } from '@/lib/supabase/admin'
 import { AdminQueries } from '@/lib/supabase/admin-queries'
 
@@ -40,23 +39,10 @@ export default async function BanksPage({ params }: BanksPageProps) {
             {t('description')}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-            {initialBanks.filter(bank => bank.is_active).length} {t('activeBanks')}
-          </Badge>
-          <Button variant="outline" size="sm">
-            <Download className="w-4 h-4 mr-2" />
-            {t('export')}
-          </Button>
-          <Button variant="outline" size="sm">
-            <Upload className="w-4 h-4 mr-2" />
-            {t('import')}
-          </Button>
-          <Button size="sm">
-            <Plus className="w-4 h-4 mr-2" />
-            {t('addBank')}
-          </Button>
-        </div>
+        <AdminPageActions
+          entityType="banks"
+          totalCount={initialBanks.length}
+        />
       </div>
 
       {/* Bank Management Table */}

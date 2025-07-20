@@ -1,0 +1,90 @@
+{
+  "ChartsPage": {
+    "title": "Financial Charts & Analytics",
+    "description": "Explore comprehensive financial data visualizations and investment analysis tools",
+    "badges": {
+      "trendAnalysis": "Trend Analysis",
+      "portfolioAllocation": "Portfolio Allocation", 
+      "roiCalculation": "ROI Calculation",
+      "realTimeInteraction": "Real-time Interaction"
+    },
+    "tabs": {
+      "loanAnalysis": "Loan Analysis",
+      "portfolio": "Portfolio",
+      "roiComparison": "ROI Comparison"
+    },
+    "actions": {
+      "interact": "Interact"
+    },
+    "loan": {
+      "title": "Loan Amortization Analysis",
+      "description": "Visualize payment schedules, interest vs principal breakdown, and total loan costs over time.",
+      "interactionType": "Loan Analysis"
+    },
+    "portfolio": {
+      "title": "Portfolio Performance",
+      "description": "Track portfolio value, rental income, and property performance across your real estate investments.",
+      "interactionType": "Portfolio Analysis",
+      "properties": {
+        "apartment": "Luxury Apartment",
+        "townhouse": "Modern Townhouse", 
+        "villa": "Executive Villa"
+      },
+      "locations": {
+        "district1": "District 1, Ho Chi Minh City",
+        "district2": "District 2, Ho Chi Minh City",
+        "diamond": "Diamond Island, District 2"
+      }
+    },
+    "roi": {
+      "title": "ROI Comparison Analysis",
+      "description": "Compare return on investment across different asset classes and investment strategies.",
+      "interactionType": "ROI Analysis",
+      "scenarios": {
+        "property": {
+          "name": "Ho Chi Minh Real Estate",
+          "description": "Rental property investment in prime location"
+        },
+        "stocks": {
+          "name": "VN30 Index Fund",
+          "description": "Diversified Vietnamese stock market exposure"
+        },
+        "bonds": {
+          "name": "Government Bonds",
+          "description": "Stable government-backed securities"
+        },
+        "savings": {
+          "name": "Bank Term Deposit",
+          "description": "Conservative fixed-rate savings account"
+        }
+      }
+    },
+    "interactions": {
+      "demo": "Demo Interaction",
+      "demoMessage": "Analyzed {type} chart data and trends"
+    },
+    "notifications": {
+      "chartViewed": "Chart Viewed",
+      "chartAnalyzed": "Successfully analyzed {type} data and generated insights"
+    },
+    "benefits": {
+      "title": "Integration Benefits",
+      "trendAnalysis": {
+        "title": "Trend Analysis",
+        "description": "Identify patterns and trends in your financial data to make informed decisions"
+      },
+      "dataVisualization": {
+        "title": "Data Visualization", 
+        "description": "Transform complex financial data into clear, actionable visual insights"
+      },
+      "accurateCalculation": {
+        "title": "Accurate Calculations",
+        "description": "Precise financial modeling and calculations for reliable planning"
+      },
+      "realTimeInteraction": {
+        "title": "Real-time Interaction",
+        "description": "Interactive charts that respond to your inputs and scenarios instantly"
+      }
+    }
+  }
+}

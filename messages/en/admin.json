@@ -24,10 +24,16 @@
       "title": "Bank Management",
       "description": "Manage Vietnamese banks and their loan products",
       "activeBanks": "Active Banks",
+      "totalBanks": "Total Banks",
       "allBanks": "All Banks",
       "export": "Export",
       "import": "Import",
-      "addBank": "Add Bank"
+      "addBank": "Add Bank",
+      "exporting": "Exporting...",
+      "exportSuccess": "Data exported successfully",
+      "exportError": "Failed to export data",
+      "importSuccess": "Data imported successfully",
+      "importError": "Failed to import data"
     },
     "rates": {
       "title": "Interest Rate Management",
@@ -36,25 +42,42 @@
       "allRates": "All Rates",
       "export": "Export",
       "import": "Import",
-      "addRate": "Add Rate"
+      "addRate": "Add Rate",
+      "exporting": "Exporting...",
+      "exportSuccess": "Rates exported successfully",
+      "exportError": "Failed to export rates",
+      "importSuccess": "Rates imported successfully",
+      "importError": "Failed to import rates"
     },
     "achievements": {
       "title": "Achievement Management",
       "description": "Manage user achievements and milestones",
       "activeAchievements": "Active Achievements",
+      "totalAchievements": "Total Achievements",
       "allAchievements": "All Achievements",
       "export": "Export",
       "import": "Import",
-      "addAchievement": "Add Achievement"
+      "addAchievement": "Add Achievement",
+      "exporting": "Exporting...",
+      "exportSuccess": "Achievements exported successfully",
+      "exportError": "Failed to export achievements",
+      "importSuccess": "Achievements imported successfully",
+      "importError": "Failed to import achievements"
     },
     "notifications": {
       "title": "Notification Management",
       "description": "Manage system notifications and announcements",
       "activeNotifications": "Active Notifications",
+      "totalNotifications": "Total Notifications",
       "allNotifications": "All Notifications",
       "export": "Export",
       "import": "Import",
-      "addNotification": "Add Notification"
+      "addNotification": "Add Notification",
+      "exporting": "Exporting...",
+      "exportSuccess": "Notifications exported successfully",
+      "exportError": "Failed to export notifications",
+      "importSuccess": "Notifications imported successfully",
+      "importError": "Failed to import notifications"
     },
     "users": {
       "title": "User Management",
@@ -63,7 +86,12 @@
       "allUsers": "All Users",
       "export": "Export",
       "import": "Import",
-      "addUser": "Add User"
+      "addUser": "Add User",
+      "exporting": "Exporting...",
+      "exportSuccess": "Users exported successfully",
+      "exportError": "Failed to export users",
+      "importSuccess": "Users imported successfully",
+      "importError": "Failed to import users"
     },
     "navigation": {
       "dashboard": "Dashboard",

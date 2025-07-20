@@ -1,0 +1,16 @@
+{
+  "AccessDenied": {
+    "title": "Truy Cập Bị Từ Chối",
+    "subtitle": "Bạn không có quyền truy cập bảng điều khiển quản trị",
+    "cardTitle": "Yêu Cầu Quyền Quản Trị Viên",
+    "description": "Bảng điều khiển quản trị chỉ dành cho những quản trị viên được ủy quyền. Nếu bạn cho rằng mình nên có quyền truy cập, vui lòng liên hệ với quản trị viên hệ thống.",
+    "returnHome": "Quay Về FinHome",
+    "requestAccess": "Yêu Cầu Quyền Truy Cập",
+    "securityNote": "Vì lý do bảo mật, tất cả các lần cố gắng truy cập đều được ghi lại.",
+    "contact": {
+      "label": "Liên hệ",
+      "email": "admin@finhome.com",
+      "subject": "Yêu Cầu Quyền Truy Cập Quản Trị"
+    }
+  }
+}

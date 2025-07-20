@@ -5,11 +5,13 @@
 
 import React from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ShieldX, Home, Mail } from 'lucide-react'
 
 export default function AccessDeniedPage() {
+  const t = useTranslations('AccessDenied')
   const router = useRouter()
   const params = useParams()
   const locale = params.locale as string
@@ -22,23 +24,22 @@ export default function AccessDeniedPage() {
             <ShieldX className="w-8 h-8 text-red-600" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Access Denied
+            {t('title')}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            You don&apos;t have permission to access the admin panel
+            {t('subtitle')}
           </p>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-center">
-              Administrator Access Required
+              {t('cardTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600">
-              The admin panel is restricted to authorized administrators only. 
-              If you believe you should have access, please contact the system administrator.
+              {t('description')}
             </p>
 
             <div className="space-y-3">
@@ -47,24 +48,24 @@ export default function AccessDeniedPage() {
                 className="w-full"
               >
                 <Home className="w-4 h-4 mr-2" />
-                Return to FinHome
+                {t('returnHome')}
               </Button>
               
               <Button
                 variant="outline"
-                onClick={() => window.location.href = 'mailto:admin@finhome.com?subject=Admin Access Request'}
+                onClick={() => window.location.href = `mailto:${t('contact.email')}?subject=${t('contact.subject')}`}
                 className="w-full"
               >
                 <Mail className="w-4 h-4 mr-2" />
-                Request Access
+                {t('requestAccess')}
               </Button>
             </div>
 
             <div className="pt-4 border-t">
               <p className="text-xs text-gray-500">
-                For security reasons, all access attempts are logged.
+                {t('securityNote')}
                 <br />
-                Contact: admin@finhome.com
+                {t('contact.label')}: {t('contact.email')}
               </p>
             </div>
           </CardContent>

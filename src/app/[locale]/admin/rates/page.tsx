@@ -4,10 +4,9 @@
 import React from 'react'
 import { getTranslations } from 'next-intl/server'
 import { InterestRateManagementTableConnected } from '@/components/admin/InterestRateManagementTableConnected'
+import { AdminPageActions } from '@/components/admin/AdminPageActions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { TrendingUp, Plus, Download, Upload } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 import { requireAdmin } from '@/lib/supabase/admin'
 import { AdminQueries } from '@/lib/supabase/admin-queries'
 
@@ -40,23 +39,10 @@ export default async function RatesPage({ params }: RatesPageProps) {
             {t('description')}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-            {initialRates.length} {t('currentRates')}
-          </Badge>
-          <Button variant="outline" size="sm">
-            <Download className="w-4 h-4 mr-2" />
-            {t('export')}
-          </Button>
-          <Button variant="outline" size="sm">
-            <Upload className="w-4 h-4 mr-2" />
-            {t('import')}
-          </Button>
-          <Button size="sm">
-            <Plus className="w-4 h-4 mr-2" />
-            {t('addRate')}
-          </Button>
-        </div>
+        <AdminPageActions
+          entityType="rates"
+          totalCount={initialRates.length}
+        />
       </div>
 
       {/* Interest Rate Management Table */}

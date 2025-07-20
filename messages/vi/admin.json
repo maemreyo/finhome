@@ -24,37 +24,61 @@
       "title": "Quản Lý Ngân Hàng",
       "description": "Quản lý các ngân hàng Việt Nam và sản phẩm vay của họ",
       "activeBanks": "Ngân Hàng Hoạt Động",
+      "totalBanks": "Tổng Số Ngân Hàng",
       "allBanks": "Tất Cả Ngân Hàng",
       "export": "Xuất",
       "import": "Nhập",
-      "addBank": "Thêm Ngân Hàng"
+      "addBank": "Thêm Ngân Hàng",
+      "exporting": "Đang xuất...",
+      "exportSuccess": "Dữ liệu đã được xuất thành công",
+      "exportError": "Không thể xuất dữ liệu",
+      "importSuccess": "Dữ liệu đã được nhập thành công",
+      "importError": "Không thể nhập dữ liệu"
     },
     "rates": {
       "title": "Quản Lý Lãi Suất",
       "description": "Quản lý lãi suất ngân hàng và sản phẩm vay",
       "currentRates": "Lãi Suất Hiện Tại",
+      "totalRates": "Tổng Số Lãi Suất",
       "allRates": "Tất Cả Lãi Suất",
       "export": "Xuất",
       "import": "Nhập",
-      "addRate": "Thêm Lãi Suất"
+      "addRate": "Thêm Lãi Suất",
+      "exporting": "Đang xuất...",
+      "exportSuccess": "Lãi suất đã được xuất thành công",
+      "exportError": "Không thể xuất lãi suất",
+      "importSuccess": "Lãi suất đã được nhập thành công",
+      "importError": "Không thể nhập lãi suất"
     },
     "achievements": {
       "title": "Quản Lý Thành Tích",
       "description": "Quản lý thành tích và cột mốc của người dùng",
       "activeAchievements": "Thành Tích Hoạt Động",
+      "totalAchievements": "Tổng Số Thành Tích",
       "allAchievements": "Tất Cả Thành Tích",
       "export": "Xuất",
       "import": "Nhập",
-      "addAchievement": "Thêm Thành Tích"
+      "addAchievement": "Thêm Thành Tích",
+      "exporting": "Đang xuất...",
+      "exportSuccess": "Thành tích đã được xuất thành công",
+      "exportError": "Không thể xuất thành tích",
+      "importSuccess": "Thành tích đã được nhập thành công",
+      "importError": "Không thể nhập thành tích"
     },
     "notifications": {
       "title": "Quản Lý Thông Báo",
       "description": "Quản lý thông báo hệ thống và công bố",
       "activeNotifications": "Thông Báo Hoạt Động",
+      "totalNotifications": "Tổng Số Thông Báo",
       "allNotifications": "Tất Cả Thông Báo",
       "export": "Xuất",
       "import": "Nhập",
-      "addNotification": "Thêm Thông Báo"
+      "addNotification": "Thêm Thông Báo",
+      "exporting": "Đang xuất...",
+      "exportSuccess": "Thông báo đã được xuất thành công",
+      "exportError": "Không thể xuất thông báo",
+      "importSuccess": "Thông báo đã được nhập thành công",
+      "importError": "Không thể nhập thông báo"
     },
     "users": {
       "title": "Quản Lý Người Dùng",
@@ -63,7 +87,12 @@
       "allUsers": "Tất Cả Người Dùng",
       "export": "Xuất",
       "import": "Nhập",
-      "addUser": "Thêm Người Dùng"
+      "addUser": "Thêm Người Dùng",
+      "exporting": "Đang xuất...",
+      "exportSuccess": "Người dùng đã được xuất thành công",
+      "exportError": "Không thể xuất người dùng",
+      "importSuccess": "Người dùng đã được nhập thành công",
+      "importError": "Không thể nhập người dùng"
     },
     "navigation": {
       "dashboard": "Bảng Điều Khiển",

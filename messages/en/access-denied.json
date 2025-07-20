@@ -1,0 +1,16 @@
+{
+  "AccessDenied": {
+    "title": "Access Denied",
+    "subtitle": "You don't have permission to access the admin panel",
+    "cardTitle": "Administrator Access Required",
+    "description": "The admin panel is restricted to authorized administrators only. If you believe you should have access, please contact the system administrator.",
+    "returnHome": "Return to FinHome",
+    "requestAccess": "Request Access",
+    "securityNote": "For security reasons, all access attempts are logged.",
+    "contact": {
+      "label": "Contact",
+      "email": "admin@finhome.com",
+      "subject": "Admin Access Request"
+    }
+  }
+}

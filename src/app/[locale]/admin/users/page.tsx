@@ -4,10 +4,9 @@
 import React from 'react'
 import { getTranslations } from 'next-intl/server'
 import { UserManagementTableConnected } from '@/components/admin/UserManagementTableConnected'
+import { AdminPageActions } from '@/components/admin/AdminPageActions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Users, Plus, Download, Upload } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { requireAdmin } from '@/lib/supabase/admin'
 import { AdminQueries } from '@/lib/supabase/admin-queries'
 
@@ -40,23 +39,10 @@ export default async function UsersPage({ params }: UsersPageProps) {
             {t('description')}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
-            {initialUsers.length} {t('totalUsers')}
-          </Badge>
-          <Button variant="outline" size="sm">
-            <Download className="w-4 h-4 mr-2" />
-            {t('export')}
-          </Button>
-          <Button variant="outline" size="sm">
-            <Upload className="w-4 h-4 mr-2" />
-            {t('import')}
-          </Button>
-          <Button size="sm">
-            <Plus className="w-4 h-4 mr-2" />
-            {t('addUser')}
-          </Button>
-        </div>
+        <AdminPageActions
+          entityType="users"
+          totalCount={initialUsers.length}
+        />
       </div>
 
       {/* User Management Table */}
