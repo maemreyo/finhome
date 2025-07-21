@@ -160,7 +160,12 @@
     
     "feature_upgrade_title": "Tính năng cao cấp",
     "feature_upgrade_message": "Tính năng này yêu cầu đăng ký gói cao cấp.",
-    "feature_upgrade_benefit": "Mở khóa công cụ nâng cao để lập kế hoạch tài chính tốt hơn."
+    "feature_upgrade_benefit": "Mở khóa công cụ nâng cao để lập kế hoạch tài chính tốt hơn.",
+
+    "export_reports_title": "Tạo báo cáo",
+    "export_reports_message": "Bạn đã đạt giới hạn 5 báo cáo xuất khẩu trên gói miễn phí.",
+    "export_reports_limit_message": "Bạn đang sử dụng {current} trong số {limit} báo cáo được phép.",
+    "export_reports_benefit": "Tạo báo cáo tùy chỉnh phù hợp với nhu cầu của bạn."
   },
   "SubscriptionNotifications": {
     "trial_ending_soon": "Thời gian dùng thử của bạn kết thúc trong {days} ngày",

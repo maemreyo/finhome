@@ -181,7 +181,12 @@
     
     "feature_upgrade_title": "Premium Feature",
     "feature_upgrade_message": "This feature requires a premium subscription.",
-    "feature_upgrade_benefit": "Unlock advanced tools for better financial planning."
+    "feature_upgrade_benefit": "Unlock advanced tools for better financial planning.",
+
+    "export_reports_title": "Export Reports",
+    "export_reports_message": "You've reached the limit of exporting reports on the free tier.",
+    "export_reports_limit_message": "You're using {current} of {limit} allowed exports.",
+    "export_reports_benefit": "Generate custom reports tailored to your needs."
   },
   "SubscriptionNotifications": {
     "trial_ending_soon": "Your trial ends in {days} days",
