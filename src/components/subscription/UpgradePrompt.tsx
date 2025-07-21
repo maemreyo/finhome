@@ -82,8 +82,8 @@ export function UpgradePrompt({
         title: tFeatures("unlimited_plans_title"),
         message: isLimitExceeded
           ? tFeatures("unlimited_plans_limit_message", {
-              current: access.currentUsage,
-              limit: access.limit,
+              current: access.currentUsage ?? 0,
+              limit: access.limit ?? 0,
             })
           : tFeatures("unlimited_plans_message"),
         benefit: tFeatures("unlimited_plans_benefit"),
@@ -97,8 +97,8 @@ export function UpgradePrompt({
         title: tFeatures("scenario_comparison_title"),
         message: isLimitExceeded
           ? tFeatures("scenario_comparison_limit_message", {
-              current: access.currentUsage,
-              limit: access.limit,
+              current: access.currentUsage ?? 0,
+              limit: access.limit ?? 0,
             })
           : tFeatures("scenario_comparison_message"),
         benefit: tFeatures("scenario_comparison_benefit"),
@@ -116,7 +116,7 @@ export function UpgradePrompt({
     };
 
     return (
-      messages[key] || {
+      (messages as any)[key] || {
         title: tFeatures("feature_upgrade_title"),
         message: tFeatures("feature_upgrade_message"),
         benefit: tFeatures("feature_upgrade_benefit"),

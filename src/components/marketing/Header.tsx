@@ -16,7 +16,7 @@ export function MarketingHeader() {
 
   const navigation = [
     { name: t('features'), href: '#features' },
-    { name: t('pricing'), href: `/${locale}/pricing` },
+    { name: t('pricing'), href: `/${locale}/subscription` },
     { name: t('about'), href: `/${locale}/about` },
     { name: t('blog'), href: `/${locale}/blog` },
     { name: t('contact'), href: `/${locale}/contact` },

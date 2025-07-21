@@ -9,7 +9,7 @@ export function MarketingFooter() {
   const footerNavigation = {
     product: [
       { name: t('features'), href: '#features' },
-      { name: t('pricing'), href: '/pricing' },
+      { name: t('pricing'), href: '/subscription' },
       { name: t('security'), href: '/security' },
       { name: t('roadmap'), href: '/roadmap' },
     ],

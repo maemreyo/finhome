@@ -1,49 +1,98 @@
-// Create Stripe Customer Portal Session
+// Create Stripe Customer Portal Session - Simplified for debugging
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createCustomerPortalSession } from '@/lib/stripe/config'
 
 export async function POST() {
   try {
+    console.log('Portal session endpoint hit')
+    
     const supabase = await createClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {
+      console.log('Auth failed:', authError)
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    // Get user's Stripe customer ID
+    console.log('Authenticated user:', user.id)
+
+    // Get user's subscription data
     const { data: subscription, error } = await supabase
       .from('subscriptions')
-      .select('stripe_customer_id')
+      .select('id, stripe_customer_id, status, user_id')
       .eq('user_id', user.id)
       .single()
 
-    if (error || !subscription?.stripe_customer_id) {
+    console.log('Subscription data:', { subscription, error })
+
+    if (error || !subscription) {
       return NextResponse.json(
-        { error: 'No subscription found' },
+        { 
+          error: 'No subscription found',
+          debug: { userId: user.id, error: error?.message }
+        },
         { status: 404 }
       )
     }
 
-    // Create customer portal session
-    const portalSession = await createCustomerPortalSession(
-      subscription.stripe_customer_id,
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`
-    )
+    // If no stripe_customer_id, return info for manual setup
+    if (!subscription.stripe_customer_id) {
+      return NextResponse.json(
+        { 
+          error: 'Subscription not linked to Stripe',
+          debug: { 
+            subscriptionId: subscription.id,
+            status: subscription.status,
+            needsStripeCustomer: true
+          }
+        },
+        { status: 400 }
+      )
+    }
 
-    return NextResponse.json({ url: portalSession.url })
+    // Try to create portal session
+    const { createCustomerPortalSession } = await import('@/lib/stripe/config')
+    
+    try {
+      const portalSession = await createCustomerPortalSession(
+        subscription.stripe_customer_id,
+        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`
+      )
+
+      console.log('Portal session created successfully')
+      return NextResponse.json({ url: portalSession.url })
+    } catch (stripeError: any) {
+      // If portal not configured, return helpful message
+      if (stripeError.code === 'invalid_request_error' && stripeError.message?.includes('No configuration provided')) {
+        return NextResponse.json(
+          { 
+            error: 'Customer portal not configured',
+            message: 'The Stripe Customer Portal needs to be configured in the Stripe Dashboard.',
+            action: 'Please configure it at: https://dashboard.stripe.com/test/settings/billing/portal',
+            debug: {
+              stripeCustomerId: subscription.stripe_customer_id,
+              subscriptionStatus: subscription.status
+            }
+          },
+          { status: 503 }
+        )
+      }
+      throw stripeError
+    }
 
   } catch (error) {
-    console.error('Error creating portal session:', error)
+    console.error('Portal session error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        debug: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }

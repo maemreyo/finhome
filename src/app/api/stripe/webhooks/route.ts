@@ -9,7 +9,7 @@ import { SubscriptionService } from '@/lib/services/subscriptionService'
 import { UserSubscriptionTier } from '@/lib/supabase/types'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16'
+  apiVersion: '2025-06-30.basil'
 })
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -115,11 +115,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     stripePriceId: priceId,
     status: subscription.status as any,
     planId: tier,
-    currentPeriodStart: new Date(subscription.current_period_start * 1000),
-    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+    currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+    currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
-    trialStart: subscription.trial_start ? new Date(subscription.trial_start * 1000) : null,
-    trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null
+    trialStart: (subscription as any).trial_start ? new Date((subscription as any).trial_start * 1000) : null,
+    trialEnd: (subscription as any).trial_end ? new Date((subscription as any).trial_end * 1000) : null
   })
 
   await SubscriptionService.trackSubscriptionEvent({
@@ -154,11 +154,11 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     stripePriceId: priceId,
     status: subscription.status as any,
     planId: tier,
-    currentPeriodStart: new Date(subscription.current_period_start * 1000),
-    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+    currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+    currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
-    trialStart: subscription.trial_start ? new Date(subscription.trial_start * 1000) : null,
-    trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null
+    trialStart: (subscription as any).trial_start ? new Date((subscription as any).trial_start * 1000) : null,
+    trialEnd: (subscription as any).trial_end ? new Date((subscription as any).trial_end * 1000) : null
   })
 
   await SubscriptionService.trackSubscriptionEvent({
@@ -185,8 +185,8 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
     stripeSubscriptionId: subscription.id,
     status: 'canceled',
     planId: 'free',
-    currentPeriodStart: new Date(subscription.current_period_start * 1000),
-    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+    currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+    currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
     cancelAtPeriodEnd: true
   })
 
@@ -208,13 +208,13 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
 
   await SubscriptionService.recordBillingEvent({
     userId,
-    stripeInvoiceId: invoice.id,
-    stripePaymentIntentId: invoice.payment_intent as string,
+    stripeInvoiceId: invoice.id || null,
+    stripePaymentIntentId: (invoice as any).payment_intent || null,
     amountPaid: invoice.amount_paid,
     currency: invoice.currency,
     status: invoice.status || 'paid',
-    invoiceUrl: invoice.hosted_invoice_url,
-    invoicePdf: invoice.invoice_pdf,
+    invoiceUrl: invoice.hosted_invoice_url || null,
+    invoicePdf: invoice.invoice_pdf || null,
     billingReason: invoice.billing_reason
   })
 
@@ -236,13 +236,13 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 
   await SubscriptionService.recordBillingEvent({
     userId,
-    stripeInvoiceId: invoice.id,
-    stripePaymentIntentId: invoice.payment_intent as string,
+    stripeInvoiceId: invoice.id || null,
+    stripePaymentIntentId: (invoice as any).payment_intent || null,
     amountPaid: 0,
     currency: invoice.currency,
     status: 'failed',
-    invoiceUrl: invoice.hosted_invoice_url,
-    invoicePdf: invoice.invoice_pdf,
+    invoiceUrl: invoice.hosted_invoice_url || null,
+    invoicePdf: invoice.invoice_pdf || null,
     billingReason: invoice.billing_reason
   })
 

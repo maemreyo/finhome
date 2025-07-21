@@ -13,7 +13,7 @@ import { motion } from 'framer-motion'
 import { useSubscriptionContext } from '@/components/subscription/SubscriptionProvider'
 
 export default function SubscriptionSuccessPage() {
-  const t = useTranslations('subscription')
+  const t = useTranslations('SubscriptionPlans')
   const router = useRouter()
   const searchParams = useSearchParams()
   const { refreshSubscription, currentPlan, tier } = useSubscriptionContext()
@@ -23,13 +23,38 @@ export default function SubscriptionSuccessPage() {
 
   useEffect(() => {
     const initializeSuccess = async () => {
-      // Refresh subscription data
-      await refreshSubscription()
-      setIsLoading(false)
+      if (!sessionId) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        // Verify the Stripe session and ensure subscription is updated
+        const response = await fetch('/api/stripe/verify-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId })
+        })
+
+        if (response.ok) {
+          // Wait a bit for webhook processing, then refresh
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          await refreshSubscription()
+        } else {
+          console.warn('Session verification failed, but continuing with refresh')
+          await refreshSubscription()
+        }
+      } catch (error) {
+        console.error('Error verifying session:', error)
+        // Still refresh subscription in case of errors
+        await refreshSubscription()
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     initializeSuccess()
-  }, [refreshSubscription])
+  }, [refreshSubscription, sessionId])
 
   if (isLoading) {
     return (

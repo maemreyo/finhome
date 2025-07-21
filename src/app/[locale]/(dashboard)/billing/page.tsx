@@ -28,6 +28,7 @@ import { SUBSCRIPTION_PLANS, formatPrice } from '@/config/subscriptionPlans'
 
 export default function BillingPage() {
   const t = useTranslations('BillingPage')
+  const tCommon = useTranslations('SubscriptionCommon')
   const { 
     subscription, 
     currentPlan, 
@@ -39,6 +40,17 @@ export default function BillingPage() {
   
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false)
   const [isCanceling, setIsCanceling] = useState(false)
+
+  // Debug subscription data
+  React.useEffect(() => {
+    console.log('[BillingPage] Subscription data:', {
+      subscription,
+      currentPlan,
+      tier,
+      isInTrial,
+      trialDaysRemaining
+    })
+  }, [subscription, currentPlan, tier, isInTrial, trialDaysRemaining])
 
   // Mock billing data for demonstration
   const mockBillingHistory = [
@@ -71,11 +83,11 @@ export default function BillingPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'paid':
-        return <Badge className="bg-green-100 text-green-800">Đã thanh toán</Badge>
+        return <Badge className="bg-green-100 text-green-800">{t('paid_status')}</Badge>
       case 'failed':
-        return <Badge variant="destructive">Thất bại</Badge>
+        return <Badge variant="destructive">{t('failed_status')}</Badge>
       case 'pending':
-        return <Badge variant="secondary">Đang xử lý</Badge>
+        return <Badge variant="secondary">{t('pending_status')}</Badge>
       default:
         return <Badge variant="outline">{status}</Badge>
     }
@@ -99,7 +111,7 @@ export default function BillingPage() {
     <div className="space-y-6">
       <Header 
         title={t('title')}
-        description="Quản lý thanh toán và lịch sử giao dịch của bạn"
+        description={t('subtitle')}
       />
       
       <div className="container mx-auto px-6 space-y-8">
@@ -148,13 +160,13 @@ export default function BillingPage() {
                     <Alert>
                       <Clock className="h-4 w-4" />
                       <AlertDescription>
-                        Bạn đang trong thời gian dùng thử. Còn <strong>{trialDaysRemaining} ngày</strong> để trải nghiệm miễn phí.
+                        {t('trial_remaining', { days: trialDaysRemaining })}
                       </AlertDescription>
                     </Alert>
                   )}
                 </>
               ) : (
-                <p className="text-gray-600">Không có thông tin gói đăng ký</p>
+                <p className="text-gray-600">{t('no_subscription_info')}</p>
               )}
             </CardContent>
           </Card>
@@ -163,7 +175,7 @@ export default function BillingPage() {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5" />
-                <span>Thông tin thanh toán</span>
+                <span>{t('payment_info')}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -171,18 +183,31 @@ export default function BillingPage() {
                 <>
                   <div className="space-y-3">
                     <div>
-                      <span className="text-gray-600 text-sm">Ngày thanh toán tiếp theo:</span>
-                      <p className="font-semibold">15 tháng 2, 2024</p>
+                      <span className="text-gray-600 text-sm">{t('next_billing')}:</span>
+                      <p className="font-semibold">
+                        {subscription?.currentPeriodEnd 
+                          ? subscription.currentPeriodEnd.toLocaleDateString('vi-VN')
+                          : t('undefined_status')
+                        }
+                      </p>
                     </div>
                     <div>
-                      <span className="text-gray-600 text-sm">Số tiền:</span>
+                      <span className="text-gray-600 text-sm">{t('amount')}:</span>
                       <p className="font-semibold">{currentPlan && formatPrice(currentPlan.price.monthly)}</p>
                     </div>
                     <div>
-                      <span className="text-gray-600 text-sm">Phương thức thanh toán:</span>
+                      <span className="text-gray-600 text-sm">{t('status')}:</span>
+                      <p className="font-semibold capitalize">
+                        {subscription?.status || t('undefined_status')}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 text-sm">{t('payment_method')}:</span>
                       <div className="flex items-center space-x-2 mt-1">
                         <CreditCard className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm">**** **** **** 4242</span>
+                        <span className="text-sm">
+                          {subscription?.stripeCustomerId ? '**** **** **** 4242' : t('no_payment_info')}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -198,7 +223,7 @@ export default function BillingPage() {
                       disabled={isUpdatingPayment}
                     >
                       <Settings className="h-4 w-4 mr-2" />
-                      {isUpdatingPayment ? 'Đang cập nhật...' : 'Cập nhật phương thức thanh toán'}
+                      {isUpdatingPayment ? t('updating') : t('update_payment')}
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -208,15 +233,15 @@ export default function BillingPage() {
                       disabled={isCanceling}
                     >
                       <AlertTriangle className="h-4 w-4 mr-2" />
-                      {isCanceling ? 'Đang hủy...' : 'Hủy đăng ký'}
+                      {isCanceling ? t('canceling') : t('cancel_subscription')}
                     </Button>
                   </div>
                 </>
               ) : (
                 <div className="text-center py-4">
-                  <p className="text-gray-600 mb-4">Bạn đang sử dụng gói miễn phí</p>
+                  <p className="text-gray-600 mb-4">{t('free_plan_message')}</p>
                   <Button onClick={() => window.location.href = '/subscription'}>
-                    Nâng cấp ngay
+                    {t('upgrade_now')}
                   </Button>
                 </div>
               )}
@@ -229,20 +254,20 @@ export default function BillingPage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <FileText className="h-5 w-5" />
-              <span>{t('BillingPage.billing_history')}</span>
+              <span>{t('billing_history')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             {tier === 'free' ? (
               <div className="text-center py-8 text-gray-500">
                 <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Chưa có lịch sử giao dịch nào</p>
-                <p className="text-sm">Nâng cấp để xem lịch sử thanh toán</p>
+                <p>{t('no_transaction_history')}</p>
+                <p className="text-sm">{t('upgrade_to_see_history')}</p>
               </div>
             ) : billingLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-gray-600 mt-4">Đang tải...</p>
+                <p className="text-gray-600 mt-4">{t('loading')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -283,7 +308,7 @@ export default function BillingPage() {
 
                 <div className="text-center pt-4">
                   <Button variant="outline" size="sm">
-                    Xem tất cả giao dịch
+                    {t('view_all_transactions')}
                   </Button>
                 </div>
               </div>
@@ -298,7 +323,7 @@ export default function BillingPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-blue-900 mb-2">
-                    {tier === 'free' ? 'Nâng cấp lên Premium' : 'Nâng cấp lên Professional'}
+                    {tier === 'free' ? `${t('upgrade_now')} lên ${tCommon('premium_tier')}` : `${t('upgrade_now')} lên ${tCommon('professional_tier')}`}
                   </h3>
                   <p className="text-blue-700 text-sm">
                     {tier === 'free' 
@@ -311,7 +336,7 @@ export default function BillingPage() {
                   className="bg-blue-600 hover:bg-blue-700"
                   onClick={() => window.location.href = '/subscription'}
                 >
-                  Nâng cấp ngay
+                  {t('upgrade_now')}
                 </Button>
               </div>
             </CardContent>

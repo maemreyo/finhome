@@ -209,22 +209,24 @@ export class SubscriptionService {
         .single()
 
       if (error) {
-        console.error('[SubscriptionService] Error getting feature usage:', error)
+        console.warn('[SubscriptionService] RPC function error, using fallback:', error)
+        // Fallback: Query feature_usage table directly
+        return await this.getFeatureUsageFallback(userId, featureKey)
+      }
+
+      if (!data || (Array.isArray(data) && data.length === 0) || (Array.isArray(data) ? data[0]?.usage_count : data.usage_count) === 0) {
         return null
       }
 
-      if (!data || data.usage_count === 0) {
-        return null
-      }
-
+      const result = Array.isArray(data) ? data[0] : data
       return {
         userId,
         featureKey,
-        count: data.usage_count,
+        count: result.usage_count,
         period: 'monthly',
-        periodStart: new Date(data.period_start),
-        periodEnd: new Date(data.period_end),
-        lastUsed: new Date(data.last_used)
+        periodStart: new Date(result.period_start),
+        periodEnd: new Date(result.period_end),
+        lastUsed: new Date(result.last_used)
       }
     } catch (error) {
       console.error('[SubscriptionService] Error getting feature usage:', error)
@@ -246,11 +248,14 @@ export class SubscriptionService {
         .single()
 
       if (error) {
-        console.error('[SubscriptionService] Error tracking feature usage:', error)
+        console.warn('[SubscriptionService] RPC function error, using fallback:', error)
+        // Fallback: Insert/update feature_usage table directly
+        await this.trackFeatureUsageFallback(userId, featureKey)
         return
       }
 
-      console.log(`[SubscriptionService] Tracked usage for ${featureKey}: ${data.current_count}`)
+      const result = data ? (Array.isArray(data) && data.length > 0 ? data[0] : (Array.isArray(data) ? null : data)) : null
+      console.log(`[SubscriptionService] Tracked usage for ${featureKey}: ${result?.current_count || 0}`)
       
       // Track analytics event
       await this.trackSubscriptionEvent({
@@ -258,9 +263,9 @@ export class SubscriptionService {
         userId,
         metadata: {
           featureKey,
-          usageCount: data.current_count,
-          periodStart: data.period_start,
-          periodEnd: data.period_end
+          usageCount: result?.current_count || 0,
+          periodStart: result?.period_start,
+          periodEnd: result?.period_end
         },
         timestamp: new Date()
       })
@@ -309,6 +314,10 @@ export class SubscriptionService {
    */
   static async upsertSubscription(subscriptionData: Partial<UserSubscription>): Promise<void> {
     try {
+      if (!subscriptionData.userId) {
+        throw new Error('UserId is required for subscription upsert')
+      }
+      
       const { error } = await supabase
         .from('subscriptions')
         .upsert({
@@ -377,7 +386,7 @@ export class SubscriptionService {
         .insert({
           user_id: eventData.userId,
           event_type: `subscription_${eventData.eventType}`,
-          event_data: eventData,
+          event_data: eventData as any,
           created_at: eventData.timestamp.toISOString()
         })
 
@@ -465,9 +474,9 @@ export class SubscriptionService {
       if (!subscription) return false
 
       const now = new Date()
-      return subscription.status === 'trialing' && 
-             subscription.trialEnd && 
-             subscription.trialEnd > now
+      return !!(subscription.status === 'trialing' && 
+                subscription.trialEnd && 
+                subscription.trialEnd > now)
     } catch (error) {
       console.error('[SubscriptionService] Error checking trial status:', error)
       return false
@@ -488,6 +497,83 @@ export class SubscriptionService {
     } catch (error) {
       console.error('[SubscriptionService] Error getting trial days remaining:', error)
       return 0
+    }
+  }
+
+  /**
+   * Fallback method to get feature usage directly from table
+   */
+  private static async getFeatureUsageFallback(userId: string, featureKey: FeatureKey): Promise<FeatureUsage | null> {
+    try {
+      const now = new Date()
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+
+      const { data, error } = await supabase
+        .from('feature_usage')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('feature_name', featureKey)
+        .gte('created_at', startOfMonth.toISOString())
+        .lte('created_at', endOfMonth.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (error || !data) {
+        return null
+      }
+
+      // Count total usage for the month
+      const { count } = await supabase
+        .from('feature_usage')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('feature_name', featureKey)
+        .gte('created_at', startOfMonth.toISOString())
+        .lte('created_at', endOfMonth.toISOString())
+
+      return {
+        userId,
+        featureKey,
+        count: count || 0,
+        period: 'monthly',
+        periodStart: startOfMonth,
+        periodEnd: endOfMonth,
+        lastUsed: new Date(data.created_at)
+      }
+    } catch (error) {
+      console.error('[SubscriptionService] Error in fallback feature usage:', error)
+      return null
+    }
+  }
+
+  /**
+   * Fallback method to track feature usage directly in table
+   */
+  private static async trackFeatureUsageFallback(userId: string, featureKey: FeatureKey): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('feature_usage')
+        .insert({
+          user_id: userId,
+          feature_key: featureKey,
+          usage_count: 1,
+          period_type: 'monthly',
+          period_start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
+          period_end: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59).toISOString(),
+          last_used: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+
+      if (error) {
+        console.error('[SubscriptionService] Error in fallback feature tracking:', error)
+      } else {
+        console.log(`[SubscriptionService] Fallback: Tracked usage for ${featureKey}`)
+      }
+    } catch (error) {
+      console.error('[SubscriptionService] Error in fallback feature tracking:', error)
     }
   }
 }

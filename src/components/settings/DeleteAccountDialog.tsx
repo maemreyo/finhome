@@ -121,7 +121,7 @@ export function DeleteAccountDialog() {
             <Checkbox
               id="confirmCheckbox"
               checked={confirmChecked}
-              onCheckedChange={setConfirmChecked}
+              onCheckedChange={(checked) => setConfirmChecked(checked === true)}
             />
             <Label htmlFor="confirmCheckbox" className="text-sm">
               {t('understandLabel')}

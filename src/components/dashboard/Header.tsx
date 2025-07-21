@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuth, useAuthActions } from '@/hooks/useAuth'
-import { User, Settings, CreditCard, LogOut, Bell, Trophy } from 'lucide-react'
+import { User, Settings, CreditCard, LogOut, Bell, Trophy, Crown } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -22,6 +22,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { LevelIndicator } from '@/components/gamification/LevelIndicator'
 import { UserProgress } from '@/lib/gamification/achievements'
 import { SubscriptionBadge, TrialBadge } from '@/components/subscription/SubscriptionBadge'
+import { SubscriptionSummary } from '@/components/subscription/SubscriptionSummary'
 
 interface HeaderProps {
   title?: string
@@ -61,6 +62,11 @@ export function Header({ title, description, userProgress }: HeaderProps) {
             />
           )}
 
+          {/* Subscription Status - More Prominent */}
+          <div className="hidden sm:block">
+            <SubscriptionSummary compact={true} />
+          </div>
+
           {/* Notifications */}
           <Button variant="ghost" size="icon" title={tCommon('notifications')}>
             <Bell className="h-4 w-4" />
@@ -85,19 +91,18 @@ export function Header({ title, description, userProgress }: HeaderProps) {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent className="w-64" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-2">
-                  <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-3">
+                  <div>
                     <p className="text-sm font-medium leading-none">
                       {user?.user_metadata?.full_name || tCommon('defaultUser')}
                     </p>
-                    <SubscriptionBadge size="sm" />
+                    <p className="text-xs leading-none text-muted-foreground mt-1">
+                      {user?.email}
+                    </p>
                   </div>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user?.email}
-                  </p>
-                  <TrialBadge />
+                  <SubscriptionSummary compact={false} />
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -105,6 +110,12 @@ export function Header({ title, description, userProgress }: HeaderProps) {
                 <Link href={`/${locale}/dashboard/profile`}>
                   <User className="mr-2 h-4 w-4" />
                   <span>{t('profile')}</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/${locale}/subscription`}>
+                  <Crown className="mr-2 h-4 w-4" />
+                  <span>{t('subscription') || 'Subscription'}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>

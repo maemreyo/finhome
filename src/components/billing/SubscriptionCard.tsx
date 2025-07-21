@@ -86,7 +86,7 @@ export function SubscriptionCard() {
             <p className="text-muted-foreground mb-4">
               You&apos;re currently on the free plan
             </p>
-            <Button onClick={() => window.location.href = '/pricing'}>
+            <Button onClick={() => window.location.href = '/subscription'}>
               Upgrade Plan
             </Button>
           </div>
@@ -130,7 +130,7 @@ export function SubscriptionCard() {
               
               <Button 
                 variant="outline" 
-                onClick={() => window.location.href = '/pricing'}
+                onClick={() => window.location.href = '/subscription'}
               >
                 Change Plan
               </Button>

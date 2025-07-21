@@ -129,6 +129,7 @@ export interface Database {
           theme: 'light' | 'dark'
           dashboard_layout: 'grid' | 'list'
           dashboard_widgets: Json
+          onboarding_progress: Json | null
           profile_visibility: 'public' | 'private' | 'friends'
           allow_data_sharing: boolean
           created_at: string
@@ -145,6 +146,7 @@ export interface Database {
           theme?: 'light' | 'dark'
           dashboard_layout?: 'grid' | 'list'
           dashboard_widgets?: Json
+          onboarding_progress?: Json | null
           profile_visibility?: 'public' | 'private' | 'friends'
           allow_data_sharing?: boolean
           created_at?: string
@@ -161,6 +163,7 @@ export interface Database {
           theme?: 'light' | 'dark'
           dashboard_layout?: 'grid' | 'list'
           dashboard_widgets?: Json
+          onboarding_progress?: Json | null
           profile_visibility?: 'public' | 'private' | 'friends'
           allow_data_sharing?: boolean
           created_at?: string
@@ -1556,6 +1559,56 @@ export interface Database {
           }
         ]
       }
+      feature_usage: {
+        Row: {
+          id: string
+          user_id: string
+          feature_name: string | null
+          feature_key: string
+          usage_count: number
+          period_type: string
+          period_start: string
+          period_end: string
+          last_used: string
+          metadata: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          feature_name?: string | null
+          feature_key: string
+          usage_count?: number
+          period_type?: string
+          period_start: string
+          period_end: string
+          last_used?: string
+          metadata?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          feature_name?: string | null
+          feature_key?: string
+          usage_count?: number
+          period_type?: string
+          period_start?: string
+          period_end?: string
+          last_used?: string
+          metadata?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_usage_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1637,6 +1690,31 @@ export interface Database {
           trend_direction: string
         }[]
       }
+      get_feature_usage: {
+        Args: {
+          p_user_id: string
+          p_feature_key: string
+          p_period_type?: string
+        }
+        Returns: {
+          usage_count: number
+          period_start: string
+          period_end: string
+          last_used: string
+        }[]
+      }
+      increment_feature_usage: {
+        Args: {
+          p_user_id: string
+          p_feature_key: string
+          p_period_type?: string
+        }
+        Returns: {
+          current_count: number
+          period_start: string
+          period_end: string
+        }[]
+      }
     }
     Enums: {
       user_subscription_tier: 'free' | 'premium' | 'professional'
@@ -1682,6 +1760,7 @@ export type PlanMilestone = Database['public']['Tables']['plan_milestones']['Row
 export type PlanStatusHistory = Database['public']['Tables']['plan_status_history']['Row']
 export type PlanShare = Database['public']['Tables']['plan_shares']['Row']
 export type UserFavorite = Database['public']['Tables']['user_favorites']['Row']
+export type FeatureUsage = Database['public']['Tables']['feature_usage']['Row']
 
 // Enum types
 export type UserSubscriptionTier = Database['public']['Enums']['user_subscription_tier']

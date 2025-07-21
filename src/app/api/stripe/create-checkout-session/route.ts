@@ -90,8 +90,8 @@ export async function POST(request: NextRequest) {
         }
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscription`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3033'}/vi/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3033'}/vi/subscription`,
       subscription_data: {
         trial_period_days: plan.trial?.enabled ? plan.trial.days : undefined,
         metadata: {

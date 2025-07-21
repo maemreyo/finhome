@@ -72,13 +72,20 @@ export async function POST(request: NextRequest) {
             })
 
           // Update user tier
-          await supabase
+          console.log(`[Webhook] Updating user ${session.metadata?.userId} to tier ${session.metadata?.planId}`)
+          const { error: tierUpdateError } = await supabase
             .from('user_profiles')
             .update({ 
               subscription_tier: session.metadata?.planId,
               updated_at: new Date().toISOString()
             })
             .eq('id', session.metadata?.userId)
+
+          if (tierUpdateError) {
+            console.error('[Webhook] Error updating user tier:', tierUpdateError)
+          } else {
+            console.log(`[Webhook] Successfully updated user tier to ${session.metadata?.planId}`)
+          }
         }
         break
       }

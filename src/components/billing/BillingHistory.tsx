@@ -1,4 +1,5 @@
-// Billing history component
+// src/components/billing/BillingHistory.tsx
+// Billing history component with i18n support
 
 'use client'
 
@@ -9,6 +10,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Download, ExternalLink } from 'lucide-react'
 import { format } from 'date-fns'
+import { useTranslations, useLocale } from 'next-intl'
+import { formatCurrency } from '@/lib/utils/currency'
 
 interface BillingRecord {
   id: string
@@ -24,6 +27,8 @@ interface BillingRecord {
 export function BillingHistory() {
   const [billingHistory, setBillingHistory] = useState<BillingRecord[]>([])
   const [loading, setLoading] = useState(true)
+  const t = useTranslations('BillingPage.billingHistory')
+  const locale = useLocale()
 
   useEffect(() => {
     const fetchBillingHistory = async () => {
@@ -51,9 +56,11 @@ export function BillingHistory() {
       uncollectible: 'destructive',
     }
 
+    const statusText = t(`statuses.${status}` as any) || status.charAt(0).toUpperCase() + status.slice(1)
+
     return (
       <Badge variant={variants[status] || 'secondary'}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {statusText}
       </Badge>
     )
   }
@@ -62,8 +69,8 @@ export function BillingHistory() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Billing History</CardTitle>
-          <CardDescription>Your payment and invoice history</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-4">
@@ -79,23 +86,23 @@ export function BillingHistory() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Billing History</CardTitle>
-        <CardDescription>Your payment and invoice history</CardDescription>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent>
         {billingHistory.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">
-            No billing history available yet.
+            {t('noHistory')}
           </p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Reason</TableHead>
-                <TableHead>Invoice</TableHead>
+                <TableHead>{t('tableHeaders.date')}</TableHead>
+                <TableHead>{t('tableHeaders.amount')}</TableHead>
+                <TableHead>{t('tableHeaders.status')}</TableHead>
+                <TableHead>{t('tableHeaders.reason')}</TableHead>
+                <TableHead>{t('tableHeaders.invoice')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -105,13 +112,17 @@ export function BillingHistory() {
                     {format(new Date(record.created_at), 'MMM dd, yyyy')}
                   </TableCell>
                   <TableCell>
-                    ${(record.amount_paid / 100).toFixed(2)} {record.currency.toUpperCase()}
+                    {formatCurrency(record.amount_paid / 100, {
+                      currency: record.currency.toUpperCase() as 'VND' | 'USD',
+                      locale,
+                      showSymbol: true
+                    })}
                   </TableCell>
                   <TableCell>
                     {getStatusBadge(record.status)}
                   </TableCell>
                   <TableCell className="capitalize">
-                    {record.billing_reason || 'Subscription'}
+                    {record.billing_reason || t('defaultReason')}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
@@ -120,6 +131,7 @@ export function BillingHistory() {
                           variant="ghost"
                           size="sm"
                           onClick={() => window.open(record.invoice_url!, '_blank')}
+                          title={t('viewInvoice')}
                         >
                           <ExternalLink className="h-4 w-4" />
                         </Button>
@@ -129,6 +141,7 @@ export function BillingHistory() {
                           variant="ghost"
                           size="sm"
                           onClick={() => window.open(record.invoice_pdf!, '_blank')}
+                          title={t('downloadInvoice')}
                         >
                           <Download className="h-4 w-4" />
                         </Button>

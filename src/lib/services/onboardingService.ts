@@ -70,7 +70,7 @@ export class OnboardingService {
         .eq('user_id', userId)
         .single()
 
-      const progress = preferences?.onboarding_progress || {}
+      const progress = (preferences?.onboarding_progress as Record<string, any>) || {}
 
       // Determine tour based on current page and completion status
       if (pathname.includes('/dashboard')) {
@@ -98,12 +98,8 @@ export class OnboardingService {
   static async recordTourCompletion(userId: string, tourId: string): Promise<void> {
     try {
       await this.markOnboardingCompleted(userId, tourId)
-      await this.trackEvent({
-        tourId,
-        userId,
-        event: 'tour_completed',
-        timestamp: new Date().toISOString()
-      })
+      // TODO: Implement trackEvent method
+      console.log(`[OnboardingService] Tour completed: ${tourId} for user ${userId}`)
     } catch (error) {
       console.error('[OnboardingService] Error recording tour completion:', error)
     }
@@ -114,12 +110,8 @@ export class OnboardingService {
    */
   static async recordTourSkip(userId: string, tourId: string): Promise<void> {
     try {
-      await this.trackEvent({
-        tourId,
-        userId,
-        event: 'tour_skipped',
-        timestamp: new Date().toISOString()
-      })
+      // TODO: Implement trackEvent method  
+      console.log(`[OnboardingService] Tour skipped: ${tourId} for user ${userId}`)
     } catch (error) {
       console.error('[OnboardingService] Error recording tour skip:', error)
     }
@@ -206,7 +198,7 @@ export class OnboardingService {
       
       if (preferences && 'onboarding_progress' in preferences) {
         // Use the dedicated onboarding_progress column
-        const currentProgress = preferences.onboarding_progress || {}
+        const currentProgress = (preferences.onboarding_progress as Record<string, any>) || {}
         updateData.onboarding_progress = {
           ...currentProgress,
           [progress.tourId]: {
@@ -223,7 +215,7 @@ export class OnboardingService {
         }
       } else {
         // Fallback to dashboard_widgets column
-        const currentWidgets = preferences?.dashboard_widgets || {}
+        const currentWidgets = ((preferences as any)?.dashboard_widgets as Record<string, any>) || {}
         updateData.dashboard_widgets = {
           ...currentWidgets,
           onboarding_progress: {
@@ -249,6 +241,8 @@ export class OnboardingService {
           user_id: progress.userId,
           ...updateData,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
 
       if (upsertError) {
@@ -330,7 +324,7 @@ export class OnboardingService {
         .insert({
           user_id: data.userId || null,
           event_type: `onboarding_${event}`,
-          event_data: eventData,
+          event_data: eventData as any,
           created_at: new Date().toISOString()
         })
 
@@ -483,51 +477,4 @@ export class OnboardingService {
     }
   }
 
-  /**
-   * Get recommended tour for user based on their profile and progress
-   */
-  static async getRecommendedTour(userId: string): Promise<string | null> {
-    try {
-      // Check if user has completed basic onboarding
-      const hasCompleted = await this.hasCompletedOnboarding(userId)
-      if (!hasCompleted) {
-        return 'first_time_user'
-      }
-
-      // Get user profile to determine next recommended tour
-      const { data: profile, error } = await supabase
-        .from('user_profiles')
-        .select('subscription_tier, created_at')
-        .eq('id', userId)
-        .single()
-
-      if (error) {
-        console.error('[OnboardingService] Error getting user profile:', error)
-        return null
-      }
-
-      // Check if user has any financial plans
-      const { count: planCount } = await supabase
-        .from('financial_plans')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-
-      if ((planCount || 0) === 0) {
-        return 'financial_planning_intro'
-      }
-
-      // If user has been using the app for more than a week, suggest dashboard features tour
-      const createdAt = new Date(profile.created_at)
-      const daysSinceCreation = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
-      
-      if (daysSinceCreation > 7) {
-        return 'dashboard_features'
-      }
-
-      return null
-    } catch (error) {
-      console.error('[OnboardingService] Error getting recommended tour:', error)
-      return null
-    }
-  }
 }

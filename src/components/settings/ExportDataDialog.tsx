@@ -94,8 +94,9 @@ export function ExportDataDialog() {
 
       if (options.includeActivities) {
         try {
-          const activities = await DashboardService.getUserActivities(user.id)
-          exportData.activities = activities
+          // TODO: Implement getUserActivities method in DashboardService
+          console.warn('Activities export not yet implemented')
+          exportData.activities = []
         } catch (error) {
           console.warn('Could not fetch activities data:', error)
         }
