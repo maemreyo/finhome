@@ -62,7 +62,7 @@ export async function POST() {
     try {
       const portalSession = await createCustomerPortalSession(
         subscription.stripe_customer_id,
-        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`
+        `${process.env.NEXT_PUBLIC_APP_URL}/billing`
       )
 
       console.log('Portal session created successfully')

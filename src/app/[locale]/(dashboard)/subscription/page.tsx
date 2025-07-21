@@ -3,7 +3,6 @@
 
 import React from 'react'
 import { useTranslations } from 'next-intl'
-import { Header } from '@/components/dashboard/Header'
 import { SubscriptionPlansCard } from '@/components/subscription/SubscriptionPlansCard'
 
 export default function SubscriptionPage() {
@@ -11,11 +10,6 @@ export default function SubscriptionPage() {
 
   return (
     <div className="space-y-6">
-      <Header 
-        title={t('title')}
-        description={t('subtitle')}
-      />
-      
       <div className="container mx-auto px-6">
         <SubscriptionPlansCard />
       </div>

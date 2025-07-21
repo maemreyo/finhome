@@ -1,4 +1,3 @@
-// src/app/[locale]/dashboard/page.tsx
 // Main dashboard page with locale support - UPDATED: 2024-01-18 - Integrated with real database
 
 'use client'
@@ -169,11 +168,11 @@ export default function DashboardPage({ params }: PageProps) {
   }, [dashboardData.metrics])
 
   const handleCreatePlan = () => {
-    window.location.href = `/${locale}/dashboard/plans/new`
+    window.location.href = `/${locale}/plans/new`
   }
 
   const handleViewPlan = (planId: string) => {
-    window.location.href = `/${locale}/dashboard/plans/${planId}`
+    window.location.href = `/${locale}/plans/${planId}`
   }
 
   // Quick actions data
@@ -186,7 +185,7 @@ export default function DashboardPage({ params }: PageProps) {
     {
       id: 'newPlan',
       icon: <Calculator className="w-5 h-5" />,
-      href: `/${locale}/dashboard/plans/new`
+      href: `/${locale}/plans/new`
     },
     {
       id: 'compareRates',

@@ -239,11 +239,11 @@ INSERT INTO notifications (
     user_id, type, title, message, action_url, icon, is_read, priority
 ) VALUES
 -- Sample notifications for demo
-((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'info', $$Chào mừng đến với FinHome!$$, $$Cảm ơn bạn đã tham gia FinHome. Hãy bắt đầu bằng việc tạo kế hoạch tài chính đầu tiên.$$, '/dashboard/plans/new', '🎉', false, 8),
-((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'success', $$Kế hoạch đã được lưu$$, $$Kế hoạch "Mua nhà đầu tiên" đã được lưu thành công.$$, '/dashboard/plans', '✅', false, 5),
-((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'warning', $$Lãi suất ngân hàng thay đổi$$, $$Lãi suất vay mua nhà tại Vietcombank đã tăng 0.2%. Kiểm tra kế hoạch của bạn.$$, '/dashboard/scenarios', '⚠️', true, 7),
-((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'achievement', $$Thành tích mới!$$, $$Bạn đã mở khóa thành tích "Người lập kế hoạch tài chính". +100 điểm kinh nghiệm!$$, '/dashboard/achievements', '🏆', false, 6),
-((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'info', $$Báo cáo thị trường tháng 1$$, $$Báo cáo thị trường BĐS tháng 1/2024 đã có. Giá nhà tại TP.HCM tăng 2.3%.$$, '/dashboard/analytics', '📊', true, 4);
+((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'info', $$Chào mừng đến với FinHome!$$, $$Cảm ơn bạn đã tham gia FinHome. Hãy bắt đầu bằng việc tạo kế hoạch tài chính đầu tiên.$$, '/plans/new', '🎉', false, 8),
+((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'success', $$Kế hoạch đã được lưu$$, $$Kế hoạch "Mua nhà đầu tiên" đã được lưu thành công.$$, '/plans', '✅', false, 5),
+((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'warning', $$Lãi suất ngân hàng thay đổi$$, $$Lãi suất vay mua nhà tại Vietcombank đã tăng 0.2%. Kiểm tra kế hoạch của bạn.$$, '/scenarios', '⚠️', true, 7),
+((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'achievement', $$Thành tích mới!$$, $$Bạn đã mở khóa thành tích "Người lập kế hoạch tài chính". +100 điểm kinh nghiệm!$$, '/achievements', '🏆', false, 6),
+((SELECT id FROM auth.users WHERE email = 'demo@finhome.vn'), 'info', $$Báo cáo thị trường tháng 1$$, $$Báo cáo thị trường BĐS tháng 1/2024 đã có. Giá nhà tại TP.HCM tăng 2.3%.$$, '/analytics', '📊', true, 4);
 
 -- =============================================
 -- USER EXPERIENCE SAMPLE DATA

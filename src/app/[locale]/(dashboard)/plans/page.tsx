@@ -1,4 +1,3 @@
-// src/app/[locale]/dashboard/plans/page.tsx
 import { Suspense, use } from 'react'
 import { getUser, getUserFinancialPlans } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'

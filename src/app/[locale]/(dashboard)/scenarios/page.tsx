@@ -1,4 +1,3 @@
-// src/app/[locale]/dashboard/scenarios/page.tsx
 // Enhanced scenario comparison dashboard with new components
 
 'use client'

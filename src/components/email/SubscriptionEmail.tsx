@@ -90,7 +90,7 @@ export function SubscriptionEmail({
               © 2024 {process.env.NEXT_PUBLIC_APP_NAME}. All rights reserved.
             </Text>
             <Text style={footerText}>
-              <Link href={`${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`} style={link}>
+              <Link href={`${process.env.NEXT_PUBLIC_APP_URL}/billing`} style={link}>
                 Manage Subscription
               </Link>
               {' | '}

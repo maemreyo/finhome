@@ -1,4 +1,3 @@
-// src/components/dashboard/FinancialOverview.tsx
 // Comprehensive financial overview widget for the main dashboard with i18n support
 
 'use client'

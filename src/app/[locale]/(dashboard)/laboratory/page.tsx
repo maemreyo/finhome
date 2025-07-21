@@ -1,4 +1,3 @@
-// src/app/[locale]/dashboard/laboratory/page.tsx
 // Financial Laboratory page for what-if analysis with i18n support - UPDATED: 2024-01-18 - Integrated with real database
 
 "use client";
@@ -255,7 +254,7 @@ export default function LaboratoryPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Header title={t("title")} description={t("description")} />
+        {/* <Header title={t("title")} description={t("description")} /> */}
         <div className="p-6 space-y-6">
           <Skeleton className="h-32" />
           <Skeleton className="h-96" />
@@ -267,7 +266,7 @@ export default function LaboratoryPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <Header title={t("title")} description={t("description")} />
+        {/* <Header title={t("title")} description={t("description")} /> */}
         <div className="p-6">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
@@ -280,7 +279,7 @@ export default function LaboratoryPage() {
 
   return (
     <div className="space-y-6">
-      <Header title={t("title")} description={t("whatIfDescription")} />
+      {/* <Header title={t("title")} description={t("whatIfDescription")} /> */}
 
       <div className="p-6 space-y-6">
         {/* Plan Selection */}

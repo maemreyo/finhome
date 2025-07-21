@@ -1,4 +1,3 @@
-// src/components/dashboard/Header.tsx
 // Dashboard header with user menu and i18n support
 
 'use client'
@@ -107,7 +106,7 @@ export function Header({ title, description, userProgress }: HeaderProps) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/${locale}/dashboard/profile`}>
+                <Link href={`/${locale}/profile`}>
                   <User className="mr-2 h-4 w-4" />
                   <span>{t('profile')}</span>
                 </Link>
@@ -119,19 +118,19 @@ export function Header({ title, description, userProgress }: HeaderProps) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/${locale}/dashboard/billing`}>
+                <Link href={`/${locale}/billing`}>
                   <CreditCard className="mr-2 h-4 w-4" />
                   <span>{t('billing')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/${locale}/dashboard/achievements`}>
+                <Link href={`/${locale}/achievements`}>
                   <Trophy className="mr-2 h-4 w-4" />
                   <span>{t('achievements')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/${locale}/dashboard/settings`}>
+                <Link href={`/${locale}/settings`}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>{t('settings')}</span>
                 </Link>

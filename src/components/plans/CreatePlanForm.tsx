@@ -370,7 +370,7 @@ export function CreatePlanForm({ userId }: CreatePlanFormProps) {
 
       const result = await response.json();
       toast.success(t('messages.success'));
-      router.push(`/dashboard/plans/${result.data.id}`);
+      router.push(`/plans/${result.data.id}`);
     } catch (error) {
       console.error("Error creating plan:", error);
       toast.error(error instanceof Error ? error.message : t('messages.error'));

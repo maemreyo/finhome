@@ -1,4 +1,3 @@
-// src/app/[locale]/(dashboard)/dashboard/plans/[planId]/edit/EditPlanPageClient.tsx
 "use client";
 
 import { useState } from 'react'
@@ -36,7 +35,7 @@ export function EditPlanPageClient({ plan, locale }: EditPlanPageClientProps) {
   }
 
   const handleCancel = () => {
-    router.push(`/${locale}/dashboard/plans/${plan.id}`)
+    router.push(`/${locale}/plans/${plan.id}`)
   }
 
   const handleSave = async (updatedPlan: FinancialPlan) => {
@@ -70,7 +69,7 @@ export function EditPlanPageClient({ plan, locale }: EditPlanPageClientProps) {
       }
 
       toast.success(t('messages.success'))
-      router.push(`/${locale}/dashboard/plans/${plan.id}`)
+      router.push(`/${locale}/plans/${plan.id}`)
     } catch (error) {
       console.error('Error updating plan:', error)
       toast.error(t('messages.error'))

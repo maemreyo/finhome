@@ -1,4 +1,3 @@
-// src/components/dashboard/RecentActivity.tsx
 // Recent activity and notifications widget with i18n support
 
 'use client'

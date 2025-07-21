@@ -90,7 +90,7 @@ export function PlansList({ plans, onPlanDeleted }: PlansListProps) {
         <p className="text-muted-foreground mb-4">
           {t('empty.description')}
         </p>
-        <Link href="/dashboard/plans/new">
+        <Link href="/plans/new">
           <Button>{t('empty.createButton')}</Button>
         </Link>
       </div>
@@ -139,13 +139,13 @@ export function PlansList({ plans, onPlanDeleted }: PlansListProps) {
             </div>
             
             <div className="flex gap-2 mt-4">
-              <Link href={`/dashboard/plans/${plan.id}`} className="flex-1">
+              <Link href={`/plans/${plan.id}`} className="flex-1">
                 <Button variant="outline" size="sm" className="w-full">
                   <Eye className="w-4 h-4 mr-1" />
                   {t('actions.view')}
                 </Button>
               </Link>
-              <Link href={`/dashboard/plans/${plan.id}/edit`}>
+              <Link href={`/plans/${plan.id}/edit`}>
                 <Button variant="outline" size="sm">
                   <Edit className="w-4 h-4" />
                 </Button>

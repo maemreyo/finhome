@@ -314,18 +314,6 @@ export const FinancialLaboratory: React.FC<FinancialLaboratoryProps> = ({
 
   return (
     <div className={cn("space-y-6", className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {t("header.title")}
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            {t("header.description")}
-          </p>
-        </div>
-      </div>
-
       {/* Current Loan Summary */}
       <Card>
         <CardHeader>

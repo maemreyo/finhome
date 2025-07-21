@@ -1,4 +1,3 @@
-// src/components/dashboard/PropertyPortfolio.tsx
 // Property portfolio widget showing saved properties and investment tracking with i18n support
 
 'use client'

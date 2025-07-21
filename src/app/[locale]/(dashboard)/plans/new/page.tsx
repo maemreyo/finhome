@@ -1,4 +1,3 @@
-// src/app/[locale]/dashboard/plans/new/page.tsx
 import { getUser } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { CreatePlanForm } from '@/components/plans/CreatePlanForm'
