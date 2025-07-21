@@ -151,16 +151,29 @@ export function Sidebar({ className }: SidebarProps) {
 
           {/* Navigation */}
           <ScrollArea className="flex-1 px-3 py-4">
-            <nav className="space-y-1">
+            <nav className="space-y-1" data-testid="dashboard-navigation">
               {navigation.map((item) => {
                 const isActive = pathname === item.href || 
                   (item.href !== `/${locale}/dashboard` && pathname.startsWith(item.href))
                 
+                // Add data-testid for specific navigation items referenced in tours
+                const getTestId = (nameKey: string) => {
+                  switch (nameKey) {
+                    case 'achievements':
+                      return 'achievements-link'
+                    case 'laboratory':
+                      return 'laboratory-link'
+                    default:
+                      return undefined
+                  }
+                }
+
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsMobileOpen(false)}
+                    data-testid={getTestId(item.nameKey)}
                     className={cn(
                       "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       isActive

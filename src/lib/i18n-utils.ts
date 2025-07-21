@@ -44,6 +44,14 @@ export const AVAILABLE_NAMESPACES: Record<string, NamespaceConfig> = {
     name: 'financial-laboratory',
     description: 'Financial Laboratory what-if analysis tool (FinancialLaboratory)',
   },
+  onboarding: {
+    name: 'onboarding',
+    description: 'User onboarding tours and tutorials (Onboarding)',
+  },
+  subscription: {
+    name: 'subscription',
+    description: 'Subscription and monetization content (SubscriptionPlans, FeatureGates, UpgradePrompts)',
+  },
 };
 
 /**
@@ -112,6 +120,10 @@ export function validateNamespaceMessages(
           return ['Charts', 'ScenarioComparisonTable'].includes(key);
         case 'financial-laboratory':
           return key === 'FinancialLaboratory';
+        case 'onboarding':
+          return ["OnboardingControls", "OnboardingWelcome", "OnboardingMessages", "OnboardingWelcome", "OnboardingSteps", "OnboardingFinancialPlanning", "OnboardingDashboardFeatures"].includes(key);
+        case 'subscription':
+          return ['SubscriptionPlans', 'FeatureGates', 'UpgradePrompts', 'BillingPage', 'SubscriptionCommon', 'Features', 'SubscriptionNotifications', 'SubscriptionFaq'].includes(key);
         default:
           return false;
       }
@@ -190,5 +202,7 @@ export function getNamespaceStats(): Record<string, { description: string; estim
     plans: { description: AVAILABLE_NAMESPACES.plans.description, estimatedSize: '~26.8KB' },
     charts: { description: AVAILABLE_NAMESPACES.charts.description, estimatedSize: '~1.9KB' },
     'financial-laboratory': { description: AVAILABLE_NAMESPACES['financial-laboratory'].description, estimatedSize: '~2.1KB' },
+    onboarding: { description: AVAILABLE_NAMESPACES.onboarding.description, estimatedSize: '~3.2KB' },
+    subscription: { description: AVAILABLE_NAMESPACES.subscription.description, estimatedSize: '~8.5KB' },
   };
 }

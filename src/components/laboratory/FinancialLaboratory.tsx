@@ -35,6 +35,8 @@ import {
   Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FeatureGate } from "@/components/subscription/FeatureGate";
+import { FeatureBadge } from "@/components/subscription/SubscriptionBadge";
 
 // Type definitions
 interface LoanDetails {
@@ -379,8 +381,18 @@ export const FinancialLaboratory: React.FC<FinancialLaboratoryProps> = ({
       >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="prepayment">{t("tabs.prepayment")}</TabsTrigger>
-          <TabsTrigger value="refinance">{t("tabs.refinance")}</TabsTrigger>
-          <TabsTrigger value="stress-test">{t("tabs.stressTest")}</TabsTrigger>
+          <TabsTrigger value="refinance">
+            <div className="flex items-center gap-2">
+              {t("tabs.refinance")}
+              <FeatureBadge featureKey="advanced_calculations" />
+            </div>
+          </TabsTrigger>
+          <TabsTrigger value="stress-test">
+            <div className="flex items-center gap-2">
+              {t("tabs.stressTest")}
+              <FeatureBadge featureKey="monte_carlo_analysis" />
+            </div>
+          </TabsTrigger>
         </TabsList>
 
         {/* Prepayment Simulator */}
@@ -551,7 +563,8 @@ export const FinancialLaboratory: React.FC<FinancialLaboratoryProps> = ({
 
         {/* Refinance Analyzer */}
         <TabsContent value="refinance" className="space-y-4">
-          <Card>
+          <FeatureGate featureKey="advanced_calculations" promptStyle="inline">
+            <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <RefreshCw className="w-5 h-5" />
@@ -777,11 +790,13 @@ export const FinancialLaboratory: React.FC<FinancialLaboratoryProps> = ({
               </div>
             </CardContent>
           </Card>
+          </FeatureGate>
         </TabsContent>
 
         {/* Market Scenario Testing */}
         <TabsContent value="stress-test" className="space-y-4">
-          <Card>
+          <FeatureGate featureKey="monte_carlo_analysis" promptStyle="inline">
+            <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
@@ -869,6 +884,7 @@ export const FinancialLaboratory: React.FC<FinancialLaboratoryProps> = ({
               </div>
             </CardContent>
           </Card>
+          </FeatureGate>
         </TabsContent>
       </Tabs>
     </div>

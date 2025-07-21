@@ -1,0 +1,88 @@
+{
+  "OnboardingControls": {
+    "back": "Back",
+    "close": "Close",
+    "finish": "Finish",
+    "next": "Next",
+    "skip": "Skip"
+  },
+  "OnboardingMessages": {
+    "completed": "Onboarding completed successfully!",
+    "skipped": "Onboarding skipped. You can restart it anytime from settings.",
+    "error": "An error occurred during onboarding. Please try again."
+  },
+  "OnboardingWelcome": {
+    "title": "Welcome to FinHome!",
+    "content": "We're excited to help you with your real estate financial planning journey. This quick tour will show you the main features and help you get started. Let's begin!"
+  },
+  "OnboardingSteps": {
+    "navigation": {
+      "title": "Navigation Menu",
+      "content": "This is your main navigation menu. Here you can access your dashboard, financial plans, market analysis tools, and more. Each section contains powerful tools to help with your property investment decisions."
+    },
+    "quickStats": {
+      "title": "Quick Statistics",
+      "content": "Your financial overview at a glance. See your total portfolio value, monthly cash flow, investment returns, and other key metrics that matter most to your financial goals."
+    },
+    "createPlan": {
+      "title": "Create Your First Plan",
+      "content": "This is where the magic happens! Click here to create your first financial plan. You can analyze different property investment scenarios, compare loan options, and make informed decisions."
+    },
+    "dashboardTabs": {
+      "title": "Dashboard Sections",
+      "content": "Switch between different views of your financial data. The Overview tab shows your portfolio summary, Plans shows your active financial plans, and Analytics provides detailed insights."
+    },
+    "userMenu": {
+      "title": "Account & Settings",
+      "content": "Access your account settings, preferences, subscription details, and help resources. You can also customize your dashboard and notification preferences here."
+    },
+    "completion": {
+      "title": "You're All Set!",
+      "content": "Congratulations! You've completed the basic tour. You're now ready to start your real estate financial planning journey. Remember, you can always access help and tutorials from the user menu."
+    }
+  },
+  "OnboardingFinancialPlanning": {
+    "plansOverview": {
+      "title": "Your Financial Plans",
+      "content": "This section displays all your financial plans. Each plan can contain multiple property scenarios, loan comparisons, and investment strategies. You can create, edit, and analyze different financial scenarios here."
+    },
+    "planCreation": {
+      "title": "Plan Creation Wizard",
+      "content": "Use this form to create detailed financial plans. Enter property details, loan terms, investment goals, and other parameters. The system will automatically calculate projections and provide insights."
+    },
+    "scenarios": {
+      "title": "Scenario Analysis",
+      "content": "Compare different investment scenarios side-by-side. You can adjust parameters like down payment, loan terms, rental income, and see how they affect your returns and cash flow."
+    },
+    "analytics": {
+      "title": "Financial Analytics",
+      "content": "Deep dive into your financial data with comprehensive charts and analysis. Track your portfolio performance, cash flow trends, and get actionable insights for better decision making."
+    },
+    "laboratory": {
+      "title": "Financial Laboratory",
+      "content": "Experiment with advanced financial calculations and modeling tools. Test different investment strategies, analyze market scenarios, and optimize your property investment approach."
+    }
+  },
+  "OnboardingDashboardFeatures": {
+    "portfolioOverview": {
+      "title": "Portfolio Overview",
+      "content": "Your complete portfolio summary including total asset value, equity, debt, and performance metrics. This gives you a bird's eye view of your real estate investments."
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "content": "Stay updated with your latest transactions, plan updates, market alerts, and other important activities. This helps you keep track of all changes to your financial situation."
+    },
+    "marketInsights": {
+      "title": "Market Insights",
+      "content": "Get real-time market data, property price trends, and investment opportunities in your areas of interest. Make informed decisions based on current market conditions."
+    },
+    "achievements": {
+      "title": "Achievements & Goals",
+      "content": "Track your progress towards financial goals and unlock achievements as you reach milestones. This gamified approach helps you stay motivated on your investment journey."
+    },
+    "settings": {
+      "title": "Settings & Preferences",
+      "content": "Customize your experience, manage notification preferences, update your profile, and configure advanced features to match your investment style and preferences."
+    }
+  }
+}

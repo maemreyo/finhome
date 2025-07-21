@@ -1,0 +1,88 @@
+{
+  "OnboardingControls": {
+    "back": "Quay lại",
+    "close": "Đóng",
+    "finish": "Hoàn thành",
+    "next": "Tiếp theo",
+    "skip": "Bỏ qua"
+  },
+  "OnboardingMessages": {
+    "completed": "Hoàn thành hướng dẫn thành công!",
+    "skipped": "Đã bỏ qua hướng dẫn. Bạn có thể khởi động lại bất cứ lúc nào từ cài đặt.",
+    "error": "Đã xảy ra lỗi trong quá trình hướng dẫn. Vui lòng thử lại."
+  },
+  "OnboardingWelcome": {
+    "title": "Chào mừng đến với FinHome!",
+    "content": "Chúng tôi rất vui được hỗ trợ bạn trong hành trình lập kế hoạch tài chính bất động sản. Hướng dẫn nhanh này sẽ giới thiệu các tính năng chính và giúp bạn bắt đầu. Hãy cùng khám phá!"
+  },
+  "OnboardingSteps": {
+    "navigation": {
+      "title": "Menu Điều Hướng",
+      "content": "Đây là menu điều hướng chính của bạn. Tại đây bạn có thể truy cập bảng điều khiển, kế hoạch tài chính, công cụ phân tích thị trường và nhiều hơn nữa. Mỗi phần chứa các công cụ mạnh mẽ để hỗ trợ quyết định đầu tư bất động sản."
+    },
+    "quickStats": {
+      "title": "Thống Kê Nhanh",
+      "content": "Tổng quan tài chính của bạn trong một cái nhìn. Xem tổng giá trị danh mục đầu tư, dòng tiền hàng tháng, lợi nhuận đầu tư và các chỉ số quan trọng khác phù hợp với mục tiêu tài chính của bạn."
+    },
+    "createPlan": {
+      "title": "Tạo Kế Hoạch Đầu Tiên",
+      "content": "Đây là nơi diễn ra điều kỳ diệu! Nhấn vào đây để tạo kế hoạch tài chính đầu tiên của bạn. Bạn có thể phân tích các kịch bản đầu tư bất động sản khác nhau, so sánh các lựa chọn vay và đưa ra quyết định sáng suốt."
+    },
+    "dashboardTabs": {
+      "title": "Các Phần Bảng Điều Khiển",
+      "content": "Chuyển đổi giữa các góc nhìn khác nhau về dữ liệu tài chính của bạn. Tab Tổng quan hiển thị tóm tắt danh mục đầu tư, Kế hoạch hiển thị các kế hoạch tài chính đang hoạt động, và Phân tích cung cấp thông tin chi tiết."
+    },
+    "userMenu": {
+      "title": "Tài Khoản & Cài Đặt",
+      "content": "Truy cập cài đặt tài khoản, tùy chọn, chi tiết đăng ký và tài nguyên trợ giúp. Bạn cũng có thể tùy chỉnh bảng điều khiển và tùy chọn thông báo tại đây."
+    },
+    "completion": {
+      "title": "Bạn Đã Sẵn Sàng!",
+      "content": "Chúc mừng! Bạn đã hoàn thành hướng dẫn cơ bản. Bây giờ bạn đã sẵn sàng bắt đầu hành trình lập kế hoạch tài chính bất động sản. Hãy nhớ rằng bạn luôn có thể truy cập trợ giúp và hướng dẫn từ menu người dùng."
+    }
+  },
+  "OnboardingFinancialPlanning": {
+    "plansOverview": {
+      "title": "Kế Hoạch Tài Chính Của Bạn",
+      "content": "Phần này hiển thị tất cả các kế hoạch tài chính của bạn. Mỗi kế hoạch có thể chứa nhiều kịch bản bất động sản, so sánh khoản vay và chiến lược đầu tư. Bạn có thể tạo, chỉnh sửa và phân tích các kịch bản tài chính khác nhau tại đây."
+    },
+    "planCreation": {
+      "title": "Trình Hướng Dẫn Tạo Kế Hoạch",
+      "content": "Sử dụng biểu mẫu này để tạo các kế hoạch tài chính chi tiết. Nhập thông tin bất động sản, điều khoản vay, mục tiêu đầu tư và các tham số khác. Hệ thống sẽ tự động tính toán dự báo và cung cấp thông tin chi tiết."
+    },
+    "scenarios": {
+      "title": "Phân Tích Kịch Bản",
+      "content": "So sánh các kịch bản đầu tư khác nhau cạnh nhau. Bạn có thể điều chỉnh các tham số như tiền trả trước, điều khoản vay, thu nhập cho thuê và xem chúng ảnh hưởng như thế nào đến lợi nhuận và dòng tiền của bạn."
+    },
+    "analytics": {
+      "title": "Phân Tích Tài Chính",
+      "content": "Đi sâu vào dữ liệu tài chính của bạn với các biểu đồ và phân tích toàn diện. Theo dõi hiệu suất danh mục đầu tư, xu hướng dòng tiền và nhận thông tin chi tiết có thể hành động để ra quyết định tốt hơn."
+    },
+    "laboratory": {
+      "title": "Phòng Thí Nghiệm Tài Chính",
+      "content": "Thử nghiệm với các công cụ tính toán và mô hình tài chính nâng cao. Kiểm tra các chiến lược đầu tư khác nhau, phân tích kịch bản thị trường và tối ưu hóa phương pháp đầu tư bất động sản của bạn."
+    }
+  },
+  "OnboardingDashboardFeatures": {
+    "portfolioOverview": {
+      "title": "Tổng Quan Danh Mục Đầu Tư",
+      "content": "Tóm tắt danh mục đầu tư hoàn chỉnh của bạn bao gồm tổng giá trị tài sản, vốn chủ sở hữu, nợ và chỉ số hiệu suất. Điều này cung cấp cho bạn cái nhìn tổng thể về các khoản đầu tư bất động sản."
+    },
+    "recentActivity": {
+      "title": "Hoạt Động Gần Đây",
+      "content": "Cập nhật với các giao dịch mới nhất, cập nhật kế hoạch, cảnh báo thị trường và các hoạt động quan trọng khác. Điều này giúp bạn theo dõi tất cả các thay đổi trong tình hình tài chính của mình."
+    },
+    "marketInsights": {
+      "title": "Thông Tin Thị Trường",
+      "content": "Nhận dữ liệu thị trường thời gian thực, xu hướng giá bất động sản và cơ hội đầu tư trong các khu vực bạn quan tâm. Đưa ra quyết định sáng suốt dựa trên điều kiện thị trường hiện tại."
+    },
+    "achievements": {
+      "title": "Thành Tựu & Mục Tiêu",
+      "content": "Theo dõi tiến trình hướng tới mục tiêu tài chính và mở khóa thành tựu khi bạn đạt được các cột mốc. Phương pháp game hóa này giúp bạn duy trì động lực trong hành trình đầu tư."
+    },
+    "settings": {
+      "title": "Cài Đặt & Tùy Chọn",
+      "content": "Tùy chỉnh trải nghiệm của bạn, quản lý tùy chọn thông báo, cập nhật hồ sơ và cấu hình các tính năng nâng cao để phù hợp với phong cách đầu tư và tùy chọn của bạn."
+    }
+  }
+}

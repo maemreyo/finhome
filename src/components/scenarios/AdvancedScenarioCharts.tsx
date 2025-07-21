@@ -28,6 +28,7 @@ import {
   Scatter
 } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { FeatureGate } from '@/components/subscription/FeatureGate'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency, formatPercentage } from '@/lib/utils'
 import { FinancialScenario } from '@/types/scenario'
@@ -55,6 +56,28 @@ const CHART_THEMES = {
 }
 
 export default function AdvancedScenarioCharts({
+  scenarios,
+  selectedMetrics = ['monthlyPayment', 'totalCost', 'roi', 'riskScore'],
+  className
+}: AdvancedScenarioChartsProps) {
+  const t = useTranslations('AdvancedScenarioCharts')
+
+  return (
+    <FeatureGate 
+      featureKey="scenario_comparison" 
+      promptStyle="banner"
+      trackUsage={true}
+    >
+      <AdvancedScenarioChartsContent 
+        scenarios={scenarios}
+        selectedMetrics={selectedMetrics}
+        className={className}
+      />
+    </FeatureGate>
+  )
+}
+
+function AdvancedScenarioChartsContent({
   scenarios,
   selectedMetrics = ['monthlyPayment', 'totalCost', 'roi', 'riskScore'],
   className

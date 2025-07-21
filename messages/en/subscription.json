@@ -1,0 +1,157 @@
+{
+  "SubscriptionPlans": {
+    "title": "Choose Your Plan",
+    "subtitle": "Unlock the full potential of FinHome with our premium features",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save_percentage": "Save {percentage}%",
+    "most_popular": "Most Popular",
+    "free_trial": "{days}-day free trial",
+    "current_plan": "Current Plan",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade",
+    "contact_sales": "Contact Sales",
+    "features_included": "What's included",
+    "compare_plans": "Compare all plans",
+    "faq_title": "Frequently Asked Questions",
+    "pricing_currency": "All prices in Vietnamese Dong (VND)",
+    "plan_details": {
+      "basic": {
+        "name": "Basic",
+        "description": "Personal financial planning",
+        "price_monthly": "0",
+        "price_yearly": "0",
+        "features": [
+          "2 financial plans",
+          "1 scenario per plan",
+          "Basic loan calculations",
+          "Community support"
+        ]
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "Advanced financial tools",
+        "price_monthly": "199.000",
+        "price_yearly": "1.990.000",
+        "features": [
+          "Unlimited financial plans",
+          "Unlimited scenarios per plan",
+          "Advanced loan calculations",
+          "Real-time market data",
+          "Priority support"
+        ]
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "Comprehensive financial analysis",
+        "price_monthly": "499.000",
+        "price_yearly": "4.990.000",
+        "features": [
+          "All premium features",
+          "Monte Carlo analysis",
+          "Custom reports",
+          "Expert support"
+        ]
+      }
+    }
+  },
+  "FeatureGates": {
+    "feature_locked": "This feature is locked",
+    "upgrade_required": "Upgrade Required",
+    "subscription_required": "Premium subscription required to access this feature",
+    "limit_exceeded": "Usage limit exceeded",
+    "trial_expired": "Trial period has expired",
+    "feature_disabled": "Feature temporarily disabled",
+    "unlock_with_upgrade": "Unlock with {plan} plan"
+  },
+  "UpgradePrompts": {
+    "unlock_feature": "Unlock Feature",
+    "upgrade_now": "Upgrade Now",
+    "compare_plans": "Compare Plans",
+    "learn_more": "Learn More",
+    "start_trial": "Start Free Trial",
+    "upgrade_to": "Upgrade to {plan}",
+    "free_trial_available": "{days}-day free trial available",
+    "no_credit_card": "No credit card required",
+    "cancel_anytime": "Cancel anytime"
+  },
+  "BillingPage": {
+    "title": "Billing & Subscription",
+    "current_plan": "Current Plan",
+    "next_billing": "Next billing date",
+    "amount": "Amount",
+    "payment_method": "Payment Method",
+    "billing_history": "Billing History",
+    "download_invoice": "Download Invoice",
+    "update_payment": "Update Payment Method",
+    "cancel_subscription": "Cancel Subscription",
+    "reactivate": "Reactivate Subscription",
+    "manage_subscription": "Manage Subscription"
+  },
+  "SubscriptionCommon": {
+    "free_tier": "Free",
+    "premium_tier": "Premium",
+    "professional_tier": "Professional",
+    "premium_feature": "Premium",
+    "professional_feature": "Pro",
+    "new_feature": "New",
+    "trial_days_remaining": "{days} days left",
+    "upgrade_to_premium": "Upgrade to Premium",
+    "upgrade_to_professional": "Upgrade to Pro",
+    "feature_temporarily_disabled": "This feature is temporarily disabled",
+    "premium_feature_locked": "Premium feature - upgrade to unlock"
+  },
+  "Features": {
+    "unlimited_plans_title": "Create Unlimited Plans",
+    "unlimited_plans_message": "You've reached the limit of 2 active financial plans on the free tier.",
+    "unlimited_plans_limit_message": "You're using {current} of {limit} allowed plans.",
+    "unlimited_plans_benefit": "Premium users can create unlimited financial plans to explore all investment scenarios.",
+    
+    "advanced_calculations_title": "Advanced Loan Calculations",
+    "advanced_calculations_message": "Access multi-stage interest rates, prepayment analysis, and stress testing.",
+    "advanced_calculations_benefit": "Make more informed decisions with sophisticated financial modeling.",
+    
+    "scenario_comparison_title": "Advanced Scenario Comparison",
+    "scenario_comparison_message": "You've reached the limit of 1 scenario per plan on the free tier.",
+    "scenario_comparison_limit_message": "You're using {current} of {limit} allowed scenarios.",
+    "scenario_comparison_benefit": "Compare unlimited scenarios with sensitivity analysis and detailed charts.",
+    
+    "real_time_data_title": "Real-time Market Data",
+    "real_time_data_message": "Get access to live interest rates and property market insights.",
+    "real_time_data_benefit": "Stay ahead with the latest market trends and pricing information.",
+    
+    "monte_carlo_title": "Monte Carlo Analysis",
+    "monte_carlo_message": "Advanced probability modeling for risk assessment.",
+    "monte_carlo_benefit": "Professional-grade analytics for sophisticated investment analysis.",
+    
+    "feature_upgrade_title": "Premium Feature",
+    "feature_upgrade_message": "This feature requires a premium subscription.",
+    "feature_upgrade_benefit": "Unlock advanced tools for better financial planning."
+  },
+  "SubscriptionNotifications": {
+    "trial_ending_soon": "Your trial ends in {days} days",
+    "trial_ended": "Your trial has ended",
+    "upgrade_successful": "Successfully upgraded to {plan}",
+    "downgrade_scheduled": "Downgrade scheduled for {date}",
+    "payment_failed": "Payment failed - please update your payment method",
+    "subscription_canceled": "Subscription canceled successfully"
+  },
+  "SubscriptionFaq": {
+    "can_cancel_anytime": {
+      "question": "Can I cancel anytime?",
+      "answer": "Yes, you can cancel your subscription at any time from your account settings."
+    },
+    "refund_policy": {
+      "question": "Do I get a refund?",
+      "answer": "We offer a 30-day money-back guarantee for new subscriptions."
+    },
+    "data_security": {
+      "question": "Is my data secure?",
+      "answer": "All data is encrypted and stored securely according to international standards."
+    },
+    "plan_changes": {
+      "question": "Can I upgrade/downgrade later?",
+      "answer": "Yes, you can change your plan at any time. Changes take effect immediately."
+    }
+  }
+}

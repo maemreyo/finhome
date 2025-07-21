@@ -6,6 +6,8 @@ import "@/app/globals.css";
 import { getTranslations } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
+import { SupabaseProvider } from "@/components/providers/SupabaseProvider";
+import { SubscriptionProvider } from "@/components/subscription/SubscriptionProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +21,7 @@ const geistMono = Geist_Mono({
 
 interface LayoutProps {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+  params: { locale: string };
 }
 
 export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
@@ -80,16 +82,20 @@ export default async function LocaleLayout({
   
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        enableSystem
-        disableTransitionOnChange
-        storageKey="finhome-theme"
-      >
-        {children}
-        <Toaster />
-      </ThemeProvider>
+      <SupabaseProvider>
+        <SubscriptionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+            storageKey="finhome-theme"
+          >
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </SubscriptionProvider>
+      </SupabaseProvider>
     </NextIntlClientProvider>
   );
 }

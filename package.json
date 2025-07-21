@@ -76,6 +76,7 @@
     "react-financial-charts": "2.0.1",
     "react-hook-form": "^7.60.0",
     "react-hot-toast": "2.4.1",
+    "react-joyride": "3.0.0-7",
     "react-vis-timeline": "2.0.3",
     "recharts": "2.13.3",
     "resend": "^4.6.0",

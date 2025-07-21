@@ -21,6 +21,7 @@ import { useTranslations } from 'next-intl'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { LevelIndicator } from '@/components/gamification/LevelIndicator'
 import { UserProgress } from '@/lib/gamification/achievements'
+import { SubscriptionBadge, TrialBadge } from '@/components/subscription/SubscriptionBadge'
 
 interface HeaderProps {
   title?: string
@@ -86,13 +87,17 @@ export function Header({ title, description, userProgress }: HeaderProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    {user?.user_metadata?.full_name || tCommon('defaultUser')}
-                  </p>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium leading-none">
+                      {user?.user_metadata?.full_name || tCommon('defaultUser')}
+                    </p>
+                    <SubscriptionBadge size="sm" />
+                  </div>
                   <p className="text-xs leading-none text-muted-foreground">
                     {user?.email}
                   </p>
+                  <TrialBadge />
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />

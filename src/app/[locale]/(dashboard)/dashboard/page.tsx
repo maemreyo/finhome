@@ -47,6 +47,10 @@ import AchievementSystem from '@/components/achievements/AchievementSystem'
 // Import database service
 import { DashboardService } from '@/lib/services/dashboardService'
 
+// Import onboarding components
+import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
+import { useOnboardingCheck } from '@/hooks/useOnboarding'
+
 // Import legacy components for fallback
 import { TimelineVisualization } from '@/components/timeline/TimelineVisualization'
 import { type FinancialPlanWithMetrics } from '@/lib/api/plans'
@@ -98,6 +102,7 @@ export default function DashboardPage({ params }: PageProps) {
   const { locale } = use(params)
   const t = useTranslations('Dashboard')
   const { user, isAuthenticated } = useAuth()
+  const { needsOnboarding, recommendedFlow } = useOnboardingCheck()
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
   const [selectedView, setSelectedView] = useState<'overview' | 'legacy'>('overview')
@@ -223,17 +228,17 @@ export default function DashboardPage({ params }: PageProps) {
           </p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3" data-testid="user-menu">
           <Badge variant="outline" className="text-sm">
             <RefreshCw className="w-3 h-3 mr-1" />
             {t('lastUpdated', { time: lastUpdated.toLocaleTimeString(locale) })}
           </Badge>
           <NotificationCenter />
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" data-testid="settings-link">
             <Settings className="w-4 h-4 mr-1" />
             {t('settings')}
           </Button>
-          <Button size="sm" onClick={handleCreatePlan}>
+          <Button size="sm" onClick={handleCreatePlan} data-testid="create-plan-button">
             <Plus className="w-4 h-4 mr-1" />
             {t('createPlan')}
           </Button>
@@ -252,6 +257,7 @@ export default function DashboardPage({ params }: PageProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
+              data-testid="quick-stats"
             >
               <FinancialOverview />
             </motion.div>
@@ -308,7 +314,7 @@ export default function DashboardPage({ params }: PageProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
-              <Tabs defaultValue="portfolio" className="space-y-4">
+              <Tabs defaultValue="portfolio" className="space-y-4" data-testid="dashboard-tabs">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="portfolio" className="flex items-center gap-2">
                     <Home className="w-4 h-4" />
@@ -324,7 +330,7 @@ export default function DashboardPage({ params }: PageProps) {
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="portfolio" className="space-y-4">
+                <TabsContent value="portfolio" className="space-y-4" data-testid="portfolio-overview">
                   <PropertyPortfolio />
                 </TabsContent>
 
@@ -515,6 +521,7 @@ export default function DashboardPage({ params }: PageProps) {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
+              data-testid="recent-activity"
             >
               <RecentActivity limit={4} />
             </motion.div>
@@ -524,6 +531,7 @@ export default function DashboardPage({ params }: PageProps) {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
+              data-testid="market-insights"
             >
               <Card>
                 <CardHeader>
@@ -620,6 +628,17 @@ export default function DashboardPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      {/* Onboarding Tour */}
+      {/* {needsOnboarding && recommendedFlow && isAuthenticated && (
+        <OnboardingTour
+          tourId={recommendedFlow}
+          autoStart={true}
+          onComplete={() => console.log('Onboarding completed')}
+          onSkip={() => console.log('Onboarding skipped')}
+          onError={(error) => console.error('Onboarding error:', error)}
+        />
+      )} */}
     </div>
   )
 }

@@ -1,0 +1,118 @@
+{
+  "SubscriptionPlans": {
+    "title": "Chọn Gói Dịch Vụ",
+    "subtitle": "Mở khóa toàn bộ tiềm năng của FinHome với các tính năng cao cấp",
+    "monthly": "Hàng tháng",
+    "yearly": "Hàng năm",
+    "save_percentage": "Tiết kiệm {percentage}%",
+    "most_popular": "Phổ biến nhất",
+    "free_trial": "Dùng thử miễn phí {days} ngày",
+    "current_plan": "Gói hiện tại",
+    "upgrade": "Nâng cấp",
+    "downgrade": "Hạ cấp",
+    "contact_sales": "Liên hệ bán hàng",
+    "features_included": "Tính năng bao gồm",
+    "compare_plans": "So sánh tất cả gói",
+    "faq_title": "Câu hỏi thường gặp",
+    "pricing_currency": "Tất cả giá tính bằng Đồng Việt Nam (VND)"
+  },
+  "FeatureGates": {
+    "feature_locked": "Tính năng này đã bị khóa",
+    "upgrade_required": "Cần nâng cấp",
+    "subscription_required": "Cần đăng ký gói cao cấp để truy cập tính năng này",
+    "limit_exceeded": "Đã vượt quá giới hạn sử dụng",
+    "trial_expired": "Thời gian dùng thử đã hết hạn",
+    "feature_disabled": "Tính năng tạm thời bị vô hiệu hóa",
+    "unlock_with_upgrade": "Mở khóa với gói {plan}"
+  },
+  "UpgradePrompts": {
+    "unlock_feature": "Mở khóa tính năng",
+    "upgrade_now": "Nâng cấp ngay",
+    "compare_plans": "So sánh gói",
+    "learn_more": "Tìm hiểu thêm",
+    "start_trial": "Bắt đầu dùng thử miễn phí",
+    "upgrade_to": "Nâng cấp lên {plan}",
+    "free_trial_available": "Có dùng thử miễn phí {days} ngày",
+    "no_credit_card": "Không cần thẻ tín dụng",
+    "cancel_anytime": "Hủy bất cứ lúc nào"
+  },
+  "BillingPage": {
+    "title": "Thanh toán & Đăng ký",
+    "current_plan": "Gói hiện tại",
+    "next_billing": "Ngày thanh toán tiếp theo",
+    "amount": "Số tiền",
+    "payment_method": "Phương thức thanh toán",
+    "billing_history": "Lịch sử thanh toán",
+    "download_invoice": "Tải hóa đơn",
+    "update_payment": "Cập nhật phương thức thanh toán",
+    "cancel_subscription": "Hủy đăng ký",
+    "reactivate": "Kích hoạt lại đăng ký",
+    "manage_subscription": "Quản lý đăng ký"
+  },
+  "SubscriptionCommon": {
+    "free_tier": "Miễn phí",
+    "premium_tier": "Cao cấp",
+    "professional_tier": "Chuyên nghiệp",
+    "premium_feature": "Cao cấp",
+    "professional_feature": "Chuyên nghiệp",
+    "new_feature": "Mới",
+    "trial_days_remaining": "Còn {days} ngày",
+    "upgrade_to_premium": "Nâng cấp lên Cao cấp",
+    "upgrade_to_professional": "Nâng cấp lên Chuyên nghiệp",
+    "feature_temporarily_disabled": "Tính năng này tạm thời bị vô hiệu hóa",
+    "premium_feature_locked": "Tính năng cao cấp - nâng cấp để mở khóa"
+  },
+  "Features": {
+    "unlimited_plans_title": "Tạo kế hoạch không giới hạn",
+    "unlimited_plans_message": "Bạn đã đạt giới hạn 2 kế hoạch tài chính đang hoạt động trên gói miễn phí.",
+    "unlimited_plans_limit_message": "Bạn đang sử dụng {current} trong số {limit} kế hoạch được phép.",
+    "unlimited_plans_benefit": "Người dùng cao cấp có thể tạo kế hoạch tài chính không giới hạn để khám phá tất cả kịch bản đầu tư.",
+    
+    "advanced_calculations_title": "Tính toán vay nâng cao",
+    "advanced_calculations_message": "Truy cập lãi suất đa giai đoạn, phân tích trả trước và kiểm tra sức chịu đựng.",
+    "advanced_calculations_benefit": "Đưa ra quyết định sáng suốt hơn với mô hình tài chính tinh vi.",
+    
+    "scenario_comparison_title": "So sánh kịch bản nâng cao",
+    "scenario_comparison_message": "Bạn đã đạt giới hạn 1 kịch bản mỗi kế hoạch trên gói miễn phí.",
+    "scenario_comparison_limit_message": "Bạn đang sử dụng {current} trong số {limit} kịch bản được phép.",
+    "scenario_comparison_benefit": "So sánh kịch bản không giới hạn với phân tích độ nhạy và biểu đồ chi tiết.",
+    
+    "real_time_data_title": "Dữ liệu thị trường thời gian thực",
+    "real_time_data_message": "Truy cập lãi suất trực tiếp và thông tin thị trường bất động sản.",
+    "real_time_data_benefit": "Luôn dẫn đầu với xu hướng thị trường và thông tin giá cả mới nhất.",
+    
+    "monte_carlo_title": "Phân tích Monte Carlo",
+    "monte_carlo_message": "Mô hình xác suất nâng cao để đánh giá rủi ro.",
+    "monte_carlo_benefit": "Phân tích cấp độ chuyên nghiệp cho phân tích đầu tư tinh vi.",
+    
+    "feature_upgrade_title": "Tính năng cao cấp",
+    "feature_upgrade_message": "Tính năng này yêu cầu đăng ký gói cao cấp.",
+    "feature_upgrade_benefit": "Mở khóa công cụ nâng cao để lập kế hoạch tài chính tốt hơn."
+  },
+  "SubscriptionNotifications": {
+    "trial_ending_soon": "Thời gian dùng thử của bạn kết thúc trong {days} ngày",
+    "trial_ended": "Thời gian dùng thử của bạn đã kết thúc",
+    "upgrade_successful": "Nâng cấp thành công lên {plan}",
+    "downgrade_scheduled": "Hạ cấp được lên lịch vào {date}",
+    "payment_failed": "Thanh toán thất bại - vui lòng cập nhật phương thức thanh toán",
+    "subscription_canceled": "Hủy đăng ký thành công"
+  },
+  "SubscriptionFaq": {
+    "can_cancel_anytime": {
+      "question": "Tôi có thể hủy bất cứ lúc nào không?",
+      "answer": "Có, bạn có thể hủy đăng ký bất cứ lúc nào từ trang cài đặt tài khoản."
+    },
+    "refund_policy": {
+      "question": "Tôi có được hoàn tiền không?",
+      "answer": "Chúng tôi có chính sách hoàn tiền trong 30 ngày đầu tiên."
+    },
+    "data_security": {
+      "question": "Dữ liệu của tôi có được bảo mật không?",
+      "answer": "Tất cả dữ liệu được mã hóa và lưu trữ an toàn theo tiêu chuẩn quốc tế."
+    },
+    "plan_changes": {
+      "question": "Tôi có thể nâng cấp/hạ cấp sau không?",
+      "answer": "Có, bạn có thể thay đổi gói bất cứ lúc nào. Thay đổi sẽ có hiệu lực ngay lập tức."
+    }
+  }
+}
