@@ -62,7 +62,7 @@ export function UpgradePrompt({
   };
 
   const handleUpgrade = (tier: UserSubscriptionTier) => {
-    router.push(`/subscription/upgrade?plan=${tier}&feature=${featureKey}`);
+    router.push(`/subscription/checkout?plan=${tier}&feature=${featureKey}`);
   };
 
   if (isDismissed) return null;
@@ -166,7 +166,7 @@ export function UpgradePrompt({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => router.push("/subscription/plans")}
+          onClick={() => router.push("/subscription")}
           className="sm:w-auto"
         >
           {t("compare_plans")}
@@ -283,7 +283,7 @@ export function QuickUpgradeButton({
       size={size}
       onClick={() =>
         router.push(
-          `/subscription/upgrade?plan=${targetTier}&feature=${featureKey}`
+          `/subscription/checkout?plan=${targetTier}&feature=${featureKey}`
         )
       }
       className={`${className}`}

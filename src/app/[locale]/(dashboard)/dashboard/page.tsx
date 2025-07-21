@@ -47,6 +47,11 @@ import AchievementSystem from '@/components/achievements/AchievementSystem'
 // Import database service
 import { DashboardService } from '@/lib/services/dashboardService'
 
+// Import monetization components
+import { FeatureGate } from '@/components/subscription/FeatureGate'
+import { FeatureBadge } from '@/components/subscription/SubscriptionBadge'
+import { useSubscriptionContext } from '@/components/subscription/SubscriptionProvider'
+
 // Import onboarding components
 import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
 import { useOnboardingCheck } from '@/hooks/useOnboarding'
@@ -323,10 +328,12 @@ export default function DashboardPage({ params }: PageProps) {
                   <TabsTrigger value="analytics" className="flex items-center gap-2">
                     <PieChart className="w-4 h-4" />
                     {t('tabs.analytics')}
+                    <FeatureBadge featureKey="scenario_comparison" />
                   </TabsTrigger>
                   <TabsTrigger value="calendar" className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     {t('tabs.schedule')}
+                    <FeatureBadge featureKey="real_time_data" />
                   </TabsTrigger>
                 </TabsList>
 
@@ -335,7 +342,8 @@ export default function DashboardPage({ params }: PageProps) {
                 </TabsContent>
 
                 <TabsContent value="analytics" className="space-y-4">
-                  <Card>
+                  <FeatureGate featureKey="scenario_comparison" promptStyle="inline">
+                    <Card>
                     <CardHeader>
                       <CardTitle>{t('investmentAnalysis.title')}</CardTitle>
                     </CardHeader>
@@ -349,11 +357,13 @@ export default function DashboardPage({ params }: PageProps) {
                         </div>
                       </div>
                     </CardContent>
-                  </Card>
+                    </Card>
+                  </FeatureGate>
                 </TabsContent>
 
                 <TabsContent value="calendar" className="space-y-4">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <FeatureGate featureKey="real_time_data" promptStyle="inline">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Upcoming Events */}
                     <Card>
                       <CardHeader>
@@ -507,7 +517,8 @@ export default function DashboardPage({ params }: PageProps) {
                         </div>
                       </CardContent>
                     </Card>
-                  </div>
+                    </div>
+                  </FeatureGate>
                 </TabsContent>
               </Tabs>
             </motion.div>

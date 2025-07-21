@@ -12,6 +12,9 @@ import Link from 'next/link'
 import { Database } from '@/lib/supabase/types'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
+import { useSubscriptionContext } from '@/components/subscription/SubscriptionProvider'
+import { FeatureGate } from '@/components/subscription/FeatureGate'
+import { FeatureBadge } from '@/components/subscription/SubscriptionBadge'
 
 type FinancialPlan = Database['public']['Tables']['financial_plans']['Row']
 
@@ -25,6 +28,7 @@ interface PlansListProps {
 export function PlansList({ plans, onPlanDeleted }: PlansListProps) {
   const t = useTranslations('PlansList')
   const [deletingPlanId, setDeletingPlanId] = useState<string | null>(null)
+  const { tier } = useSubscriptionContext()
 
   const getStatusLabel = (status: string) => {
     switch (status) {
@@ -93,8 +97,16 @@ export function PlansList({ plans, onPlanDeleted }: PlansListProps) {
     )
   }
 
+  // Show plan limit notification for free users
+  const showPlanLimitWarning = tier === 'free' && plans.length >= 2
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="space-y-4">
+      {showPlanLimitWarning && (
+        <FeatureGate featureKey="unlimited_plans" promptStyle="banner" />
+      )}
+      
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {plans.map((plan) => (
         <Card key={plan.id} className="hover:shadow-md transition-shadow">
           <CardHeader>
@@ -166,6 +178,7 @@ export function PlansList({ plans, onPlanDeleted }: PlansListProps) {
           </CardContent>
         </Card>
       ))}
+      </div>
     </div>
   )
 }

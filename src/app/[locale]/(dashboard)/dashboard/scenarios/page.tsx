@@ -38,6 +38,8 @@ import {
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
+import { FeatureGate } from '@/components/subscription/FeatureGate'
+import { FeatureBadge } from '@/components/subscription/SubscriptionBadge'
 
 // Import our new components
 import ScenarioComparisonTable from '@/components/scenarios/ScenarioComparisonTable'
@@ -592,9 +594,24 @@ const EnhancedScenariosPage: React.FC = () => {
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="comparison">{t('comparisonTable')}</TabsTrigger>
           <TabsTrigger value="charts">{t('visualCharts')}</TabsTrigger>
-          <TabsTrigger value="advanced">{t('advancedCharts')}</TabsTrigger>
-          <TabsTrigger value="interactive">{t('interactiveSliders')}</TabsTrigger>
-          <TabsTrigger value="analysis">{t('analysis')}</TabsTrigger>
+          <TabsTrigger value="advanced">
+            <div className="flex items-center gap-2">
+              {t('advancedCharts')}
+              <FeatureBadge featureKey="scenario_comparison" />
+            </div>
+          </TabsTrigger>
+          <TabsTrigger value="interactive">
+            <div className="flex items-center gap-2">
+              {t('interactiveSliders')}
+              <FeatureBadge featureKey="scenario_comparison" />
+            </div>
+          </TabsTrigger>
+          <TabsTrigger value="analysis">
+            <div className="flex items-center gap-2">
+              {t('analysis')}
+              <FeatureBadge featureKey="monte_carlo_analysis" />
+            </div>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="comparison" className="space-y-6">
@@ -619,7 +636,8 @@ const EnhancedScenariosPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="advanced" className="space-y-6">
-          <ErrorBoundary>
+          <FeatureGate featureKey="scenario_comparison" promptStyle="inline">
+            <ErrorBoundary>
             {chartScenarios.length > 0 ? (
               <AdvancedScenarioCharts
                 scenarios={chartScenarios.filter(s => selectedScenarioIds.includes(s.id))}
@@ -632,11 +650,13 @@ const EnhancedScenariosPage: React.FC = () => {
                 </CardContent>
               </Card>
             )}
-          </ErrorBoundary>
+            </ErrorBoundary>
+          </FeatureGate>
         </TabsContent>
 
         <TabsContent value="interactive" className="space-y-6">
-          <ErrorBoundary>
+          <FeatureGate featureKey="scenario_comparison" promptStyle="inline">
+            <ErrorBoundary>
             {chartScenarios.length > 0 && selectedScenarioIds.length > 0 ? (
               <InteractiveParameterSliders
                 baseScenario={chartScenarios.find(s => selectedScenarioIds.includes(s.id)) || chartScenarios[0]}
@@ -651,11 +671,13 @@ const EnhancedScenariosPage: React.FC = () => {
                 </CardContent>
               </Card>
             )}
-          </ErrorBoundary>
+            </ErrorBoundary>
+          </FeatureGate>
         </TabsContent>
 
         <TabsContent value="analysis" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <FeatureGate featureKey="monte_carlo_analysis" promptStyle="inline">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -741,7 +763,8 @@ const EnhancedScenariosPage: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
+            </div>
+          </FeatureGate>
         </TabsContent>
       </Tabs>
     </div>

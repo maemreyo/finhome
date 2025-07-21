@@ -97,8 +97,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       currency: 'VND'
     },
     stripeIds: {
-      monthly: 'price_premium_monthly_vnd',
-      yearly: 'price_premium_yearly_vnd'
+      monthly: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID || 'price_premium_monthly_vnd',
+      yearly: process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID || 'price_premium_yearly_vnd'
     },
     popular: true,
     trial: {
@@ -228,8 +228,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       currency: 'VND'
     },
     stripeIds: {
-      monthly: 'price_professional_monthly_vnd',
-      yearly: 'price_professional_yearly_vnd'
+      monthly: process.env.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID || 'price_professional_monthly_vnd',
+      yearly: process.env.STRIPE_PROFESSIONAL_YEARLY_PRICE_ID || 'price_professional_yearly_vnd'
     },
     trial: {
       enabled: true,

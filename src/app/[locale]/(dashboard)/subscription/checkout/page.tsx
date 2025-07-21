@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Check, CreditCard, Shield, ArrowLeft } from 'lucide-react'
 import { useSubscriptionContext } from '@/components/subscription/SubscriptionProvider'
+import { useAuth } from '@/hooks/useAuth'
 import { SUBSCRIPTION_PLANS, formatPrice, calculateYearlyDiscount } from '@/config/subscriptionPlans'
 import { UserSubscriptionTier } from '@/lib/supabase/types'
 
@@ -21,6 +22,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { tier: currentTier, refreshSubscription } = useSubscriptionContext()
+  const { user } = useAuth()
   
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -56,7 +58,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           planId: selectedPlan.tier,
           billing: billingParam,
-          userId: 'demo-user-id', // In real app, get from auth context
+          userId: user?.id || '',
           featureKey: featureParam
         })
       })

@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl'
 
 interface FeatureGateProps {
   featureKey: FeatureKey
-  children: React.ReactNode
+  children?: React.ReactNode
   fallback?: React.ReactNode
   showUpgradePrompt?: boolean
   promptStyle?: 'modal' | 'banner' | 'inline' | 'tooltip'

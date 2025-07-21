@@ -22,6 +22,8 @@ import {
 } from 'lucide-react'
 import { DashboardService } from '@/lib/services/dashboardService'
 import { formatCurrency } from '@/lib/utils'
+import { FeatureGate } from '@/components/subscription/FeatureGate'
+import { FeatureBadge } from '@/components/subscription/SubscriptionBadge'
 
 export default function AnalyticsPage() {
   const t = useTranslations('Dashboard.Analytics')
@@ -157,8 +159,18 @@ export default function AnalyticsPage() {
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">{t('tabs.overview')}</TabsTrigger>
-            <TabsTrigger value="performance">{t('tabs.performance')}</TabsTrigger>
-            <TabsTrigger value="trends">{t('tabs.trends')}</TabsTrigger>
+            <TabsTrigger value="performance">
+              <div className="flex items-center gap-2">
+                {t('tabs.performance')}
+                <FeatureBadge featureKey="scenario_comparison" />
+              </div>
+            </TabsTrigger>
+            <TabsTrigger value="trends">
+              <div className="flex items-center gap-2">
+                {t('tabs.trends')}
+                <FeatureBadge featureKey="real_time_data" />
+              </div>
+            </TabsTrigger>
             <TabsTrigger value="goals">{t('tabs.goals')}</TabsTrigger>
           </TabsList>
 
@@ -239,14 +251,15 @@ export default function AnalyticsPage() {
           </TabsContent>
 
           <TabsContent value="performance" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('planPerformance.title')}</CardTitle>
-                <CardDescription>
-                  {t('planPerformance.description')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+            <FeatureGate featureKey="scenario_comparison" promptStyle="inline">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('planPerformance.title')}</CardTitle>
+                  <CardDescription>
+                    {t('planPerformance.description')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
                 {isLoading ? (
                   <div className="h-96 flex items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -285,12 +298,14 @@ export default function AnalyticsPage() {
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </FeatureGate>
           </TabsContent>
 
           <TabsContent value="trends" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <FeatureGate featureKey="real_time_data" promptStyle="inline">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -392,7 +407,8 @@ export default function AnalyticsPage() {
                   )}
                 </CardContent>
               </Card>
-            </div>
+              </div>
+            </FeatureGate>
           </TabsContent>
 
           <TabsContent value="goals" className="space-y-4">
