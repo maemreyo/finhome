@@ -158,6 +158,7 @@ export function EnhancedQuickTransactionForm({
         onCancel={onCancel}
         suggestedTags={suggestions}
         quickMode={quickMode}
+        userId={userId}
       />
 
       {/* Quick Mode Tips */}

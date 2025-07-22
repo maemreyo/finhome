@@ -90,6 +90,7 @@ export default async function ExpensesPage() {
     <div className="space-y-6 p-6">
       <Suspense fallback={<ExpenseTrackingDashboardSkeleton />}>
         <ExpenseTrackingDashboard
+          userId={user.id}
           initialData={{
             wallets: wallets || [],
             expenseCategories: expenseCategories || [],

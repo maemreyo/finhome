@@ -43,6 +43,7 @@ import {
   Lightbulb
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ReceiptImageUpload, ReceiptImage } from '@/components/ui/receipt-image-upload'
 
 const intelligentTransactionSchema = z.object({
   wallet_id: z.string().min(1, 'Please select a wallet'),
@@ -57,6 +58,7 @@ const intelligentTransactionSchema = z.object({
   transaction_date: z.string().optional(),
   merchant_name: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  receipt_images: z.array(z.string()).optional(),
 })
 
 type FormData = z.infer<typeof intelligentTransactionSchema>
@@ -109,6 +111,7 @@ export function IntelligentTransactionForm({
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [suggestionType, setSuggestionType] = useState<'description' | 'merchant' | null>(null)
   const [autoSuggestEnabled, setAutoSuggestEnabled] = useState(true)
+  const [receiptImages, setReceiptImages] = useState<ReceiptImage[]>([])
   
   // Form references
   const descriptionInputRef = useRef<HTMLInputElement>(null)
@@ -121,6 +124,7 @@ export function IntelligentTransactionForm({
       amount: 0,
       transaction_date: new Date().toISOString().split('T')[0],
       tags: [],
+      receipt_images: [],
     }
   })
 
@@ -248,6 +252,11 @@ export function IntelligentTransactionForm({
     setIsSubmitting(true)
 
     try {
+      // Get receipt image URLs from uploaded images
+      const receiptImageUrls = receiptImages
+        .filter(img => img.uploaded && img.url)
+        .map(img => img.url!)
+
       const response = await fetch('/api/expenses', {
         method: 'POST',
         headers: {
@@ -256,6 +265,7 @@ export function IntelligentTransactionForm({
         body: JSON.stringify({
           ...data,
           tags: selectedTags,
+          receipt_images: receiptImageUrls,
         }),
       })
 
@@ -274,6 +284,7 @@ export function IntelligentTransactionForm({
 
       form.reset()
       setSelectedTags([])
+      setReceiptImages([])
       clearSuggestions()
       onSuccess?.()
 
@@ -679,6 +690,24 @@ export function IntelligentTransactionForm({
               </div>
             )}
           </div>
+
+          {/* Receipt Images */}
+          {!quickMode && (
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1">
+                <Camera className="h-4 w-4 text-muted-foreground" />
+                Receipt Images
+              </Label>
+              <ReceiptImageUpload
+                images={receiptImages}
+                onImagesChange={setReceiptImages}
+                userId={userId || 'current-user-id'}
+                maxImages={3}
+                autoUpload={false}
+                className=""
+              />
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className={cn("flex gap-2", quickMode ? "pt-2" : "pt-4")}>

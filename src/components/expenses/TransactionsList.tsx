@@ -27,6 +27,7 @@ import {
 import { cn, formatCurrency } from '@/lib/utils'
 import { format, parseISO, isToday, isYesterday, isThisWeek, isThisMonth } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import { ReceiptImageViewer } from '@/components/ui/receipt-image-viewer'
 
 interface Transaction {
   id: string
@@ -91,6 +92,9 @@ export function TransactionsList({
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'yesterday' | 'week' | 'month'>('all')
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [selectedImages, setSelectedImages] = useState<string[]>([])
+  const [viewerTitle, setViewerTitle] = useState('')
 
   useEffect(() => {
     setFilteredTransactions(transactions)
@@ -384,9 +388,17 @@ export function TransactionsList({
                               )}
                               
                               {transaction.receipt_images && transaction.receipt_images.length > 0 && (
-                                <Badge variant="outline" className="text-xs">
+                                <Badge 
+                                  variant="outline" 
+                                  className="text-xs cursor-pointer hover:bg-muted-foreground/10 transition-colors"
+                                  onClick={() => {
+                                    setSelectedImages(transaction.receipt_images!)
+                                    setViewerTitle(`${transaction.description || 'Transaction'} - Receipt Images`)
+                                    setViewerOpen(true)
+                                  }}
+                                >
                                   <Camera className="h-3 w-3 mr-1" />
-                                  {transaction.receipt_images.length}
+                                  {transaction.receipt_images.length} receipt{transaction.receipt_images.length > 1 ? 's' : ''}
                                 </Badge>
                               )}
 
@@ -451,6 +463,14 @@ export function TransactionsList({
           </div>
         )}
       </CardContent>
+      
+      {/* Receipt Image Viewer Modal */}
+      <ReceiptImageViewer
+        images={selectedImages}
+        open={viewerOpen}
+        onOpenChange={setViewerOpen}
+        title={viewerTitle}
+      />
     </Card>
   )
 }

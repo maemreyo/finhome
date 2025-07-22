@@ -18,6 +18,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import { ReceiptImageUpload, ReceiptImage } from '@/components/ui/receipt-image-upload'
 import { 
   Calculator, 
   Camera, 
@@ -49,6 +50,7 @@ const quickTransactionSchema = z.object({
   transaction_date: z.string().optional(),
   merchant_name: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  receipt_images: z.array(z.string()).optional(),
 })
 
 type FormData = z.infer<typeof quickTransactionSchema>
@@ -81,6 +83,7 @@ interface QuickTransactionFormProps {
   className?: string
   suggestedTags?: string[] // Previously used tags for suggestions
   quickMode?: boolean // Compact mode for faster entry
+  userId?: string // For receipt image upload
 }
 
 export function QuickTransactionForm({
@@ -91,7 +94,8 @@ export function QuickTransactionForm({
   onCancel,
   className,
   suggestedTags = [],
-  quickMode = false
+  quickMode = false,
+  userId = 'current-user-id' // TODO: Get from actual user session
 }: QuickTransactionFormProps) {
   const t = useTranslations('QuickTransactionForm')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -100,6 +104,7 @@ export function QuickTransactionForm({
   const [transactionType, setTransactionType] = useState<'expense' | 'income' | 'transfer'>('expense')
   const [tagInputOpen, setTagInputOpen] = useState(false)
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>(suggestedTags)
+  const [receiptImages, setReceiptImages] = useState<ReceiptImage[]>([])
   const tagInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<FormData>({
@@ -109,6 +114,7 @@ export function QuickTransactionForm({
       amount: 0,
       transaction_date: new Date().toISOString().split('T')[0],
       tags: [],
+      receipt_images: [],
     }
   })
 
@@ -163,6 +169,11 @@ export function QuickTransactionForm({
     setIsSubmitting(true)
 
     try {
+      // Get receipt image URLs from uploaded images
+      const receiptImageUrls = receiptImages
+        .filter(img => img.uploaded && img.url)
+        .map(img => img.url!)
+
       const response = await fetch('/api/expenses', {
         method: 'POST',
         headers: {
@@ -171,6 +182,7 @@ export function QuickTransactionForm({
         body: JSON.stringify({
           ...data,
           tags: selectedTags,
+          receipt_images: receiptImageUrls,
         }),
       })
 
@@ -191,6 +203,7 @@ export function QuickTransactionForm({
 
       form.reset()
       setSelectedTags([])
+      setReceiptImages([])
       onSuccess?.()
 
     } catch (error) {
@@ -445,6 +458,24 @@ export function QuickTransactionForm({
                 placeholder="Description (optional)"
                 {...form.register('description')}
                 className="h-8 text-sm"
+              />
+            </div>
+          )}
+
+          {/* Receipt Images */}
+          {!quickMode && (
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1">
+                <Camera className="h-4 w-4 text-muted-foreground" />
+                Receipt Images
+              </Label>
+              <ReceiptImageUpload
+                images={receiptImages}
+                onImagesChange={setReceiptImages}
+                userId={userId}
+                maxImages={3}
+                autoUpload={false}
+                className=""
               />
             </div>
           )}

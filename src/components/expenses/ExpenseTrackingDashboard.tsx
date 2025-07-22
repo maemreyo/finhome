@@ -80,6 +80,7 @@ interface Budget {
 }
 
 interface ExpenseTrackingDashboardProps {
+  userId: string;
   initialData: {
     wallets: Wallet[];
     expenseCategories: any[];
@@ -91,6 +92,7 @@ interface ExpenseTrackingDashboardProps {
 }
 
 export function ExpenseTrackingDashboard({
+  userId,
   initialData,
 }: ExpenseTrackingDashboardProps) {
   const t = useTranslations("ExpenseTrackingDashboard");
@@ -371,7 +373,7 @@ export function ExpenseTrackingDashboard({
                   expenseCategories={initialData.expenseCategories}
                   incomeCategories={initialData.incomeCategories}
                   onSuccess={handleTransactionSuccess}
-                  userId="current-user-id" // TODO: Get actual user ID
+                  userId={userId}
                   defaultQuickMode={true}
                   className="border-0 shadow-none p-0"
                 />
@@ -383,7 +385,7 @@ export function ExpenseTrackingDashboard({
                   expenseCategories={initialData.expenseCategories}
                   incomeCategories={initialData.incomeCategories}
                   onSuccess={handleTransactionSuccess}
-                  userId="current-user-id" // TODO: Get actual user ID
+                  userId={userId}
                   quickMode={true}
                   className="border-0 shadow-none p-0"
                 />
