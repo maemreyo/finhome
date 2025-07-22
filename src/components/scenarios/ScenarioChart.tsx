@@ -233,15 +233,15 @@ const ScenarioChart: React.FC<ScenarioChartProps> = ({
   const getChartDescription = () => {
     switch (chartType) {
       case 'bar':
-        return t('chartDescriptions.bar')
+        return t('chartTypes.bar')
       case 'line':
-        return t('chartDescriptions.line')
+        return t('chartTypes.line')
       case 'pie':
-        return t('chartDescriptions.pie')
+        return t('chartTypes.pie')
       case 'area':
-        return t('chartDescriptions.area')
+        return t('chartTypes.area')
       default:
-        return t('chartDescriptions.default')
+        return t('chartTypes.default')
     }
   }
 

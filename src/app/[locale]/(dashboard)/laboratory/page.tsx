@@ -248,7 +248,7 @@ export default function LaboratoryPage() {
 
   const handleCreateNewPlan = () => {
     // Navigate to create new plan page
-    window.location.href = '/dashboard/plans/new';
+    window.location.href = '/plans/new';
   };
 
   if (loading) {

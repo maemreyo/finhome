@@ -28,7 +28,7 @@ export default async function PlansPage({ params }: PageProps) {
       title={t('title')}
       description={t('description')}
       headerAction={
-        <Link href={`/${locale}/dashboard/plans/new`}>
+        <Link href={`/${locale}/plans/new`}>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             {t('createButton')}

@@ -1,4 +1,3 @@
-// src/components/dashboard/StatsCard.tsx
 // Reusable stats card component with i18n support
 
 import React from 'react'

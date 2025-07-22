@@ -224,16 +224,16 @@ function AdvancedScenarioChartsContent({
       {/* Scenario Overview Bar Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('scenarioOverview.title')}</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
           <CardDescription>
-            {t('scenarioOverview.description')}
+            {t('description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Monthly Payment Comparison */}
             <div>
-              <h4 className="text-sm font-medium mb-3">{t('monthlyPaymentChart.title')}</h4>
+              <h4 className="text-sm font-medium mb-3">{t('metrics.monthlyPayment')}</h4>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />

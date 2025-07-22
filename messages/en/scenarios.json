@@ -1,0 +1,697 @@
+{
+  "ScenarioComparisonTable": {
+    "title": "Scenario Comparison Table",
+    "descriptionNoSelection": "Compare financial scenarios side by side",
+    "descriptionWithSelection": "Comparing {count} scenarios",
+    "noScenariosSelected": "Select scenarios to compare",
+    "monthlyPayment": "Monthly Payment",
+    "totalInterest": "Total Interest",
+    "totalCost": "Total Cost",
+    "loanDuration": "Loan Duration",
+    "interestRate": "Interest Rate",
+    "riskLevel": "Risk Level",
+    "months": "months",
+    "metric": "Metric",
+    "scenarioSummary": "Scenario Summary",
+    "best": "Best",
+    "totalCostLabel": "Total Cost:",
+    "moreThanBestOption": "more than best option",
+    "riskLabel": "Risk:",
+    "downPayment": "Down Payment",
+    "loanToValue": "Loan-to-Value",
+    "debtToIncome": "Debt-to-Income",
+    "affordabilityScore": "Affordability Score",
+    "monthlySavings": "Monthly Savings"
+  },
+  "months": "months",
+  "ScenarioParameterEditor": {
+    "title": "Scenario Parameter Editor",
+    "description": "Adjust financial parameters to create custom scenarios",
+    "actions": {
+      "save": "Save Scenario",
+      "reset": "Reset",
+      "preview": "Preview",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "update": "Update Scenario"
+    },
+    "tabs": {
+      "basic": "Basic Info",
+      "loan": "Loan Details", 
+      "income": "Income & Expenses",
+      "advanced": "Advanced"
+    },
+    "fields": {
+      "scenarioName": "Scenario Name",
+      "scenarioNamePlaceholder": "Enter scenario name",
+      "scenarioType": "Scenario Type",
+      "scenarioDescription": "Description",
+      "scenarioDescriptionPlaceholder": "Describe this scenario",
+      "purchasePrice": "Purchase Price",
+      "purchasePricePlaceholder": "Enter property purchase price",
+      "downPayment": "Down Payment",
+      "downPaymentPlaceholder": "Enter down payment amount",
+      "downPaymentPercentage": "Down Payment (%)",
+      "interestRate": "Interest Rate (%)",
+      "interestRatePlaceholder": "Enter annual interest rate",
+      "loanTerm": "Loan Term (Years)",
+      "loanTermPlaceholder": "Enter loan term in years",
+      "monthlyIncome": "Monthly Income",
+      "monthlyIncomePlaceholder": "Enter monthly gross income",
+      "monthlyExpenses": "Monthly Expenses",
+      "monthlyExpensesPlaceholder": "Enter monthly expenses",
+      "expectedRentalIncome": "Expected Rental Income",
+      "expectedRentalIncomePlaceholder": "Enter expected rental income",
+      "propertyTaxes": "Property Taxes",
+      "insurance": "Insurance",
+      "maintenance": "Maintenance & Repairs",
+      "riskLevel": "Risk Level",
+      "propertyAppreciationRate": "Property Appreciation Rate",
+      "rentGrowthRate": "Rent Growth Rate",
+      "vacancyRate": "Vacancy Rate",
+      "propertyTax": "Property Tax Rate",
+      "loanAmount": "Loan Amount",
+      "currentValue": "Current: {value}",
+      "years": "years"
+    },
+    "scenarioTypes": {
+      "baseline": "Baseline",
+      "optimistic": "Optimistic",
+      "pessimistic": "Pessimistic",
+      "alternative": "Alternative",
+      "stress_test": "Stress Test"
+    },
+    "presets": {
+      "title": "Quick Start Templates",
+      "conservative": "Conservative",
+      "moderate": "Moderate", 
+      "aggressive": "Aggressive"
+    },
+    "riskLevels": {
+      "low": "Low Risk",
+      "medium": "Medium Risk",
+      "high": "High Risk"
+    },
+    "validation": {
+      "scenarioNameRequired": "Scenario name is required",
+      "purchasePriceRequired": "Purchase price is required",
+      "purchasePriceTooLow": "Purchase price must be greater than 0",
+      "downPaymentTooHigh": "Down payment cannot exceed purchase price",
+      "downPaymentRequired": "Down payment is required",
+      "interestRateRequired": "Interest rate is required",
+      "interestRateRange": "Interest rate must be between 0% and 30%",
+      "loanTermRequired": "Loan term is required",
+      "loanTermRange": "Loan term must be between 1 and 30 years",
+      "monthlyIncomeRequired": "Monthly income is required",
+      "monthlyExpensesRequired": "Monthly expenses is required",
+      "dtiTooHigh": "Debt-to-income ratio is too high (>50%)",
+      "invalidNumber": "Please enter a valid number"
+    },
+    "calculatedMetrics": {
+      "title": "Calculated Metrics",
+      "monthlyPayment": "Monthly Payment",
+      "loanAmount": "Loan Amount",
+      "totalInterest": "Total Interest",
+      "totalCost": "Total Cost",
+      "dtiRatio": "DTI Ratio",
+      "ltvRatio": "LTV Ratio",
+      "affordabilityScore": "Affordability Score",
+      "monthlySavings": "Monthly Savings"
+    },
+    "deleteConfirmation": {
+      "title": "Delete Scenario",
+      "message": "Are you sure you want to delete this scenario? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "InteractiveParameterSliders": {
+    "title": "Interactive Parameter Sliders",
+    "description": "Adjust parameters in real-time and see immediate impact on your scenario",
+    "controls": {
+      "autoUpdate": "Auto Update",
+      "applyChanges": "Apply Changes",
+      "reset": "Reset to Original",
+      "realTimeMode": "Real-time Mode",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "currentMetrics": {
+      "title": "Current Metrics",
+      "monthlyPayment": "Monthly Payment",
+      "loanAmount": "Loan Amount", 
+      "dtiRatio": "DTI Ratio",
+      "affordabilityScore": "Affordability Score",
+      "totalInterest": "Total Interest",
+      "totalCost": "Total Cost",
+      "monthlySavings": "Monthly Savings"
+    },
+    "parameters": {
+      "title": "Scenario Parameters",
+      "purchasePrice": {
+        "label": "Purchase Price",
+        "description": "Total property purchase price"
+      },
+      "downPayment": {
+        "label": "Down Payment",
+        "description": "Initial payment as percentage of purchase price"
+      },
+      "interestRate": {
+        "label": "Interest Rate",
+        "description": "Annual interest rate for the loan"
+      },
+      "loanTerm": {
+        "label": "Loan Term",
+        "description": "Number of years to repay the loan"
+      },
+      "loanTermYears": {
+        "label": "Loan Term",
+        "description": "Number of years to repay the loan",
+        "unit": "years"
+      },
+      "monthlyIncome": {
+        "label": "Monthly Income",
+        "description": "Your gross monthly income"
+      },
+      "monthlyExpenses": {
+        "label": "Monthly Expenses",
+        "description": "Your total monthly expenses excluding loan payment"
+      }
+    },
+    "ranges": {
+      "years": "years",
+      "percent": "%",
+      "currency": "VND"
+    },
+    "impact": {
+      "title": "Impact Analysis",
+      "positive": "Positive impact",
+      "negative": "Negative impact",
+      "neutral": "No significant impact"
+    },
+    "riskAssessment": {
+      "title": "Risk Assessment",
+      "dtiRatioLabel": "Debt-to-Income Ratio",
+      "riskLevels": {
+        "low": "Low Risk",
+        "medium": "Medium Risk",
+        "high": "High Risk"
+      },
+      "ranges": {
+        "low": "0-30%",
+        "medium": "30-40%",
+        "high": "40%+"
+      }
+    }
+  },
+  "AdvancedScenarioCharts": {
+    "title": "Advanced Scenario Charts",
+    "description": "Detailed visual analysis of your financial scenarios",
+    "chartTypes": {
+      "cashFlow": "Cash Flow Analysis",
+      "paymentBreakdown": "Payment Breakdown",
+      "sensitivityAnalysis": "Sensitivity Analysis",
+      "riskAssessment": "Risk Assessment",
+      "comparisonMatrix": "Comparison Matrix"
+    },
+    "metrics": {
+      "monthlyPayment": "Monthly Payment",
+      "totalCost": "Total Cost",
+      "totalInterest": "Total Interest",
+      "dtiRatio": "DTI Ratio",
+      "ltvRatio": "LTV Ratio",
+      "affordabilityScore": "Affordability Score",
+      "monthlySavings": "Monthly Savings",
+      "payoffTime": "Payoff Time"
+    },
+    "monthlyPaymentChart": {
+      "tooltipLabel": "Monthly Payment",
+      "scenarioLabel": "Scenario: {type}"
+    },
+    "chartControls": {
+      "selectMetrics": "Select Metrics",
+      "timeframe": "Timeframe",
+      "chartType": "Chart Type",
+      "downloadChart": "Download Chart",
+      "fullscreen": "Fullscreen"
+    },
+    "timeframes": {
+      "1year": "1 Year",
+      "5years": "5 Years",
+      "10years": "10 Years",
+      "fullTerm": "Full Term"
+    },
+    "noDataMessage": "No data available for the selected scenarios and metrics",
+    "loadingMessage": "Loading chart data...",
+    "multidimensionalAnalysis": {
+      "title": "Multi-dimensional Analysis",
+      "description": "Comprehensive radar chart comparison of all scenario aspects",
+      "metrics": {
+        "affordability": "Affordability",
+        "roiPotential": "ROI Potential",
+        "riskLevel": "Risk Level",
+        "monthlyPayment": "Monthly Payment",
+        "timeToPayoff": "Time to Payoff"
+      }
+    },
+    "loanBalanceOverTime": {
+      "title": "Loan Balance Over Time",
+      "description": "How your loan balance decreases over time for each scenario",
+      "xAxisLabel": "Year {year}",
+      "yAxisLabel": "Remaining Balance",
+      "tooltipLabel": "Month {month}"
+    },
+    "riskReturnAnalysis": {
+      "title": "Risk vs Return Analysis",
+      "description": "Scatter plot showing risk-return profile of each scenario",
+      "xAxisLabel": "Risk Score",
+      "yAxisLabel": "Expected Return (%)",
+      "tooltipRisk": "Risk: {value}",
+      "tooltipReturn": "Return: {value}%"
+    },
+    "totalCostChart": {
+      "title": "Total Cost Comparison",
+      "tooltipLabel": "Total Cost",
+      "scenarioLabel": "Scenario: {type}"
+    },
+    "financialMetricsMatrix": {
+      "title": "Financial Metrics Matrix",
+      "description": "Comprehensive comparison of all financial metrics",
+      "headers": {
+        "scenario": "Scenario",
+        "monthlyPayment": "Monthly Payment",
+        "totalCost": "Total Cost",
+        "affordabilityScore": "Affordability",
+        "dtiRatio": "DTI Ratio",
+        "riskLevel": "Risk Level"
+      },
+      "riskLevels": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      }
+    }
+  },
+  "ScenarioChart": {
+    "title": "Scenario Visualization",
+    "description": "Visual comparison of your financial scenarios",
+    "chartTypes": {
+      "bar": "Bar Chart",
+      "line": "Line Chart", 
+      "pie": "Pie Chart",
+      "area": "Area Chart",
+      "scatter": "Scatter Plot"
+    },
+    "controls": {
+      "chartType": "Chart Type",
+      "selectChart": "Select chart type",
+      "downloadChart": "Download",
+      "printChart": "Print",
+      "shareChart": "Share"
+    },
+    "legends": {
+      "monthlyPayment": "Monthly Payment",
+      "totalCost": "Total Cost",
+      "totalInterest": "Total Interest", 
+      "downPayment": "Down Payment",
+      "loanAmount": "Loan Amount"
+    },
+    "axes": {
+      "scenarios": "Scenarios",
+      "amount": "Amount (VND)",
+      "percentage": "Percentage (%)",
+      "months": "Months"
+    },
+    "noScenariosMessage": "Please select scenarios to display charts",
+    "loadingChart": "Loading chart...",
+    "chartError": "Error loading chart data"
+  },
+  "ScenarioComparison": {
+    "title": "Scenario Comparison",
+    "description": "Side-by-side comparison of financial scenarios",
+    "selectScenarios": "Select scenarios to compare",
+    "addScenario": "Add Scenario",
+    "removeScenario": "Remove Scenario",
+    "compareButton": "Compare Selected",
+    "exportComparison": "Export Comparison",
+    "printComparison": "Print Comparison",
+    "winner": "Best Option",
+    "pros": "Advantages",
+    "cons": "Disadvantages",
+    "recommendation": "Recommendation"
+  },
+  "CreateScenarioModal": {
+    "title": "Create New Scenario",
+    "editTitle": "Edit Scenario",
+    "description": "Create a new financial scenario for comparison",
+    "quickStart": "Quick Start Templates",
+    "templates": {
+      "conservative": {
+        "title": "Conservative Plan",
+        "description": "Low risk with higher down payment"
+      },
+      "balanced": {
+        "title": "Balanced Plan", 
+        "description": "Moderate risk and balanced payments"
+      },
+      "aggressive": {
+        "title": "Aggressive Plan",
+        "description": "Higher risk for potentially better returns"
+      }
+    },
+    "useTemplate": "Use Template",
+    "customScenario": "Create Custom Scenario",
+    "close": "Close"
+  },
+  "ExportScenarios": {
+    "title": "Export Scenarios",
+    "subtitle": "Download your financial analysis",
+    "description": "Export your scenario data in various formats",
+    "selectFormat": "Select Export Format",
+    "formats": {
+      "csv": "CSV (Spreadsheet)",
+      "pdf": "PDF Report",
+      "excel": "Excel Workbook",
+      "json": "JSON Data",
+      "csvDescription": "Compatible with Excel and Google Sheets",
+      "pdfDescription": "Professional report format",
+      "excelDescription": "Advanced Excel workbook with multiple sheets",
+      "jsonDescription": "Developer-friendly structured data"
+    },
+    "features": {
+      "basicExport": "Basic data export",
+      "spreadsheetCompatible": "Compatible with all spreadsheet apps",
+      "utf8Encoded": "UTF-8 encoded",
+      "professionalFormatting": "Professional formatting",
+      "chartsAndTables": "Charts and tables",
+      "printReady": "Print-ready",
+      "multipleWorksheets": "Multiple worksheets",
+      "summaryStatistics": "Summary statistics",
+      "advancedFormatting": "Advanced formatting",
+      "completeDataStructure": "Complete data structure",
+      "apiIntegration": "API integration ready",
+      "machineReadable": "Machine readable"
+    },
+    "options": {
+      "selectedOnly": "Selected scenarios only",
+      "allScenarios": "All scenarios",
+      "includeCharts": "Include charts",
+      "includeAnalysis": "Include analysis",
+      "includeRecommendations": "Include recommendations"
+    },
+    "premium": "Premium",
+    "exportOptions": "Export Options",
+    "exportPreview": "Export Preview",
+    "selectedScenarios": "Selected scenarios",
+    "exportFormat": "Export format",
+    "worksheets": "Worksheets",
+    "worksheetContent": "Scenario Data + Summary",
+    "downloadNotice": "File will be downloaded automatically after generation.",
+    "includeCharts": "Include charts and visualizations",
+    "includeAnalysis": "Include detailed analysis",
+    "export": "Export",
+    "cancel": "Cancel",
+    "exporting": "Exporting...",
+    "success": "Export completed successfully",
+    "error": "Export failed. Please try again."
+  },
+  "Common": {
+    "months": "months",
+    "years": "years",
+    "percent": "%",
+    "currency": "VND"
+  },
+  "SmartScenarios": {
+    "title": "AI-Powered Smart Scenarios",
+    "description": "Generate optimized scenarios based on your financial profile",
+    "analyzing": "Analyzing your financial situation...",
+    "generating": "Generating smart scenarios...",
+    "complete": "Analysis complete",
+    "error": "Unable to generate smart scenarios at this time",
+    "recommendations": {
+      "title": "AI Recommendations",
+      "based_on": "Based on your profile:",
+      "risk_tolerance": "Risk tolerance: {level}",
+      "income_level": "Income level: {level}",
+      "investment_goals": "Investment goals: {goals}"
+    },
+    "generated_scenarios": {
+      "title": "Generated Scenarios",
+      "count": "{count} scenarios generated",
+      "apply_all": "Apply All",
+      "apply_selected": "Apply Selected",
+      "review": "Review"
+    }
+  },
+  "MonteCarloAnalysis": {
+    "title": "Monte Carlo Risk Analysis",
+    "premium": "Premium",
+    "description": "Statistical analysis with 10,000 simulations to assess scenario robustness",
+    "noScenariosMessage": "Select scenarios to run Monte Carlo analysis",
+    "meanPayment": "Mean Payment",
+    "stdDeviation": "Std Deviation",
+    "var95": "VaR (95%)",
+    "volatility": "Volatility",
+    "skewness": "Skewness",
+    "kurtosis": "Kurtosis",
+    "riskRange": "Risk Range (5th - 95th percentile)",
+    "bestCase": "Best case",
+    "worstCase": "Worst case",
+    "sensitivityTitle": "Sensitivity Analysis",
+    "sensitivityDescription": "Impact of ±1% change in key parameters",
+    "riskAssessmentTitle": "Risk Assessment",
+    "riskLevel": "High",
+    "risk": "Risk",
+    "dtiRatio": "DTI Ratio",
+    "affordabilityScore": "Affordability Score"
+  },
+  "PremiumUpgradeCard": {
+    "smartScenarios": {
+      "title": "AI Smart Scenarios",
+      "description": "Generate personalized scenarios with AI analysis",
+      "benefits": [
+        "AI-powered scenario recommendations",
+        "Market context analysis",
+        "Personalized strategy insights",
+        "Risk assessment and optimization"
+      ]
+    },
+    "advancedExport": {
+      "title": "Advanced Export Options",
+      "description": "Export your data in professional formats",
+      "benefits": [
+        "PDF professional reports",
+        "Excel workbooks with charts",
+        "JSON data for developers",
+        "Custom branded reports"
+      ]
+    },
+    "advancedAnalytics": {
+      "title": "Advanced Analytics",
+      "description": "Deep insights and detailed analysis",
+      "benefits": [
+        "Interactive charts and graphs",
+        "Sensitivity analysis",
+        "Risk visualization",
+        "Performance metrics"
+      ]
+    },
+    "monteCarloAnalysis": {
+      "title": "Monte Carlo Analysis",
+      "description": "Advanced probability and risk modeling",
+      "benefits": [
+        "Probabilistic scenario modeling",
+        "Risk distribution analysis",
+        "Confidence interval calculations",
+        "Advanced statistical insights"
+      ]
+    },
+    "scenarioComparison": {
+      "title": "Unlimited Scenarios",
+      "description": "Create and compare unlimited scenarios",
+      "benefits": [
+        "Unlimited scenario creation",
+        "Side-by-side comparisons",
+        "Advanced filtering options",
+        "Bulk scenario operations"
+      ]
+    },
+    "premiumFeature": "Premium Feature",
+    "professionalFeature": "Professional Feature",
+    "premium": "Premium",
+    "professional": "Professional",
+    "monthPrice": "/month",
+    "freeTrial": "14-day free trial",
+    "upgradeToPrefix": "Upgrade to ",
+    "upgradeToPro": "Pro",
+    "upgradeToUnlock": "Upgrade to unlock this feature",
+    "securityNote": "Secure payment • Cancel anytime • 30-day money back"
+  },
+  "ScenarioFilters": {
+    "title": "Filters",
+    "clearAll": "Clear all",
+    "riskLevel": "Risk Level",
+    "type": "Type",
+    "all": "All",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "baseline": "Baseline",
+    "optimistic": "Optimistic",
+    "pessimistic": "Pessimistic",
+    "alternative": "Alternative",
+    "stressTest": "Stress Test"
+  },
+  "ScenarioGrid": {
+    "noScenariosTitle": "No scenarios found",
+    "noScenariosDescription": "Create your first scenario to get started with comparisons",
+    "createFirstScenario": "Create First Scenario",
+    "noDescription": "No description available",
+    "riskSuffix": "risk",
+    "monthly": "Monthly",
+    "totalCost": "Total Cost",
+    "affordability": "Affordability",
+    "selected": "Selected",
+    "createNewScenario": "Create New Scenario",
+    "addCustomScenario": "Add a custom scenario to compare",
+    "scenariosUsed": "{current}/{max} scenarios used"
+  },
+  "ScenarioLimitCard": {
+    "scenarios": {
+      "title": "Scenario Limit Reached",
+      "description": "Free users can create up to 1 scenario per plan",
+      "premiumBenefit": "Unlimited scenarios with Premium",
+      "upgradeReasons": [
+        "Create unlimited scenarios",
+        "Compare multiple options side-by-side", 
+        "Advanced scenario analysis",
+        "Export scenarios in multiple formats"
+      ]
+    },
+    "plans": {
+      "title": "Plan Limit Reached",
+      "description": "Free users can create up to 2 active plans",
+      "premiumBenefit": "Unlimited plans with Premium",
+      "upgradeReasons": [
+        "Create unlimited financial plans",
+        "Track multiple properties at once",
+        "Advanced planning tools",
+        "Collaboration features"
+      ]
+    },
+    "smartScenarios": {
+      "title": "AI Usage Limit Reached",
+      "description": "You've reached your monthly AI scenario generation limit",
+      "premiumBenefit": "More AI scenarios with Professional",
+      "upgradeReasons": [
+        "Unlimited AI scenario generation",
+        "Advanced market analysis",
+        "Premium AI insights",
+        "Priority AI processing"
+      ]
+    },
+    "premiumFeature": "Premium Feature",
+    "proFeature": "Pro Feature",
+    "usage": "Usage",
+    "monthPrice": "/month",
+    "freeTrial": "14-day free trial",
+    "upgradeNow": "Upgrade Now"
+  },
+  "ScenarioPageHeader": {
+    "title": "Financial Scenarios",
+    "description": "Create and compare financial scenarios to make informed decisions",
+    "scenarios": "scenarios",
+    "selected": "selected",
+    "limitReached": "Limit Reached",
+    "generateSmartScenarios": "Generate Smart Scenarios",
+    "export": "Export",
+    "createScenario": "Create Scenario",
+    "limitReachedTooltip": "You've reached your limit of {maxScenarios} scenarios",
+    "limitReachedButton": "Limit Reached ({maxScenarios} max)",
+    "editScenario": "Edit Scenario",
+    "createNewScenario": "Create New Scenario"
+  },
+  "ScenarioTabs": {
+    "comparisonTable": "Comparison",
+    "visualCharts": "Charts",
+    "advancedCharts": "Advanced",
+    "interactiveSliders": "Interactive",
+    "analysis": "Analysis",
+    "selectScenariosForAdvancedCharts": "Select scenarios to view advanced charts",
+    "selectScenariosForInteractiveSliders": "Select scenarios to use interactive parameter sliders"
+  },
+  "SmartRecommendations": {
+    "title": "Smart Recommendations",
+    "selectScenariosForRecommendations": "Select scenarios to get recommendations",
+    "recommended": "Recommended",
+    "lowestCostRecommendation": "This is the most cost-effective option based on total cost",
+    "moreExpensive": "more expensive than the best option"
+  },
+  "AIAnalysisModal": {
+    "title": "AI-Powered Smart Scenarios",
+    "subtitle": "Personalized Financial Analysis",
+    "description": "Analysis complete - {count} scenarios generated",
+    "userProfileTitle": "Based on your profile",
+    "marketContextTitle": "Market Context",
+    "strategyTitle": "AI Strategy Recommendation",
+    "nextStepsTitle": "Recommended Next Steps",
+    "disclaimerTitle": "AI-Generated Analysis",
+    "disclaimerText": "This analysis is generated by AI and should be used as a starting point for your financial planning. Always consult with qualified financial advisors before making major investment decisions.",
+    "closeButton": "Close Analysis",
+    "reviewButton": "Review Scenarios",
+    "generatedBy": "Generated by",
+    "aiInsights": "AI Insights",
+    "keyRecommendations": "Key Recommendations",
+    "riskAnalysis": "Risk Analysis",
+    "marketTrends": "Market Trends",
+    "personalizedStrategy": "Personalized Strategy"
+  },
+  "ExportModal": {
+    "title": "Export Scenarios",
+    "subtitle": "Download your financial analysis",
+    "description": "Export your scenario data in various formats",
+    "selectFormat": "Select Export Format",
+    "formats": {
+      "csv": "CSV (Spreadsheet)",
+      "pdf": "PDF Report", 
+      "excel": "Excel Workbook",
+      "json": "JSON Data",
+      "csvDescription": "Compatible with Excel and Google Sheets",
+      "pdfDescription": "Professional report format",
+      "excelDescription": "Advanced Excel workbook with multiple sheets",
+      "jsonDescription": "Developer-friendly structured data"
+    },
+    "features": {
+      "basicExport": "Basic data export",
+      "spreadsheetCompatible": "Compatible with all spreadsheet apps",
+      "utf8Encoded": "UTF-8 encoded",
+      "professionalFormatting": "Professional formatting",
+      "chartsAndTables": "Charts and tables",
+      "printReady": "Print-ready",
+      "multipleWorksheets": "Multiple worksheets",
+      "summaryStatistics": "Summary statistics",
+      "advancedFormatting": "Advanced formatting",
+      "completeDataStructure": "Complete data structure",
+      "apiIntegration": "API integration ready",
+      "machineReadable": "Machine readable"
+    },
+    "premium": "Premium",
+    "exportOptions": "Export Options",
+    "exportPreview": "Export Preview",
+    "selectedScenarios": "Selected scenarios",
+    "exportFormat": "Export format",
+    "worksheets": "Worksheets",
+    "worksheetContent": "Scenario Data + Summary",
+    "downloadNotice": "File will be downloaded automatically after generation.",
+    "exportButton": "Export",
+    "cancelButton": "Cancel",
+    "processing": "Processing export...",
+    "success": "Export completed successfully!",
+    "error": "Export failed. Please try again.",
+    "includeCharts": "Include charts and visualizations",
+    "includeAnalysis": "Include detailed analysis",
+    "customFilename": "Custom filename",
+    "filenameHelp": "Leave blank for auto-generated filename"
+  }
+}

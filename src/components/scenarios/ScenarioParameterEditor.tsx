@@ -355,19 +355,19 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
             >
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">{t('preview.monthlyPayment')}</Label>
+                  <Label className="text-sm font-medium">{t('calculatedMetrics.monthlyPayment')}</Label>
                   <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}</div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">{t('preview.totalInterest')}</Label>
+                  <Label className="text-sm font-medium">{t('calculatedMetrics.totalInterest')}</Label>
                   <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}</div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">{t('preview.totalCost')}</Label>
+                  <Label className="text-sm font-medium">{t('calculatedMetrics.totalCost')}</Label>
                   <div className="text-2xl font-bold">{formatCurrency(calculatedScenario.calculatedMetrics?.totalCost || 0)}</div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">{t('preview.riskLevel')}</Label>
+                  <Label className="text-sm font-medium">{t('fields.riskLevel')}</Label>
                   <Badge className={cn('text-sm', getRiskLevelColor(calculatedScenario.riskLevel))}>
                     {calculatedScenario.riskLevel.toUpperCase()}
                   </Badge>
@@ -375,16 +375,16 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
               </div>
               
               <div className="pt-4 border-t">
-                <h4 className="font-medium mb-2">{t('preview.keyMetrics')}</h4>
+                <h4 className="font-medium mb-2">{t('calculatedMetrics.title')}</h4>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600">{t('preview.monthlyPayment')}:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}
+                    <span className="text-gray-600">{t('calculatedMetrics.monthlyPayment')}:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}
                   </div>
                   <div>
-                    <span className="text-gray-600">{t('preview.totalInterest')}:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}
+                    <span className="text-gray-600">{t('calculatedMetrics.totalInterest')}:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}
                   </div>
                   <div>
-                    <span className="text-gray-600">{t('preview.totalCost')}:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalCost || 0)}
+                    <span className="text-gray-600">{t('calculatedMetrics.totalCost')}:</span> {formatCurrency(calculatedScenario.calculatedMetrics?.totalCost || 0)}
                   </div>
                 </div>
               </div>
@@ -426,7 +426,7 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
                           <SelectItem value="optimistic">{t('scenarioTypes.optimistic')}</SelectItem>
                           <SelectItem value="pessimistic">{t('scenarioTypes.pessimistic')}</SelectItem>
                           <SelectItem value="alternative">{t('scenarioTypes.alternative')}</SelectItem>
-                          <SelectItem value="stress_test">{t('scenarioTypes.stressTest')}</SelectItem>
+                          <SelectItem value="stress_test">{t('scenarioTypes.stress_test')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -658,23 +658,23 @@ const ScenarioParameterEditor: React.FC<ScenarioParameterEditorProps> = ({
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">
             <h4 className="font-medium mb-2 flex items-center gap-2">
               <Calculator className="w-4 h-4" />
-              Live Calculations
+              {t('calculatedMetrics.title')}
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <span className="text-gray-600">Monthly Payment:</span>
+                <span className="text-gray-600">{t('calculatedMetrics.monthlyPayment')}:</span>
                 <div className="font-medium">{formatCurrency(calculatedScenario.calculatedMetrics?.monthlyPayment || 0)}</div>
               </div>
               <div>
-                <span className="text-gray-600">Total Interest:</span>
+                <span className="text-gray-600">{t('calculatedMetrics.totalInterest')}:</span>
                 <div className="font-medium">{formatCurrency(calculatedScenario.calculatedMetrics?.totalInterest || 0)}</div>
               </div>
               <div>
-                <span className="text-gray-600">Duration:</span>
-                <div className="font-medium">{calculatedScenario.calculatedMetrics?.payoffTimeMonths || 0} months</div>
+                <span className="text-gray-600">{t('fields.loanTerm')}:</span>
+                <div className="font-medium">{calculatedScenario.calculatedMetrics?.payoffTimeMonths || 0} {t('months')}</div>
               </div>
               <div>
-                <span className="text-gray-600">Risk Level:</span>
+                <span className="text-gray-600">{t('fields.riskLevel')}:</span>
                 <Badge className={cn('text-xs', getRiskLevelColor(calculatedScenario.riskLevel))}>
                   {calculatedScenario.riskLevel}
                 </Badge>

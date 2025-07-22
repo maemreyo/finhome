@@ -128,6 +128,9 @@ export interface ScenarioAnalysisResult {
   opportunities: string[]
 }
 
+// Timeline scenario type (alias for compatibility)
+export type TimelineScenario = FinancialScenario
+
 // Export types for external use
 export type {
   FinancialPlan,

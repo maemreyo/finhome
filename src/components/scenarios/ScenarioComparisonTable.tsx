@@ -329,7 +329,7 @@ const ScenarioComparisonTable: React.FC<ScenarioComparisonTableProps> = ({
                               {metric.type === "months" && (
                                 <span>
                                   {comparison.trend === "up" ? "+" : ""}
-                                  {value - baselineValue} months
+                                  {value - baselineValue} {t('months')}
                                 </span>
                               )}
                             </div>

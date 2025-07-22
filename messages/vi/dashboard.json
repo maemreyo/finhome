@@ -756,7 +756,12 @@
         "demoPlanDescription": "Kế hoạch mẫu cho người dùng chưa xác thực",
         "noDescriptionAvailable": "Không có mô tả"
       },
-      "loadingScenarios": "Đang tải kịch bản..."
+      "loadingScenarios": "Đang tải kịch bản...",
+      "scenarios": "kịch bản",
+      "selected": "đã chọn",
+      "limitReached": "Đạt giới hạn",
+      "limitReachedTooltip": "Đã đạt giới hạn kịch bản ({maxScenarios}). Nâng cấp để tạo thêm kịch bản.",
+      "limitReachedButton": "Đã đạt giới hạn ({maxScenarios})"
     }
   }
 }

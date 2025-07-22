@@ -1,4 +1,3 @@
-// src/app/[locale]/(dashboard)/dashboard/plans/[planId]/edit/page.tsx
 import { getUser, getFinancialPlanWithDetails } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import { EditPlanPageClient } from './EditPlanPageClient'

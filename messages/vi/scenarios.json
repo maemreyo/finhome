@@ -1,0 +1,697 @@
+{
+  "ScenarioComparisonTable": {
+    "title": "Bảng So Sánh Kịch Bản",
+    "descriptionNoSelection": "So sánh các kịch bản tài chính cạnh nhau",
+    "descriptionWithSelection": "Đang so sánh {count} kịch bản",
+    "noScenariosSelected": "Chọn kịch bản để so sánh",
+    "monthlyPayment": "Thanh Toán Hàng Tháng",
+    "totalInterest": "Tổng Lãi Suất",
+    "totalCost": "Tổng Chi Phí",
+    "loanDuration": "Thời Hạn Vay",
+    "interestRate": "Lãi Suất",
+    "riskLevel": "Mức Rủi Ro",
+    "months": "tháng",
+    "metric": "Chỉ Số",
+    "scenarioSummary": "Tóm Tắt Kịch Bản",
+    "best": "Tốt Nhất",
+    "totalCostLabel": "Tổng Chi Phí:",
+    "moreThanBestOption": "cao hơn lựa chọn tốt nhất",
+    "riskLabel": "Rủi Ro:",
+    "downPayment": "Tiền Trả Trước",
+    "loanToValue": "Tỷ Lệ Vay/Giá Trị",
+    "debtToIncome": "Tỷ Lệ Nợ/Thu Nhập",
+    "affordabilityScore": "Điểm Khả Năng Chi Trả",
+    "monthlySavings": "Tiết Kiệm Hàng Tháng"
+  },
+  "months": "tháng",
+  "ScenarioParameterEditor": {
+    "title": "Trình Chỉnh Sửa Tham Số Kịch Bản",
+    "description": "Điều chỉnh các tham số tài chính để tạo kịch bản tùy chỉnh",
+    "actions": {
+      "save": "Lưu Kịch Bản",
+      "reset": "Đặt Lại",
+      "preview": "Xem Trước",
+      "edit": "Chỉnh Sửa",
+      "cancel": "Hủy",
+      "delete": "Xóa",
+      "update": "Cập Nhật Kịch Bản"
+    },
+    "tabs": {
+      "basic": "Thông Tin Cơ Bản",
+      "loan": "Chi Tiết Khoản Vay",
+      "income": "Thu Nhập & Chi Phí",
+      "advanced": "Nâng Cao"
+    },
+    "fields": {
+      "scenarioName": "Tên Kịch Bản",
+      "scenarioNamePlaceholder": "Nhập tên kịch bản",
+      "scenarioType": "Loại Kịch Bản",
+      "scenarioDescription": "Mô Tả",
+      "scenarioDescriptionPlaceholder": "Mô tả kịch bản này",
+      "purchasePrice": "Giá Mua",
+      "purchasePricePlaceholder": "Nhập giá mua bất động sản",
+      "downPayment": "Tiền Trả Trước",
+      "downPaymentPlaceholder": "Nhập số tiền trả trước",
+      "downPaymentPercentage": "Tiền Trả Trước (%)",
+      "interestRate": "Lãi Suất (%)",
+      "interestRatePlaceholder": "Nhập lãi suất hàng năm",
+      "loanTerm": "Thời Hạn Vay (Năm)",
+      "loanTermPlaceholder": "Nhập thời hạn vay tính bằng năm",
+      "monthlyIncome": "Thu Nhập Hàng Tháng",
+      "monthlyIncomePlaceholder": "Nhập thu nhập tổng hàng tháng",
+      "monthlyExpenses": "Chi Phí Hàng Tháng",
+      "monthlyExpensesPlaceholder": "Nhập chi phí hàng tháng",
+      "expectedRentalIncome": "Thu Nhập Cho Thuê Dự Kiến",
+      "expectedRentalIncomePlaceholder": "Nhập thu nhập cho thuê dự kiến",
+      "propertyTaxes": "Thuế Bất Động Sản",
+      "insurance": "Bảo Hiểm",
+      "maintenance": "Bảo Trì & Sửa Chữa",
+      "riskLevel": "Mức Rủi Ro",
+      "propertyAppreciationRate": "Tỷ Lệ Tăng Giá Bất Động Sản",
+      "rentGrowthRate": "Tỷ Lệ Tăng Giá Thuê",
+      "vacancyRate": "Tỷ Lệ Trống",
+      "propertyTax": "Thuế Bất Động Sản",
+      "loanAmount": "Số Tiền Vay",
+      "currentValue": "Hiện tại: {value}",
+      "years": "năm"
+    },
+    "scenarioTypes": {
+      "baseline": "Cơ Sở",
+      "optimistic": "Lạc Quan",
+      "pessimistic": "Bi Quan",
+      "alternative": "Thay Thế",
+      "stress_test": "Kiểm Tra Áp Lực"
+    },
+    "presets": {
+      "title": "Mẫu Khởi Đầu Nhanh",
+      "conservative": "Thận Trọng",
+      "moderate": "Trung Bình",
+      "aggressive": "Tích Cực"
+    },
+    "riskLevels": {
+      "low": "Rủi Ro Thấp",
+      "medium": "Rủi Ro Trung Bình",
+      "high": "Rủi Ro Cao"
+    },
+    "validation": {
+      "scenarioNameRequired": "Tên kịch bản là bắt buộc",
+      "purchasePriceRequired": "Giá mua là bắt buộc",
+      "purchasePriceTooLow": "Giá mua phải lớn hơn 0",
+      "downPaymentTooHigh": "Tiền trả trước không thể vượt quá giá mua",
+      "downPaymentRequired": "Tiền trả trước là bắt buộc",
+      "interestRateRequired": "Lãi suất là bắt buộc",
+      "interestRateRange": "Lãi suất phải từ 0% đến 30%",
+      "loanTermRequired": "Thời hạn vay là bắt buộc",
+      "loanTermRange": "Thời hạn vay phải từ 1 đến 30 năm",
+      "monthlyIncomeRequired": "Thu nhập hàng tháng là bắt buộc",
+      "monthlyExpensesRequired": "Chi phí hàng tháng là bắt buộc",
+      "dtiTooHigh": "Tỷ lệ nợ trên thu nhập quá cao (>50%)",
+      "invalidNumber": "Vui lòng nhập số hợp lệ"
+    },
+    "calculatedMetrics": {
+      "title": "Chỉ Số Tính Toán",
+      "monthlyPayment": "Thanh Toán Hàng Tháng",
+      "loanAmount": "Số Tiền Vay",
+      "totalInterest": "Tổng Lãi Suất",
+      "totalCost": "Tổng Chi Phí",
+      "dtiRatio": "Tỷ Lệ DTI",
+      "ltvRatio": "Tỷ Lệ LTV",
+      "affordabilityScore": "Điểm Khả Năng Chi Trả",
+      "monthlySavings": "Tiết Kiệm Hàng Tháng"
+    },
+    "deleteConfirmation": {
+      "title": "Xóa Kịch Bản",
+      "message": "Bạn có chắc chắn muốn xóa kịch bản này? Hành động này không thể hoàn tác.",
+      "confirm": "Xóa",
+      "cancel": "Hủy"
+    }
+  },
+  "InteractiveParameterSliders": {
+    "title": "Thanh Trượt Tham Số Tương Tác",
+    "description": "Điều chỉnh tham số theo thời gian thực và xem tác động ngay lập tức",
+    "controls": {
+      "autoUpdate": "Tự Động Cập Nhật",
+      "applyChanges": "Áp Dụng Thay Đổi",
+      "reset": "Đặt Lại Gốc",
+      "realTimeMode": "Chế Độ Thời Gian Thực",
+      "enabled": "Bật",
+      "disabled": "Tắt"
+    },
+    "currentMetrics": {
+      "title": "Chỉ Số Hiện Tại",
+      "monthlyPayment": "Thanh Toán Hàng Tháng",
+      "loanAmount": "Số Tiền Vay",
+      "dtiRatio": "Tỷ Lệ DTI",
+      "affordabilityScore": "Điểm Khả Năng Chi Trả",
+      "totalInterest": "Tổng Lãi Suất",
+      "totalCost": "Tổng Chi Phí",
+      "monthlySavings": "Tiết Kiệm Hàng Tháng"
+    },
+    "parameters": {
+      "title": "Tham Số Kịch Bản",
+      "purchasePrice": {
+        "label": "Giá Mua",
+        "description": "Tổng giá mua bất động sản"
+      },
+      "downPayment": {
+        "label": "Tiền Trả Trước",
+        "description": "Thanh toán ban đầu tính theo phần trăm của giá mua"
+      },
+      "interestRate": {
+        "label": "Lãi Suất",
+        "description": "Lãi suất hàng năm cho khoản vay"
+      },
+      "loanTerm": {
+        "label": "Thời Hạn Vay",
+        "description": "Số năm để trả hết khoản vay"
+      },
+      "loanTermYears": {
+        "label": "Thời Hạn Vay",
+        "description": "Số năm để trả hết khoản vay",
+        "unit": "năm"
+      },
+      "monthlyIncome": {
+        "label": "Thu Nhập Hàng Tháng",
+        "description": "Thu nhập tổng hàng tháng của bạn"
+      },
+      "monthlyExpenses": {
+        "label": "Chi Phí Hàng Tháng",
+        "description": "Tổng chi phí hàng tháng không bao gồm thanh toán vay"
+      }
+    },
+    "ranges": {
+      "years": "năm",
+      "percent": "%",
+      "currency": "VND"
+    },
+    "impact": {
+      "title": "Phân Tích Tác Động",
+      "positive": "Tác động tích cực",
+      "negative": "Tác động tiêu cực",
+      "neutral": "Không có tác động đáng kể"
+    },
+    "riskAssessment": {
+      "title": "Đánh Giá Rủi Ro",
+      "dtiRatioLabel": "Tỷ Lệ Nợ Trên Thu Nhập",
+      "riskLevels": {
+        "low": "Rủi Ro Thấp",
+        "medium": "Rủi Ro Trung Bình",
+        "high": "Rủi Ro Cao"
+      },
+      "ranges": {
+        "low": "0-30%",
+        "medium": "30-40%",
+        "high": "40%+"
+      }
+    }
+  },
+  "AdvancedScenarioCharts": {
+    "title": "Biểu Đồ Kịch Bản Nâng Cao",
+    "description": "Phân tích trực quan chi tiết các kịch bản tài chính của bạn",
+    "chartTypes": {
+      "cashFlow": "Phân Tích Dòng Tiền",
+      "paymentBreakdown": "Phân Tích Chi Tiết Thanh Toán",
+      "sensitivityAnalysis": "Phân Tích Độ Nhạy",
+      "riskAssessment": "Đánh Giá Rủi Ro",
+      "comparisonMatrix": "Ma Trận So Sánh"
+    },
+    "metrics": {
+      "monthlyPayment": "Thanh Toán Hàng Tháng",
+      "totalCost": "Tổng Chi Phí",
+      "totalInterest": "Tổng Lãi Suất",
+      "dtiRatio": "Tỷ Lệ DTI",
+      "ltvRatio": "Tỷ Lệ LTV",
+      "affordabilityScore": "Điểm Khả Năng Chi Trả",
+      "monthlySavings": "Tiết Kiệm Hàng Tháng",
+      "payoffTime": "Thời Gian Trả Hết"
+    },
+    "monthlyPaymentChart": {
+      "tooltipLabel": "Thanh Toán Hàng Tháng",
+      "scenarioLabel": "Kịch bản: {type}"
+    },
+    "chartControls": {
+      "selectMetrics": "Chọn Chỉ Số",
+      "timeframe": "Khung Thời Gian",
+      "chartType": "Loại Biểu Đồ",
+      "downloadChart": "Tải Biểu Đồ",
+      "fullscreen": "Toàn Màn Hình"
+    },
+    "timeframes": {
+      "1year": "1 Năm",
+      "5years": "5 Năm",
+      "10years": "10 Năm",
+      "fullTerm": "Toàn Bộ Thời Hạn"
+    },
+    "noDataMessage": "Không có dữ liệu cho các kịch bản và chỉ số đã chọn",
+    "loadingMessage": "Đang tải dữ liệu biểu đồ...",
+    "multidimensionalAnalysis": {
+      "title": "Phân Tích Đa Chiều",
+      "description": "So sánh biểu đồ radar toàn diện của tất cả khía cạnh kịch bản",
+      "metrics": {
+        "affordability": "Khả Năng Chi Trả",
+        "roiPotential": "Tiềm Năng ROI",
+        "riskLevel": "Mức Rủi Ro",
+        "monthlyPayment": "Thanh Toán Hàng Tháng",
+        "timeToPayoff": "Thời Gian Trả Hết"
+      }
+    },
+    "loanBalanceOverTime": {
+      "title": "Số Dư Vay Theo Thời Gian",
+      "description": "Số dư vay của bạn giảm theo thời gian cho mỗi kịch bản",
+      "xAxisLabel": "Năm {year}",
+      "yAxisLabel": "Số Dư Còn Lại",
+      "tooltipLabel": "Tháng {month}"
+    },
+    "riskReturnAnalysis": {
+      "title": "Phân Tích Rủi Ro vs Lợi Nhuận",
+      "description": "Biểu đồ phân tán hiển thị hồ sơ rủi ro-lợi nhuận của mỗi kịch bản",
+      "xAxisLabel": "Điểm Rủi Ro",
+      "yAxisLabel": "Lợi Nhuận Dự Kiến (%)",
+      "tooltipRisk": "Rủi ro: {value}",
+      "tooltipReturn": "Lợi nhuận: {value}%"
+    },
+    "totalCostChart": {
+      "title": "So Sánh Tổng Chi Phí",
+      "tooltipLabel": "Tổng Chi Phí",
+      "scenarioLabel": "Kịch bản: {type}"
+    },
+    "financialMetricsMatrix": {
+      "title": "Ma Trận Chỉ Số Tài Chính",
+      "description": "So sánh toàn diện tất cả chỉ số tài chính",
+      "headers": {
+        "scenario": "Kịch Bản",
+        "monthlyPayment": "Thanh Toán Hàng Tháng",
+        "totalCost": "Tổng Chi Phí",
+        "affordabilityScore": "Khả Năng Chi Trả",
+        "dtiRatio": "Tỷ Lệ DTI",
+        "riskLevel": "Mức Rủi Ro"
+      },
+      "riskLevels": {
+        "low": "Thấp",
+        "medium": "Trung Bình",
+        "high": "Cao"
+      }
+    }
+  },
+  "ScenarioChart": {
+    "title": "Trực Quan Hóa Kịch Bản",
+    "description": "So sánh trực quan các kịch bản tài chính của bạn",
+    "chartTypes": {
+      "bar": "Biểu Đồ Cột",
+      "line": "Biểu Đồ Đường",
+      "pie": "Biểu Đồ Tròn",
+      "area": "Biểu Đồ Diện Tích",
+      "scatter": "Biểu Đồ Phân Tán"
+    },
+    "controls": {
+      "chartType": "Loại Biểu Đồ",
+      "selectChart": "Chọn loại biểu đồ",
+      "downloadChart": "Tải Xuống",
+      "printChart": "In",
+      "shareChart": "Chia Sẻ"
+    },
+    "legends": {
+      "monthlyPayment": "Thanh Toán Hàng Tháng",
+      "totalCost": "Tổng Chi Phí",
+      "totalInterest": "Tổng Lãi Suất",
+      "downPayment": "Tiền Trả Trước",
+      "loanAmount": "Số Tiền Vay"
+    },
+    "axes": {
+      "scenarios": "Kịch Bản",
+      "amount": "Số Tiền (VND)",
+      "percentage": "Phần Trăm (%)",
+      "months": "Tháng"
+    },
+    "noScenariosMessage": "Vui lòng chọn kịch bản để hiển thị biểu đồ",
+    "loadingChart": "Đang tải biểu đồ...",
+    "chartError": "Lỗi tải dữ liệu biểu đồ"
+  },
+  "ScenarioComparison": {
+    "title": "So Sánh Kịch Bản",
+    "description": "So sánh cạnh nhau các kịch bản tài chính",
+    "selectScenarios": "Chọn kịch bản để so sánh",
+    "addScenario": "Thêm Kịch Bản",
+    "removeScenario": "Xóa Kịch Bản",
+    "compareButton": "So Sánh Đã Chọn",
+    "exportComparison": "Xuất So Sánh",
+    "printComparison": "In So Sánh",
+    "winner": "Lựa Chọn Tốt Nhất",
+    "pros": "Ưu Điểm",
+    "cons": "Nhược Điểm",
+    "recommendation": "Khuyến Nghị"
+  },
+  "CreateScenarioModal": {
+    "title": "Tạo Kịch Bản Mới",
+    "editTitle": "Chỉnh Sửa Kịch Bản",
+    "description": "Tạo kịch bản tài chính mới để so sánh",
+    "quickStart": "Mẫu Khởi Đầu Nhanh",
+    "templates": {
+      "conservative": {
+        "title": "Kế Hoạch Thận Trọng",
+        "description": "Rủi ro thấp với tiền trả trước cao hơn"
+      },
+      "balanced": {
+        "title": "Kế Hoạch Cân Bằng",
+        "description": "Rủi ro vừa phải và thanh toán cân bằng"
+      },
+      "aggressive": {
+        "title": "Kế Hoạch Tích Cực",
+        "description": "Rủi ro cao để có khả năng lợi nhuận tốt hơn"
+      }
+    },
+    "useTemplate": "Sử Dụng Mẫu",
+    "customScenario": "Tạo Kịch Bản Tùy Chỉnh",
+    "close": "Đóng"
+  },
+  "ExportScenarios": {
+    "title": "Xuất Kịch Bản",
+    "subtitle": "Tải xuống phân tích tài chính của bạn",
+    "description": "Xuất dữ liệu kịch bản của bạn dưới nhiều định dạng khác nhau",
+    "selectFormat": "Chọn Định Dạng Xuất",
+    "formats": {
+      "csv": "CSV (Bảng Tính)",
+      "pdf": "Báo Cáo PDF",
+      "excel": "Excel Workbook",
+      "json": "Dữ Liệu JSON",
+      "csvDescription": "Tương thích với Excel và Google Sheets",
+      "pdfDescription": "Định dạng báo cáo chuyên nghiệp",
+      "excelDescription": "Sổ làm việc Excel nâng cao với nhiều sheet",
+      "jsonDescription": "Dữ liệu có cấu trúc thân thiện với nhà phát triển"
+    },
+    "features": {
+      "basicExport": "Xuất dữ liệu cơ bản",
+      "spreadsheetCompatible": "Tương thích với tất cả ứng dụng bảng tính",
+      "utf8Encoded": "Mã hóa UTF-8",
+      "professionalFormatting": "Định dạng chuyên nghiệp",
+      "chartsAndTables": "Biểu đồ và bảng",
+      "printReady": "Sẵn sàng in",
+      "multipleWorksheets": "Nhiều worksheet",
+      "summaryStatistics": "Thống kê tóm tắt",
+      "advancedFormatting": "Định dạng nâng cao",
+      "completeDataStructure": "Cấu trúc dữ liệu hoàn chỉnh",
+      "apiIntegration": "Sẵn sàng tích hợp API",
+      "machineReadable": "Có thể đọc bằng máy"
+    },
+    "options": {
+      "selectedOnly": "Chỉ kịch bản đã chọn",
+      "allScenarios": "Tất cả kịch bản",
+      "includeCharts": "Bao gồm biểu đồ",
+      "includeAnalysis": "Bao gồm phân tích",
+      "includeRecommendations": "Bao gồm khuyến nghị"
+    },
+    "premium": "Premium",
+    "exportOptions": "Tùy Chọn Xuất",
+    "exportPreview": "Xem Trước Xuất",
+    "selectedScenarios": "Kịch bản đã chọn",
+    "exportFormat": "Định dạng xuất",
+    "worksheets": "Worksheets",
+    "worksheetContent": "Dữ Liệu Kịch Bản + Tóm Tắt",
+    "downloadNotice": "Tệp sẽ được tải xuống tự động sau khi tạo.",
+    "includeCharts": "Bao gồm biểu đồ và trực quan hóa",
+    "includeAnalysis": "Bao gồm phân tích chi tiết",
+    "export": "Xuất",
+    "cancel": "Hủy",
+    "exporting": "Đang xuất...",
+    "success": "Xuất hoàn thành thành công",
+    "error": "Xuất thất bại. Vui lòng thử lại."
+  },
+  "ScenarioCommon": {
+    "months": "tháng",
+    "years": "năm",
+    "percent": "%",
+    "currency": "VND"
+  },
+  "SmartScenarios": {
+    "title": "Kịch Bản Thông Minh Được Hỗ Trợ AI",
+    "description": "Tạo kịch bản được tối ưu hóa dựa trên hồ sơ tài chính của bạn",
+    "analyzing": "Đang phân tích tình hình tài chính của bạn...",
+    "generating": "Đang tạo kịch bản thông minh...",
+    "complete": "Hoàn thành phân tích",
+    "error": "Không thể tạo kịch bản thông minh vào lúc này",
+    "recommendations": {
+      "title": "Khuyến Nghị AI",
+      "based_on": "Dựa trên hồ sơ của bạn:",
+      "risk_tolerance": "Khả năng chấp nhận rủi ro: {level}",
+      "income_level": "Mức thu nhập: {level}",
+      "investment_goals": "Mục tiêu đầu tư: {goals}"
+    },
+    "generated_scenarios": {
+      "title": "Kịch Bản Được Tạo",
+      "count": "Đã tạo {count} kịch bản",
+      "apply_all": "Áp Dụng Tất Cả",
+      "apply_selected": "Áp Dụng Đã Chọn",
+      "review": "Xem Lại"
+    }
+  },
+  "MonteCarloAnalysis": {
+    "title": "Phân Tích Monte Carlo",
+    "premium": "Premium",
+    "description": "Phân tích thống kê với 10.000 mô phỏng để đánh giá độ vững vàng của kịch bản",
+    "selectScenarios": "Chọn kịch bản để chạy phân tích Monte Carlo",
+    "meanPayment": "Thanh Toán Trung Bình:",
+    "stdDeviation": "Độ Lệch Chuẩn:",
+    "var95": "VaR (95%):",
+    "volatility": "Biến Động:",
+    "skewness": "Độ Xiên:",
+    "kurtosis": "Độ Nhọn:",
+    "riskRange": "Phạm Vi Rủi Ro (5% - 95%)",
+    "bestCase": "Trường hợp tốt nhất: {value}",
+    "worstCase": "Trường hợp tệ nhất: {value}",
+    "sensitivityAnalysis": "Phân Tích Độ Nhạy",
+    "impactChange": "Tác động của thay đổi ±1% trong các tham số chính",
+    "riskAssessment": "Đánh Giá Rủi Ro",
+    "highRisk": "Rủi Ro Cao",
+    "mediumRisk": "Rủi Ro Trung Bình",
+    "lowRisk": "Rủi Ro Thấp",
+    "dtiRatio": "Tỷ Lệ DTI:",
+    "affordabilityScore": "Điểm Khả Năng Chi Trả:"
+  },
+  "PremiumUpgradeCard": {
+    "smartScenarios": {
+      "title": "Kịch Bản AI Thông Minh",
+      "description": "Tạo kịch bản cá nhân hóa với phân tích AI",
+      "benefits": [
+        "Khuyến nghị kịch bản được hỗ trợ AI",
+        "Phân tích bối cảnh thị trường",
+        "Thông tin chiến lược cá nhân hóa",
+        "Đánh giá và tối ưu hóa rủi ro"
+      ]
+    },
+    "advancedExport": {
+      "title": "Tùy Chọn Xuất Nâng Cao",
+      "description": "Xuất dữ liệu của bạn dưới định dạng chuyên nghiệp",
+      "benefits": [
+        "Báo cáo chuyên nghiệp PDF",
+        "Sổ làm việc Excel với biểu đồ",
+        "Dữ liệu JSON cho nhà phát triển",
+        "Báo cáo tùy chỉnh thương hiệu"
+      ]
+    },
+    "advancedAnalytics": {
+      "title": "Phân Tích Nâng Cao",
+      "description": "Thông tin chi tiết sâu sắc và phân tích chi tiết",
+      "benefits": [
+        "Biểu đồ tương tác",
+        "Phân tích độ nhạy",
+        "Trực quan hóa rủi ro",
+        "Chỉ số hiệu suất"
+      ]
+    },
+    "monteCarloAnalysis": {
+      "title": "Phân Tích Monte Carlo",
+      "description": "Mô hình xác suất và rủi ro nâng cao",
+      "benefits": [
+        "Mô hình kịch bản xác suất",
+        "Phân tích phân bố rủi ro",
+        "Tính toán khoảng tin cậy",
+        "Thông tin thống kê nâng cao"
+      ]
+    },
+    "scenarioComparison": {
+      "title": "Kịch Bản Không Giới Hạn",
+      "description": "Tạo và so sánh kịch bản không giới hạn",
+      "benefits": [
+        "Tạo kịch bản không giới hạn",
+        "So sánh cạnh nhau",
+        "Tùy chọn lọc nâng cao",
+        "Thao tác kịch bản hàng loạt"
+      ]
+    },
+    "premiumFeature": "Tính Năng Premium",
+    "professionalFeature": "Tính Năng Chuyên Nghiệp",
+    "premium": "Premium",
+    "professional": "Chuyên Nghiệp",
+    "monthPrice": "/tháng",
+    "freeTrial": "Dùng thử miễn phí 14 ngày",
+    "upgradeToPrefix": "Nâng cấp lên ",
+    "upgradeToPro": "Pro",
+    "securityNote": "Thanh toán bảo mật • Hủy bất cứ lúc nào • Hoàn tiền trong 30 ngày"
+  },
+  "ScenarioFilters": {
+    "title": "Bộ Lọc",
+    "clearAll": "Xóa tất cả",
+    "riskLevel": "Mức Rủi Ro",
+    "type": "Loại",
+    "all": "Tất Cả",
+    "low": "Thấp",
+    "medium": "Trung Bình",
+    "high": "Cao",
+    "baseline": "Cơ Sở",
+    "optimistic": "Lạc Quan",
+    "pessimistic": "Bi Quan",
+    "alternative": "Thay Thế",
+    "stressTest": "Kiểm Tra Áp Lực"
+  },
+  "ScenarioGrid": {
+    "noScenariosTitle": "Không tìm thấy kịch bản",
+    "noScenariosDescription": "Tạo kịch bản đầu tiên để bắt đầu so sánh",
+    "createFirstScenario": "Tạo Kịch Bản Đầu Tiên",
+    "noDescription": "Không có mô tả",
+    "riskSuffix": "rủi ro",
+    "monthly": "Hàng Tháng",
+    "totalCost": "Tổng Chi Phí",
+    "affordability": "Khả Năng Chi Trả",
+    "selected": "Đã Chọn",
+    "createNewScenario": "Tạo Kịch Bản Mới",
+    "addCustomScenario": "Thêm kịch bản tùy chỉnh để so sánh",
+    "scenariosUsed": "Đã sử dụng {current}/{max} kịch bản"
+  },
+  "ScenarioLimitCard": {
+    "scenarios": {
+      "title": "Đã Đạt Giới Hạn Kịch Bản",
+      "description": "Người dùng miễn phí có thể tạo tối đa 1 kịch bản mỗi kế hoạch",
+      "premiumBenefit": "Kịch bản không giới hạn với Premium",
+      "upgradeReasons": [
+        "Tạo kịch bản không giới hạn",
+        "So sánh nhiều lựa chọn cạnh nhau",
+        "Phân tích kịch bản nâng cao",
+        "Xuất kịch bản dưới nhiều định dạng"
+      ]
+    },
+    "plans": {
+      "title": "Đã Đạt Giới Hạn Kế Hoạch",
+      "description": "Người dùng miễn phí có thể tạo tối đa 2 kế hoạch đang hoạt động",
+      "premiumBenefit": "Kế hoạch không giới hạn với Premium",
+      "upgradeReasons": [
+        "Tạo kế hoạch tài chính không giới hạn",
+        "Theo dõi nhiều bất động sản cùng lúc",
+        "Công cụ lập kế hoạch nâng cao",
+        "Tính năng cộng tác"
+      ]
+    },
+    "smartScenarios": {
+      "title": "Đã Đạt Giới Hạn Sử Dụng AI",
+      "description": "Bạn đã đạt giới hạn tạo kịch bản AI hàng tháng",
+      "premiumBenefit": "Nhiều kịch bản AI hơn với Chuyên Nghiệp",
+      "upgradeReasons": [
+        "Tạo kịch bản AI không giới hạn",
+        "Phân tích thị trường nâng cao",
+        "Thông tin AI cao cấp",
+        "Xử lý AI ưu tiên"
+      ]
+    },
+    "premiumFeature": "Tính Năng Premium",
+    "proFeature": "Tính Năng Pro",
+    "usage": "Sử Dụng",
+    "monthPrice": "/tháng",
+    "freeTrial": "Dùng thử miễn phí 14 ngày",
+    "upgradeNow": "Nâng Cấp Ngay"
+  },
+  "ScenarioPageHeader": {
+    "title": "Kịch Bản Tài Chính",
+    "description": "Tạo và so sánh kịch bản tài chính để đưa ra quyết định sáng suốt",
+    "scenarios": "kịch bản",
+    "selected": "đã chọn",
+    "limitReached": "Đã Đạt Giới Hạn",
+    "generateSmartScenarios": "Tạo Kịch Bản Thông Minh",
+    "export": "Xuất",
+    "createScenario": "Tạo Kịch Bản",
+    "limitReachedTooltip": "Bạn đã đạt giới hạn {maxScenarios} kịch bản",
+    "limitReachedButton": "Đã Đạt Giới Hạn (tối đa {maxScenarios})",
+    "editScenario": "Chỉnh Sửa Kịch Bản",
+    "createNewScenario": "Tạo Kịch Bản Mới"
+  },
+  "ScenarioTabs": {
+    "comparisonTable": "So Sánh",
+    "visualCharts": "Biểu Đồ",
+    "advancedCharts": "Nâng Cao",
+    "interactiveSliders": "Tương Tác",
+    "analysis": "Phân Tích",
+    "selectScenariosForAdvancedCharts": "Chọn kịch bản để xem biểu đồ nâng cao",
+    "selectScenariosForInteractiveSliders": "Chọn kịch bản để sử dụng thanh trượt tham số tương tác"
+  },
+  "SmartRecommendations": {
+    "title": "Khuyến Nghị Thông Minh",
+    "selectScenariosForRecommendations": "Chọn kịch bản để nhận khuyến nghị",
+    "recommended": "Được Khuyến Nghị",
+    "lowestCostRecommendation": "Đây là lựa chọn hiệu quả về chi phí nhất dựa trên tổng chi phí",
+    "moreExpensive": "đắt hơn lựa chọn tốt nhất"
+  },
+  "AIAnalysisModal": {
+    "title": "Kịch Bản Thông Minh Được Hỗ Trợ AI",
+    "subtitle": "Phân Tích Tài Chính Cá Nhân Hóa",
+    "description": "Hoàn thành phân tích - đã tạo {count} kịch bản",
+    "userProfileTitle": "Dựa trên hồ sơ của bạn",
+    "marketContextTitle": "Bối Cảnh Thị Trường",
+    "strategyTitle": "Khuyến Nghị Chiến Lược AI",
+    "nextStepsTitle": "Các Bước Tiếp Theo Được Khuyến Nghị",
+    "disclaimerTitle": "Phân Tích Được Tạo Bởi AI",
+    "disclaimerText": "Phân tích này được tạo bởi AI và nên được sử dụng như điểm khởi đầu cho kế hoạch tài chính của bạn. Luôn tham khảo ý kiến của các cố vấn tài chính có trình độ trước khi đưa ra quyết định đầu tư lớn.",
+    "closeButton": "Đóng Phân Tích",
+    "reviewButton": "Xem Lại Kịch Bản",
+    "generatedBy": "Được tạo bởi",
+    "aiInsights": "Thông Tin AI",
+    "keyRecommendations": "Khuyến Nghị Chính",
+    "riskAnalysis": "Phân Tích Rủi Ro",
+    "marketTrends": "Xu Hướng Thị Trường",
+    "personalizedStrategy": "Chiến Lược Cá Nhân Hóa"
+  },
+  "ExportModal": {
+    "title": "Xuất Kịch Bản",
+    "subtitle": "Tải xuống phân tích tài chính của bạn",
+    "description": "Xuất dữ liệu kịch bản của bạn dưới nhiều định dạng khác nhau",
+    "selectFormat": "Chọn Định Dạng Xuất",
+    "formats": {
+      "csv": "CSV (Bảng Tính)",
+      "pdf": "Báo Cáo PDF",
+      "excel": "Excel Workbook",
+      "json": "Dữ Liệu JSON",
+      "csvDescription": "Tương thích với Excel và Google Sheets",
+      "pdfDescription": "Định dạng báo cáo chuyên nghiệp",
+      "excelDescription": "Sổ làm việc Excel nâng cao với nhiều sheet",
+      "jsonDescription": "Dữ liệu có cấu trúc thân thiện với nhà phát triển"
+    },
+    "features": {
+      "basicExport": "Xuất dữ liệu cơ bản",
+      "spreadsheetCompatible": "Tương thích với tất cả ứng dụng bảng tính",
+      "utf8Encoded": "Mã hóa UTF-8",
+      "professionalFormatting": "Định dạng chuyên nghiệp",
+      "chartsAndTables": "Biểu đồ và bảng",
+      "printReady": "Sẵn sàng in",
+      "multipleWorksheets": "Nhiều worksheet",
+      "summaryStatistics": "Thống kê tóm tắt",
+      "advancedFormatting": "Định dạng nâng cao",
+      "completeDataStructure": "Cấu trúc dữ liệu hoàn chỉnh",
+      "apiIntegration": "Sẵn sàng tích hợp API",
+      "machineReadable": "Có thể đọc bằng máy"
+    },
+    "premium": "Premium",
+    "exportOptions": "Tùy Chọn Xuất",
+    "exportPreview": "Xem Trước Xuất",
+    "selectedScenarios": "Kịch bản đã chọn",
+    "exportFormat": "Định dạng xuất",
+    "worksheets": "Worksheets",
+    "worksheetContent": "Dữ Liệu Kịch Bản + Tóm Tắt",
+    "downloadNotice": "Tệp sẽ được tải xuống tự động sau khi tạo.",
+    "exportButton": "Xuất",
+    "cancelButton": "Hủy",
+    "processing": "Đang xử lý xuất...",
+    "success": "Xuất hoàn thành thành công!",
+    "error": "Xuất thất bại. Vui lòng thử lại.",
+    "includeCharts": "Bao gồm biểu đồ và trực quan hóa",
+    "includeAnalysis": "Bao gồm phân tích chi tiết",
+    "customFilename": "Tên tệp tùy chỉnh",
+    "filenameHelp": "Để trống để tạo tên tệp tự động"
+  }
+}

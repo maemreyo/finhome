@@ -756,7 +756,12 @@
         "demoPlanDescription": "Sample plan for unauthenticated users",
         "noDescriptionAvailable": "No description available"
       },
-      "loadingScenarios": "Loading scenarios..."
+      "loadingScenarios": "Loading scenarios...",
+      "scenarios": "scenarios",
+      "selected": "selected",
+      "limitReached": "Limit reached",
+      "limitReachedTooltip": "Scenario limit reached ({maxScenarios}). Upgrade to create more scenarios.",
+      "limitReachedButton": "Limit Reached ({maxScenarios})"
     }
   }
 }

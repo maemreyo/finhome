@@ -459,6 +459,79 @@ export const FEATURE_GATES: FeatureGate[] = [
       }
       return { hasAccess: true }
     }
+  },
+  {
+    key: 'advanced_export',
+    name: 'Advanced Export',
+    nameVi: 'Xuất dữ liệu nâng cao',
+    description: 'Export scenarios to PDF, Excel, and JSON formats',
+    descriptionVi: 'Xuất kịch bản sang định dạng PDF, Excel và JSON',
+    requiredTier: 'premium',
+    category: 'analytics',
+    checkAccess: async (user) => {
+      if (user.subscription_tier === 'free') {
+        return {
+          hasAccess: false,
+          reason: 'subscription_required',
+          upgradeRequired: 'premium'
+        }
+      }
+      return { hasAccess: true }
+    }
+  },
+  {
+    key: 'smart_scenarios',
+    name: 'AI Smart Scenarios',
+    nameVi: 'Kịch bản thông minh AI',
+    description: 'AI-powered scenario generation and analysis',
+    descriptionVi: 'Tạo và phân tích kịch bản được hỗ trợ bởi AI',
+    requiredTier: 'premium',
+    category: 'advanced',
+    checkAccess: async (user, usage) => {
+      if (user.subscription_tier === 'free') {
+        return {
+          hasAccess: false,
+          reason: 'subscription_required',
+          upgradeRequired: 'premium'
+        }
+      }
+      
+      // Check usage limits for premium users
+      if (user.subscription_tier === 'premium') {
+        const currentUsage = usage?.smartScenarios || 0
+        const monthlyLimit = 50
+        if (currentUsage >= monthlyLimit) {
+          return {
+            hasAccess: false,
+            reason: 'limit_exceeded',
+            upgradeRequired: 'professional',
+            currentUsage: currentUsage,
+            limit: monthlyLimit
+          }
+        }
+      }
+      
+      return { hasAccess: true }
+    }
+  },
+  {
+    key: 'advanced_analytics',
+    name: 'Advanced Analytics',
+    nameVi: 'Phân tích nâng cao',
+    description: 'Advanced charts, sensitivity analysis, and detailed metrics',
+    descriptionVi: 'Biểu đồ nâng cao, phân tích độ nhạy và chỉ số chi tiết',
+    requiredTier: 'premium',
+    category: 'analytics',
+    checkAccess: async (user) => {
+      if (user.subscription_tier === 'free') {
+        return {
+          hasAccess: false,
+          reason: 'subscription_required',
+          upgradeRequired: 'premium'
+        }
+      }
+      return { hasAccess: true }
+    }
   }
 ]
 

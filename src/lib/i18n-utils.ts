@@ -52,6 +52,10 @@ export const AVAILABLE_NAMESPACES: Record<string, NamespaceConfig> = {
     name: 'subscription',
     description: 'Subscription and monetization content (SubscriptionPlans, FeatureGates, UpgradePrompts)',
   },
+  scenarios: {
+    name: 'scenarios',
+    description: 'Scenarios and scenario comparison content (Scenario, ScenarioComparison)',
+  }
 };
 
 /**
@@ -117,13 +121,15 @@ export function validateNamespaceMessages(
         case 'plans':
           return ['NewPlanPage', 'PlanDetailView', 'CreatePlanForm', 'PlansList'].includes(key);
         case 'charts':
-          return ['Charts', 'ScenarioComparisonTable'].includes(key);
+          return ['Charts'].includes(key);
         case 'financial-laboratory':
           return key === 'FinancialLaboratory';
         case 'onboarding':
           return ["OnboardingControls", "OnboardingWelcome", "OnboardingMessages", "OnboardingWelcome", "OnboardingSteps", "OnboardingFinancialPlanning", "OnboardingDashboardFeatures"].includes(key);
         case 'subscription':
           return ['SubscriptionPlans', 'FeatureGates', 'UpgradePrompts', 'BillingPage', 'SubscriptionCommon', 'Features', 'SubscriptionNotifications', 'SubscriptionFaq'].includes(key);
+        case 'scenarios':
+          return ['ScenarioComparisonTable', 'ScenarioParameterEditor', 'InteractiveParameterSliders', 'ScenarioChart', 'ScenarioComparison', 'CreateScenarioModal', 'ExportScenarios', 'ScenarioCommon', 'SmartScenarios', 'AIAnalysisModal'].includes(key);
         default:
           return false;
       }
@@ -204,5 +210,6 @@ export function getNamespaceStats(): Record<string, { description: string; estim
     'financial-laboratory': { description: AVAILABLE_NAMESPACES['financial-laboratory'].description, estimatedSize: '~2.1KB' },
     onboarding: { description: AVAILABLE_NAMESPACES.onboarding.description, estimatedSize: '~3.2KB' },
     subscription: { description: AVAILABLE_NAMESPACES.subscription.description, estimatedSize: '~8.5KB' },
+    scenarios: { description: AVAILABLE_NAMESPACES.scenarios.description, estimatedSize: '~7.2KB' },
   };
 }
