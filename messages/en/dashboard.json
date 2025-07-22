@@ -6,6 +6,11 @@
       "dashboard": "Dashboard",
       "plans": "Financial Plans",
       "scenarios": "Scenario Comparison",
+      "expensesTracking": "Expense Tracking",
+      "expenses": "Expenses",
+      "wallets": "Wallets",
+      "budgets": "Budgets",
+      "goals": "Goals",
       "laboratory": "Laboratory",
       "profile": "Profile",
       "billing": "Billing",
@@ -13,7 +18,8 @@
       "achievements": "Achievements",
       "settings": "Settings",
       "help": "Help",
-      "subscription": "Subscription"
+      "subscription": "Subscription",
+      "account": "Account"
     },
     "lastUpdated": "Updated: {time}",
     "settings": "Settings",

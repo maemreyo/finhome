@@ -1559,6 +1559,731 @@ export interface Database {
           }
         ]
       }
+      expense_transactions: {
+        Row: {
+          id: string
+          user_id: string
+          transaction_type: 'expense' | 'income' | 'transfer'
+          amount: number
+          description: string | null
+          transaction_date: string
+          expense_category_id: string | null
+          income_category_id: string | null
+          wallet_id: string
+          transfer_to_wallet_id: string | null
+          receipt_url: string | null
+          tags: string[] | null
+          notes: string | null
+          location: string | null
+          is_recurring: boolean
+          recurring_pattern: Json | null
+          exchange_rate: number | null
+          original_currency: string | null
+          is_verified: boolean
+          reference_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          transaction_type: 'expense' | 'income' | 'transfer'
+          amount: number
+          description?: string | null
+          transaction_date: string
+          expense_category_id?: string | null
+          income_category_id?: string | null
+          wallet_id: string
+          transfer_to_wallet_id?: string | null
+          receipt_url?: string | null
+          tags?: string[] | null
+          notes?: string | null
+          location?: string | null
+          is_recurring?: boolean
+          recurring_pattern?: Json | null
+          exchange_rate?: number | null
+          original_currency?: string | null
+          is_verified?: boolean
+          reference_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          transaction_type?: 'expense' | 'income' | 'transfer'
+          amount?: number
+          description?: string | null
+          transaction_date?: string
+          expense_category_id?: string | null
+          income_category_id?: string | null
+          wallet_id?: string
+          transfer_to_wallet_id?: string | null
+          receipt_url?: string | null
+          tags?: string[] | null
+          notes?: string | null
+          location?: string | null
+          is_recurring?: boolean
+          recurring_pattern?: Json | null
+          exchange_rate?: number | null
+          original_currency?: string | null
+          is_verified?: boolean
+          reference_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_transactions_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_transactions_expense_category_id_fkey"
+            columns: ["expense_category_id"]
+            referencedRelation: "expense_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_transactions_income_category_id_fkey"
+            columns: ["income_category_id"]
+            referencedRelation: "income_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            referencedRelation: "expense_wallets"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      expense_categories: {
+        Row: {
+          id: string
+          name_en: string
+          name_vi: string
+          icon: string
+          color: string
+          parent_category_id: string | null
+          is_income: boolean
+          is_active: boolean
+          sort_order: number
+          budget_limit_default: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name_en: string
+          name_vi: string
+          icon: string
+          color: string
+          parent_category_id?: string | null
+          is_income?: boolean
+          is_active?: boolean
+          sort_order?: number
+          budget_limit_default?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name_en?: string
+          name_vi?: string
+          icon?: string
+          color?: string
+          parent_category_id?: string | null
+          is_income?: boolean
+          is_active?: boolean
+          sort_order?: number
+          budget_limit_default?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      income_categories: {
+        Row: {
+          id: string
+          name_en: string
+          name_vi: string
+          icon: string
+          color: string
+          parent_category_id: string | null
+          is_active: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name_en: string
+          name_vi: string
+          icon: string
+          color: string
+          parent_category_id?: string | null
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name_en?: string
+          name_vi?: string
+          icon?: string
+          color?: string
+          parent_category_id?: string | null
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      expense_wallets: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          wallet_type: 'cash' | 'bank_account' | 'e_wallet' | 'credit_card' | 'savings' | 'investment' | 'other'
+          balance: number
+          currency: string
+          icon: string
+          color: string
+          bank_name: string | null
+          account_number: string | null
+          is_default: boolean
+          is_active: boolean
+          is_shared: boolean
+          shared_with_users: string[] | null
+          auto_sync_enabled: boolean
+          last_sync_at: string | null
+          sync_balance: number | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          wallet_type: 'cash' | 'bank_account' | 'e_wallet' | 'credit_card' | 'savings' | 'investment' | 'other'
+          balance?: number
+          currency?: string
+          icon: string
+          color: string
+          bank_name?: string | null
+          account_number?: string | null
+          is_default?: boolean
+          is_active?: boolean
+          is_shared?: boolean
+          shared_with_users?: string[] | null
+          auto_sync_enabled?: boolean
+          last_sync_at?: string | null
+          sync_balance?: number | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          wallet_type?: 'cash' | 'bank_account' | 'e_wallet' | 'credit_card' | 'savings' | 'investment' | 'other'
+          balance?: number
+          currency?: string
+          icon?: string
+          color?: string
+          bank_name?: string | null
+          account_number?: string | null
+          is_default?: boolean
+          is_active?: boolean
+          is_shared?: boolean
+          shared_with_users?: string[] | null
+          auto_sync_enabled?: boolean
+          last_sync_at?: string | null
+          sync_balance?: number | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_wallets_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      expense_budgets: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          description: string | null
+          budget_period: 'weekly' | 'monthly' | 'yearly'
+          total_budget: number
+          current_spent: number
+          remaining_amount: number
+          progress_percentage: number
+          alert_threshold_percentage: number | null
+          start_date: string
+          end_date: string
+          is_active: boolean
+          is_exceeded: boolean
+          category_budgets: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          description?: string | null
+          budget_period: 'weekly' | 'monthly' | 'yearly'
+          total_budget: number
+          current_spent?: number
+          remaining_amount?: number
+          progress_percentage?: number
+          alert_threshold_percentage?: number | null
+          start_date: string
+          end_date: string
+          is_active?: boolean
+          is_exceeded?: boolean
+          category_budgets?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          description?: string | null
+          budget_period?: 'weekly' | 'monthly' | 'yearly'
+          total_budget?: number
+          current_spent?: number
+          remaining_amount?: number
+          progress_percentage?: number
+          alert_threshold_percentage?: number | null
+          start_date?: string
+          end_date?: string
+          is_active?: boolean
+          is_exceeded?: boolean
+          category_budgets?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_budgets_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      expense_goals: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          description: string | null
+          goal_type: 'general_savings' | 'emergency_fund' | 'vacation' | 'education' | 'buy_house' | 'buy_car' | 'other'
+          target_amount: number
+          current_amount: number
+          progress_percentage: number
+          monthly_target: number | null
+          target_date: string | null
+          deadline: string | null
+          status: 'active' | 'completed' | 'paused' | 'cancelled'
+          icon: string | null
+          color: string | null
+          house_purchase_data: Json | null
+          months_remaining: number | null
+          required_monthly_savings: number | null
+          is_on_track: boolean | null
+          created_at: string
+          updated_at: string
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          description?: string | null
+          goal_type: 'general_savings' | 'emergency_fund' | 'vacation' | 'education' | 'buy_house' | 'buy_car' | 'other'
+          target_amount: number
+          current_amount?: number
+          progress_percentage?: number
+          monthly_target?: number | null
+          target_date?: string | null
+          deadline?: string | null
+          status?: 'active' | 'completed' | 'paused' | 'cancelled'
+          icon?: string | null
+          color?: string | null
+          house_purchase_data?: Json | null
+          months_remaining?: number | null
+          required_monthly_savings?: number | null
+          is_on_track?: boolean | null
+          created_at?: string
+          updated_at?: string
+          completed_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          description?: string | null
+          goal_type?: 'general_savings' | 'emergency_fund' | 'vacation' | 'education' | 'buy_house' | 'buy_car' | 'other'
+          target_amount?: number
+          current_amount?: number
+          progress_percentage?: number
+          monthly_target?: number | null
+          target_date?: string | null
+          deadline?: string | null
+          status?: 'active' | 'completed' | 'paused' | 'cancelled'
+          icon?: string | null
+          color?: string | null
+          house_purchase_data?: Json | null
+          months_remaining?: number | null
+          required_monthly_savings?: number | null
+          is_on_track?: boolean | null
+          created_at?: string
+          updated_at?: string
+          completed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_goals_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      goal_contributions: {
+        Row: {
+          id: string
+          goal_id: string
+          user_id: string
+          amount: number
+          contribution_date: string
+          wallet_id: string | null
+          description: string | null
+          transaction_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          goal_id: string
+          user_id: string
+          amount: number
+          contribution_date: string
+          wallet_id?: string | null
+          description?: string | null
+          transaction_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          goal_id?: string
+          user_id?: string
+          amount?: number
+          contribution_date?: string
+          wallet_id?: string | null
+          description?: string | null
+          transaction_id?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_contributions_goal_id_fkey"
+            columns: ["goal_id"]
+            referencedRelation: "expense_goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goal_contributions_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      expense_achievements: {
+        Row: {
+          id: string
+          name_en: string
+          name_vi: string
+          description_en: string
+          description_vi: string
+          category: 'first_time' | 'streak' | 'savings' | 'budgeting' | 'house_purchase'
+          requirement_type: string
+          requirement_value: number
+          experience_points: number
+          badge_icon: string
+          badge_color: string
+          triggers_funnel_action: boolean
+          is_active: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name_en: string
+          name_vi: string
+          description_en: string
+          description_vi: string
+          category: 'first_time' | 'streak' | 'savings' | 'budgeting' | 'house_purchase'
+          requirement_type: string
+          requirement_value: number
+          experience_points: number
+          badge_icon: string
+          badge_color: string
+          triggers_funnel_action?: boolean
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name_en?: string
+          name_vi?: string
+          description_en?: string
+          description_vi?: string
+          category?: 'first_time' | 'streak' | 'savings' | 'budgeting' | 'house_purchase'
+          requirement_type?: string
+          requirement_value?: number
+          experience_points?: number
+          badge_icon?: string
+          badge_color?: string
+          triggers_funnel_action?: boolean
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      expense_challenges: {
+        Row: {
+          id: string
+          name_en: string
+          name_vi: string
+          description_en: string
+          description_vi: string
+          challenge_type: 'daily' | 'weekly' | 'monthly' | 'special'
+          category: 'budgeting' | 'saving' | 'tracking' | 'house_goal'
+          target_value: number | null
+          duration_days: number
+          experience_points: number
+          completion_badge: string | null
+          is_active: boolean
+          start_date: string | null
+          end_date: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name_en: string
+          name_vi: string
+          description_en: string
+          description_vi: string
+          challenge_type: 'daily' | 'weekly' | 'monthly' | 'special'
+          category: 'budgeting' | 'saving' | 'tracking' | 'house_goal'
+          target_value?: number | null
+          duration_days: number
+          experience_points: number
+          completion_badge?: string | null
+          is_active?: boolean
+          start_date?: string | null
+          end_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name_en?: string
+          name_vi?: string
+          description_en?: string
+          description_vi?: string
+          challenge_type?: 'daily' | 'weekly' | 'monthly' | 'special'
+          category?: 'budgeting' | 'saving' | 'tracking' | 'house_goal'
+          target_value?: number | null
+          duration_days?: number
+          experience_points?: number
+          completion_badge?: string | null
+          is_active?: boolean
+          start_date?: string | null
+          end_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_challenges: {
+        Row: {
+          id: string
+          challenge_id: string
+          user_id: string
+          started_at: string
+          completed_at: string | null
+          current_progress: number
+          target_progress: number
+          is_completed: boolean
+          is_abandoned: boolean
+          progress_data: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          challenge_id: string
+          user_id: string
+          started_at: string
+          completed_at?: string | null
+          current_progress?: number
+          target_progress: number
+          is_completed?: boolean
+          is_abandoned?: boolean
+          progress_data?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          challenge_id?: string
+          user_id?: string
+          started_at?: string
+          completed_at?: string | null
+          current_progress?: number
+          target_progress?: number
+          is_completed?: boolean
+          is_abandoned?: boolean
+          progress_data?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenges_challenge_id_fkey"
+            columns: ["challenge_id"]
+            referencedRelation: "expense_challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_challenges_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      user_achievements: {
+        Row: {
+          id: string
+          user_id: string
+          achievement_id: string
+          current_progress: number
+          required_progress: number
+          progress_percentage: number
+          is_unlocked: boolean
+          unlocked_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          achievement_id: string
+          current_progress?: number
+          required_progress: number
+          progress_percentage?: number
+          is_unlocked?: boolean
+          unlocked_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          achievement_id?: string
+          current_progress?: number
+          required_progress?: number
+          progress_percentage?: number
+          is_unlocked?: boolean
+          unlocked_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            referencedRelation: "expense_achievements"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      budget_categories: {
+        Row: {
+          id: string
+          budget_id: string
+          category_id: string
+          allocated_amount: number
+          spent_amount: number
+          remaining_amount: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          budget_id: string
+          category_id: string
+          allocated_amount: number
+          spent_amount?: number
+          remaining_amount?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          budget_id?: string
+          category_id?: string
+          allocated_amount?: number
+          spent_amount?: number
+          remaining_amount?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_categories_budget_id_fkey"
+            columns: ["budget_id"]
+            referencedRelation: "expense_budgets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_categories_category_id_fkey"
+            columns: ["category_id"]
+            referencedRelation: "expense_categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       feature_usage: {
         Row: {
           id: string
@@ -1785,3 +2510,42 @@ export type PlanStatusHistoryInsert = Database['public']['Tables']['plan_status_
 export type PlanShareInsert = Database['public']['Tables']['plan_shares']['Insert']
 export type PlanShareUpdate = Database['public']['Tables']['plan_shares']['Update']
 export type UserFavoriteInsert = Database['public']['Tables']['user_favorites']['Insert']
+
+// Expense tracking types
+export type ExpenseTransaction = Database['public']['Tables']['expense_transactions']['Row']
+export type ExpenseTransactionInsert = Database['public']['Tables']['expense_transactions']['Insert']
+export type ExpenseTransactionUpdate = Database['public']['Tables']['expense_transactions']['Update']
+export type ExpenseCategory = Database['public']['Tables']['expense_categories']['Row']
+export type ExpenseCategoryInsert = Database['public']['Tables']['expense_categories']['Insert']
+export type IncomeCategory = Database['public']['Tables']['income_categories']['Row']
+export type IncomeCategoryInsert = Database['public']['Tables']['income_categories']['Insert']
+export type ExpenseWallet = Database['public']['Tables']['expense_wallets']['Row']
+export type ExpenseWalletInsert = Database['public']['Tables']['expense_wallets']['Insert']
+export type ExpenseWalletUpdate = Database['public']['Tables']['expense_wallets']['Update']
+export type ExpenseBudget = Database['public']['Tables']['expense_budgets']['Row']
+export type ExpenseBudgetInsert = Database['public']['Tables']['expense_budgets']['Insert']
+export type ExpenseBudgetUpdate = Database['public']['Tables']['expense_budgets']['Update']
+export type ExpenseGoal = Database['public']['Tables']['expense_goals']['Row']
+export type ExpenseGoalInsert = Database['public']['Tables']['expense_goals']['Insert']
+export type ExpenseGoalUpdate = Database['public']['Tables']['expense_goals']['Update']
+export type GoalContribution = Database['public']['Tables']['goal_contributions']['Row']
+export type GoalContributionInsert = Database['public']['Tables']['goal_contributions']['Insert']
+export type ExpenseAchievement = Database['public']['Tables']['expense_achievements']['Row']
+export type ExpenseAchievementInsert = Database['public']['Tables']['expense_achievements']['Insert']
+export type ExpenseChallenge = Database['public']['Tables']['expense_challenges']['Row']
+export type ExpenseChallengeInsert = Database['public']['Tables']['expense_challenges']['Insert']
+export type UserChallenge = Database['public']['Tables']['user_challenges']['Row']
+export type UserChallengeInsert = Database['public']['Tables']['user_challenges']['Insert']
+export type UserChallengeUpdate = Database['public']['Tables']['user_challenges']['Update']
+export type BudgetCategory = Database['public']['Tables']['budget_categories']['Row']
+export type BudgetCategoryInsert = Database['public']['Tables']['budget_categories']['Insert']
+
+// Expense tracking enums
+export type TransactionType = 'expense' | 'income' | 'transfer'
+export type WalletType = 'cash' | 'bank_account' | 'e_wallet' | 'credit_card' | 'savings' | 'investment' | 'other'
+export type BudgetPeriod = 'weekly' | 'monthly' | 'yearly'
+export type GoalType = 'general_savings' | 'emergency_fund' | 'vacation' | 'education' | 'buy_house' | 'buy_car' | 'other'
+export type GoalStatus = 'active' | 'completed' | 'paused' | 'cancelled'
+export type AchievementCategory = 'first_time' | 'streak' | 'savings' | 'budgeting' | 'house_purchase'
+export type ChallengeType = 'daily' | 'weekly' | 'monthly' | 'special'
+export type ChallengeCategory = 'budgeting' | 'saving' | 'tracking' | 'house_goal'

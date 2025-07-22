@@ -1,0 +1,4 @@
+Tôi muốn:
+1. Trên Sidebar, hãy thiết kế các wrapper để nó che các page của phần kế hoạch tài chính -> tôi muốn release phần này sau. Nhưng vẫn cần tách các page: hồ sơ, thanh toán, cài đặt và trợ giúp để hiển thị ở mục riêng (thay vì gộp chung với Kế hoạch tài chính như hiện tại)
+2. Tạo page mới là page Ví -> thay vì để ngay ở page expenses như hiện tại
+3. Triển khai i18n cho toàn bộ các page. Tham khảo page @src/components/onboarding/OnboardingTour.tsx, @messages/en/onboarding.json, @src/lib/i18n-utils.ts

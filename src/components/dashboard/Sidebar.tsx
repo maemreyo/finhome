@@ -24,39 +24,87 @@ import {
   TrendingUp,
   Trophy,
   Home,
-  Beaker
+  Beaker,
+  Wallet,
+  Target,
+  PieChart,
+  Award
 } from 'lucide-react'
 
 interface SidebarProps {
   className?: string
 }
 
-// Navigation items with existing status
-const navigationItems = [
+// Expense tracking navigation items (primary section)
+const expenseTrackingItems = [
+  {
+    nameKey: 'expenses',
+    href: '/expenses',
+    icon: Wallet,
+    exists: true,
+  },
+  {
+    nameKey: 'wallets',
+    href: '/wallets',
+    icon: CreditCard,
+    exists: true,
+  },
+  {
+    nameKey: 'analytics',
+    href: '/expenses/analytics',
+    icon: BarChart3,
+    exists: true,
+  },
+  {
+    nameKey: 'budgets',
+    href: '/expenses/budgets', 
+    icon: PieChart,
+    exists: true,
+  },
+  {
+    nameKey: 'goals',
+    href: '/expenses/goals',
+    icon: Target,
+    exists: true,
+  },
+  {
+    nameKey: 'achievements',
+    href: '/expenses/achievements',
+    icon: Award,
+    exists: true,
+  },
+]
+
+// Financial planning navigation items (hidden for future release)
+const financialPlanningItems = [
   {
     nameKey: 'dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
-    exists: true,
+    exists: false, // Hidden until future release
   },
   {
     nameKey: 'plans',
     href: '/plans',
     icon: FileText,
-    exists: true,
+    exists: false, // Hidden until future release
   },
   {
     nameKey: 'scenarios',
     href: '/scenarios',
     icon: Calculator,
-    exists: true,
+    exists: false, // Hidden until future release
   },
   {
     nameKey: 'laboratory',
     href: '/laboratory',
     icon: Beaker,
-    exists: true,
+    exists: false, // Hidden until future release
   },
+]
+
+// User account navigation items (separate section)
+const userAccountItems = [
   {
     nameKey: 'profile',
     href: '/profile',
@@ -67,19 +115,6 @@ const navigationItems = [
     nameKey: 'billing',
     href: '/billing',
     icon: CreditCard,
-    exists: true,
-  },
-  // These pages exist
-  {
-    nameKey: 'analytics',
-    href: '/analytics',
-    icon: BarChart3,
-    exists: true,
-  },
-  {
-    nameKey: 'achievements',
-    href: '/achievements',
-    icon: Trophy,
     exists: true,
   },
   {
@@ -103,8 +138,22 @@ export function Sidebar({ className }: SidebarProps) {
   const locale = params?.locale as string || 'en'
   const t = useTranslations('Dashboard.navigation')
 
-  // Create locale-prefixed navigation
-  const navigation = navigationItems.filter(item => item.exists).map(item => ({
+  // Create locale-prefixed navigation for expense tracking
+  const expenseNavigation = expenseTrackingItems.filter(item => item.exists).map(item => ({
+    ...item,
+    name: t(item.nameKey),
+    href: `/${locale}${item.href}`
+  }))
+
+  // Create locale-prefixed navigation for financial planning (hidden)
+  const financialPlanningNavigation = financialPlanningItems.filter(item => item.exists).map(item => ({
+    ...item,
+    name: t(item.nameKey),
+    href: `/${locale}${item.href}`
+  }))
+
+  // Create locale-prefixed navigation for user account items
+  const userAccountNavigation = userAccountItems.filter(item => item.exists).map(item => ({
     ...item,
     name: t(item.nameKey),
     href: `/${locale}${item.href}`
@@ -151,41 +200,123 @@ export function Sidebar({ className }: SidebarProps) {
 
           {/* Navigation */}
           <ScrollArea className="flex-1 px-3 py-4">
-            <nav className="space-y-1" data-testid="dashboard-navigation">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href || 
-                  (item.href !== `/${locale}/dashboard` && pathname.startsWith(item.href))
-                
-                // Add data-testid for specific navigation items referenced in tours
-                const getTestId = (nameKey: string) => {
-                  switch (nameKey) {
-                    case 'achievements':
-                      return 'achievements-link'
-                    case 'laboratory':
-                      return 'laboratory-link'
-                    default:
-                      return undefined
-                  }
-                }
+            <nav className="space-y-6" data-testid="dashboard-navigation">
+              {/* Expense Tracking Section */}
+              <div>
+                <div className="px-3 mb-2">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {t("expensesTracking")}
+                  </h2>
+                </div>
+                <div className="space-y-1">
+                  {expenseNavigation.map((item) => {
+                    const isActive = pathname === item.href || 
+                      (item.href !== `/${locale}/expenses` && pathname.startsWith(item.href))
+                    
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setIsMobileOpen(false)}
+                        className={cn(
+                          "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        )}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.name}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setIsMobileOpen(false)}
-                    data-testid={getTestId(item.nameKey)}
-                    className={cn(
-                      "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.name}</span>
-                  </Link>
-                )
-              })}
+              {/* Separator */}
+              <div className="border-t border-border"></div>
+
+              {/* Financial Planning Section (Hidden for future release) */}
+              {financialPlanningNavigation.length > 0 && (
+                <>
+                  <div>
+                    <div className="px-3 mb-2">
+                      <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        {t("plans")}
+                      </h2>
+                    </div>
+                    <div className="space-y-1">
+                      {financialPlanningNavigation.map((item) => {
+                        const isActive = pathname === item.href || 
+                          (item.href !== `/${locale}/dashboard` && pathname.startsWith(item.href))
+                        
+                        // Add data-testid for specific navigation items referenced in tours
+                        const getTestId = (nameKey: string) => {
+                          switch (nameKey) {
+                            case 'laboratory':
+                              return 'laboratory-link'
+                            default:
+                              return undefined
+                          }
+                        }
+
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setIsMobileOpen(false)}
+                            data-testid={getTestId(item.nameKey)}
+                            className={cn(
+                              "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                              isActive
+                                ? "bg-primary text-primary-foreground"
+                                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                            )}
+                          >
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.name}</span>
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  
+                  {/* Separator */}
+                  <div className="border-t border-border"></div>
+                </>
+              )}
+
+              {/* User Account Section */}
+              <div>
+                <div className="px-3 mb-2">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {t("account")}
+                  </h2>
+                </div>
+                <div className="space-y-1">
+                  {userAccountNavigation.map((item) => {
+                    const isActive = pathname === item.href || 
+                      (item.href !== `/${locale}/dashboard` && pathname.startsWith(item.href))
+
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setIsMobileOpen(false)}
+                        className={cn(
+                          "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        )}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.name}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
             </nav>
           </ScrollArea>
 

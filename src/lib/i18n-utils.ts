@@ -55,6 +55,10 @@ export const AVAILABLE_NAMESPACES: Record<string, NamespaceConfig> = {
   scenarios: {
     name: 'scenarios',
     description: 'Scenarios and scenario comparison content (Scenario, ScenarioComparison)',
+  },
+  expenses: {
+    name: 'expenses',
+    description: 'Expense tracking and budget management content (BudgetManager, ExpenseAnalytics, etc)',
   }
 };
 
@@ -130,6 +134,8 @@ export function validateNamespaceMessages(
           return ['SubscriptionPlans', 'FeatureGates', 'UpgradePrompts', 'BillingPage', 'SubscriptionCommon', 'Features', 'SubscriptionNotifications', 'SubscriptionFaq'].includes(key);
         case 'scenarios':
           return ['ScenarioComparisonTable', 'ScenarioParameterEditor', 'InteractiveParameterSliders', 'ScenarioChart', 'ScenarioComparison', 'CreateScenarioModal', 'ExportScenarios', 'ScenarioCommon', 'SmartScenarios', 'AIAnalysisModal'].includes(key);
+        case 'expenses':
+          return ['BudgetManager', 'ExpenseAnalytics', 'ExpenseTrackingDashboard', 'GamificationCenter', 'GoalManager', 'QuickTransactionForm', 'TransactionsList', 'ExpenseCommon', 'Wallets'].includes(key);
         default:
           return false;
       }
@@ -211,5 +217,6 @@ export function getNamespaceStats(): Record<string, { description: string; estim
     onboarding: { description: AVAILABLE_NAMESPACES.onboarding.description, estimatedSize: '~3.2KB' },
     subscription: { description: AVAILABLE_NAMESPACES.subscription.description, estimatedSize: '~8.5KB' },
     scenarios: { description: AVAILABLE_NAMESPACES.scenarios.description, estimatedSize: '~7.2KB' },
+    expenses: { description: AVAILABLE_NAMESPACES.expenses.description, estimatedSize: '~8.5KB' },
   };
 }

@@ -4,6 +4,11 @@
       "dashboard": "Dashboard",
       "plans": "Kế Hoạch Tài Chính",
       "scenarios": "So Sánh Kịch Bản",
+      "expensesTracking": "Theo dõi Chi tiêu",
+      "expenses": "Chi Tiêu",
+      "wallets": "Ví",
+      "budgets": "Ngân Sách", 
+      "goals": "Mục Tiêu",
       "laboratory": "Phòng Thí Nghiệm",
       "profile": "Hồ Sơ",
       "billing": "Thanh Toán",
@@ -11,7 +16,8 @@
       "achievements": "Thành Tích",
       "settings": "Cài Đặt",
       "help": "Trợ Giúp",
-      "subscription": "Đăng ký"
+      "subscription": "Đăng ký",
+      "account": "Tài Khoản"
     },
     "title": "Tổng Quan Tài Chính",
     "description": "Theo dõi tiến độ và quản lý đầu tư bất động sản của bạn",
