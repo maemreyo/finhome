@@ -1,7 +1,8 @@
 // src/components/expenses/QuickTransactionForm.tsx
+// UPDATED: Enhanced UI/UX for 2-3 click transaction entry and flexible tagging
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -12,6 +13,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 import { 
@@ -25,7 +29,10 @@ import {
   Tag,
   Clock,
   Check,
-  X
+  X,
+  ChevronDown,
+  Zap,
+  Hash
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -72,6 +79,8 @@ interface QuickTransactionFormProps {
   onSuccess?: () => void
   onCancel?: () => void
   className?: string
+  suggestedTags?: string[] // Previously used tags for suggestions
+  quickMode?: boolean // Compact mode for faster entry
 }
 
 export function QuickTransactionForm({
@@ -80,13 +89,18 @@ export function QuickTransactionForm({
   incomeCategories,
   onSuccess,
   onCancel,
-  className
+  className,
+  suggestedTags = [],
+  quickMode = false
 }: QuickTransactionFormProps) {
   const t = useTranslations('QuickTransactionForm')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [customTag, setCustomTag] = useState('')
   const [transactionType, setTransactionType] = useState<'expense' | 'income' | 'transfer'>('expense')
+  const [tagInputOpen, setTagInputOpen] = useState(false)
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>(suggestedTags)
+  const tagInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<FormData>({
     resolver: zodResolver(quickTransactionSchema),
@@ -113,13 +127,30 @@ export function QuickTransactionForm({
     setValue('amount', currentAmount + amount)
   }
 
-  const addTag = () => {
-    if (customTag.trim() && !selectedTags.includes(customTag.trim())) {
-      const newTags = [...selectedTags, customTag.trim()]
+  const addTag = (tagToAdd?: string) => {
+    const tagValue = tagToAdd || customTag.trim()
+    if (tagValue && !selectedTags.includes(tagValue)) {
+      const newTags = [...selectedTags, tagValue]
       setSelectedTags(newTags)
       setValue('tags', newTags)
       setCustomTag('')
+      setTagInputOpen(false)
+      
+      // Add to local suggestions if it's a new tag
+      if (!suggestedTags.includes(tagValue)) {
+        setFilteredSuggestions(prev => [tagValue, ...prev])
+      }
     }
+  }
+
+  const handleTagInputChange = (value: string) => {
+    setCustomTag(value)
+    // Filter suggestions based on input
+    const filtered = suggestedTags.filter(tag => 
+      tag.toLowerCase().includes(value.toLowerCase()) &&
+      !selectedTags.includes(tag)
+    )
+    setFilteredSuggestions(filtered)
   }
 
   const removeTag = (tag: string) => {
@@ -179,22 +210,54 @@ export function QuickTransactionForm({
   }
 
   return (
-    <Card className={cn("w-full max-w-md mx-auto", className)}>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          {transactionType === 'expense' && <Minus className="h-5 w-5 text-red-500" />}
-          {transactionType === 'income' && <Plus className="h-5 w-5 text-green-500" />}
-          {transactionType === 'transfer' && <ArrowRightLeft className="h-5 w-5 text-blue-500" />}
-          {transactionType === 'expense' && t('expense')}
-          {transactionType === 'income' && t('income')}
-          {transactionType === 'transfer' && t('transfer')}
+    <Card className={cn("w-full max-w-md mx-auto", quickMode && "shadow-sm", className)}>
+      <CardHeader className={cn("pb-3", quickMode && "pb-2 pt-4")}>
+        <CardTitle className={cn("flex items-center gap-2", quickMode ? "text-base" : "text-lg")}>
+          <Zap className={cn("text-amber-500", quickMode ? "h-4 w-4" : "h-5 w-5")} />
+          <span>Quick Entry</span>
+          {!quickMode && (
+            <>
+              {transactionType === 'expense' && <Minus className="h-5 w-5 text-red-500" />}
+              {transactionType === 'income' && <Plus className="h-5 w-5 text-green-500" />}
+              {transactionType === 'transfer' && <ArrowRightLeft className="h-5 w-5 text-blue-500" />}
+              {transactionType === 'expense' && t('expense')}
+              {transactionType === 'income' && t('income')}
+              {transactionType === 'transfer' && t('transfer')}
+            </>
+          )}
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Transaction Type Toggle */}
-          <div className="flex rounded-lg bg-muted p-1">
+      <CardContent className={cn(quickMode && "px-4 pb-4")}>
+        <form 
+          onSubmit={form.handleSubmit(onSubmit)} 
+          className={cn(quickMode ? "space-y-2" : "space-y-4")}
+          onKeyDown={(e) => {
+            // Keyboard shortcuts for power users
+            if (e.ctrlKey || e.metaKey) {
+              switch (e.key) {
+                case 'Enter':
+                  e.preventDefault()
+                  form.handleSubmit(onSubmit)()
+                  break
+                case '1':
+                  e.preventDefault()
+                  setValue('transaction_type', 'expense')
+                  break
+                case '2':
+                  e.preventDefault()
+                  setValue('transaction_type', 'income')
+                  break
+                case '3':
+                  e.preventDefault()
+                  setValue('transaction_type', 'transfer')
+                  break
+              }
+            }
+          }}
+        >
+          {/* Transaction Type Toggle - Enhanced for Quick Mode */}
+          <div className={cn("flex rounded-lg bg-muted p-1", quickMode && "p-0.5")}>
             {(['expense', 'income', 'transfer'] as const).map((type) => (
               <button
                 key={type}
@@ -207,26 +270,31 @@ export function QuickTransactionForm({
                   setValue('transfer_to_wallet_id', undefined)
                 }}
                 className={cn(
-                  "flex-1 rounded-md py-2 px-3 text-sm font-medium transition-all",
+                  "flex-1 rounded-md font-medium transition-all",
                   "flex items-center justify-center gap-1",
+                  quickMode ? "py-1.5 px-2 text-xs" : "py-2 px-3 text-sm",
                   transactionType === type
                     ? "bg-background shadow text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                {type === 'expense' && <Minus className="h-4 w-4" />}
-                {type === 'income' && <Plus className="h-4 w-4" />}
-                {type === 'transfer' && <ArrowRightLeft className="h-4 w-4" />}
-                {type === 'expense' && t('expense')}
-                {type === 'income' && t('income')}
-                {type === 'transfer' && t('transfer')}
+                {type === 'expense' && <Minus className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />}
+                {type === 'income' && <Plus className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />}
+                {type === 'transfer' && <ArrowRightLeft className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />}
+                {!quickMode && (
+                  <>
+                    {type === 'expense' && t('expense')}
+                    {type === 'income' && t('income')}
+                    {type === 'transfer' && t('transfer')}
+                  </>
+                )}
               </button>
             ))}
           </div>
 
-          {/* Amount Input with Quick Buttons */}
-          <div className="space-y-2">
-            <Label>{t('amount')}</Label>
+          {/* Amount Input with Quick Buttons - Enhanced */}
+          <div className={cn("space-y-2", quickMode && "space-y-1")}>
+            <Label className={cn(quickMode && "text-sm")}>{t('amount')}</Label>
             <div className="relative">
               <Input
                 type="number"
@@ -234,51 +302,67 @@ export function QuickTransactionForm({
                 min="0"
                 placeholder="0"
                 {...form.register('amount', { valueAsNumber: true })}
-                className="text-xl font-semibold pr-16"
+                className={cn(
+                  "font-semibold pr-16",
+                  quickMode ? "text-lg h-10" : "text-xl"
+                )}
+                autoFocus={quickMode}
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                {t('currency')}
+              <div className={cn(
+                "absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground",
+                quickMode ? "text-xs" : "text-sm"
+              )}>
+                VND
               </div>
             </div>
             
-            {/* Quick Amount Buttons */}
-            <div className="flex gap-1">
-              {[10000, 20000, 50000, 100000, 200000, 500000].map((amount) => (
+            {/* Quick Amount Buttons - Optimized for frequent amounts */}
+            <div className="flex gap-1 flex-wrap">
+              {(quickMode 
+                ? [10000, 25000, 50000, 100000, 200000] // More common amounts for quick mode
+                : [10000, 20000, 50000, 100000, 200000, 500000]
+              ).map((amount) => (
                 <Button
                   key={amount}
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => handleQuickAmount(amount)}
-                  className="text-xs px-2 py-1 h-7"
+                  className={cn(
+                    "text-xs px-2 py-1 h-6 min-w-0",
+                    quickMode && "h-5"
+                  )}
                 >
-                  +{(amount / 1000)}k
+                  +{amount >= 1000000 ? (amount / 1000000) + 'M' : (amount / 1000) + 'k'}
                 </Button>
               ))}
             </div>
           </div>
 
-          {/* Wallet Selection */}
-          <div className="space-y-2">
-            <Label>
-              <Wallet className="inline h-4 w-4 mr-1" />
-              {transactionType === 'transfer' ? t('fromWallet') : t('wallet')}
+          {/* Wallet Selection - Optimized */}
+          <div className={cn("space-y-2", quickMode && "space-y-1")}>
+            <Label className={cn("flex items-center gap-1", quickMode && "text-sm")}>
+              <Wallet className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />
+              {quickMode 
+                ? (transactionType === 'transfer' ? 'From' : 'Wallet')
+                : (transactionType === 'transfer' ? t('fromWallet') : t('wallet'))
+              }
             </Label>
             <Select onValueChange={(value) => setValue('wallet_id', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder={t('wallet')} />
+              <SelectTrigger className={cn(quickMode && "h-8")}>
+                <SelectValue placeholder={quickMode ? "Select wallet" : t('wallet')} />
               </SelectTrigger>
               <SelectContent>
                 {wallets.map((wallet) => (
                   <SelectItem key={wallet.id} value={wallet.id}>
                     <div className="flex items-center gap-2">
                       <div 
-                        className="w-3 h-3 rounded-full"
+                        className="w-3 h-3 rounded-full flex-shrink-0"
                         style={{ backgroundColor: wallet.color }}
                       />
-                      <span>{wallet.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {wallet.balance.toLocaleString('vi-VN')} {wallet.currency}
+                      <span className="truncate">{wallet.name}</span>
+                      <span className="text-xs text-muted-foreground ml-auto">
+                        {wallet.balance.toLocaleString('vi-VN', { maximumFractionDigits: 0 })}
                       </span>
                     </div>
                   </SelectItem>
@@ -314,20 +398,24 @@ export function QuickTransactionForm({
             </div>
           )}
 
-          {/* Category Selection */}
+          {/* Category Selection - Enhanced with Search */}
           {transactionType !== 'transfer' && (
-            <div className="space-y-2">
-              <Label>{t('category')}</Label>
+            <div className={cn("space-y-2", quickMode && "space-y-1")}>
+              <Label className={cn(quickMode && "text-sm")}>
+                {quickMode ? 'Category' : t('category')}
+              </Label>
               <Select onValueChange={(value) => setValue(getCategoryFieldName(), value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('category')} />
+                <SelectTrigger className={cn(quickMode && "h-8")}>
+                  <SelectValue placeholder={quickMode ? "Select category" : t('category')} />
                 </SelectTrigger>
                 <SelectContent className="max-h-[200px] overflow-y-auto">
-                  {getCurrentCategories().map((category) => (
+                  {getCurrentCategories()
+                    .sort((a, b) => a.name_vi.localeCompare(b.name_vi)) // Sort alphabetically
+                    .map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       <div className="flex items-center gap-2">
                         <div 
-                          className="w-3 h-3 rounded-full"
+                          className="w-3 h-3 rounded-full flex-shrink-0"
                           style={{ backgroundColor: category.color }}
                         />
                         <span>{category.name_vi}</span>
@@ -339,79 +427,213 @@ export function QuickTransactionForm({
             </div>
           )}
 
-          {/* Description */}
-          <div className="space-y-2">
-            <Label>{t('description')}</Label>
-            <Input
-              placeholder={t('descriptionPlaceholder')}
-              {...form.register('description')}
-            />
-          </div>
-
-          {/* Tags */}
-          <div className="space-y-2">
-            <Label>
-              <Tag className="inline h-4 w-4 mr-1" />
-              {t('tags')}
-            </Label>
-            <div className="flex gap-1">
+          {/* Description - Optional in Quick Mode */}
+          {!quickMode && (
+            <div className="space-y-2">
+              <Label>{t('description')}</Label>
               <Input
-                placeholder={t('addTagPlaceholder')}
-                value={customTag}
-                onChange={(e) => setCustomTag(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                className="flex-1"
+                placeholder={t('descriptionPlaceholder')}
+                {...form.register('description')}
               />
-              <Button type="button" onClick={addTag} size="sm">
-                <Plus className="h-4 w-4" />
-              </Button>
             </div>
+          )}
+          
+          {/* Compact Description for Quick Mode */}
+          {quickMode && (
+            <div className="space-y-1">
+              <Input
+                placeholder="Description (optional)"
+                {...form.register('description')}
+                className="h-8 text-sm"
+              />
+            </div>
+          )}
+
+          {/* Enhanced Tags with Suggestions */}
+          <div className={cn("space-y-2", quickMode && "space-y-1")}>
+            <Label className={cn("flex items-center gap-1", quickMode && "text-sm")}>
+              <Hash className={cn("text-muted-foreground", quickMode ? "h-3 w-3" : "h-4 w-4")} />
+              {quickMode ? 'Tags' : t('tags')}
+            </Label>
             
+            {/* Tag Input with Suggestions */}
+            <Popover open={tagInputOpen} onOpenChange={setTagInputOpen}>
+              <div className="flex gap-1">
+                <PopoverTrigger asChild>
+                  <div className="flex-1 relative">
+                    <Input
+                      ref={tagInputRef}
+                      placeholder={quickMode ? "Add tag..." : t('addTagPlaceholder')}
+                      value={customTag}
+                      onChange={(e) => handleTagInputChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          addTag()
+                        } else if (e.key === 'ArrowDown' && filteredSuggestions.length > 0) {
+                          e.preventDefault()
+                          setTagInputOpen(true)
+                        }
+                      }}
+                      onFocus={() => customTag && setTagInputOpen(true)}
+                      className={cn(quickMode && "h-8 text-sm")}
+                    />
+                    {(filteredSuggestions.length > 0 || customTag) && (
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                    )}
+                  </div>
+                </PopoverTrigger>
+                <Button 
+                  type="button" 
+                  onClick={() => addTag()} 
+                  size={quickMode ? "sm" : "sm"}
+                  className={cn(quickMode && "h-8 px-2")}
+                  disabled={!customTag.trim()}
+                >
+                  <Plus className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />
+                </Button>
+              </div>
+              
+              <PopoverContent className="w-full p-0" align="start">
+                <Command>
+                  <CommandInput 
+                    placeholder="Search or create tag..." 
+                    value={customTag}
+                    onValueChange={handleTagInputChange}
+                  />
+                  <CommandEmpty>
+                    {customTag && (
+                      <div className="p-2">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-sm"
+                          onClick={() => addTag()}
+                        >
+                          <Plus className="h-3 w-3 mr-2" />
+                          Create "{customTag}"
+                        </Button>
+                      </div>
+                    )}
+                  </CommandEmpty>
+                  {filteredSuggestions.length > 0 && (
+                    <CommandGroup heading="Suggested tags">
+                      <ScrollArea className="max-h-32">
+                        {filteredSuggestions.slice(0, 8).map((tag) => (
+                          <CommandItem
+                            key={tag}
+                            onSelect={() => addTag(tag)}
+                            className="text-sm"
+                          >
+                            <Hash className="h-3 w-3 mr-2 text-muted-foreground" />
+                            {tag}
+                          </CommandItem>
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup>
+                  )}
+                </Command>
+              </PopoverContent>
+            </Popover>
+            
+            {/* Selected Tags */}
             {selectedTags.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {selectedTags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-xs">
+                  <Badge 
+                    key={tag} 
+                    variant="secondary" 
+                    className={cn(
+                      "flex items-center gap-1 pr-1",
+                      quickMode ? "text-xs py-0" : "text-xs"
+                    )}
+                  >
+                    <Hash className="h-2.5 w-2.5" />
                     {tag}
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="h-auto p-0 ml-1"
+                      className="h-auto p-0.5 hover:bg-destructive hover:text-destructive-foreground"
                       onClick={() => removeTag(tag)}
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-2.5 w-2.5" />
                     </Button>
                   </Badge>
                 ))}
               </div>
             )}
+            
+            {/* Quick Tag Suggestions */}
+            {selectedTags.length === 0 && suggestedTags.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">Quick add:</p>
+                <div className="flex flex-wrap gap-1">
+                  {suggestedTags.slice(0, 5).map((tag) => (
+                    <Button
+                      key={tag}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => addTag(tag)}
+                      className={cn(
+                        "h-6 px-2 text-xs border-dashed hover:border-solid",
+                        quickMode && "h-5"
+                      )}
+                    >
+                      <Hash className="h-2.5 w-2.5 mr-1" />
+                      {tag}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 pt-4">
+          {/* Action Buttons - Optimized */}
+          <div className={cn("flex gap-2", quickMode ? "pt-2" : "pt-4")}>
             {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
-                {t('cancel')}
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onCancel} 
+                className={cn("flex-1", quickMode && "h-8 text-sm")}
+              >
+                {quickMode ? 'Cancel' : t('cancel')}
               </Button>
             )}
             <Button 
               type="submit" 
-              disabled={isSubmitting} 
-              className="flex-1"
+              disabled={isSubmitting || !watch('wallet_id') || !watch('amount')} 
+              className={cn("flex-1 font-medium", quickMode && "h-8 text-sm")}
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {t('saving')}
+                  <div className={cn(
+                    "border-2 border-white border-t-transparent rounded-full animate-spin",
+                    quickMode ? "w-3 h-3" : "w-4 h-4"
+                  )} />
+                  {quickMode ? 'Saving...' : t('saving')}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4" />
-                  {t('saveTransaction')}
+                  <Check className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />
+                  {quickMode ? 'Save' : t('saveTransaction')}
+                  {quickMode && (
+                    <kbd className="ml-1 px-1 py-0.5 text-xs bg-black/10 rounded border">
+                      ⌘↵
+                    </kbd>
+                  )}
                 </div>
               )}
             </Button>
           </div>
+          
+          {/* Quick Mode Tips */}
+          {quickMode && (
+            <div className="text-xs text-muted-foreground text-center pt-1 border-t">
+              <p>Tips: ⌘+1/2/3 to switch type • ⌘+Enter to save • ↓ for tag suggestions</p>
+            </div>
+          )}
         </form>
       </CardContent>
     </Card>
