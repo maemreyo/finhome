@@ -42,6 +42,7 @@ import {
 import { cn, formatCurrency } from '@/lib/utils'
 import { format, addMonths, differenceInMonths, differenceInDays } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import { GoalAdviceSection } from './GoalAdviceSection'
 
 const createGoalSchema = (t: any) => z.object({
   name: z.string().min(1, t('goalNameRequired')),
@@ -150,6 +151,7 @@ export function GoalManager({
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null)
   const [contributionAmount, setContributionAmount] = useState('')
   const [selectedWallet, setSelectedWallet] = useState('')
+  const [showAdvice, setShowAdvice] = useState<Set<string>>(new Set())
 
   const form = useForm<FormData>({
     // resolver: zodResolver(createGoalSchema),
@@ -298,6 +300,18 @@ export function GoalManager({
     
     const months = differenceInMonths(new Date(deadline), new Date())
     return t('monthsLeft', { count: months })
+  }
+
+  const toggleAdvice = (goalId: string) => {
+    setShowAdvice(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(goalId)) {
+        newSet.delete(goalId)
+      } else {
+        newSet.add(goalId)
+      }
+      return newSet
+    })
   }
 
   // Filter goals by type
@@ -664,6 +678,34 @@ export function GoalManager({
                       </Alert>
                     )}
 
+                    {/* Enhanced Financial Advice Section */}
+                    <div className="border-t pt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mb-3"
+                        onClick={() => toggleAdvice(goal.id)}
+                      >
+                        <Lightbulb className="h-4 w-4 mr-2" />
+                        {showAdvice.has(goal.id) ? 'Ẩn gợi ý tài chính' : 'Xem gợi ý tài chính'}
+                        <ArrowRight className={`h-4 w-4 ml-2 transition-transform ${showAdvice.has(goal.id) ? 'rotate-90' : ''}`} />
+                      </Button>
+                      
+                      {showAdvice.has(goal.id) && (
+                        <div className="mt-4">
+                          <GoalAdviceSection
+                            goalId={goal.id}
+                            goalName={goal.name}
+                            goalType={goal.goal_type}
+                            onAdviceUpdate={() => {
+                              // Refresh goals data if needed
+                              onGoalUpdate?.(goal)
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
                     {/* House Purchase CTA */}
                     {goal.progress_percentage > 25 && stage !== 'initial' && (
                       <div className="border-t pt-3">
@@ -770,15 +812,41 @@ export function GoalManager({
                       </div>
                     </div>
 
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => setSelectedGoal(goal)}
-                    >
-                      <Plus className="h-3 w-3 mr-2" />
-                      {t('contribute')}
-                    </Button>
+                    <div className="space-y-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setSelectedGoal(goal)}
+                      >
+                        <Plus className="h-3 w-3 mr-2" />
+                        {t('contribute')}
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-full text-xs"
+                        onClick={() => toggleAdvice(goal.id)}
+                      >
+                        <Lightbulb className="h-3 w-3 mr-2" />
+                        {showAdvice.has(goal.id) ? 'Ẩn gợi ý' : 'Gợi ý tài chính'}
+                      </Button>
+                    </div>
+
+                    {showAdvice.has(goal.id) && (
+                      <div className="border-t pt-3 mt-3">
+                        <GoalAdviceSection
+                          goalId={goal.id}
+                          goalName={goal.name}
+                          goalType={goal.goal_type}
+                          onAdviceUpdate={() => {
+                            // Refresh goals data if needed
+                            onGoalUpdate?.(goal)
+                          }}
+                        />
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )
