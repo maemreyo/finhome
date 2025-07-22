@@ -34,6 +34,7 @@ import {
 import { cn, formatCurrency } from '@/lib/utils'
 import { format, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import { FiftyThirtyTwentyBudgetForm } from './FiftyThirtyTwentyBudgetForm'
 
 const createBudgetSchema = (t: any) => z.object({
   name: z.string().min(1, t('budgetNameRequired')),
@@ -41,7 +42,7 @@ const createBudgetSchema = (t: any) => z.object({
   budget_period: z.enum(['weekly', 'monthly', 'yearly']),
   total_budget: z.number().positive(t('budgetAmountRequired')),
   alert_threshold_percentage: z.number().min(50).max(100).optional(),
-  category_budgets: z.record(z.number().min(0)).optional(),
+  category_budgets: z.record(z.string(), z.number().min(0)).optional(),
 })
 
 type FormData = z.infer<ReturnType<typeof createBudgetSchema>>
@@ -59,6 +60,7 @@ interface Budget {
   name: string
   description?: string
   budget_period: 'weekly' | 'monthly' | 'yearly'
+  budget_method?: string
   total_budget: number
   current_spent: number
   remaining_amount: number
@@ -74,7 +76,9 @@ interface Budget {
     remaining_amount: number
     category: Category
   }>
-  spending_by_category: Record<string, number>
+  spending_by_category?: Record<string, number>
+  budget_allocation?: Record<string, number>
+  category_mapping?: Record<string, string>
 }
 
 interface BudgetManagerProps {
@@ -98,6 +102,7 @@ export function BudgetManager({
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedPeriod, setSelectedPeriod] = useState<Date>(new Date())
+  const [budgetMethod, setBudgetMethod] = useState<'manual' | '50_30_20' | '6_jars'>('manual')
 
   const form = useForm<FormData>({
     resolver: zodResolver(createBudgetSchema(t)),
@@ -292,14 +297,121 @@ export function BudgetManager({
               {t('createBudget')}
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingBudget ? t('editBudget') : t('createNewBudget')}
               </DialogTitle>
             </DialogHeader>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Budget Method Selection */}
+            {!editingBudget && (
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base font-medium">Choose Budget Method</Label>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Select a budgeting methodology that fits your financial goals.
+                  </p>
+                </div>
+                
+                <div className="grid gap-3 md:grid-cols-3">
+                  <Card 
+                    className={cn(
+                      "cursor-pointer transition-all hover:shadow-md",
+                      budgetMethod === 'manual' && "ring-2 ring-primary"
+                    )}
+                    onClick={() => setBudgetMethod('manual')}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <DollarSign className="h-5 w-5 text-blue-500" />
+                        <h3 className="font-medium">Manual Budget</h3>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Create a custom budget by manually allocating amounts to categories.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={cn(
+                      "cursor-pointer transition-all hover:shadow-md",
+                      budgetMethod === '50_30_20' && "ring-2 ring-primary"
+                    )}
+                    onClick={() => setBudgetMethod('50_30_20')}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Target className="h-5 w-5 text-green-500" />
+                        <h3 className="font-medium">50/30/20 Rule</h3>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Simple rule: 50% needs, 30% wants, 20% savings & debt.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={cn(
+                      "cursor-pointer transition-all hover:shadow-md",
+                      budgetMethod === '6_jars' && "ring-2 ring-primary opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <PiggyBank className="h-5 w-5 text-purple-500" />
+                        <h3 className="font-medium">6 Jars Method</h3>
+                        <Badge variant="secondary" className="text-xs">Soon</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        T. Harv Eker's wealth building system with 6 allocation jars.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
+
+            {/* Render appropriate form based on method */}
+            {budgetMethod === '50_30_20' && !editingBudget ? (
+              <FiftyThirtyTwentyBudgetForm
+                categories={categories}
+                onSubmit={async (budgetData) => {
+                  try {
+                    const response = await fetch('/api/expenses/budgets', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(budgetData),
+                    })
+
+                    if (!response.ok) {
+                      const errorData = await response.json()
+                      throw new Error(errorData.error || 'Failed to create budget')
+                    }
+
+                    const result = await response.json()
+                    const savedBudget = result.budget
+
+                    setBudgets(prev => [...prev, savedBudget])
+                    onBudgetCreate?.(savedBudget)
+                    toast.success('50/30/20 Budget created successfully!')
+
+                    setIsCreateDialogOpen(false)
+                    setBudgetMethod('manual')
+                  } catch (error) {
+                    console.error('Error creating budget:', error)
+                    toast.error(error instanceof Error ? error.message : 'Failed to create budget')
+                  }
+                }}
+                onCancel={() => {
+                  setIsCreateDialogOpen(false)
+                  setBudgetMethod('manual')
+                }}
+              />
+            ) : (
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>{t('budgetName')}</Label>
@@ -397,6 +509,7 @@ export function BudgetManager({
                 </Button>
               </div>
             </form>
+            )}
           </DialogContent>
         </Dialog>
       </div>

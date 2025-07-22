@@ -7,11 +7,14 @@ const createBudgetSchema = z.object({
   name: z.string().min(1, 'Budget name is required'),
   description: z.string().optional(),
   budget_period: z.enum(['weekly', 'monthly', 'yearly']),
+  budget_method: z.string().optional().default('manual'),
   start_date: z.string(),
   end_date: z.string(),
   total_budget: z.number().positive(),
-  category_budgets: z.record(z.number().min(0)).optional(),
+  category_budgets: z.record(z.string(), z.number().min(0)).optional(),
   alert_threshold_percentage: z.number().min(0).max(100).optional(),
+  budget_allocation: z.record(z.string(), z.number()).optional(),
+  category_mapping: z.record(z.string(), z.string()).optional(),
 })
 
 const updateBudgetSchema = createBudgetSchema.partial()
