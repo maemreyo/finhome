@@ -29,7 +29,8 @@ import {
   Calendar,
   PieChart,
   DollarSign,
-  AlertCircle
+  AlertCircle,
+  PiggyBank
 } from 'lucide-react'
 import { cn, formatCurrency } from '@/lib/utils'
 import { format, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns'
@@ -364,7 +365,7 @@ export function BudgetManager({
                         <Badge variant="secondary" className="text-xs">Soon</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        T. Harv Eker's wealth building system with 6 allocation jars.
+                        T. Harv Eker&apos;s wealth building system with 6 allocation jars.
                       </p>
                     </CardContent>
                   </Card>

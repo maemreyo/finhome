@@ -45,6 +45,7 @@ import {
   Filter,
   Download,
   RefreshCw,
+  BookOpen,
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -57,6 +58,7 @@ import {
   eachMonthOfInterval,
 } from "date-fns";
 import { vi } from "date-fns/locale";
+import { StorytellingReport } from "./StorytellingReport";
 
 interface Transaction {
   id: string;
@@ -95,6 +97,7 @@ interface ExpenseAnalyticsProps {
 
 type DateRangeOption = "7d" | "30d" | "3m" | "6m" | "1y";
 type ChartType = "category" | "trend" | "comparison" | "cashflow";
+type ViewType = "analytics" | "storytelling";
 
 const COLORS = [
   "#3B82F6",
@@ -117,6 +120,7 @@ export function ExpenseAnalytics({
   const t = useTranslations('ExpenseAnalytics')
   const [dateRange, setDateRange] = useState<DateRangeOption>("30d");
   const [selectedChart, setSelectedChart] = useState<ChartType>("category");
+  const [selectedView, setSelectedView] = useState<ViewType>("analytics");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Calculate date range
@@ -386,10 +390,10 @@ export function ExpenseAnalytics({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
-            {t('title')}
+            {selectedView === "analytics" ? t('title') : "Báo cáo chi tiêu thông minh"}
           </h2>
           <p className="text-muted-foreground">
-            {t('subtitle')}
+            {selectedView === "analytics" ? t('subtitle') : "Hiểu rõ dòng tiền với phân tích và insights cá nhân hóa"}
           </p>
         </div>
 
@@ -417,8 +421,31 @@ export function ExpenseAnalytics({
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* View Selector */}
+      <div className="flex items-center gap-2 border-b">
+        <Button
+          variant={selectedView === "analytics" ? "default" : "ghost"}
+          onClick={() => setSelectedView("analytics")}
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+        >
+          <BarChart3 className="h-4 w-4 mr-2" />
+          {t('title')}
+        </Button>
+        <Button
+          variant={selectedView === "storytelling" ? "default" : "ghost"}
+          onClick={() => setSelectedView("storytelling")}
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+        >
+          <BookOpen className="h-4 w-4 mr-2" />
+          Báo cáo thông minh
+        </Button>
+      </div>
+
+      {/* Conditional Content */}
+      {selectedView === "analytics" ? (
+        <>
+          {/* Summary Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('totalExpenses')}</CardTitle>
@@ -723,6 +750,14 @@ export function ExpenseAnalytics({
             </div>
           </CardContent>
         </Card>
+      )}
+        </>
+      ) : (
+        /* Storytelling Report View */
+        <StorytellingReport 
+          initialPeriod={dateRange}
+          className="mt-6"
+        />
       )}
     </div>
   );
