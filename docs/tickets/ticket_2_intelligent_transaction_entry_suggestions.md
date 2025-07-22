@@ -17,6 +17,24 @@ Ticket này sẽ tập trung vào việc phát triển logic backend và tích h
     -   Khi người dùng bắt đầu gõ, ứng dụng sẽ hiển thị các gợi ý phù hợp.
     -   Đảm bảo trải nghiệm người dùng mượt mà khi chọn gợi ý.
 
+**Ngữ cảnh Schema (supabase/migrations/011_expense_tracking_system.sql):**
+
+Để triển khai tính năng này, các bảng sau trong schema Supabase là quan trọng:
+
+-   **`expense_transactions`**: Đây là bảng chính chứa tất cả các giao dịch của người dùng. Các cột quan trọng để học hỏi thói quen và đưa ra gợi ý bao gồm:
+    -   `description`: Mô tả giao dịch.
+    -   `expense_category_id`: ID danh mục chi tiêu (liên kết với `expense_categories`).
+    -   `income_category_id`: ID danh mục thu nhập (liên kết với `income_categories`).
+    -   `merchant_name`: Tên người bán/thương gia.
+    -   `tags`: Mảng các thẻ (tags) được gắn với giao dịch.
+    -   `amount`: Số tiền giao dịch (có thể dùng để gợi ý số tiền phổ biến cho một loại giao dịch).
+
+-   **`expense_categories`**: Chứa thông tin chi tiết về các danh mục chi tiêu, bao gồm `id`, `name_vi`, `name_en`. Cần thiết để hiển thị tên danh mục gợi ý cho người dùng.
+
+-   **`income_categories`**: Tương tự như `expense_categories`, chứa thông tin chi tiết về các danh mục thu nhập (`id`, `name_vi`, `name_en`).
+
+Logic gợi ý sẽ cần truy vấn bảng `expense_transactions` để phân tích các giao dịch trước đây của người dùng (dựa trên `user_id`) và tìm ra các cặp `(description, category)`, `(merchant_name, category)`, hoặc `(tags, category)` thường xuyên xuất hiện cùng nhau. Sau đó, sử dụng thông tin từ `expense_categories` và `income_categories` để trả về tên danh mục thân thiện với người dùng.
+
 **Đầu ra mong đợi:**
 -   API backend có khả năng trả về các gợi ý giao dịch dựa trên lịch sử người dùng.
 -   `QuickTransactionForm.tsx` hiển thị và cho phép người dùng chọn các gợi ý thông minh cho các trường nhập liệu chính.
