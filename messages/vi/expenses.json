@@ -276,6 +276,10 @@
   "Wallets": {
     "title": "Quản Lý Ví",
     "description": "Theo dõi và quản lý các ví tài chính của bạn",
+    "tabs": {
+      "personal": "Ví cá nhân",
+      "shared": "Ví chung"
+    },
     "overview": {
       "totalBalance": "Tổng số dư",
       "cash": "Tiền mặt", 

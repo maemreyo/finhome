@@ -275,6 +275,10 @@
   "Wallets": {
     "title": "Wallet Management",
     "description": "Track and manage your financial wallets",
+    "tabs": {
+      "personal": "Personal Wallets",
+      "shared": "Shared Wallets"
+    },
     "overview": {
       "totalBalance": "Total Balance",
       "cash": "Cash",

@@ -2,7 +2,7 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { WalletManager } from '@/components/expenses/WalletManager'
+import { WalletsPageContent } from '@/components/wallets/WalletsPageContent'
 
 export default async function WalletsPage() {
   const supabase = await createClient()
@@ -13,19 +13,37 @@ export default async function WalletsPage() {
     redirect('/auth/login')
   }
 
-  // Fetch wallets data
-  const { data: wallets } = await supabase
+  // Fetch personal wallets data
+  const { data: personalWallets } = await supabase
     .from('expense_wallets')
     .select('*')
     .eq('user_id', user.id)
     .eq('is_active', true)
     .order('created_at', { ascending: false })
 
+  // Fetch shared wallets data
+  const { data: sharedWallets } = await supabase
+    .from('shared_expense_wallets')
+    .select(`
+      *,
+      members:shared_wallet_members!inner(
+        role,
+        can_add_transactions,
+        can_edit_transactions,
+        can_delete_transactions,
+        can_manage_budget
+      )
+    `)
+    .eq('shared_wallet_members.user_id', user.id)
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+
   return (
     <div className="space-y-6 p-6">
       <Suspense fallback={<WalletsSkeleton />}>
-        <WalletManager
-          initialWallets={wallets || []}
+        <WalletsPageContent
+          initialPersonalWallets={personalWallets || []}
+          initialSharedWallets={sharedWallets || []}
         />
       </Suspense>
     </div>
