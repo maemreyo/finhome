@@ -30,7 +30,8 @@ import {
   PieChart,
   DollarSign,
   AlertCircle,
-  PiggyBank
+  PiggyBank,
+  BookOpen
 } from 'lucide-react'
 import { cn, formatCurrency } from '@/lib/utils'
 import { format, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns'
@@ -38,6 +39,8 @@ import { vi } from 'date-fns/locale'
 import { FiftyThirtyTwentyBudgetForm } from './FiftyThirtyTwentyBudgetForm'
 import { SixJarsBudgetForm } from './SixJarsBudgetForm'
 import { SixJarsVisualization } from './SixJarsVisualization'
+import { KakeiboBudgetForm } from './KakeiboBudgetForm'
+import { KakeiboVisualization } from './KakeiboVisualization'
 import { CategoryManagementDialog } from './CategoryForm'
 import { DynamicIcon } from '@/lib/utils/icon-utils'
 
@@ -107,7 +110,7 @@ export function BudgetManager({
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedPeriod, setSelectedPeriod] = useState<Date>(new Date())
-  const [budgetMethod, setBudgetMethod] = useState<'manual' | '50_30_20' | '6_jars'>('manual')
+  const [budgetMethod, setBudgetMethod] = useState<'manual' | '50_30_20' | '6_jars' | 'kakeibo'>('manual')
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
   const [managedCategories, setManagedCategories] = useState(categories)
   const [viewBudgetDialog, setViewBudgetDialog] = useState<Budget | null>(null)
@@ -331,16 +334,23 @@ export function BudgetManager({
           </Dialog>
         </div>
 
-        {/* 6 Jars Budget Detail Dialog */}
+        {/* Budget Detail Dialog */}
         <Dialog open={!!viewBudgetDialog} onOpenChange={() => setViewBudgetDialog(null)}>
           <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {viewBudgetDialog?.name} - 6 Jars Details
+                {viewBudgetDialog?.name} - {
+                  viewBudgetDialog?.budget_method === '6_jars' ? '6 Jars Details' :
+                  viewBudgetDialog?.budget_method === 'kakeibo' ? 'Kakeibo Details' :
+                  'Budget Details'
+                }
               </DialogTitle>
             </DialogHeader>
-            {viewBudgetDialog && (
+            {viewBudgetDialog && viewBudgetDialog.budget_method === '6_jars' && (
               <SixJarsVisualization budget={viewBudgetDialog} />
+            )}
+            {viewBudgetDialog && viewBudgetDialog.budget_method === 'kakeibo' && (
+              <KakeiboVisualization budget={viewBudgetDialog} />
             )}
           </DialogContent>
         </Dialog>
@@ -376,7 +386,7 @@ export function BudgetManager({
                   </p>
                 </div>
                 
-                <div className="grid gap-3 md:grid-cols-3">
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
                   <Card 
                     className={cn(
                       "cursor-pointer transition-all hover:shadow-md",
@@ -427,6 +437,24 @@ export function BudgetManager({
                       </div>
                       <p className="text-xs text-muted-foreground">
                         T. Harv Eker&apos;s wealth building system with 6 allocation jars.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={cn(
+                      "cursor-pointer transition-all hover:shadow-md",
+                      budgetMethod === 'kakeibo' && "ring-2 ring-primary"
+                    )}
+                    onClick={() => setBudgetMethod('kakeibo')}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <BookOpen className="h-5 w-5 text-orange-500" />
+                        <h3 className="font-medium">Kakeibo Method</h3>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Japanese budgeting focused on mindful spending and self-reflection.
                       </p>
                     </CardContent>
                   </Card>
@@ -496,6 +524,43 @@ export function BudgetManager({
                     setBudgets(prev => [...prev, savedBudget])
                     onBudgetCreate?.(savedBudget)
                     toast.success('6 Jars Budget created successfully!')
+
+                    setIsCreateDialogOpen(false)
+                    setBudgetMethod('manual')
+                  } catch (error) {
+                    console.error('Error creating budget:', error)
+                    toast.error(error instanceof Error ? error.message : 'Failed to create budget')
+                  }
+                }}
+                onCancel={() => {
+                  setIsCreateDialogOpen(false)
+                  setBudgetMethod('manual')
+                }}
+              />
+            ) : budgetMethod === 'kakeibo' && !editingBudget ? (
+              <KakeiboBudgetForm
+                categories={categories}
+                onSubmit={async (budgetData) => {
+                  try {
+                    const response = await fetch('/api/expenses/budgets', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(budgetData),
+                    })
+
+                    if (!response.ok) {
+                      const errorData = await response.json()
+                      throw new Error(errorData.error || 'Failed to create budget')
+                    }
+
+                    const result = await response.json()
+                    const savedBudget = result.budget
+
+                    setBudgets(prev => [...prev, savedBudget])
+                    onBudgetCreate?.(savedBudget)
+                    toast.success('Kakeibo Budget created successfully!')
 
                     setIsCreateDialogOpen(false)
                     setBudgetMethod('manual')
@@ -724,15 +789,25 @@ export function BudgetManager({
                     <div className="flex items-center gap-1">
                       {getBudgetStatusIcon(status)}
                       <div className="flex gap-1">
-                        {budget.budget_method === '6_jars' && (
+                        {(budget.budget_method === '6_jars' || budget.budget_method === 'kakeibo') && (
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setViewBudgetDialog(budget)}
                             className="h-8 w-8 p-0"
-                            title="View 6 Jars Details"
+                            title={
+                              budget.budget_method === '6_jars' ? 'View 6 Jars Details' :
+                              budget.budget_method === 'kakeibo' ? 'View Kakeibo Details' :
+                              'View Details'
+                            }
                           >
-                            <PiggyBank className="h-4 w-4" />
+                            {budget.budget_method === '6_jars' ? (
+                              <PiggyBank className="h-4 w-4" />
+                            ) : budget.budget_method === 'kakeibo' ? (
+                              <BookOpen className="h-4 w-4" />
+                            ) : (
+                              <PiggyBank className="h-4 w-4" />
+                            )}
                           </Button>
                         )}
                         <Button
@@ -791,7 +866,8 @@ export function BudgetManager({
                       {budget.budget_method && budget.budget_method !== 'manual' && (
                         <Badge variant="secondary" className="text-xs">
                           {budget.budget_method === '50_30_20' ? '50/30/20' : 
-                           budget.budget_method === '6_jars' ? '6 Jars' : budget.budget_method}
+                           budget.budget_method === '6_jars' ? '6 Jars' : 
+                           budget.budget_method === 'kakeibo' ? 'Kakeibo' : budget.budget_method}
                         </Badge>
                       )}
                     </div>

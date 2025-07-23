@@ -150,6 +150,12 @@ export async function POST(request: NextRequest) {
     const budgetData = {
       user_id: user.id,
       ...validatedData,
+      // Store budget_allocation and category_mapping in category_budgets JSONB field
+      category_budgets: {
+        ...validatedData.category_budgets,
+        ...(validatedData.budget_allocation && { budget_allocation: validatedData.budget_allocation }),
+        ...(validatedData.category_mapping && { category_mapping: validatedData.category_mapping }),
+      }
     }
 
     const { data: budget, error: createError } = await supabase
