@@ -29,6 +29,8 @@ import { useRecentTransactions } from '@/hooks/useRecentTransactions'
 import { ConversationalTransactionDialog } from './ConversationalTransactionDialog'
 import { SkeletonTransactionLoader } from '@/components/ui/skeleton-transaction-loader'
 import { OnboardingHelper } from './OnboardingHelper'
+import { SmartTipsHelper } from './SmartTipsHelper'
+import { AdvancedFeatureTour } from './AdvancedFeatureTour'
 import { 
   Calculator, 
   Camera, 
@@ -167,6 +169,18 @@ export function UnifiedTransactionForm({
   // Onboarding state
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false)
+
+  // Behavioral tracking state for proactive suggestions
+  const [recentTransactionSubmissions, setRecentTransactionSubmissions] = useState<{
+    timestamp: number
+    text: string
+    success: boolean
+  }[]>([])
+  const [proactiveSuggestionShown, setProactiveSuggestionShown] = useState<Set<string>>(new Set())
+  
+  // Advanced tour state
+  const [showAdvancedTour, setShowAdvancedTour] = useState(false)
+  const [advancedTourOffered, setAdvancedTourOffered] = useState(false)
   
   // Receipt and OCR state
   const [receiptImages, setReceiptImages] = useState<ReceiptImage[]>([])
@@ -343,6 +357,145 @@ export function UnifiedTransactionForm({
     // Don't auto-submit, let user trigger it manually for better control
   }
 
+  // Behavioral analysis for proactive suggestions
+  const analyzeUserBehavior = useCallback((text: string, success: boolean) => {
+    const now = Date.now()
+    const newSubmission = { timestamp: now, text, success }
+    
+    setRecentTransactionSubmissions(prev => {
+      // Keep only submissions from last 2 minutes
+      const recentSubmissions = prev.filter(sub => now - sub.timestamp < 120000)
+      return [...recentSubmissions, newSubmission].slice(-10) // Keep max 10 recent
+    })
+  }, [])
+
+  // Proactive suggestion logic
+  const checkForProactiveSuggestions = useCallback(() => {
+    const now = Date.now()
+    const recentSuccessful = recentTransactionSubmissions.filter(
+      sub => sub.success && (now - sub.timestamp) < 60000 // Last minute
+    )
+
+    // Suggestion 1: Batch transactions if user made 2 single transactions quickly
+    if (recentSuccessful.length >= 2 && !proactiveSuggestionShown.has('batch_suggestion')) {
+      const lastTwo = recentSuccessful.slice(-2)
+      const timeDiff = lastTwo[1].timestamp - lastTwo[0].timestamp
+      
+      // If two successful transactions within 30 seconds
+      if (timeDiff < 30000) {
+        const bothAreSingle = lastTwo.every(sub => 
+          !sub.text.includes(',') && 
+          !sub.text.includes(' và ') &&
+          !sub.text.includes(' với ')
+        )
+        
+        if (bothAreSingle) {
+          toast.success('Mẹo hay: Lần tới bạn có thể tiết kiệm thời gian bằng cách nhập cả hai giao dịch cùng lúc!', {
+            duration: 5000,
+            action: {
+              label: 'Thử ngay',
+              onClick: () => setConversationalText('ăn sáng 30k, cà phê 25k')
+            }
+          })
+          
+          setProactiveSuggestionShown(prev => new Set([...prev, 'batch_suggestion']))
+          return
+        }
+      }
+    }
+
+    // Suggestion 2: Tags if user frequently mentions categories but doesn't use hashtags
+    if (recentSuccessful.length >= 3 && !proactiveSuggestionShown.has('tags_suggestion')) {
+      const recentTexts = recentSuccessful.slice(-3).map(sub => sub.text.toLowerCase())
+      const hasCategories = recentTexts.some(text => 
+        text.includes('giải trí') || 
+        text.includes('ăn uống') || 
+        text.includes('đi lại') ||
+        text.includes('mua sắm')
+      )
+      const hasHashtags = recentTexts.some(text => text.includes('#'))
+      
+      if (hasCategories && !hasHashtags) {
+        toast.info('Mẹo: Bạn có thể dùng # để tự động gắn thẻ, ví dụ: "xem phim 250k #giải_trí"', {
+          duration: 5000,
+          action: {
+            label: 'Thử ngay',
+            onClick: () => setConversationalText('xem phim 120k #giải_trí')
+          }
+        })
+        
+        setProactiveSuggestionShown(prev => new Set([...prev, 'tags_suggestion']))
+        return
+      }
+    }
+
+    // Suggestion 3: Relative time for power users
+    if (recentSuccessful.length >= 5 && !proactiveSuggestionShown.has('time_suggestion')) {
+      const hasTimeReferences = recentSuccessful.some(sub =>
+        sub.text.toLowerCase().includes('hôm qua') ||
+        sub.text.toLowerCase().includes('tuần trước') ||
+        sub.text.toLowerCase().includes('tháng trước')
+      )
+      
+      if (!hasTimeReferences) {
+        toast.info('Bạn đã khá thành thạo! Thử dùng "hôm qua" hoặc "tuần trước" để ghi giao dịch cũ', {
+          duration: 6000,
+          action: {
+            label: 'Xem ví dụ',
+            onClick: () => setConversationalText('hôm qua ăn phở 50k, tuần trước mua sách 150k')
+          }
+        })
+        
+        setProactiveSuggestionShown(prev => new Set([...prev, 'time_suggestion']))
+        return
+      }
+    }
+  }, [recentTransactionSubmissions, proactiveSuggestionShown])
+
+  // Check for proactive suggestions when submissions change
+  useEffect(() => {
+    if (recentTransactionSubmissions.length > 0) {
+      // Small delay to avoid immediate suggestion after submission
+      const timer = setTimeout(checkForProactiveSuggestions, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [recentTransactionSubmissions, checkForProactiveSuggestions])
+
+  // Check if user qualifies for advanced tour
+  useEffect(() => {
+    if (!conversationalMode || advancedTourOffered) return
+
+    const successCount = parseInt(localStorage.getItem(`ai_success_count_${userId}`) || '0')
+    
+    // Offer advanced tour after 10 successful AI uses
+    if (successCount >= 10 && hasSeenOnboarding) {
+      const tourOfferedKey = `advanced_tour_offered_${userId}`
+      const hasBeenOffered = localStorage.getItem(tourOfferedKey) === 'true'
+      
+      if (!hasBeenOffered) {
+        setAdvancedTourOffered(true)
+        localStorage.setItem(tourOfferedKey, 'true')
+        
+        // Show offer after a delay
+        setTimeout(() => {
+          toast.info('Bạn có muốn khám phá các mẹo nhập liệu chuyên nghiệp không?', {
+            duration: 8000,
+            action: {
+              label: 'Bắt đầu tour',
+              onClick: () => setShowAdvancedTour(true)
+            }
+          })
+        }, 2000)
+      }
+    }
+  }, [conversationalMode, userId, advancedTourOffered, hasSeenOnboarding])
+
+  // Track successful AI usage count
+  const incrementSuccessCount = useCallback(() => {
+    const currentCount = parseInt(localStorage.getItem(`ai_success_count_${userId}`) || '0')
+    localStorage.setItem(`ai_success_count_${userId}`, (currentCount + 1).toString())
+  }, [userId])
+
   const handleQuickAmount = (amount: number) => {
     const currentAmount = getValues('amount') || 0
     setValue('amount', currentAmount + amount)
@@ -425,6 +578,10 @@ export function UnifiedTransactionForm({
           setParsedData(result.data)
           setShowConfirmationDialog(true)
           await logParsingSession(result.data, conversationalText)
+          
+          // Track successful behavior for proactive suggestions
+          analyzeUserBehavior(conversationalText, true)
+          incrementSuccessCount()
         } else {
           throw new Error('No transactions found in the text')
         }
@@ -433,6 +590,9 @@ export function UnifiedTransactionForm({
       console.error('Error parsing conversational text:', error)
       const errorFeedback = createErrorFeedback(error, conversationalText)
       setParsingError(errorFeedback)
+      
+      // Track failed behavior for analysis
+      analyzeUserBehavior(conversationalText, false)
       
       // Still show toast for immediate feedback, but Alert provides more guidance
       toast.error('AI parsing failed - see guidance below')
@@ -512,6 +672,10 @@ export function UnifiedTransactionForm({
                   
                   // Log parsing session
                   await logParsingSession(parsed.data, conversationalText)
+                  
+                  // Track successful behavior for proactive suggestions
+                  analyzeUserBehavior(conversationalText, true)
+                  incrementSuccessCount()
                   
                   // Clear streaming state
                   setTimeout(() => {
@@ -1211,6 +1375,7 @@ export function UnifiedTransactionForm({
               </Label>
               <div className="relative">
                 <Textarea
+                  data-tour="conversational-input"
                   placeholder={(() => {
                     const examples = getDynamicConversationalExamples()
                     return `Try: "${examples[0].text}" or describe multiple transactions naturally`
@@ -1243,9 +1408,15 @@ export function UnifiedTransactionForm({
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Brain className="h-3 w-3" />
               <span>AI will analyze your text and suggest transactions for confirmation</span>
-              <kbd className="ml-auto px-1 py-0.5 text-xs bg-muted rounded border">
-                ⌘↵ to parse
-              </kbd>
+              <div className="flex items-center gap-2 ml-auto">
+                <SmartTipsHelper 
+                  onTipClick={(example) => setConversationalText(example)}
+                  userLevel={hasRecentTransactions ? 'intermediate' : 'beginner'}
+                />
+                <kbd className="px-1 py-0.5 text-xs bg-muted rounded border">
+                  ⌘↵ to parse
+                </kbd>
+              </div>
             </div>
 
             {/* Enhanced Error Feedback */}
@@ -2001,6 +2172,13 @@ export function UnifiedTransactionForm({
           onExampleClick={handleOnboardingExampleClick}
           userHasTransactions={hasRecentTransactions}
           currentMode={conversationalMode ? 'conversational' : 'traditional'}
+        />
+
+        {/* Advanced Feature Tour for Power Users */}
+        <AdvancedFeatureTour
+          isOpen={showAdvancedTour}
+          onClose={() => setShowAdvancedTour(false)}
+          onExampleClick={(example) => setConversationalText(example)}
         />
       </CardContent>
     </Card>
