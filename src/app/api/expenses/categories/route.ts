@@ -1,6 +1,12 @@
 // src/app/api/expenses/categories/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+
+const updateCategorySchema = z.object({
+  icon: z.string().optional(),
+  color: z.string().optional(),
+})
 
 // GET /api/expenses/categories - Fetch expense and income categories
 export async function GET(request: NextRequest) {

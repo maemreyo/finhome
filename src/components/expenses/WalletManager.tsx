@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Wallet,
   CreditCard,
@@ -28,6 +29,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn, formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
+import { WalletForm } from "./WalletForm";
+import { DynamicIcon } from "@/lib/utils/icon-utils";
 
 interface Wallet {
   id: string;
@@ -50,6 +53,8 @@ export function WalletManager({ initialWallets }: WalletManagerProps) {
   const [wallets, setWallets] = useState(initialWallets);
   const [showBalances, setShowBalances] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
   const t = useTranslations("Wallets");
 
   // Calculate totals
@@ -84,7 +89,7 @@ export function WalletManager({ initialWallets }: WalletManagerProps) {
   const refreshWallets = async () => {
     setIsRefreshing(true);
     try {
-      const response = await fetch("/api/wallets");
+      const response = await fetch("/api/expenses/wallets");
       if (response.ok) {
         const data = await response.json();
         setWallets(data.wallets);
@@ -94,6 +99,43 @@ export function WalletManager({ initialWallets }: WalletManagerProps) {
       toast.error(t("messages.refreshError"));
     } finally {
       setIsRefreshing(false);
+    }
+  };
+
+  const handleWalletSuccess = (wallet: Wallet) => {
+    if (editingWallet) {
+      // Update existing wallet
+      setWallets(prev => prev.map(w => w.id === wallet.id ? wallet : w));
+    } else {
+      // Add new wallet
+      setWallets(prev => [...prev, wallet]);
+    }
+    setIsCreateDialogOpen(false);
+    setEditingWallet(null);
+  };
+
+  const handleEditWallet = (wallet: Wallet) => {
+    setEditingWallet(wallet);
+    setIsCreateDialogOpen(true);
+  };
+
+  const handleDeleteWallet = async (walletId: string) => {
+    if (!confirm(t("messages.confirmDelete"))) return;
+
+    try {
+      const response = await fetch(`/api/expenses/wallets/${walletId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setWallets(prev => prev.filter(w => w.id !== walletId));
+        toast.success(t("messages.deleteSuccess"));
+      } else {
+        toast.error(t("messages.deleteError"));
+      }
+    } catch (error) {
+      console.error('Error deleting wallet:', error);
+      toast.error(t("messages.deleteError"));
     }
   };
 
@@ -210,7 +252,10 @@ export function WalletManager({ initialWallets }: WalletManagerProps) {
           </h2>
           <p className="text-muted-foreground">{t("list.description")}</p>
         </div>
-        <Button>
+        <Button onClick={() => {
+          setEditingWallet(null);
+          setIsCreateDialogOpen(true);
+        }}>
           <Plus className="h-4 w-4 mr-2" />
           {t("list.addNew")}
         </Button>
@@ -226,7 +271,10 @@ export function WalletManager({ initialWallets }: WalletManagerProps) {
           <p className="text-muted-foreground mb-4">
             {t("list.empty.description")}
           </p>
-          <Button>
+          <Button onClick={() => {
+            setEditingWallet(null);
+            setIsCreateDialogOpen(true);
+          }}>
             <Plus className="h-4 w-4 mr-2" />
             {t("list.empty.createFirst")}
           </Button>
@@ -247,7 +295,8 @@ export function WalletManager({ initialWallets }: WalletManagerProps) {
                       className="w-10 h-10 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: wallet.color + "20" }}
                     >
-                      <IconComponent
+                      <DynamicIcon
+                        name={wallet.icon || 'wallet'}
                         className="h-5 w-5"
                         style={{ color: wallet.color }}
                       />
@@ -267,11 +316,14 @@ export function WalletManager({ initialWallets }: WalletManagerProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditWallet(wallet)}>
                         <Edit className="h-4 w-4 mr-2" />
                         {t("actions.edit")}
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem 
+                        className="text-red-600"
+                        onClick={() => handleDeleteWallet(wallet.id)}
+                      >
                         <Trash2 className="h-4 w-4 mr-2" />
                         {t("actions.delete")}
                       </DropdownMenuItem>
@@ -306,6 +358,22 @@ export function WalletManager({ initialWallets }: WalletManagerProps) {
           })}
         </div>
       )}
+
+      {/* Wallet Form Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingWallet ? t("form.editWallet") : t("form.createWallet")}
+            </DialogTitle>
+          </DialogHeader>
+          <WalletForm
+            wallet={editingWallet}
+            onSuccess={handleWalletSuccess}
+            onCancel={() => setIsCreateDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

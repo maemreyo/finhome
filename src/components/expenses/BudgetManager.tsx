@@ -36,6 +36,8 @@ import { cn, formatCurrency } from '@/lib/utils'
 import { format, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { FiftyThirtyTwentyBudgetForm } from './FiftyThirtyTwentyBudgetForm'
+import { CategoryManagementDialog } from './CategoryForm'
+import { DynamicIcon } from '@/lib/utils/icon-utils'
 
 const createBudgetSchema = (t: any) => z.object({
   name: z.string().min(1, t('budgetNameRequired')),
@@ -104,6 +106,8 @@ export function BudgetManager({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedPeriod, setSelectedPeriod] = useState<Date>(new Date())
   const [budgetMethod, setBudgetMethod] = useState<'manual' | '50_30_20' | '6_jars'>('manual')
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
+  const [managedCategories, setManagedCategories] = useState(categories)
 
   const form = useForm<FormData>({
     resolver: zodResolver(createBudgetSchema(t)),
@@ -282,6 +286,46 @@ export function BudgetManager({
           <p className="text-muted-foreground">
             {t('subtitle')}
           </p>
+        </div>
+
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsCategoryDialogOpen(true)}
+          >
+            <PiggyBank className="h-4 w-4 mr-2" />
+            {t('manageCategories')}
+          </Button>
+          
+          <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>{t('categoryManagement')}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6">
+                <CategoryManagementDialog
+                  categories={managedCategories.filter(c => c.name_en !== 'Income')} // Expense categories
+                  categoryType="expense"
+                  onCategoriesUpdate={(updated) => setManagedCategories(prev => 
+                    prev.map(cat => {
+                      const updatedCat = updated.find(u => u.id === cat.id);
+                      return updatedCat || cat;
+                    })
+                  )}
+                />
+                <CategoryManagementDialog
+                  categories={managedCategories.filter(c => c.name_en === 'Income' || c.name_vi.includes('Thu'))} // Income categories - this needs proper filtering
+                  categoryType="income"
+                  onCategoriesUpdate={(updated) => setManagedCategories(prev => 
+                    prev.map(cat => {
+                      const updatedCat = updated.find(u => u.id === cat.id);
+                      return updatedCat || cat;
+                    })
+                  )}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -480,9 +524,15 @@ export function BudgetManager({
                   {categories.map((category) => (
                     <div key={category.id} className="flex items-center gap-3">
                       <div 
-                        className="w-4 h-4 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: category.color }}
-                      />
+                        className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center"
+                        style={{ backgroundColor: category.color + '20' }}
+                      >
+                        <DynamicIcon 
+                          name={category.icon || 'circle'} 
+                          className="w-3 h-3" 
+                          style={{ color: category.color }} 
+                        />
+                      </div>
                       <span className="flex-1 text-sm">{category.name_vi}</span>
                       <Input
                         type="number"
@@ -684,9 +734,15 @@ export function BudgetManager({
                       {budget.category_allocations.slice(0, 3).map((allocation) => (
                         <div key={allocation.id} className="flex items-center gap-2 text-xs">
                           <div 
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: allocation.category.color }}
+                          className="w-2 h-2 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: allocation.category.color + '40' }}
+                        >
+                          <DynamicIcon 
+                            name={allocation.category.icon || 'circle'} 
+                            className="w-1 h-1" 
+                            style={{ color: allocation.category.color }} 
                           />
+                        </div>
                           <span className="flex-1 truncate">{allocation.category.name_vi}</span>
                           <span className={cn(
                             allocation.spent_amount > allocation.allocated_amount 
