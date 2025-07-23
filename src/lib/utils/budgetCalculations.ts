@@ -249,6 +249,35 @@ export function getDefaultCategoryMapping(
         mapping[category.id] = 'needs'
       }
     })
+  } else if (method === '6_jars') {
+    // Map common Vietnamese category keys to 6 jars groups
+    const necessitiesKeywords = ['food', 'housing', 'transport', 'utilities', 'healthcare', 'insurance', 'grocery']
+    const educationKeywords = ['education', 'book', 'course', 'training', 'learning', 'skill']
+    const ltssKeywords = ['investment', 'savings', 'retirement', 'property', 'long-term']
+    const playKeywords = ['entertainment', 'dining', 'travel', 'hobbies', 'recreation', 'fun']
+    const financialFreedomKeywords = ['stock', 'business', 'passive', 'dividend', 'real-estate']
+    const giveKeywords = ['charity', 'donation', 'gift', 'help', 'giving']
+    
+    categories.forEach(category => {
+      const categoryKey = category.category_key?.toLowerCase() || category.name_vi.toLowerCase()
+      
+      if (necessitiesKeywords.some(keyword => categoryKey.includes(keyword))) {
+        mapping[category.id] = 'necessities'
+      } else if (educationKeywords.some(keyword => categoryKey.includes(keyword))) {
+        mapping[category.id] = 'education'
+      } else if (ltssKeywords.some(keyword => categoryKey.includes(keyword))) {
+        mapping[category.id] = 'ltss'
+      } else if (playKeywords.some(keyword => categoryKey.includes(keyword))) {
+        mapping[category.id] = 'play'
+      } else if (financialFreedomKeywords.some(keyword => categoryKey.includes(keyword))) {
+        mapping[category.id] = 'financial_freedom'
+      } else if (giveKeywords.some(keyword => categoryKey.includes(keyword))) {
+        mapping[category.id] = 'give'
+      } else {
+        // Default to necessities for essential categories
+        mapping[category.id] = 'necessities'
+      }
+    })
   }
   
   return mapping

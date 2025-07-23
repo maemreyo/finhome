@@ -36,6 +36,8 @@ import { cn, formatCurrency } from '@/lib/utils'
 import { format, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { FiftyThirtyTwentyBudgetForm } from './FiftyThirtyTwentyBudgetForm'
+import { SixJarsBudgetForm } from './SixJarsBudgetForm'
+import { SixJarsVisualization } from './SixJarsVisualization'
 import { CategoryManagementDialog } from './CategoryForm'
 import { DynamicIcon } from '@/lib/utils/icon-utils'
 
@@ -108,6 +110,7 @@ export function BudgetManager({
   const [budgetMethod, setBudgetMethod] = useState<'manual' | '50_30_20' | '6_jars'>('manual')
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
   const [managedCategories, setManagedCategories] = useState(categories)
+  const [viewBudgetDialog, setViewBudgetDialog] = useState<Budget | null>(null)
 
   const form = useForm<FormData>({
     resolver: zodResolver(createBudgetSchema(t)),
@@ -328,6 +331,20 @@ export function BudgetManager({
           </Dialog>
         </div>
 
+        {/* 6 Jars Budget Detail Dialog */}
+        <Dialog open={!!viewBudgetDialog} onOpenChange={() => setViewBudgetDialog(null)}>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {viewBudgetDialog?.name} - 6 Jars Details
+              </DialogTitle>
+            </DialogHeader>
+            {viewBudgetDialog && (
+              <SixJarsVisualization budget={viewBudgetDialog} />
+            )}
+          </DialogContent>
+        </Dialog>
+
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => {
@@ -399,14 +416,14 @@ export function BudgetManager({
                   <Card 
                     className={cn(
                       "cursor-pointer transition-all hover:shadow-md",
-                      budgetMethod === '6_jars' && "ring-2 ring-primary opacity-50 cursor-not-allowed"
+                      budgetMethod === '6_jars' && "ring-2 ring-primary"
                     )}
+                    onClick={() => setBudgetMethod('6_jars')}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <PiggyBank className="h-5 w-5 text-purple-500" />
                         <h3 className="font-medium">6 Jars Method</h3>
-                        <Badge variant="secondary" className="text-xs">Soon</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground">
                         T. Harv Eker&apos;s wealth building system with 6 allocation jars.
@@ -442,6 +459,43 @@ export function BudgetManager({
                     setBudgets(prev => [...prev, savedBudget])
                     onBudgetCreate?.(savedBudget)
                     toast.success('50/30/20 Budget created successfully!')
+
+                    setIsCreateDialogOpen(false)
+                    setBudgetMethod('manual')
+                  } catch (error) {
+                    console.error('Error creating budget:', error)
+                    toast.error(error instanceof Error ? error.message : 'Failed to create budget')
+                  }
+                }}
+                onCancel={() => {
+                  setIsCreateDialogOpen(false)
+                  setBudgetMethod('manual')
+                }}
+              />
+            ) : budgetMethod === '6_jars' && !editingBudget ? (
+              <SixJarsBudgetForm
+                categories={categories}
+                onSubmit={async (budgetData) => {
+                  try {
+                    const response = await fetch('/api/expenses/budgets', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(budgetData),
+                    })
+
+                    if (!response.ok) {
+                      const errorData = await response.json()
+                      throw new Error(errorData.error || 'Failed to create budget')
+                    }
+
+                    const result = await response.json()
+                    const savedBudget = result.budget
+
+                    setBudgets(prev => [...prev, savedBudget])
+                    onBudgetCreate?.(savedBudget)
+                    toast.success('6 Jars Budget created successfully!')
 
                     setIsCreateDialogOpen(false)
                     setBudgetMethod('manual')
@@ -670,6 +724,17 @@ export function BudgetManager({
                     <div className="flex items-center gap-1">
                       {getBudgetStatusIcon(status)}
                       <div className="flex gap-1">
+                        {budget.budget_method === '6_jars' && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setViewBudgetDialog(budget)}
+                            className="h-8 w-8 p-0"
+                            title="View 6 Jars Details"
+                          >
+                            <PiggyBank className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="sm"
@@ -718,10 +783,18 @@ export function BudgetManager({
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground border-t pt-3">
-                    <Badge variant="outline" className="text-xs">
-                      {budget.budget_period === 'weekly' ? t('week') : 
-                       budget.budget_period === 'monthly' ? t('month') : t('year')}
-                    </Badge>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        {budget.budget_period === 'weekly' ? t('week') : 
+                         budget.budget_period === 'monthly' ? t('month') : t('year')}
+                      </Badge>
+                      {budget.budget_method && budget.budget_method !== 'manual' && (
+                        <Badge variant="secondary" className="text-xs">
+                          {budget.budget_method === '50_30_20' ? '50/30/20' : 
+                           budget.budget_method === '6_jars' ? '6 Jars' : budget.budget_method}
+                        </Badge>
+                      )}
+                    </div>
                     <span>
                       {format(new Date(budget.start_date), 'dd/MM')} - {format(new Date(budget.end_date), 'dd/MM')}
                     </span>
