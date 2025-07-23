@@ -46,6 +46,7 @@ import {
   Download,
   RefreshCw,
   BookOpen,
+  Brain,
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -59,6 +60,7 @@ import {
 } from "date-fns";
 import { vi } from "date-fns/locale";
 import { StorytellingReport } from "./StorytellingReport";
+import { AIFinancialAdvisor } from "./AIFinancialAdvisor";
 
 interface Transaction {
   id: string;
@@ -97,7 +99,7 @@ interface ExpenseAnalyticsProps {
 
 type DateRangeOption = "7d" | "30d" | "3m" | "6m" | "1y";
 type ChartType = "category" | "trend" | "comparison" | "cashflow";
-type ViewType = "analytics" | "storytelling";
+type ViewType = "analytics" | "storytelling" | "ai_advisor";
 
 const COLORS = [
   "#3B82F6",
@@ -390,10 +392,14 @@ export function ExpenseAnalytics({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
-            {selectedView === "analytics" ? t('title') : "Báo cáo chi tiêu thông minh"}
+            {selectedView === "analytics" ? t('title') : 
+             selectedView === "storytelling" ? "Báo cáo chi tiêu thông minh" :
+             "Cố vấn AI Tài chính"}
           </h2>
           <p className="text-muted-foreground">
-            {selectedView === "analytics" ? t('subtitle') : "Hiểu rõ dòng tiền với phân tích và insights cá nhân hóa"}
+            {selectedView === "analytics" ? t('subtitle') : 
+             selectedView === "storytelling" ? "Hiểu rõ dòng tiền với phân tích và insights cá nhân hóa" :
+             "Nhận lời khuyên tài chính thông minh được cá nhân hóa bởi AI"}
           </p>
         </div>
 
@@ -438,6 +444,14 @@ export function ExpenseAnalytics({
         >
           <BookOpen className="h-4 w-4 mr-2" />
           Báo cáo thông minh
+        </Button>
+        <Button
+          variant={selectedView === "ai_advisor" ? "default" : "ghost"}
+          onClick={() => setSelectedView("ai_advisor")}
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+        >
+          <Brain className="h-4 w-4 mr-2" />
+          Cố vấn AI
         </Button>
       </div>
 
@@ -752,12 +766,15 @@ export function ExpenseAnalytics({
         </Card>
       )}
         </>
-      ) : (
+      ) : selectedView === "storytelling" ? (
         /* Storytelling Report View */
         <StorytellingReport 
           initialPeriod={dateRange}
           className="mt-6"
         />
+      ) : (
+        /* AI Financial Advisor View */
+        <AIFinancialAdvisor />
       )}
     </div>
   );

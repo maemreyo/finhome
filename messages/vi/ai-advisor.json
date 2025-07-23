@@ -1,0 +1,77 @@
+{
+  "title": "Cố vấn AI Tài chính",
+  "subtitle": "Nhận insight và lời khuyên tài chính được cá nhân hóa bởi AI",
+  "premiumFeature": "Tính năng Premium",
+  "unlockAdvisor": "Mở khóa Cố vấn AI",
+  "upgradeCTA": "Nâng cấp ngay",
+  "upgradeToAccess": "Nâng cấp để truy cập Cố vấn AI",
+  "refreshAI": "Làm mới AI",
+  "analyzing": "Đang phân tích...",
+  "aiAnalyzing": "AI đang phân tích dữ liệu...",
+  "analysisComplete": "AI đã phân tích dữ liệu tài chính của bạn!",
+  "error": "Không thể tải insight AI. Vui lòng thử lại sau.",
+  
+  "timePeriods": {
+    "current_month": "Tháng hiện tại",
+    "last_3_months": "3 tháng qua", 
+    "last_6_months": "6 tháng qua",
+    "last_year": "12 tháng qua"
+  },
+  
+  "analysisTypes": {
+    "comprehensive": "Toàn diện",
+    "spending_analysis": "Phân tích chi tiêu",
+    "budget_optimization": "Tối ưu ngân sách",
+    "saving_opportunities": "Cơ hội tiết kiệm",
+    "goal_recommendations": "Lời khuyên mục tiêu"
+  },
+  
+  "healthScore": {
+    "title": "Điểm Sức khỏe Tài chính",
+    "outOf": "/100"
+  },
+  
+  "tabs": {
+    "insights": "Insight AI",
+    "recommendations": "Đề xuất", 
+    "tips": "Mẹo cá nhân",
+    "actions": "Hành động"
+  },
+  
+  "priorities": {
+    "high": "Cao",
+    "medium": "Vừa", 
+    "low": "Thấp"
+  },
+  
+  "actions": {
+    "immediate": "Hành động ngay lập tức",
+    "longTerm": "Chiến lược dài hạn",
+    "thisWeek": "Tuần này",
+    "nextMonth": "1-3 tháng tới",
+    "markComplete": "Đánh dấu hoàn thành"
+  },
+  
+  "features": [
+    "Phân tích thói quen chi tiêu thông minh",
+    "Phát hiện cơ hội tiết kiệm được cá nhân hóa", 
+    "Đề xuất tối ưu hóa ngân sách",
+    "Lời khuyên đạt mục tiêu tài chính"
+  ],
+  
+  "insightTypes": {
+    "spending_pattern": "Phát hiện thói quen chi tiêu",
+    "saving_opportunity": "Cơ hội tiết kiệm",
+    "budget_alert": "Cảnh báo ngân sách", 
+    "goal_advice": "Lời khuyên mục tiêu",
+    "risk_warning": "Cảnh báo rủi ro"
+  },
+  
+  "confidence": "Độ tin cậy",
+  "impact": "Tác động",
+  "potentialSavings": "Tiềm năng tiết kiệm",
+  "actionSteps": "Các bước thực hiện",
+  "generatedAt": "Phân tích được tạo lúc",
+  "cached": "Đã lưu cache",
+  "poweredBy": "Được tạo bởi Gemini AI"
+}

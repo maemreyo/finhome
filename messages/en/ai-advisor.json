@@ -1,0 +1,77 @@
+{
+  "title": "AI Financial Advisor",
+  "subtitle": "Get personalized financial insights and advice powered by AI",
+  "premiumFeature": "Premium Feature",
+  "unlockAdvisor": "Unlock AI Advisor",
+  "upgradeCTA": "Upgrade Now",
+  "upgradeToAccess": "Upgrade to Access AI Advisor",
+  "refreshAI": "Refresh AI",
+  "analyzing": "Analyzing...",
+  "aiAnalyzing": "AI is analyzing data...",
+  "analysisComplete": "AI has analyzed your financial data!",
+  "error": "Unable to load AI insights. Please try again later.",
+  
+  "timePeriods": {
+    "current_month": "Current Month",
+    "last_3_months": "Last 3 Months", 
+    "last_6_months": "Last 6 Months",
+    "last_year": "Last 12 Months"
+  },
+  
+  "analysisTypes": {
+    "comprehensive": "Comprehensive",
+    "spending_analysis": "Spending Analysis",
+    "budget_optimization": "Budget Optimization",
+    "saving_opportunities": "Saving Opportunities",
+    "goal_recommendations": "Goal Recommendations"
+  },
+  
+  "healthScore": {
+    "title": "Financial Health Score",
+    "outOf": "/100"
+  },
+  
+  "tabs": {
+    "insights": "AI Insights",
+    "recommendations": "Recommendations", 
+    "tips": "Personal Tips",
+    "actions": "Actions"
+  },
+  
+  "priorities": {
+    "high": "High",
+    "medium": "Medium", 
+    "low": "Low"
+  },
+  
+  "actions": {
+    "immediate": "Immediate Actions",
+    "longTerm": "Long-term Strategies",
+    "thisWeek": "This Week",
+    "nextMonth": "1-3 Months",
+    "markComplete": "Mark Complete"
+  },
+  
+  "features": [
+    "Smart spending pattern analysis",
+    "Personalized saving opportunity detection", 
+    "Budget optimization recommendations",
+    "Financial goal achievement advice"
+  ],
+  
+  "insightTypes": {
+    "spending_pattern": "Spending Pattern Insight",
+    "saving_opportunity": "Saving Opportunity",
+    "budget_alert": "Budget Alert", 
+    "goal_advice": "Goal Advice",
+    "risk_warning": "Risk Warning"
+  },
+  
+  "confidence": "Confidence",
+  "impact": "Impact",
+  "potentialSavings": "Potential Savings",
+  "actionSteps": "Action Steps",
+  "generatedAt": "Analysis generated at",
+  "cached": "Cached",
+  "poweredBy": "Powered by Gemini AI"
+}
