@@ -302,6 +302,7 @@ export function ExpenseTrackingDashboard({
             userId={userId}
             defaultQuickMode={true}
             defaultAiMode={false}
+            defaultConversationalMode={true}
             className="border-0 shadow-none"
           />
 

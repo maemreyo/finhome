@@ -23,6 +23,7 @@ import { useTranslations } from 'next-intl'
 import { ReceiptImageUpload, ReceiptImage } from '@/components/ui/receipt-image-upload'
 import { useIntelligentSuggestions } from '@/hooks/useIntelligentSuggestions'
 import { useTagSuggestions } from '@/hooks/useTagSuggestions'
+import { ConversationalTransactionDialog } from './ConversationalTransactionDialog'
 import { 
   Calculator, 
   Camera, 
@@ -45,7 +46,10 @@ import {
   Target,
   History,
   Lightbulb,
-  Settings
+  Settings,
+  MessageCircle,
+  Send,
+  Loader2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -96,6 +100,7 @@ interface UnifiedTransactionFormProps {
   userId?: string
   defaultQuickMode?: boolean
   defaultAiMode?: boolean
+  defaultConversationalMode?: boolean
 }
 
 export function UnifiedTransactionForm({
@@ -107,7 +112,8 @@ export function UnifiedTransactionForm({
   className,
   userId = 'current-user-id',
   defaultQuickMode = false,
-  defaultAiMode = false
+  defaultAiMode = false,
+  defaultConversationalMode = false
 }: UnifiedTransactionFormProps) {
   const t = useTranslations('UnifiedTransactionForm')
   
@@ -120,10 +126,18 @@ export function UnifiedTransactionForm({
   // UI state
   const [quickMode, setQuickMode] = useState(defaultQuickMode)
   const [aiMode, setAiMode] = useState(defaultAiMode)
+  const [conversationalMode, setConversationalMode] = useState(defaultConversationalMode)
   const [showSettings, setShowSettings] = useState(false)
   const [tagInputOpen, setTagInputOpen] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [suggestionType, setSuggestionType] = useState<'description' | 'merchant' | null>(null)
+  
+  // Conversational mode state
+  const [conversationalText, setConversationalText] = useState('')
+  const [isParsingText, setIsParsingText] = useState(false)
+  const [parsedData, setParsedData] = useState<any>(null)
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
+  const [corrections, setCorrections] = useState<any[]>([])
   
   // Receipt and OCR state
   const [receiptImages, setReceiptImages] = useState<ReceiptImage[]>([])
@@ -282,6 +296,135 @@ export function UnifiedTransactionForm({
     const newTags = selectedTags.filter(t => t !== tag)
     setSelectedTags(newTags)
     setValue('tags', newTags)
+  }
+
+  // Handle conversational text parsing
+  const handleConversationalSubmit = async () => {
+    if (!conversationalText.trim()) {
+      toast.error('Please enter some text to analyze')
+      return
+    }
+
+    setIsParsingText(true)
+    try {
+      const response = await fetch('/api/expenses/parse-from-text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: conversationalText,
+          user_preferences: {
+            default_wallet_id: wallets[0]?.id,
+            currency: 'VND',
+          },
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to parse text')
+      }
+
+      const result = await response.json()
+      
+      if (result.success && result.data) {
+        setParsedData(result.data)
+        setShowConfirmationDialog(true)
+        
+        // Create parsing session log
+        await logParsingSession(result.data, conversationalText)
+      } else {
+        throw new Error('No transactions found in the text')
+      }
+    } catch (error) {
+      console.error('Error parsing conversational text:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to parse your message')
+    } finally {
+      setIsParsingText(false)
+    }
+  }
+
+  // Log parsing session for analytics
+  const logParsingSession = async (data: any, inputText: string) => {
+    try {
+      await fetch('/api/expenses/parsing-sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          input_text: inputText,
+          transactions_parsed: data.transactions.length,
+          avg_confidence: data.transactions.reduce((acc: number, t: any) => acc + t.confidence_score, 0) / data.transactions.length,
+          parsed_transactions: data.transactions,
+          ai_model_used: data.metadata?.ai_model || 'gemini-1.5-flash',
+        }),
+      })
+    } catch (error) {
+      console.error('Error logging parsing session:', error)
+      // Don't show error to user - this is just for analytics
+    }
+  }
+
+  // Handle correction logging
+  const handleCorrection = async (correction: any) => {
+    setCorrections(prev => [...prev, correction])
+    
+    try {
+      await fetch('/api/expenses/log-correction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(correction),
+      })
+    } catch (error) {
+      console.error('Error logging correction:', error)
+      // Don't show error to user - this is just for learning
+    }
+  }
+
+  // Handle confirmed transactions from dialog
+  const handleConfirmedTransactions = async (transactions: any[]) => {
+    setIsSubmitting(true)
+    
+    try {
+      const results = []
+      
+      for (const transaction of transactions) {
+        const response = await fetch('/api/expenses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(transaction),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to create transaction')
+        }
+
+        const result = await response.json()
+        results.push(result)
+      }
+      
+      toast.success(`Successfully created ${transactions.length} transaction${transactions.length !== 1 ? 's' : ''}!`)
+      
+      // Reset conversational state
+      setConversationalText('')
+      setParsedData(null)
+      setCorrections([])
+      
+      onSuccess?.()
+      
+    } catch (error) {
+      console.error('Error creating transactions:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to create some transactions')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   // Process receipt image with OCR
@@ -516,25 +659,42 @@ export function UnifiedTransactionForm({
         {/* Settings Panel */}
         {showSettings && (
           <div className="pt-3 border-t space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="quick-mode"
-                  checked={quickMode}
-                  onCheckedChange={setQuickMode}
-                />
-                <Label htmlFor="quick-mode" className="text-sm">Quick Mode</Label>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="quick-mode"
+                    checked={quickMode}
+                    onCheckedChange={setQuickMode}
+                  />
+                  <Label htmlFor="quick-mode" className="text-sm">Quick Mode</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="ai-mode"
+                    checked={aiMode}
+                    onCheckedChange={setAiMode}
+                  />
+                  <Label htmlFor="ai-mode" className="text-sm flex items-center gap-1">
+                    <Brain className="h-3 w-3" />
+                    AI Mode
+                  </Label>
+                </div>
               </div>
+              
               <div className="flex items-center gap-2">
                 <Switch
-                  id="ai-mode"
-                  checked={aiMode}
-                  onCheckedChange={setAiMode}
+                  id="conversational-mode"
+                  checked={conversationalMode}
+                  onCheckedChange={setConversationalMode}
                 />
-                <Label htmlFor="ai-mode" className="text-sm flex items-center gap-1">
-                  <Brain className="h-3 w-3" />
-                  AI Mode
+                <Label htmlFor="conversational-mode" className="text-sm flex items-center gap-1">
+                  <MessageCircle className="h-3 w-3" />
+                  Conversational Mode
                 </Label>
+                <Badge variant="secondary" className="text-xs">
+                  NEW
+                </Badge>
               </div>
             </div>
             
@@ -543,6 +703,15 @@ export function UnifiedTransactionForm({
                 <Sparkles className="h-3 w-3 text-purple-500" />
                 <span className="text-purple-700 dark:text-purple-300">
                   AI suggestions enabled - Start typing for smart recommendations
+                </span>
+              </div>
+            )}
+
+            {conversationalMode && (
+              <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-md text-xs">
+                <MessageCircle className="h-3 w-3 text-blue-500" />
+                <span className="text-blue-700 dark:text-blue-300">
+                  Conversational mode enabled - Just describe your transactions naturally!
                 </span>
               </div>
             )}
@@ -574,33 +743,116 @@ export function UnifiedTransactionForm({
       </CardHeader>
 
       <CardContent className={cn(quickMode && "px-4 pb-4")}>
-        <form 
-          onSubmit={form.handleSubmit(onSubmit)} 
-          className={cn(quickMode ? "space-y-2" : "space-y-4")}
-          onKeyDown={(e) => {
-            // Keyboard shortcuts for power users
-            if (e.ctrlKey || e.metaKey) {
-              switch (e.key) {
-                case 'Enter':
-                  e.preventDefault()
-                  form.handleSubmit(onSubmit)()
-                  break
-                case '1':
-                  e.preventDefault()
-                  setValue('transaction_type', 'expense')
-                  break
-                case '2':
-                  e.preventDefault()
-                  setValue('transaction_type', 'income')
-                  break
-                case '3':
-                  e.preventDefault()
-                  setValue('transaction_type', 'transfer')
-                  break
+        {/* Conversational Mode Interface */}
+        {conversationalMode ? (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium flex items-center gap-2">
+                <MessageCircle className="h-4 w-4 text-blue-500" />
+                Tell me about your transactions
+              </Label>
+              <div className="relative">
+                <Textarea
+                  placeholder="Example: 'tiêu 25k trà sữa với bạn bè' or 'hôm nay được thưởng 5 triệu, sếp thật tuyệt vời' or 'ăn sáng phở 40k, đổ xăng 50k, và nhận lương 15tr'"
+                  value={conversationalText}
+                  onChange={(e) => setConversationalText(e.target.value)}
+                  className="min-h-[100px] pr-12 resize-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                      e.preventDefault()
+                      handleConversationalSubmit()
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  onClick={handleConversationalSubmit}
+                  disabled={isParsingText || !conversationalText.trim()}
+                  className="absolute bottom-2 right-2 h-8 w-8 p-0"
+                >
+                  {isParsingText ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Brain className="h-3 w-3" />
+              <span>AI will analyze your text and suggest transactions for confirmation</span>
+              <kbd className="ml-auto px-1 py-0.5 text-xs bg-muted rounded border">
+                ⌘↵ to parse
+              </kbd>
+            </div>
+
+            {/* Example suggestions */}
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Try these examples:</p>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  "tiêu 25k trà sữa với bạn bè",
+                  "hôm nay được thưởng 5 triệu, sếp thật tuyệt vời", 
+                  "ăn sáng phở 40k, đổ xăng 50k, và nhận lương 15tr"
+                ].map((example, index) => (
+                  <Button
+                    key={index}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setConversationalText(example)}
+                    className="justify-start text-left h-auto py-2 px-3 text-xs whitespace-normal"
+                  >
+                    <MessageCircle className="h-3 w-3 mr-2 flex-shrink-0" />
+                    "{example}"
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <Separator />
+            
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setConversationalMode(false)}
+                className="text-xs"
+              >
+                Switch to traditional form
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <form 
+            onSubmit={form.handleSubmit(onSubmit)} 
+            className={cn(quickMode ? "space-y-2" : "space-y-4")}
+            onKeyDown={(e) => {
+              // Keyboard shortcuts for power users
+              if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                  case 'Enter':
+                    e.preventDefault()
+                    form.handleSubmit(onSubmit)()
+                    break
+                  case '1':
+                    e.preventDefault()
+                    setValue('transaction_type', 'expense')
+                    break
+                  case '2':
+                    e.preventDefault()
+                    setValue('transaction_type', 'income')
+                    break
+                  case '3':
+                    e.preventDefault()
+                    setValue('transaction_type', 'transfer')
+                    break
+                }
               }
-            }
-          }}
-        >
+            }}
+          >
           {/* Transaction Type Toggle */}
           <div className={cn("flex rounded-lg bg-muted p-1", quickMode && "p-0.5")}>
             {(['expense', 'income', 'transfer'] as const).map((type) => (
@@ -1152,6 +1404,20 @@ export function UnifiedTransactionForm({
             </div>
           )}
         </form>
+        )}
+
+        {/* Conversational Transaction Confirmation Dialog */}
+        <ConversationalTransactionDialog
+          isOpen={showConfirmationDialog}
+          onClose={() => setShowConfirmationDialog(false)}
+          parsedData={parsedData}
+          wallets={wallets}
+          expenseCategories={expenseCategories}
+          incomeCategories={incomeCategories}
+          onConfirm={handleConfirmedTransactions}
+          onCorrection={handleCorrection}
+          originalText={conversationalText}
+        />
       </CardContent>
     </Card>
   )

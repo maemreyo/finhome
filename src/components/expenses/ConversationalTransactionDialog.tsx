@@ -1,0 +1,592 @@
+// src/components/expenses/ConversationalTransactionDialog.tsx
+// Confirmation dialog for AI-parsed transactions with editable fields
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
+import { 
+  Brain, 
+  Edit3, 
+  Check, 
+  X, 
+  AlertCircle, 
+  Sparkles, 
+  Hash, 
+  Wallet,
+  DollarSign,
+  Tag,
+  Calendar,
+  FileText,
+  ArrowRight
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+// Transaction validation schema
+const transactionSchema = z.object({
+  transaction_type: z.enum(['expense', 'income', 'transfer']),
+  amount: z.number().positive(),
+  description: z.string().min(1),
+  expense_category_id: z.string().optional(),
+  income_category_id: z.string().optional(),
+  wallet_id: z.string().min(1),
+  tags: z.array(z.string()).default([]),
+  transaction_date: z.string().optional(),
+  notes: z.string().optional(),
+})
+
+type TransactionFormData = z.infer<typeof transactionSchema>
+
+interface ParsedTransaction {
+  transaction_type: 'expense' | 'income' | 'transfer'
+  amount: number
+  description: string
+  suggested_category_id?: string
+  suggested_category_name?: string
+  suggested_tags: string[]
+  suggested_wallet_id?: string
+  confidence_score: number
+  extracted_merchant?: string
+  extracted_date?: string
+  notes?: string
+  parsing_context?: {
+    original_text: string
+    processing_timestamp: string
+    user_id: string
+  }
+}
+
+interface ParsedData {
+  transactions: ParsedTransaction[]
+  analysis_summary?: string
+  metadata?: {
+    total_transactions: number
+    processing_time: string
+    ai_model: string
+  }
+}
+
+interface Category {
+  id: string
+  name_en: string
+  name_vi: string
+  icon: string
+  color: string
+  category_key: string
+}
+
+interface Wallet {
+  id: string
+  name: string
+  balance: number
+  currency: string
+  icon: string
+  color: string
+  wallet_type: string
+}
+
+interface ConversationalTransactionDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  parsedData: ParsedData | null
+  wallets: Wallet[]
+  expenseCategories: Category[]
+  incomeCategories: Category[]
+  onConfirm: (transactions: TransactionFormData[]) => void
+  onCorrection?: (correction: any) => void
+  originalText: string
+}
+
+export function ConversationalTransactionDialog({
+  isOpen,
+  onClose,
+  parsedData,
+  wallets,
+  expenseCategories,
+  incomeCategories,
+  onConfirm,
+  onCorrection,
+  originalText
+}: ConversationalTransactionDialogProps) {
+  const t = useTranslations('UnifiedTransactionForm')
+  const [editingTransactions, setEditingTransactions] = useState<TransactionFormData[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false)
+
+  // Initialize editing transactions when parsedData changes
+  useEffect(() => {
+    if (parsedData?.transactions) {
+      const initialTransactions = parsedData.transactions.map(transaction => ({
+        transaction_type: transaction.transaction_type,
+        amount: transaction.amount,
+        description: transaction.description,
+        expense_category_id: transaction.transaction_type === 'expense' ? transaction.suggested_category_id : undefined,
+        income_category_id: transaction.transaction_type === 'income' ? transaction.suggested_category_id : undefined,
+        wallet_id: transaction.suggested_wallet_id || wallets[0]?.id || '',
+        tags: transaction.suggested_tags || [],
+        transaction_date: transaction.extracted_date || new Date().toISOString().split('T')[0],
+        notes: transaction.notes || '',
+      }))
+      setEditingTransactions(initialTransactions)
+    }
+  }, [parsedData, wallets])
+
+  const updateTransaction = (index: number, field: keyof TransactionFormData, value: any) => {
+    setEditingTransactions(prev => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      
+      // Track corrections for learning
+      if (parsedData?.transactions[index] && onCorrection) {
+        const original = parsedData.transactions[index]
+        const correctionType = determineCorrectionType(field, original, updated[index])
+        
+        onCorrection({
+          input_text: originalText,
+          original_suggestion: original,
+          corrected_data: updated[index],
+          correction_type: correctionType,
+        })
+      }
+      
+      return updated
+    })
+  }
+
+  const determineCorrectionType = (field: keyof TransactionFormData, original: ParsedTransaction, corrected: TransactionFormData): string => {
+    switch (field) {
+      case 'expense_category_id':
+      case 'income_category_id':
+        return 'category_change'
+      case 'amount':
+        return 'amount_change'
+      case 'description':
+        return 'description_change'
+      case 'transaction_type':
+        return 'transaction_type_change'
+      case 'tags':
+        return 'tags_change'
+      case 'wallet_id':
+        return 'wallet_change'
+      default:
+        return 'multiple_changes'
+    }
+  }
+
+  const getCurrentCategories = (transactionType: string) => {
+    return transactionType === 'expense' ? expenseCategories : incomeCategories
+  }
+
+  const addTag = (transactionIndex: number, tag: string) => {
+    if (tag.trim() && !editingTransactions[transactionIndex]?.tags.includes(tag)) {
+      const newTags = [...(editingTransactions[transactionIndex]?.tags || []), tag.trim()]
+      updateTransaction(transactionIndex, 'tags', newTags)
+    }
+  }
+
+  const removeTag = (transactionIndex: number, tagToRemove: string) => {
+    const newTags = editingTransactions[transactionIndex]?.tags.filter(tag => tag !== tagToRemove) || []
+    updateTransaction(transactionIndex, 'tags', newTags)
+  }
+
+  const handleConfirm = async () => {
+    if (!editingTransactions.length) return
+
+    try {
+      setIsSubmitting(true)
+      
+      // Validate all transactions
+      const validatedTransactions = editingTransactions.map((transaction, index) => {
+        try {
+          return transactionSchema.parse(transaction)
+        } catch (error) {
+          throw new Error(`Transaction ${index + 1}: ${error instanceof z.ZodError ? error.issues[0].message : 'Invalid data'}`)
+        }
+      })
+
+      await onConfirm(validatedTransactions)
+      onClose()
+      
+    } catch (error) {
+      console.error('Error confirming transactions:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to confirm transactions')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const getTotalAmount = () => {
+    return editingTransactions.reduce((total, transaction) => {
+      return transaction.transaction_type === 'expense' 
+        ? total - transaction.amount 
+        : total + transaction.amount
+    }, 0)
+  }
+
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 0.8) return 'text-green-600 bg-green-50'
+    if (confidence >= 0.5) return 'text-yellow-600 bg-yellow-50'
+    return 'text-red-600 bg-red-50'
+  }
+
+  if (!parsedData) return null
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-purple-500" />
+            AI Transaction Analysis
+            <Badge variant="secondary" className="ml-2">
+              {parsedData.transactions.length} transaction{parsedData.transactions.length !== 1 ? 's' : ''} found
+            </Badge>
+          </DialogTitle>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[60vh]">
+          <div className="space-y-4">
+            {/* Analysis Summary */}
+            {parsedData.analysis_summary && (
+              <Alert>
+                <Sparkles className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>AI Analysis:</strong> {parsedData.analysis_summary}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Original Text Display */}
+            <Card className="bg-muted/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Your Input
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm italic">"{originalText}"</p>
+              </CardContent>
+            </Card>
+
+            {/* Advanced Options Toggle */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="advanced-options"
+                  checked={showAdvancedOptions}
+                  onCheckedChange={setShowAdvancedOptions}
+                />
+                <Label htmlFor="advanced-options" className="text-sm">
+                  Show advanced editing options
+                </Label>
+              </div>
+            </div>
+
+            {/* Transaction Cards */}
+            <div className="space-y-4">
+              {parsedData.transactions.map((original, index) => {
+                const editing = editingTransactions[index]
+                if (!editing) return null
+
+                return (
+                  <Card key={index} className="border-2">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <div className={cn(
+                            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
+                            editing.transaction_type === 'expense' ? "bg-red-100 text-red-700" :
+                            editing.transaction_type === 'income' ? "bg-green-100 text-green-700" :
+                            "bg-blue-100 text-blue-700"
+                          )}>
+                            {index + 1}
+                          </div>
+                          {editing.transaction_type === 'expense' ? 'Expense' : 
+                           editing.transaction_type === 'income' ? 'Income' : 'Transfer'}
+                        </CardTitle>
+                        
+                        <Badge className={cn("text-xs", getConfidenceColor(original.confidence_score))}>
+                          <Brain className="h-3 w-3 mr-1" />
+                          {Math.round(original.confidence_score * 100)}% confident
+                        </Badge>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="space-y-4">
+                      {/* Amount */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-sm font-medium flex items-center gap-1">
+                            <DollarSign className="h-3 w-3" />
+                            Amount
+                          </Label>
+                          <Input
+                            type="number"
+                            value={editing.amount}
+                            onChange={(e) => updateTransaction(index, 'amount', parseFloat(e.target.value) || 0)}
+                            className="mt-1"
+                          />
+                        </div>
+
+                        {/* Wallet */}
+                        <div>
+                          <Label className="text-sm font-medium flex items-center gap-1">
+                            <Wallet className="h-3 w-3" />
+                            Wallet
+                          </Label>
+                          <Select 
+                            value={editing.wallet_id} 
+                            onValueChange={(value) => updateTransaction(index, 'wallet_id', value)}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {wallets.map((wallet) => (
+                                <SelectItem key={wallet.id} value={wallet.id}>
+                                  <div className="flex items-center gap-2">
+                                    <div 
+                                      className="w-3 h-3 rounded-full"
+                                      style={{ backgroundColor: wallet.color }}
+                                    />
+                                    {wallet.name}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <div>
+                        <Label className="text-sm font-medium flex items-center gap-1">
+                          <Edit3 className="h-3 w-3" />
+                          Description
+                        </Label>
+                        <Input
+                          value={editing.description}
+                          onChange={(e) => updateTransaction(index, 'description', e.target.value)}
+                          className="mt-1"
+                          placeholder="Transaction description..."
+                        />
+                      </div>
+
+                      {/* Category */}
+                      {editing.transaction_type !== 'transfer' && (
+                        <div>
+                          <Label className="text-sm font-medium flex items-center gap-1">
+                            <Tag className="h-3 w-3" />
+                            Category
+                            {original.suggested_category_name && (
+                              <Badge variant="outline" className="ml-2 text-xs">
+                                AI suggested: {original.suggested_category_name}
+                              </Badge>
+                            )}
+                          </Label>
+                          <Select 
+                            value={editing.transaction_type === 'expense' ? editing.expense_category_id : editing.income_category_id} 
+                            onValueChange={(value) => {
+                              const field = editing.transaction_type === 'expense' ? 'expense_category_id' : 'income_category_id'
+                              updateTransaction(index, field, value)
+                            }}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getCurrentCategories(editing.transaction_type).map((category) => (
+                                <SelectItem key={category.id} value={category.id}>
+                                  <div className="flex items-center gap-2">
+                                    <div 
+                                      className="w-3 h-3 rounded-full"
+                                      style={{ backgroundColor: category.color }}
+                                    />
+                                    {category.name_vi}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* Tags */}
+                      <div>
+                        <Label className="text-sm font-medium flex items-center gap-1">
+                          <Hash className="h-3 w-3" />
+                          Tags
+                          {original.suggested_tags.length > 0 && (
+                            <Badge variant="outline" className="ml-2 text-xs">
+                              AI suggested {original.suggested_tags.length} tags
+                            </Badge>
+                          )}
+                        </Label>
+                        
+                        {/* Current Tags */}
+                        {editing.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1 mb-2">
+                            {editing.tags.map((tag, tagIndex) => (
+                              <Badge key={tagIndex} variant="secondary" className="text-xs pr-1">
+                                {tag}
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-auto p-0.5 ml-1 hover:bg-destructive hover:text-destructive-foreground"
+                                  onClick={() => removeTag(index, tag)}
+                                >
+                                  <X className="h-2.5 w-2.5" />
+                                </Button>
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* AI Suggested Tags (if different from current) */}
+                        {original.suggested_tags.length > 0 && (
+                          <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">AI suggestions:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {original.suggested_tags
+                                .filter(tag => !editing.tags.includes(tag))
+                                .map((tag, tagIndex) => (
+                                <Button
+                                  key={tagIndex}
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => addTag(index, tag)}
+                                  className="h-6 px-2 text-xs border-dashed hover:border-solid"
+                                >
+                                  <Hash className="h-2.5 w-2.5 mr-1" />
+                                  {tag}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Advanced Options */}
+                      {showAdvancedOptions && (
+                        <div className="space-y-3 pt-2 border-t">
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* Transaction Date */}
+                            <div>
+                              <Label className="text-sm font-medium flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                Date
+                              </Label>
+                              <Input
+                                type="date"
+                                value={editing.transaction_date}
+                                onChange={(e) => updateTransaction(index, 'transaction_date', e.target.value)}
+                                className="mt-1"
+                              />
+                            </div>
+
+                            {/* Transaction Type */}
+                            <div>
+                              <Label className="text-sm font-medium">Transaction Type</Label>
+                              <Select 
+                                value={editing.transaction_type} 
+                                onValueChange={(value: 'expense' | 'income' | 'transfer') => {
+                                  updateTransaction(index, 'transaction_type', value)
+                                  // Clear category when changing type
+                                  updateTransaction(index, 'expense_category_id', undefined)
+                                  updateTransaction(index, 'income_category_id', undefined)
+                                }}
+                              >
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="expense">Expense</SelectItem>
+                                  <SelectItem value="income">Income</SelectItem>
+                                  <SelectItem value="transfer">Transfer</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          {/* Notes */}
+                          <div>
+                            <Label className="text-sm font-medium">Notes</Label>
+                            <Textarea
+                              value={editing.notes || ''}
+                              onChange={(e) => updateTransaction(index, 'notes', e.target.value)}
+                              className="mt-1"
+                              placeholder="Additional notes..."
+                              rows={2}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+
+            {/* Summary */}
+            {editingTransactions.length > 1 && (
+              <Card className="bg-muted/50">
+                <CardContent className="pt-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Total Impact:</span>
+                    <div className={cn(
+                      "font-bold text-lg",
+                      getTotalAmount() >= 0 ? "text-green-600" : "text-red-600"
+                    )}>
+                      {getTotalAmount() >= 0 ? '+' : ''}{getTotalAmount().toLocaleString('vi-VN')} VND
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </ScrollArea>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirm} 
+            disabled={isSubmitting || !editingTransactions.length}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Creating...
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4" />
+                Confirm {editingTransactions.length} Transaction{editingTransactions.length !== 1 ? 's' : ''}
+              </div>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
