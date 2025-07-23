@@ -33,7 +33,9 @@ import {
   X,
   ChevronDown,
   Zap,
-  Hash
+  Hash,
+  Sparkles,
+  Eye
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -105,6 +107,8 @@ export function QuickTransactionForm({
   const [tagInputOpen, setTagInputOpen] = useState(false)
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>(suggestedTags)
   const [receiptImages, setReceiptImages] = useState<ReceiptImage[]>([])
+  const [isProcessingOCR, setIsProcessingOCR] = useState(false)
+  const [ocrProcessedImages, setOcrProcessedImages] = useState<Set<string>>(new Set())
   const tagInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<FormData>({
@@ -163,6 +167,82 @@ export function QuickTransactionForm({
     const newTags = selectedTags.filter(t => t !== tag)
     setSelectedTags(newTags)
     setValue('tags', newTags)
+  }
+
+  // Process receipt image with OCR
+  const processReceiptOCR = async (imageUrl: string, imageId: string) => {
+    if (ocrProcessedImages.has(imageId)) return
+
+    setIsProcessingOCR(true)
+    try {
+      const response = await fetch('/api/expenses/receipt-ocr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageUrl: imageUrl,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('OCR processing failed')
+      }
+
+      const result = await response.json()
+      
+      if (result.success && result.data) {
+        const { amount, merchant_name, transaction_date, description, category_suggestion } = result.data
+
+        // Auto-fill form fields with OCR data (only if fields are empty)
+        if (amount && !getValues('amount')) {
+          setValue('amount', amount)
+        }
+        if (merchant_name && !getValues('merchant_name')) {
+          setValue('merchant_name', merchant_name)
+        }
+        if (transaction_date && !getValues('transaction_date')) {
+          setValue('transaction_date', transaction_date)
+        }
+        if (description && !getValues('description')) {
+          setValue('description', description)
+        }
+
+        // Suggest category if available
+        if (category_suggestion) {
+          const categories = transactionType === 'expense' ? expenseCategories : incomeCategories
+          const suggestedCategory = categories.find(cat => cat.category_key === category_suggestion)
+          if (suggestedCategory && !getValues(getCategoryFieldName())) {
+            setValue(getCategoryFieldName(), suggestedCategory.id)
+          }
+        }
+
+        // Mark this image as processed
+        setOcrProcessedImages(prev => new Set([...prev, imageId]))
+
+        // Show success message
+        toast.success('Receipt data extracted and filled automatically!')
+      } else {
+        toast.error('Could not extract data from receipt image')
+      }
+    } catch (error) {
+      console.error('OCR processing error:', error)
+      toast.error('Failed to process receipt image')
+    } finally {
+      setIsProcessingOCR(false)
+    }
+  }
+
+  // Handle receipt images change with OCR processing
+  const handleReceiptImagesChange = (images: ReceiptImage[]) => {
+    setReceiptImages(images)
+
+    // Process newly uploaded images with OCR
+    images.forEach(image => {
+      if (image.uploaded && image.url && !ocrProcessedImages.has(image.id)) {
+        processReceiptOCR(image.url, image.id)
+      }
+    })
   }
 
   const onSubmit = async (data: FormData) => {
@@ -468,15 +548,29 @@ export function QuickTransactionForm({
               <Label className="flex items-center gap-1">
                 <Camera className="h-4 w-4 text-muted-foreground" />
                 Receipt Images
+                {isProcessingOCR && (
+                  <div className="flex items-center gap-1 ml-2">
+                    <Sparkles className="h-3 w-3 text-blue-500 animate-pulse" />
+                    <span className="text-xs text-blue-600">Processing OCR...</span>
+                  </div>
+                )}
               </Label>
               <ReceiptImageUpload
                 images={receiptImages}
-                onImagesChange={setReceiptImages}
+                onImagesChange={handleReceiptImagesChange}
                 userId={userId}
                 maxImages={3}
                 autoUpload={false}
                 className=""
               />
+              {receiptImages.length > 0 && ocrProcessedImages.size > 0 && (
+                <div className="flex items-center gap-1 text-xs text-green-600">
+                  <Eye className="h-3 w-3" />
+                  <span>
+                    OCR processed {ocrProcessedImages.size} of {receiptImages.length} images
+                  </span>
+                </div>
+              )}
             </div>
           )}
 

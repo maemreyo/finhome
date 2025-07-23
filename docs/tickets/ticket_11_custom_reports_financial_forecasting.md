@@ -1,4 +1,4 @@
-## Ticket 11: Báo cáo tùy chỉnh & Dự báo tài chính (Custom Reports & Financial Forecasting)
+## Ticket 11: Báo cáo tùy chỉnh & Dự báo tài chính (Custom Reports & Financial Forecasting) (SKIPPED)
 
 **Mục tiêu:** Cung cấp cho người dùng khả năng tạo các báo cáo tài chính tùy chỉnh và xem dự báo tài chính, giúp họ đưa ra quyết định thông minh hơn về tiền bạc.
 
