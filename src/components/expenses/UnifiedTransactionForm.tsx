@@ -739,32 +739,73 @@ export function UnifiedTransactionForm({
     }
   }
 
-  // Handle confirmed transactions from dialog
+  // Handle confirmed transactions from dialog - ATOMIC BATCH PROCESSING
   const handleConfirmedTransactions = async (transactions: any[]) => {
     setIsSubmitting(true)
     
     try {
-      const results = []
-      
-      for (const transaction of transactions) {
-        const response = await fetch('/api/expenses', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(transaction),
-        })
-
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to create transaction')
-        }
-
-        const result = await response.json()
-        results.push(result)
+      // Get the current user and default wallet
+      const defaultWallet = wallets.find(w => w.is_default) || wallets[0]
+      if (!defaultWallet) {
+        throw new Error('No wallet available for transactions')
       }
+
+      // Transform transactions for batch API
+      const batchTransactions = transactions.map(transaction => ({
+        transaction_type: transaction.transaction_type,
+        amount: transaction.amount,
+        currency: transaction.currency || 'VND',
+        description: transaction.description || '',
+        notes: transaction.notes || '',
+        expense_category_key: transaction.expense_category_key,
+        income_category_key: transaction.income_category_key,
+        custom_category: transaction.custom_category,
+        tags: transaction.tags || [],
+        transfer_to_wallet_id: transaction.transfer_to_wallet_id,
+        transfer_fee: transaction.transfer_fee || 0,
+        transaction_date: transaction.transaction_date || format(new Date(), 'yyyy-MM-dd'),
+        transaction_time: transaction.transaction_time || format(new Date(), 'HH:mm:ss'),
+        receipt_images: transaction.receipt_images || [],
+        location: transaction.location,
+        merchant_name: transaction.merchant_name,
+        is_confirmed: transaction.is_confirmed !== false
+      }))
+
+      // Send atomic batch request
+      const response = await fetch('/api/transactions/batch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user?.id,
+          wallet_id: transaction_data.wallet_id || defaultWallet.id,
+          transactions: batchTransactions
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        
+        // Provide detailed error information for data integrity issues
+        if (errorData.validation_errors) {
+          const errorMessages = errorData.validation_errors.join(', ')
+          throw new Error(`Validation failed: ${errorMessages}`)
+        }
+        
+        throw new Error(errorData.error || 'Failed to process transaction batch')
+      }
+
+      const result = await response.json()
       
-      toast.success(`Successfully created ${transactions.length} transaction${transactions.length !== 1 ? 's' : ''}!`)
+      // Success - all transactions were processed atomically
+      toast.success(
+        `${result.message} (${result.transaction_count} transaction${result.transaction_count !== 1 ? 's' : ''})`,
+        {
+          description: `Wallet balance: ${result.wallet.previous_balance?.toLocaleString('vi-VN')} → ${result.wallet.current_balance?.toLocaleString('vi-VN')} VND`,
+          duration: 5000
+        }
+      )
       
       // Reset conversational state
       setConversationalText('')
@@ -774,8 +815,25 @@ export function UnifiedTransactionForm({
       onSuccess?.()
       
     } catch (error) {
-      console.error('Error creating transactions:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to create some transactions')
+      console.error('Failed to create atomic transaction batch:', error)
+      
+      // Enhanced error messaging for data integrity issues
+      let errorMessage = error instanceof Error ? error.message : 'Failed to create transactions'
+      
+      if (errorMessage.includes('Insufficient balance')) {
+        errorMessage = 'Không đủ số dư để thực hiện tất cả giao dịch. Vui lòng kiểm tra lại số dư ví.'
+      } else if (errorMessage.includes('Validation failed')) {
+        errorMessage = `Dữ liệu giao dịch không hợp lệ: ${errorMessage.replace('Validation failed: ', '')}`
+      } else if (errorMessage.includes('Wallet not found')) {
+        errorMessage = 'Không tìm thấy ví hoặc bạn không có quyền truy cập.'
+      } else if (errorMessage.includes('atomic')) {
+        errorMessage = 'Lỗi xử lý giao dịch nguyên tử. Tất cả giao dịch đã được rollback để đảm bảo toàn vẹn dữ liệu.'
+      }
+      
+      toast.error(errorMessage, {
+        description: 'Tất cả giao dịch đã được hủy bỏ để đảm bảo tính nhất quán của dữ liệu.',
+        duration: 8000
+      })
     } finally {
       setIsSubmitting(false)
     }

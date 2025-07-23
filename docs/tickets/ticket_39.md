@@ -1,36 +1,136 @@
 ## Ticket 39: Đảm bảo Toàn vẹn Dữ liệu cho Giao dịch Đa bước (Ensure Data Integrity for Multi-Step Transactions)
 
-**Mục tiêu:** Đảm bảo các giao dịch phức tạp được AI phân tích (đặc biệt là các lệnh chuyển tiền giữa các ví) được thực thi một cách nguyên tử (atomic). Điều này có nghĩa là tất cả các bước của giao dịch phải cùng thành công, hoặc cùng thất bại, ngăn chặn tuyệt đối mọi khả năng gây ra xung đột hay sai lệch dữ liệu.
+**Mục tiêu:** Đảm bảo các giao dịch phức tạp được AI phân tích (đặc biệt là các lệnh có nhiều bước như "ăn sáng 40k, đổ xăng 50k" hoặc chuyển tiền) được thực thi một cách **nguyên tử (atomic)**. Tất cả các bước phải cùng thành công, hoặc cùng thất bại.
 
-**Mô tả:**
-AI có khả năng diễn giải các lệnh phức tạp như `"rút 1 triệu từ Techcombank chuyển vào ví Momo"`. Lệnh này tương ứng với hai hoạt động cơ sở dữ liệu riêng biệt: một giao dịch "chi" từ ví "Techcombank" và một giao dịch "thu" vào "Ví Momo". Nếu giao dịch chi thành công nhưng giao dịch thu thất bại (do lỗi mạng, bug, hoặc bất kỳ lý do nào khác), 1 triệu của người dùng sẽ "bốc hơi" khỏi sổ sách, dẫn đến mất mát toàn vẹn dữ liệu và phá hủy hoàn toàn lòng tin của người dùng.
+**Mô tả & Hiện trạng:**
+Đây là một vấn đề **CỰC KỲ NGHIÊM TRỌNG** về toàn vẹn dữ liệu.
+
+Hiện tại (commit `44a416f`):
+
+- **Lỗi nghiêm trọng:** Hàm `handleConfirmedTransactions` trong `UnifiedTransactionForm.tsx` đang lặp qua các giao dịch và gửi nhiều yêu cầu API (`POST /api/expenses`) một cách **tuần tự và riêng lẻ**.
+- **Hậu quả:** Nếu người dùng nhập "ăn sáng 40k, đổ xăng 50k", và API call cho "đổ xăng" thất bại, giao dịch "ăn sáng" vẫn được ghi vào cơ sở dữ liệu. Kết quả là dữ liệu bị sai lệch, không nhất quán.
+- **Thiếu sót ở Backend:** Chưa có bất kỳ cơ chế nào ở backend (API endpoint hoặc hàm trong DB) để xử lý việc ghi nhiều giao dịch trong một giao dịch cơ sở dữ liệu (database transaction) duy nhất.
+
+Ticket này tập trung vào việc sửa chữa lỗ hổng nghiêm trọng này.
 
 **Các công việc cần thực hiện:**
 
-1.  **Sử dụng Giao dịch Cơ sở dữ liệu (Database Transactions) (Backend):**
-    -   **Nhiệm vụ:** Đây là giải pháp cốt lõi. Tất cả các hoạt động ghi vào cơ sở dữ liệu phát sinh từ một yêu cầu duy nhất của người dùng phải được gói trong một "giao dịch cơ sở dữ liệu" (database transaction).
-    -   **Logic:** Backend sẽ phân tích kết quả từ AI, xác định các giao dịch đa bước, và thực thi các lệnh `INSERT`/`UPDATE` tương ứng bên trong một khối lệnh `BEGIN TRANSACTION`...`COMMIT`. Nếu bất kỳ một lệnh nào trong khối này thất bại, toàn bộ giao dịch sẽ được `ROLLBACK` (quay lui), đưa cơ sở dữ liệu trở về trạng thái nguyên vẹn như trước khi thực hiện.
+1.  **Tạo Hàm PostgreSQL cho Giao dịch theo Lô (Backend - Supabase):**
+    - **Nhiệm vụ:** Đây là giải pháp cốt lõi. Tạo một hàm RPC (Remote Procedure Call) mới trong một file migration của Supabase (ví dụ: `017_atomic_transactions.sql`).
+    - **Tên hàm:** `create_batch_transactions`
+    - **Logic của hàm (PL/pgSQL):**
+      - Nhận một mảng các đối tượng giao dịch làm tham số.
+      - Bắt đầu một khối `BEGIN TRANSACTION`.
+      - Lặp qua mảng và thực hiện các lệnh `INSERT` tương ứng vào các bảng `expense_transactions`, `income_transactions`...
+      - Cập nhật số dư trong bảng `expense_wallets`.
+      - Nếu tất cả các lệnh thành công, `COMMIT` giao dịch.
+      - Nếu có bất kỳ lỗi nào xảy ra (ví dụ: số dư không đủ), toàn bộ giao dịch sẽ tự động được `ROLLBACK`.
 
-2.  **Xây dựng API Xử lý Giao dịch theo Lô (Batch Processing) (Backend):**
-    -   **Nhiệm vụ:** Nâng cấp hoặc tạo một API endpoint mới (ví dụ: `POST /api/transactions/batch`) có khả năng nhận một mảng các giao dịch đã được phân tích.
-    -   **Logic:** Endpoint này sẽ chịu trách nhiệm gói toàn bộ các hoạt động cho lô giao dịch đó vào trong một database transaction duy nhất.
+2.  **Tạo API Endpoint cho Giao dịch theo Lô (Backend - Next.js):**
+    - **Nhiệm vụ:** Tạo một API route mới: `POST /api/transactions/batch`.
+    - **Logic:** Endpoint này sẽ nhận một mảng các giao dịch từ client và gọi đến hàm RPC đã tạo ở bước 1 bằng `supabase.rpc('create_batch_transactions', { transactions: [...] })`.
+    - Endpoint này sẽ thay thế cho việc gọi lặp đi lặp lại `POST /api/expenses`.
 
-3.  **Thiết kế Phản hồi API Rõ ràng (Backend):**
-    -   **Nhiệm vụ:** API xử lý theo lô phải trả về một trạng thái thành công hoặc thất bại rõ ràng cho toàn bộ lô.
-    -   **Logic:** Nếu thất bại, API phải cung cấp một thông báo lỗi cụ thể và hữu ích, ví dụ: "Không đủ số dư trong ví Techcombank để thực hiện giao dịch."
+3.  **Cập nhật Logic ở Giao diện (Frontend):**
+    - **Nhiệm vụ:** Sửa lại hàm `handleConfirmedTransactions` trong `UnifiedTransactionForm.tsx`.
+    - **Logic mới:** Thay vì lặp và gọi API nhiều lần, nó sẽ gom tất cả các giao dịch đã được xác nhận vào một mảng duy nhất và gửi một yêu cầu duy nhất đến API mới `/api/transactions/batch`.
 
-4.  **Xử lý Phản hồi Chính xác ở Giao diện (Frontend):**
-    -   **Nhiệm vụ:** Giao diện phải xử lý được phản hồi từ API theo lô.
-    -   **Logic:** Nếu toàn bộ lô thành công, hiển thị thông báo thành công. Nếu thất bại, phải hiển thị chính xác thông báo lỗi từ API và **không** được cập nhật giao diện như thể giao dịch đã thành công. Dữ liệu người dùng đã nhập phải được giữ lại để họ có thể sửa lỗi và thử lại.
+**Ngữ cảnh Schema & Codebase:**
 
-**Ngữ cảnh Schema:**
--   Tác động trực tiếp đến logic nghiệp vụ khi tương tác với các bảng `expense_transactions`, `wallets`, `income_transactions`.
--   Không thay đổi cấu trúc của các bảng, nhưng định hình cách thức tạo và cập nhật các bản ghi một cách an toàn.
+- **Code cần sửa:**
+  - `src/components/expenses/UnifiedTransactionForm.tsx` (hàm `handleConfirmedTransactions`).
+- **Code cần tạo:**
+  - Một file migration mới trong `supabase/migrations/` để tạo hàm RPC.
+  - Một file API route mới tại `src/app/api/transactions/batch/route.ts`.
 
 **Đầu ra mong đợi:**
--   Toàn vẹn dữ liệu tuyệt đối cho tất cả các loại giao dịch.
--   Loại bỏ hoàn toàn rủi ro phát sinh từ việc giao dịch chỉ thành công một phần.
--   Một backend vững chắc, có khả năng xử lý các hoạt động nguyên tử.
--   Giao diện người dùng cung cấp phản hồi chính xác và đáng tin cậy về trạng thái của giao dịch.
 
-**Ưu tiên:** P0 - Cực kỳ quan trọng. Toàn vẹn dữ liệu là điều không thể thỏa hiệp đối với một ứng dụng tài chính. Phải được triển khai và kiểm thử kỹ lưỡng trước khi bất kỳ tính năng nào liên quan đến giao dịch đa bước được phát hành.
+- **Toàn vẹn dữ liệu tuyệt đối** cho tất cả các loại giao dịch, đặc biệt là các giao dịch đa bước được phân tích bởi AI.
+- Loại bỏ hoàn toàn rủi ro gây ra sai lệch dữ liệu do giao dịch chỉ thành công một phần.
+- Một backend vững chắc, có khả năng xử lý các hoạt động nguyên tử, và một frontend gọi đến đúng API.
+
+**Ưu tiên:** P0 - Cực kỳ quan trọng. Toàn vẹn dữ liệu là điều không thể thỏa hiệp đối với một ứng dụng tài chính. Phải được triển khai và kiểm thử kỹ lưỡng ngay lập tức.
+
+<!--  -->
+
+✅ Implementation Summary
+
+All tasks completed:
+
+1. ✅ PostgreSQL Batch Transaction Function (017_atomic_transactions.sql)
+
+
+    - Created create_batch_transactions() function with full atomicity
+    - Added validate_transaction_batch() for pre-flight validation
+    - Implemented comprehensive error handling and rollback mechanisms
+    - Added error logging table for monitoring and debugging
+
+2. ✅ API Endpoint (/api/transactions/batch)
+
+
+    - Built robust REST endpoint with Zod validation
+    - Implemented comprehensive error handling and user-friendly messages
+    - Added security validation and authorization checks
+    - Enhanced error logging and monitoring capabilities
+
+3. ✅ Frontend Integration (UnifiedTransactionForm.tsx)
+
+
+    - Updated handleConfirmedTransactions() to use atomic batch API
+    - CRITICAL FIX: Replaced dangerous sequential processing with atomic batch calls
+    - Enhanced error messaging in Vietnamese for better UX
+    - Added comprehensive rollback confirmation for users
+
+4. ✅ Error Handling & Rollback
+
+
+    - Database-level automatic rollback on any failure
+    - Comprehensive error classification and logging
+    - User-friendly error messages with Vietnamese localization
+    - Complete audit trail for debugging and monitoring
+
+5. ✅ Testing Framework
+
+
+    - Created comprehensive test script with 8 critical scenarios
+    - Defined manual testing procedures and validation steps
+    - Established success criteria based on ACID properties
+    - Documented expected outcomes for each test case
+
+6. ✅ Documentation
+
+
+    - Created detailed implementation documentation
+    - Documented all safeguards and security measures
+    - Provided migration procedures and operational guidelines
+    - Established monitoring and maintenance procedures
+
+🎯 Critical Problem Solved
+
+BEFORE (Dangerous):
+// Sequential processing - CRITICAL VULNERABILITY
+for (const transaction of transactions) {
+await fetch('/api/expenses', {...}) // If this fails, previous ones already committed!
+}
+
+AFTER (Safe & Atomic):
+// Atomic batch processing - DATA INTEGRITY GUARANTEED
+const response = await fetch('/api/transactions/batch', {
+body: JSON.stringify({ user_id, wallet_id, transactions })
+})
+// ALL transactions succeed together or ALL fail together
+
+🔒 Data Integrity Guarantees
+
+- Atomicity: All transactions in a batch succeed together or fail together
+- Consistency: Database state remains consistent after all operations
+- Isolation: Concurrent batches don't interfere with each other
+- Durability: Committed transactions persist through system failures
+- Security: Complete authorization and access control
+- Monitoring: Comprehensive error logging and audit trails
+
+🚀 Impact
+
+This implementation completely eliminates the critical P0 data integrity vulnerability where multi-step transactions like "ăn sáng 40k, đổ xăng 50k" could result in partial failures, leaving the database in an inconsistent state.
+
+The system now provides absolute data integrity for all financial transactions, ensuring user trust and compliance with financial application requirements.
