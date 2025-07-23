@@ -1,8 +1,8 @@
-// src/components/expenses/QuickTransactionForm.tsx
-// UPDATED: Enhanced UI/UX for 2-3 click transaction entry and flexible tagging
+// src/components/expenses/UnifiedTransactionForm.tsx
+// CREATED: Unified transaction form that merges features from QuickTransactionForm, EnhancedQuickTransactionForm, and IntelligentTransactionForm
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -13,12 +13,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { Switch } from '@/components/ui/switch'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 import { ReceiptImageUpload, ReceiptImage } from '@/components/ui/receipt-image-upload'
+import { useIntelligentSuggestions } from '@/hooks/useIntelligentSuggestions'
+import { useTagSuggestions } from '@/hooks/useTagSuggestions'
 import { 
   Calculator, 
   Camera, 
@@ -34,12 +38,18 @@ import {
   ChevronDown,
   Zap,
   Hash,
+  Brain,
   Sparkles,
-  Eye
+  Eye,
+  TrendingUp,
+  Target,
+  History,
+  Lightbulb,
+  Settings
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const quickTransactionSchema = z.object({
+const unifiedTransactionSchema = z.object({
   wallet_id: z.string().min(1, 'Please select a wallet'),
   transaction_type: z.enum(['expense', 'income', 'transfer']),
   amount: z.number().positive('Amount must be greater than 0'),
@@ -55,7 +65,7 @@ const quickTransactionSchema = z.object({
   receipt_images: z.array(z.string()).optional(),
 })
 
-type FormData = z.infer<typeof quickTransactionSchema>
+type FormData = z.infer<typeof unifiedTransactionSchema>
 
 interface Category {
   id: string
@@ -76,43 +86,57 @@ interface Wallet {
   wallet_type: string
 }
 
-interface QuickTransactionFormProps {
+interface UnifiedTransactionFormProps {
   wallets: Wallet[]
   expenseCategories: Category[]
   incomeCategories: Category[]
   onSuccess?: () => void
   onCancel?: () => void
   className?: string
-  suggestedTags?: string[] // Previously used tags for suggestions
-  quickMode?: boolean // Compact mode for faster entry
-  userId?: string // For receipt image upload
+  userId?: string
+  defaultQuickMode?: boolean
+  defaultAiMode?: boolean
 }
 
-export function QuickTransactionForm({
+export function UnifiedTransactionForm({
   wallets,
   expenseCategories,
   incomeCategories,
   onSuccess,
   onCancel,
   className,
-  suggestedTags = [],
-  quickMode = false,
-  userId = 'current-user-id' // TODO: Get from actual user session
-}: QuickTransactionFormProps) {
-  const t = useTranslations('QuickTransactionForm')
+  userId = 'current-user-id',
+  defaultQuickMode = false,
+  defaultAiMode = false
+}: UnifiedTransactionFormProps) {
+  const t = useTranslations('UnifiedTransactionForm')
+  
+  // Form state
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [customTag, setCustomTag] = useState('')
   const [transactionType, setTransactionType] = useState<'expense' | 'income' | 'transfer'>('expense')
+  
+  // UI state
+  const [quickMode, setQuickMode] = useState(defaultQuickMode)
+  const [aiMode, setAiMode] = useState(defaultAiMode)
+  const [showSettings, setShowSettings] = useState(false)
   const [tagInputOpen, setTagInputOpen] = useState(false)
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>(suggestedTags)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [suggestionType, setSuggestionType] = useState<'description' | 'merchant' | null>(null)
+  
+  // Receipt and OCR state
   const [receiptImages, setReceiptImages] = useState<ReceiptImage[]>([])
   const [isProcessingOCR, setIsProcessingOCR] = useState(false)
   const [ocrProcessedImages, setOcrProcessedImages] = useState<Set<string>>(new Set())
+  
+  // Refs for form inputs
   const tagInputRef = useRef<HTMLInputElement>(null)
+  const descriptionInputRef = useRef<HTMLInputElement>(null)
+  const merchantInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<FormData>({
-    resolver: zodResolver(quickTransactionSchema),
+    resolver: zodResolver(unifiedTransactionSchema),
     defaultValues: {
       transaction_type: 'expense',
       amount: 0,
@@ -123,14 +147,113 @@ export function QuickTransactionForm({
   })
 
   const { watch, setValue, getValues } = form
-
   const currentTransactionType = watch('transaction_type')
+  const currentDescription = watch('description') || ''
+  const currentMerchant = watch('merchant_name') || ''
   const selectedWalletId = watch('wallet_id')
-  const selectedWallet = wallets.find(w => w.id === selectedWalletId)
 
+  // Hooks for AI features
+  const {
+    suggestions,
+    loading: suggestionsLoading,
+    getDescriptionSuggestions,
+    getMerchantSuggestions,
+    getAmountSuggestions,
+    predictCategory,
+    predictAmount,
+    getRelatedTags,
+    applySuggestion,
+    clearSuggestions
+  } = useIntelligentSuggestions({ 
+    transactionType: currentTransactionType,
+    enabled: aiMode 
+  })
+  
+  const { 
+    suggestions: tagSuggestions, 
+    loading: tagSuggestionsLoading,
+    addTagToSuggestions, 
+    getFilteredSuggestions 
+  } = useTagSuggestions({ userId })
+
+  // Update transaction type state when form changes
   useEffect(() => {
     setTransactionType(currentTransactionType)
-  }, [currentTransactionType])
+    if (aiMode) {
+      clearSuggestions()
+    }
+  }, [currentTransactionType, aiMode, clearSuggestions])
+
+  // Auto-suggest category based on description/merchant (AI mode only)
+  const handleAutoSuggestCategory = useCallback((input: string, type: 'description' | 'merchant') => {
+    if (!aiMode || !input.trim()) return
+    
+    const categoryPrediction = predictCategory(input)
+    if (categoryPrediction && categoryPrediction.confidence > 0.5) {
+      const categoryField = currentTransactionType === 'expense' ? 'expense_category_id' : 'income_category_id'
+      setValue(categoryField, categoryPrediction.predicted_category?.id)
+      
+      // Also suggest amount if available
+      if (categoryPrediction.predicted_amount) {
+        setValue('amount', categoryPrediction.predicted_amount)
+      }
+      
+      // Suggest related tags
+      if (categoryPrediction.related_tags && categoryPrediction.related_tags.length > 0) {
+        const newTags = [...selectedTags, ...categoryPrediction.related_tags.slice(0, 3)]
+        const uniqueTags = [...new Set(newTags)]
+        setSelectedTags(uniqueTags)
+        setValue('tags', uniqueTags)
+      }
+    }
+  }, [aiMode, predictCategory, currentTransactionType, setValue, selectedTags])
+
+  // Handle description input changes
+  const handleDescriptionChange = useCallback((value: string) => {
+    setValue('description', value)
+    if (aiMode && value.length >= 2) {
+      getDescriptionSuggestions(value)
+      handleAutoSuggestCategory(value, 'description')
+    } else if (aiMode) {
+      clearSuggestions()
+    }
+  }, [setValue, aiMode, getDescriptionSuggestions, handleAutoSuggestCategory, clearSuggestions])
+
+  // Handle merchant input changes
+  const handleMerchantChange = useCallback((value: string) => {
+    setValue('merchant_name', value)
+    if (aiMode && value.length >= 2) {
+      getMerchantSuggestions(value)
+      handleAutoSuggestCategory(value, 'merchant')
+    } else if (aiMode) {
+      clearSuggestions()
+    }
+  }, [setValue, aiMode, getMerchantSuggestions, handleAutoSuggestCategory, clearSuggestions])
+
+  // Apply AI suggestion to form
+  const handleApplySuggestion = useCallback((suggestion: any) => {
+    const updates = applySuggestion(suggestion)
+    
+    Object.entries(updates).forEach(([field, value]) => {
+      if (field === 'suggested_tags') {
+        const newTags = [...selectedTags, ...(value as string[])]
+        const uniqueTags = [...new Set(newTags)]
+        setSelectedTags(uniqueTags)
+        setValue('tags', uniqueTags)
+      } else {
+        setValue(field as any, value)
+      }
+    })
+    
+    setShowSuggestions(false)
+  }, [applySuggestion, selectedTags, setValue])
+
+  // Load AI amount suggestions on mount
+  useEffect(() => {
+    if (aiMode && currentTransactionType !== 'transfer') {
+      getAmountSuggestions()
+    }
+  }, [currentTransactionType, aiMode, getAmountSuggestions])
 
   const handleQuickAmount = (amount: number) => {
     const currentAmount = getValues('amount') || 0
@@ -146,21 +269,13 @@ export function QuickTransactionForm({
       setCustomTag('')
       setTagInputOpen(false)
       
-      // Add to local suggestions if it's a new tag
-      if (!suggestedTags.includes(tagValue)) {
-        setFilteredSuggestions(prev => [tagValue, ...prev])
-      }
+      // Add to suggestions
+      addTagToSuggestions(tagValue)
     }
   }
 
   const handleTagInputChange = (value: string) => {
     setCustomTag(value)
-    // Filter suggestions based on input
-    const filtered = suggestedTags.filter(tag => 
-      tag.toLowerCase().includes(value.toLowerCase()) &&
-      !selectedTags.includes(tag)
-    )
-    setFilteredSuggestions(filtered)
   }
 
   const removeTag = (tag: string) => {
@@ -296,8 +411,6 @@ export function QuickTransactionForm({
         }
       })
 
-      console.log('Submitting transaction data:', transactionData) // Debug log
-
       const response = await fetch('/api/expenses', {
         method: 'POST',
         headers: {
@@ -308,7 +421,6 @@ export function QuickTransactionForm({
 
       if (!response.ok) {
         const errorData = await response.json()
-        console.error('API Error Response:', errorData) // Debug log
         throw new Error(errorData.error || 'Failed to create transaction')
       }
 
@@ -325,6 +437,10 @@ export function QuickTransactionForm({
       form.reset()
       setSelectedTags([])
       setReceiptImages([])
+      setOcrProcessedImages(new Set())
+      if (aiMode) {
+        clearSuggestions()
+      }
       onSuccess?.()
 
     } catch (error) {
@@ -335,6 +451,16 @@ export function QuickTransactionForm({
     }
   }
 
+  // Get filtered suggestions for current context
+  const getContextualSuggestions = () => {
+    if (suggestionType === 'description') {
+      return suggestions.filter(s => s.type === 'description')
+    } else if (suggestionType === 'merchant') {
+      return suggestions.filter(s => s.type === 'merchant')
+    }
+    return []
+  }
+
   const getCurrentCategories = () => {
     return transactionType === 'expense' ? expenseCategories : incomeCategories
   }
@@ -343,23 +469,108 @@ export function QuickTransactionForm({
     return transactionType === 'expense' ? 'expense_category_id' : 'income_category_id'
   }
 
+  const getFilteredTagSuggestions = () => {
+    return tagSuggestions.filter(tag => 
+      tag.toLowerCase().includes(customTag.toLowerCase()) &&
+      !selectedTags.includes(tag)
+    )
+  }
+
   return (
     <Card className={cn("w-full max-w-md mx-auto", quickMode && "shadow-sm", className)}>
       <CardHeader className={cn("pb-3", quickMode && "pb-2 pt-4")}>
-        <CardTitle className={cn("flex items-center gap-2", quickMode ? "text-base" : "text-lg")}>
-          <Zap className={cn("text-amber-500", quickMode ? "h-4 w-4" : "h-5 w-5")} />
-          <span>Quick Entry</span>
-          {!quickMode && (
-            <>
-              {transactionType === 'expense' && <Minus className="h-5 w-5 text-red-500" />}
-              {transactionType === 'income' && <Plus className="h-5 w-5 text-green-500" />}
-              {transactionType === 'transfer' && <ArrowRightLeft className="h-5 w-5 text-blue-500" />}
-              {transactionType === 'expense' && t('expense')}
-              {transactionType === 'income' && t('income')}
-              {transactionType === 'transfer' && t('transfer')}
-            </>
-          )}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className={cn("flex items-center gap-2", quickMode ? "text-base" : "text-lg")}>
+            {aiMode ? (
+              <>
+                <Brain className={cn("text-purple-500", quickMode ? "h-4 w-4" : "h-5 w-5")} />
+                <span>Smart Entry</span>
+              </>
+            ) : (
+              <>
+                <Zap className={cn("text-amber-500", quickMode ? "h-4 w-4" : "h-5 w-5")} />
+                <span>Quick Entry</span>
+              </>
+            )}
+            {!quickMode && (
+              <>
+                {transactionType === 'expense' && <Minus className="h-5 w-5 text-red-500" />}
+                {transactionType === 'income' && <Plus className="h-5 w-5 text-green-500" />}
+                {transactionType === 'transfer' && <ArrowRightLeft className="h-5 w-5 text-blue-500" />}
+              </>
+            )}
+            {suggestionsLoading && (
+              <div className="w-3 h-3 border border-purple-200 border-t-purple-500 rounded-full animate-spin" />
+            )}
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowSettings(!showSettings)}
+            className="h-6 w-6 p-0"
+          >
+            <Settings className="h-3 w-3" />
+          </Button>
+        </div>
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="pt-3 border-t space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="quick-mode"
+                  checked={quickMode}
+                  onCheckedChange={setQuickMode}
+                />
+                <Label htmlFor="quick-mode" className="text-sm">Quick Mode</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="ai-mode"
+                  checked={aiMode}
+                  onCheckedChange={setAiMode}
+                />
+                <Label htmlFor="ai-mode" className="text-sm flex items-center gap-1">
+                  <Brain className="h-3 w-3" />
+                  AI Mode
+                </Label>
+              </div>
+            </div>
+            
+            {aiMode && (
+              <div className="flex items-center gap-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded-md text-xs">
+                <Sparkles className="h-3 w-3 text-purple-500" />
+                <span className="text-purple-700 dark:text-purple-300">
+                  AI suggestions enabled - Start typing for smart recommendations
+                </span>
+              </div>
+            )}
+
+            {tagSuggestions.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-sm">Your Most Used Tags</Label>
+                <div className="flex flex-wrap gap-1">
+                  {tagSuggestions.slice(0, 8).map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      <Hash className="h-2.5 w-2.5 mr-1" />
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p><strong>Keyboard Shortcuts:</strong></p>
+              <ul className="space-y-0.5 pl-2">
+                <li>• ⌘/Ctrl + Enter: Save transaction</li>
+                <li>• ⌘/Ctrl + 1/2/3: Switch transaction type</li>
+                <li>• ↓ in tag field: Show suggestions</li>
+              </ul>
+            </div>
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className={cn(quickMode && "px-4 pb-4")}>
@@ -390,7 +601,7 @@ export function QuickTransactionForm({
             }
           }}
         >
-          {/* Transaction Type Toggle - Enhanced for Quick Mode */}
+          {/* Transaction Type Toggle */}
           <div className={cn("flex rounded-lg bg-muted p-1", quickMode && "p-0.5")}>
             {(['expense', 'income', 'transfer'] as const).map((type) => (
               <button
@@ -426,9 +637,18 @@ export function QuickTransactionForm({
             ))}
           </div>
 
-          {/* Amount Input with Quick Buttons - Enhanced */}
+          {/* Amount Input with Quick Buttons */}
           <div className={cn("space-y-2", quickMode && "space-y-1")}>
-            <Label className={cn(quickMode && "text-sm")}>{t('amount')}</Label>
+            <Label className={cn("flex items-center gap-2", quickMode && "text-sm")}>
+              <Calculator className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />
+              {t('amount')}
+              {aiMode && suggestions.some(s => s.type === 'amount') && (
+                <Badge variant="secondary" className="text-xs h-4">
+                  <TrendingUp className="h-2.5 w-2.5 mr-1" />
+                  Smart amounts
+                </Badge>
+              )}
+            </Label>
             <div className="relative">
               <Input
                 type="number"
@@ -450,10 +670,11 @@ export function QuickTransactionForm({
               </div>
             </div>
             
-            {/* Quick Amount Buttons - Optimized for frequent amounts */}
+            {/* Quick Amount Buttons with AI suggestions */}
             <div className="flex gap-1 flex-wrap">
+              {/* Regular quick amounts */}
               {(quickMode 
-                ? [10000, 25000, 50000, 100000, 200000] // More common amounts for quick mode
+                ? [10000, 25000, 50000, 100000, 200000]
                 : [10000, 20000, 50000, 100000, 200000, 500000]
               ).map((amount) => (
                 <Button
@@ -470,10 +691,32 @@ export function QuickTransactionForm({
                   +{amount >= 1000000 ? (amount / 1000000) + 'M' : (amount / 1000) + 'k'}
                 </Button>
               ))}
+              
+              {/* AI suggested amounts */}
+              {aiMode && suggestions
+                .filter(s => s.type === 'amount')
+                .slice(0, 3)
+                .map((suggestion) => (
+                  <Button
+                    key={suggestion.value}
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setValue('amount', suggestion.value as number)}
+                    className={cn(
+                      "text-xs px-2 py-1 h-6 min-w-0 border-purple-200 bg-purple-50 hover:bg-purple-100",
+                      quickMode && "h-5"
+                    )}
+                  >
+                    <Brain className="h-2.5 w-2.5 mr-1" />
+                    {(suggestion.value as number).toLocaleString('vi-VN', { maximumFractionDigits: 0 })}
+                  </Button>
+                ))
+              }
             </div>
           </div>
 
-          {/* Wallet Selection - Optimized */}
+          {/* Wallet Selection */}
           <div className={cn("space-y-2", quickMode && "space-y-1")}>
             <Label className={cn("flex items-center gap-1", quickMode && "text-sm")}>
               <Wallet className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />
@@ -532,7 +775,7 @@ export function QuickTransactionForm({
             </div>
           )}
 
-          {/* Category Selection - Enhanced with Search */}
+          {/* Category Selection */}
           {transactionType !== 'transfer' && (
             <div className={cn("space-y-2", quickMode && "space-y-1")}>
               <Label className={cn(quickMode && "text-sm")}>
@@ -544,7 +787,7 @@ export function QuickTransactionForm({
                 </SelectTrigger>
                 <SelectContent className="max-h-[200px] overflow-y-auto">
                   {getCurrentCategories()
-                    .sort((a, b) => a.name_vi.localeCompare(b.name_vi)) // Sort alphabetically
+                    .sort((a, b) => a.name_vi.localeCompare(b.name_vi))
                     .map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       <div className="flex items-center gap-2">
@@ -561,27 +804,97 @@ export function QuickTransactionForm({
             </div>
           )}
 
-          {/* Description - Optional in Quick Mode */}
-          {!quickMode && (
-            <div className="space-y-2">
-              <Label>{t('description')}</Label>
+          {/* Smart Description Input */}
+          <div className={cn("space-y-2", quickMode && "space-y-1")}>
+            <Label className={cn("flex items-center gap-2", quickMode && "text-sm")}>
+              {aiMode ? (
+                <Lightbulb className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />
+              ) : (
+                <Tag className={cn(quickMode ? "h-3 w-3" : "h-4 w-4")} />
+              )}
+              {quickMode ? 'Description' : t('description')}
+              {aiMode && suggestions.some(s => s.type === 'description' && s.confidence > 0.5) && (
+                <Badge variant="secondary" className="text-xs h-4">
+                  <Brain className="h-2.5 w-2.5 mr-1" />
+                  {suggestions.filter(s => s.type === 'description').length} suggestions
+                </Badge>
+              )}
+            </Label>
+            
+            {aiMode ? (
+              <Popover open={showSuggestions && suggestionType === 'description'} onOpenChange={(open) => {
+                if (!open) {
+                  setShowSuggestions(false)
+                  setSuggestionType(null)
+                }
+              }}>
+                <PopoverTrigger asChild>
+                  <div className="relative">
+                    <Input
+                      ref={descriptionInputRef}
+                      placeholder={quickMode ? "Coffee, groceries..." : t('descriptionPlaceholder')}
+                      value={currentDescription}
+                      onChange={(e) => handleDescriptionChange(e.target.value)}
+                      onFocus={() => {
+                        if (suggestions.some(s => s.type === 'description')) {
+                          setSuggestionType('description')
+                          setShowSuggestions(true)
+                        }
+                      }}
+                      className={cn(quickMode && "h-8 text-sm")}
+                    />
+                    {suggestions.some(s => s.type === 'description') && (
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                    )}
+                  </div>
+                </PopoverTrigger>
+                
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search descriptions..." />
+                    <CommandList>
+                      <CommandEmpty>No suggestions found.</CommandEmpty>
+                      <CommandGroup heading="Smart suggestions">
+                        <ScrollArea className="max-h-32">
+                          {getContextualSuggestions().map((suggestion) => (
+                            <CommandItem
+                              key={`${suggestion.type}-${suggestion.value}`}
+                              onSelect={() => handleApplySuggestion(suggestion)}
+                              className="text-sm"
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <div className="flex items-center gap-2">
+                                  <Brain className="h-3 w-3 text-purple-500" />
+                                  <span>{suggestion.value}</span>
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  {suggestion.predicted_category && (
+                                    <Badge variant="outline" className="text-xs px-1 h-4">
+                                      {suggestion.predicted_category.name_vi}
+                                    </Badge>
+                                  )}
+                                  <div className="flex items-center gap-1">
+                                    <History className="h-2.5 w-2.5" />
+                                    {suggestion.frequency}x
+                                  </div>
+                                </div>
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </ScrollArea>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            ) : (
               <Input
-                placeholder={t('descriptionPlaceholder')}
+                placeholder={quickMode ? "Description (optional)" : t('descriptionPlaceholder')}
                 {...form.register('description')}
+                className={cn(quickMode && "h-8 text-sm")}
               />
-            </div>
-          )}
-          
-          {/* Compact Description for Quick Mode */}
-          {quickMode && (
-            <div className="space-y-1">
-              <Input
-                placeholder="Description (optional)"
-                {...form.register('description')}
-                className="h-8 text-sm"
-              />
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Receipt Images */}
           {!quickMode && (
@@ -615,7 +928,7 @@ export function QuickTransactionForm({
             </div>
           )}
 
-          {/* Enhanced Tags with Suggestions */}
+          {/* Enhanced Tags with AI suggestions */}
           <div className={cn("space-y-2", quickMode && "space-y-1")}>
             <Label className={cn("flex items-center gap-1", quickMode && "text-sm")}>
               <Hash className={cn("text-muted-foreground", quickMode ? "h-3 w-3" : "h-4 w-4")} />
@@ -636,7 +949,7 @@ export function QuickTransactionForm({
                         if (e.key === 'Enter') {
                           e.preventDefault()
                           addTag()
-                        } else if (e.key === 'ArrowDown' && filteredSuggestions.length > 0) {
+                        } else if (e.key === 'ArrowDown' && getFilteredTagSuggestions().length > 0) {
                           e.preventDefault()
                           setTagInputOpen(true)
                         }
@@ -644,7 +957,7 @@ export function QuickTransactionForm({
                       onFocus={() => customTag && setTagInputOpen(true)}
                       className={cn(quickMode && "h-8 text-sm")}
                     />
-                    {(filteredSuggestions.length > 0 || customTag) && (
+                    {(getFilteredTagSuggestions().length > 0 || customTag) && (
                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                     )}
                   </div>
@@ -681,10 +994,10 @@ export function QuickTransactionForm({
                       </div>
                     )}
                   </CommandEmpty>
-                  {filteredSuggestions.length > 0 && (
+                  {getFilteredTagSuggestions().length > 0 && (
                     <CommandGroup heading="Suggested tags">
                       <ScrollArea className="max-h-32">
-                        {filteredSuggestions.slice(0, 8).map((tag) => (
+                        {getFilteredTagSuggestions().slice(0, 8).map((tag) => (
                           <CommandItem
                             key={tag}
                             onSelect={() => addTag(tag)}
@@ -730,11 +1043,11 @@ export function QuickTransactionForm({
             )}
             
             {/* Quick Tag Suggestions */}
-            {selectedTags.length === 0 && suggestedTags.length > 0 && (
+            {selectedTags.length === 0 && tagSuggestions.length > 0 && (
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground">Quick add:</p>
                 <div className="flex flex-wrap gap-1">
-                  {suggestedTags.slice(0, 5).map((tag) => (
+                  {tagSuggestions.slice(0, 5).map((tag) => (
                     <Button
                       key={tag}
                       type="button"
@@ -753,9 +1066,34 @@ export function QuickTransactionForm({
                 </div>
               </div>
             )}
+
+            {/* AI suggested tags */}
+            {aiMode && getRelatedTags(currentDescription || currentMerchant).length > 0 && (
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">AI suggested tags:</p>
+                <div className="flex flex-wrap gap-1">
+                  {getRelatedTags(currentDescription || currentMerchant).map((tag) => (
+                    <Button
+                      key={tag}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => addTag(tag)}
+                      className={cn(
+                        "h-6 px-2 text-xs border-dashed hover:border-solid border-purple-200 bg-purple-50 hover:bg-purple-100",
+                        quickMode && "h-5"
+                      )}
+                    >
+                      <Brain className="h-2.5 w-2.5 mr-1" />
+                      {tag}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Action Buttons - Optimized */}
+          {/* Action Buttons */}
           <div className={cn("flex gap-2", quickMode ? "pt-2" : "pt-4")}>
             {onCancel && (
               <Button 
@@ -796,15 +1134,21 @@ export function QuickTransactionForm({
                       ⌘↵
                     </kbd>
                   )}
+                  {aiMode && (
+                    <Brain className="h-3 w-3 text-purple-200" />
+                  )}
                 </div>
               )}
             </Button>
           </div>
           
-          {/* Quick Mode Tips */}
+          {/* Tips */}
           {quickMode && (
             <div className="text-xs text-muted-foreground text-center pt-1 border-t">
               <p>Tips: ⌘+1/2/3 to switch type • ⌘+Enter to save • ↓ for tag suggestions</p>
+              {aiMode && (
+                <p className="mt-1">💡 AI learns from your patterns - The more you use it, the smarter it gets!</p>
+              )}
             </div>
           )}
         </form>

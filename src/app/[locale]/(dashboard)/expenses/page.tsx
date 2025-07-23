@@ -15,12 +15,12 @@ export default async function ExpensesPage() {
 
   // Fetch essential data for transaction entry and basic widgets
   const [
-    { data: wallets },
-    { data: expenseCategories },
-    { data: incomeCategories },
-    { data: recentTransactions },
-    { data: currentBudgets },
-    { data: activeGoals }
+    { data: wallets, error: walletsError },
+    { data: expenseCategories, error: expenseCategoriesError },
+    { data: incomeCategories, error: incomeCategoriesError },
+    { data: recentTransactions, error: transactionsError },
+    { data: currentBudgets, error: budgetsError },
+    { data: activeGoals, error: goalsError }
   ] = await Promise.all([
     supabase
       .from('expense_wallets')
@@ -47,7 +47,7 @@ export default async function ExpensesPage() {
         *,
         expense_category:expense_categories(*),
         income_category:income_categories(*),
-        wallet:expense_wallets(*),
+        wallet:expense_wallets!expense_transactions_wallet_id_fkey(*),
         transfer_wallet:expense_wallets!expense_transactions_transfer_to_wallet_id_fkey(*)
       `)
       .eq('user_id', user.id)
@@ -85,6 +85,14 @@ export default async function ExpensesPage() {
       .order('created_at', { ascending: false })
       .limit(3) // Only show top 3 goals
   ])
+
+  // Log any errors for debugging
+  if (walletsError) console.error('Wallets error:', walletsError)
+  if (expenseCategoriesError) console.error('Expense categories error:', expenseCategoriesError)
+  if (incomeCategoriesError) console.error('Income categories error:', incomeCategoriesError)
+  if (transactionsError) console.error('Transactions error:', transactionsError)
+  if (budgetsError) console.error('Budgets error:', budgetsError)
+  if (goalsError) console.error('Goals error:', goalsError)
 
   return (
     <div className="space-y-6 p-6">

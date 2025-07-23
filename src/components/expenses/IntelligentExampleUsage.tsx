@@ -3,7 +3,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { IntelligentTransactionForm } from './IntelligentTransactionForm'
+import { UnifiedTransactionForm } from './UnifiedTransactionForm'
 import { TransactionsList } from './TransactionsList'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -258,14 +258,15 @@ export function IntelligentExampleUsage() {
                 </CardContent>
               </Card>
               
-              <IntelligentTransactionForm
+              <UnifiedTransactionForm
                 wallets={mockWallets}
                 expenseCategories={mockExpenseCategories}
                 incomeCategories={mockIncomeCategories}
                 onSuccess={handleTransactionSuccess}
                 onCancel={() => setShowForm(false)}
                 userId="demo-user-id"
-                quickMode={true}
+                defaultQuickMode={true}
+                defaultAiMode={true}
               />
             </div>
           ) : (

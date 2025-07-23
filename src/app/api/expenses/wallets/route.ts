@@ -33,8 +33,7 @@ export async function GET(request: NextRequest) {
       .from('expense_wallets')
       .select(`
         *,
-        bank:banks(*),
-        _count_transactions:expense_transactions(count)
+        bank:banks(*)
       `)
       .eq('user_id', user.id)
       .eq('is_active', true)
@@ -117,6 +116,8 @@ export async function POST(request: NextRequest) {
       user_id: user.id,
       ...validatedData,
       balance: validatedData.balance || 0,
+      icon: validatedData.icon || 'wallet',
+      color: validatedData.color || '#3B82F6',
     }
 
     const { data: wallet, error: createError } = await supabase
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Create wallet error:', error)
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid wallet data', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid wallet data', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

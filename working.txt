@@ -1,0 +1,38 @@
+### Tổng quan trang `expenses`
+
+Trang `expenses` là một dashboard toàn diện (`ExpenseTrackingDashboard.tsx`) để quản lý tài chính cá nhân, với trọng tâm là chức năng nhập liệu giao dịch. Dựa trên các component và ticket đã phân tích, trang này được xây dựng theo một kiến trúc tiến bộ, cho phép người dùng lựa chọn giữa các cấp độ phức tạp khác nhau của form nhập liệu.
+
+**1. Thành phần chính:**
+
+*   **`ExpenseTrackingDashboard.tsx`**:
+    *   Là UI trung tâm, hiển thị các thông số tài chính quan trọng (tổng số dư, thu/chi tháng này).
+    *   Liệt kê các giao dịch gần đây, ví, ngân sách, và mục tiêu tiết kiệm.
+    *   Điểm đặc biệt là khu vực nhập liệu giao dịch, cho phép người dùng chuyển đổi giữa 3 chế độ: "Basic" (`QuickTransactionForm`), "Enhanced" (`EnhancedQuickTransactionForm`), và "Smart AI" (`IntelligentTransactionForm`). Chế độ `Enhanced` đang được đặt làm mặc định.
+
+*   **`QuickTransactionForm.tsx`**:
+    *   Đây là form nhập liệu cốt lõi, đã được tối ưu hóa đáng kể.
+    *   **Tích hợp Ticket 1 (Nhập liệu nhanh & Gắn thẻ):** Form được thiết kế để nhập liệu cực nhanh (đặc biệt ở `quickMode`), hỗ trợ gắn nhiều thẻ (tags) linh hoạt, cho phép tạo mới hoặc chọn từ các thẻ đã có.
+    *   **Tích hợp Ticket 3 (Đính kèm hóa đơn):** Form cho phép tải lên nhiều ảnh hóa đơn, xem trước, và lưu trữ URL vào CSDL. Một tính năng nâng cao là khả năng xử lý OCR (`/api/expenses/receipt-ocr`) để tự động điền thông tin từ ảnh hóa đơn vào form, giúp giảm thiểu tối đa việc nhập liệu thủ công.
+
+*   **Các Form khác (Suy luận):**
+    *   `EnhancedQuickTransactionForm.tsx`: Có thể là một phiên bản nâng cao của `QuickTransactionForm` với các phím tắt và gợi ý thẻ tốt hơn.
+    *   `IntelligentTransactionForm.tsx`: Đây là nơi triển khai đầy đủ **Ticket 2 (Gợi ý thông minh)**. Form này sử dụng hook `useIntelligentSuggestions.ts` để gọi API và tự động gợi ý danh mục, mô tả, và số tiền dựa trên lịch sử giao dịch của người dùng.
+
+**2. Luồng phát triển và Kiến trúc:**
+
+Chức năng nhập liệu đã phát triển qua 3 giai đoạn rõ rệt, tương ứng với các ticket:
+
+1.  **Nền tảng (Ticket 1):** Xây dựng một form nhập liệu nhanh, hiệu quả với hệ thống tagging linh hoạt.
+2.  **Làm giàu dữ liệu (Ticket 3):** Bổ sung khả năng cung cấp bằng chứng trực quan (ảnh hóa đơn) và tự động hóa việc trích xuất dữ liệu từ ảnh bằng OCR.
+3.  **Tầng thông minh (Ticket 2):** Xây dựng một lớp logic "thông minh" có khả năng học hỏi từ thói quen người dùng để đưa ra gợi ý, giúp quá trình nhập liệu trở nên tự động và chính xác hơn.
+
+**3. Kiến trúc tổng thể:**
+
+*   **Frontend:** Sử dụng React/Next.js với các component được phân tách rõ ràng.
+*   **Backend:** Các API routes (`/api/expenses/*`) xử lý logic nghiệp vụ, bao gồm lưu trữ dữ liệu, cung cấp gợi ý, và xử lý OCR.
+*   **Cơ sở dữ liệu (Supabase/PostgreSQL):** Schema được thiết kế tốt, sử dụng kiểu dữ liệu mảng (`TEXT[]` cho tags, `JSONB` cho ảnh) để lưu trữ thông tin một cách hiệu quả.
+*   **Quản lý trạng thái:** Sử dụng React hooks và các custom hooks (`useIntelligentSuggestions`, etc.) để quản lý logic và trạng thái ở phía client.
+
+**Kết luận:** Trang `expenses` là một tính năng được đầu tư kỹ lưỡng, có kiến trúc tốt và được phát triển theo từng giai đoạn rõ ràng. Nó cung cấp một trải nghiệm người dùng linh hoạt, từ nhập liệu cơ bản đến các tính năng thông minh, tự động hóa cao, đáp ứng nhiều nhu cầu khác nhau của người dùng.
+
+

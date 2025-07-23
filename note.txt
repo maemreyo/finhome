@@ -19,3 +19,10 @@ docs/tickets/ticket_12_ocr_automatic_data_extraction.md
 to have a clear view about the code you'll work on
 
 Currently, I have error when I clicked on create expenses in the form
+
+Các issues:
+1. Khi tôi mới vào màn `expenses`, tôi không thấy giao dịch gần đây, số dư trong ví. Phải nhấn nút refresh ở card giao dịch gần đây thì mới hiển thị
+2. UI/UX issue ở trang expenses, tôi thấy phần form đang bị lùi ở dưới màn hình, các số dư ví đang ở trên và khiến form bị dài quá 1 màn hình, user sẽ rất khó chịu. tôi cần layout nào để user focus hơn vào form.
+
+Các issues:
+1. tạo ticket 18 trong folder 

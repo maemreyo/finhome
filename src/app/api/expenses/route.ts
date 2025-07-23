@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Expenses API error:', error)
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid query parameters', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid query parameters', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -212,26 +212,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create transaction', details: createError.message }, { status: 500 })
     }
 
-    // Update user activity tracking
-    await supabase.from('user_activities').insert({
-      user_id: user.id,
-      activity_type: 'expense_tracking',
-      action: 'create_transaction',
-      resource_type: 'expense_transaction',
-      resource_id: transaction.id,
-      metadata: {
-        transaction_type: transaction.transaction_type,
-        amount: transaction.amount,
-        category: transaction.expense_category?.name_vi || transaction.income_category?.name_vi
-      }
-    })
+    // Skip user activity tracking for now (table doesn't exist in current schema)
 
     return NextResponse.json({ transaction }, { status: 201 })
 
   } catch (error) {
     console.error('Create transaction error:', error)
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid transaction data', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid transaction data', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

@@ -204,7 +204,7 @@
     "errorSaving": "Có lỗi xảy ra khi lưu mục tiêu",
     "errorDeleting": "Có lỗi xảy ra khi xóa mục tiêu"
   },
-  "QuickTransactionForm": {
+  "UnifiedTransactionForm": {
     "title": "Giao Dịch Nhanh",
     "amount": "Số tiền",
     "amountPlaceholder": "Nhập số tiền",

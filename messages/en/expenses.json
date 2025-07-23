@@ -203,7 +203,7 @@
     "errorSaving": "An error occurred while saving the goal",
     "errorDeleting": "An error occurred while deleting the goal"
   },
-  "QuickTransactionForm": {
+  "UnifiedTransactionForm": {
     "title": "Quick Transaction",
     "amount": "Amount",
     "amountPlaceholder": "Enter amount",

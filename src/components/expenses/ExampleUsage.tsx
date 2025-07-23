@@ -3,7 +3,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { EnhancedQuickTransactionForm } from './EnhancedQuickTransactionForm'
+import { UnifiedTransactionForm } from './UnifiedTransactionForm'
 import { TransactionsList } from './TransactionsList'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -124,7 +124,7 @@ export function ExampleUsage() {
 
         <TabsContent value="form" className="space-y-4">
           {showForm ? (
-            <EnhancedQuickTransactionForm
+            <UnifiedTransactionForm
               wallets={mockWallets}
               expenseCategories={mockExpenseCategories}
               incomeCategories={mockIncomeCategories}
@@ -132,6 +132,7 @@ export function ExampleUsage() {
               onCancel={() => setShowForm(false)}
               userId="mock-user-id"
               defaultQuickMode={true}
+              defaultAiMode={false}
             />
           ) : (
             <Card>
@@ -163,13 +164,14 @@ export function ExampleUsage() {
               <div>
                 <h4 className="font-medium">Basic Usage:</h4>
                 <pre className="bg-muted p-3 rounded mt-1 text-xs overflow-x-auto">
-{`<EnhancedQuickTransactionForm
+{`<UnifiedTransactionForm
   wallets={wallets}
   expenseCategories={expenseCategories}
   incomeCategories={incomeCategories}
   onSuccess={() => refreshTransactions()}
   userId={user.id}
   defaultQuickMode={true}
+  defaultAiMode={false}
 />`}
                 </pre>
               </div>

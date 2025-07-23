@@ -8,9 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { QuickTransactionForm } from "./QuickTransactionForm";
-import { EnhancedQuickTransactionForm } from "./EnhancedQuickTransactionForm";
-import { IntelligentTransactionForm } from "./IntelligentTransactionForm";
+import { UnifiedTransactionForm } from "./UnifiedTransactionForm";
 import { TransactionsList } from "./TransactionsList";
 import {
   Wallet,
@@ -108,11 +106,20 @@ export function ExpenseTrackingDashboard({
     initialData.currentBudgets
   );
   
-  // Form selection state
-  const [formMode, setFormMode] = useState<'basic' | 'enhanced' | 'intelligent'>('enhanced');
-  const [showFormSelector, setShowFormSelector] = useState(false);
+  // Form display state
+  const [showFormSettings, setShowFormSettings] = useState(false);
   const [showBalances, setShowBalances] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Helper function to check if date is in current month
+  const isThisMonth = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    return (
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  };
 
   // Calculate summary stats
   const totalBalance = wallets.reduce((sum, wallet) => sum + wallet.balance, 0);
@@ -127,15 +134,6 @@ export function ExpenseTrackingDashboard({
     )
     .reduce((sum, t) => sum + t.amount, 0);
   const netIncome = thisMonthIncome - thisMonthExpenses;
-
-  const isThisMonth = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    return (
-      date.getMonth() === now.getMonth() &&
-      date.getFullYear() === now.getFullYear()
-    );
-  };
 
   const refreshData = async () => {
     setIsRefreshing(true);
@@ -177,10 +175,31 @@ export function ExpenseTrackingDashboard({
             {t("description")}
           </p>
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowBalances(!showBalances)}
+          className="flex items-center gap-2"
+        >
+          {showBalances ? (
+            <>
+              <EyeOff className="h-4 w-4" />
+              Hide Stats
+            </>
+          ) : (
+            <>
+              <Eye className="h-4 w-4" />
+              Show Stats
+            </>
+          )}
+        </Button>
       </div>
 
-      {/* Quick Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Quick Stats Cards - Collapsible */}
+      <div className={cn(
+        "grid gap-4 md:grid-cols-2 lg:grid-cols-4 transition-all duration-300",
+        showBalances ? "h-auto opacity-100" : "h-16 opacity-60 overflow-hidden"
+      )}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -270,140 +289,33 @@ export function ExpenseTrackingDashboard({
         </Card>
       </div>
 
-      {/* Main Dashboard Grid */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left Column */}
-        <div className="space-y-6">
-          {/* Smart Transaction Form Selector */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {formMode === 'basic' && <Plus className="h-5 w-5 text-blue-500" />}
-                  {formMode === 'enhanced' && <Zap className="h-5 w-5 text-amber-500" />}
-                  {formMode === 'intelligent' && <Brain className="h-5 w-5 text-purple-500" />}
-                  <CardTitle>
-                    {formMode === 'basic' && 'Quick Entry'}
-                    {formMode === 'enhanced' && 'Enhanced Entry'}
-                    {formMode === 'intelligent' && 'Smart AI Entry'}
-                  </CardTitle>
-                  {formMode === 'intelligent' && (
-                    <Badge variant="secondary" className="ml-2">
-                      <Sparkles className="h-3 w-3 mr-1" />
-                      AI Powered
-                    </Badge>
-                  )}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowFormSelector(!showFormSelector)}
-                >
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              {/* Form Mode Selector */}
-              {showFormSelector && (
-                <div className="pt-3 border-t">
-                  <div className="flex gap-2 mb-3">
-                    <Button
-                      variant={formMode === 'basic' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => {setFormMode('basic'); setShowFormSelector(false)}}
-                      className="flex-1"
-                    >
-                      <Plus className="h-3 w-3 mr-1" />
-                      Basic
-                    </Button>
-                    <Button
-                      variant={formMode === 'enhanced' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => {setFormMode('enhanced'); setShowFormSelector(false)}}
-                      className="flex-1"
-                    >
-                      <Zap className="h-3 w-3 mr-1" />
-                      Enhanced
-                    </Button>
-                    <Button
-                      variant={formMode === 'intelligent' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => {setFormMode('intelligent'); setShowFormSelector(false)}}
-                      className="flex-1"
-                    >
-                      <Brain className="h-3 w-3 mr-1" />
-                      AI Smart
-                    </Button>
-                  </div>
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    {formMode === 'basic' && <p>• Simple transaction entry form</p>}
-                    {formMode === 'enhanced' && (
-                      <>
-                        <p>• Quick mode with keyboard shortcuts</p>
-                        <p>• Smart tag suggestions</p>
-                      </>
-                    )}
-                    {formMode === 'intelligent' && (
-                      <>
-                        <p>• AI-powered auto-complete</p>
-                        <p>• Smart category prediction</p>
-                        <p>• Amount suggestions based on history</p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-            </CardHeader>
-            
-            <CardContent className="pt-0">
-              {/* Render appropriate form based on selection */}
-              {formMode === 'basic' && (
-                <QuickTransactionForm
-                  wallets={wallets}
-                  expenseCategories={initialData.expenseCategories}
-                  incomeCategories={initialData.incomeCategories}
-                  onSuccess={handleTransactionSuccess}
-                  className="border-0 shadow-none p-0"
-                />
-              )}
-              
-              {formMode === 'enhanced' && (
-                <EnhancedQuickTransactionForm
-                  wallets={wallets}
-                  expenseCategories={initialData.expenseCategories}
-                  incomeCategories={initialData.incomeCategories}
-                  onSuccess={handleTransactionSuccess}
-                  userId={userId}
-                  defaultQuickMode={true}
-                  className="border-0 shadow-none p-0"
-                />
-              )}
-              
-              {formMode === 'intelligent' && (
-                <IntelligentTransactionForm
-                  wallets={wallets}
-                  expenseCategories={initialData.expenseCategories}
-                  incomeCategories={initialData.incomeCategories}
-                  onSuccess={handleTransactionSuccess}
-                  userId={userId}
-                  quickMode={true}
-                  className="border-0 shadow-none p-0"
-                />
-              )}
-            </CardContent>
-          </Card>
+      {/* Main Dashboard Grid - Redesigned for Form Focus */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Left Column - Transaction Form (Priority) */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Unified Transaction Form */}
+          <UnifiedTransactionForm
+            wallets={wallets}
+            expenseCategories={initialData.expenseCategories}
+            incomeCategories={initialData.incomeCategories}
+            onSuccess={handleTransactionSuccess}
+            userId={userId}
+            defaultQuickMode={true}
+            defaultAiMode={false}
+            className="border-0 shadow-none"
+          />
 
-          {/* Wallets Overview */}
+        </div>
+
+        {/* Right Column - Compact Sidebar */}
+        <div className="space-y-4">
+          {/* Compact Wallets Overview */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Wallet className="h-5 w-5" />
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Wallet className="h-4 w-4" />
                 {tWallets("title")}
               </CardTitle>
-              <Button variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-1" />
-                {tWallets("list.addNew")}
-              </Button>
             </CardHeader>
             <CardContent>
               {wallets.length === 0 ? (
@@ -520,10 +432,6 @@ export function ExpenseTrackingDashboard({
               </CardContent>
             </Card>
           )}
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-6">
           {/* Recent Transactions */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">

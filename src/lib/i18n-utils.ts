@@ -135,7 +135,7 @@ export function validateNamespaceMessages(
         case 'scenarios':
           return ['ScenarioComparisonTable', 'ScenarioParameterEditor', 'InteractiveParameterSliders', 'ScenarioChart', 'ScenarioComparison', 'CreateScenarioModal', 'ExportScenarios', 'ScenarioCommon', 'SmartScenarios', 'AIAnalysisModal'].includes(key);
         case 'expenses':
-          return ['BudgetManager', 'ExpenseAnalytics', 'ExpenseTrackingDashboard', 'GamificationCenter', 'GoalManager', 'QuickTransactionForm', 'TransactionsList', 'ExpenseCommon', 'Wallets'].includes(key);
+          return ['BudgetManager', 'ExpenseAnalytics', 'ExpenseTrackingDashboard', 'GamificationCenter', 'GoalManager', 'UnifiedTransactionForm', 'TransactionsList', 'ExpenseCommon', 'Wallets'].includes(key);
         default:
           return false;
       }
