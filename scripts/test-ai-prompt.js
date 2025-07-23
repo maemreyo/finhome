@@ -17,22 +17,68 @@ const CONFIG = {
   MAX_RETRIES: 3,
   RETRY_DELAY: 1000, // ms
   TIMEOUT: 10000, // ms
+  
+  // Authentication - Updated with fresh token
+  // AUTH_TOKEN: 'eyJhbGciOiJIUzI1NiIsImtpZCI6IjBiTlFMYW1mN2R2eXlBRlUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2d2aWZzZ252dndlcXZ2dHh3cHJzLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0NTdjYzE1Yy00ZDVkLTQwYzYtODJlNy0wODE0Yjc1ZGRhMTYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUzMjY0NTM1LCJpYXQiOjE3NTMyNjA5MzUsImVtYWlsIjoibmdvbmh1dGhhbmh0cnVuZzE0MDlAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6Im5nb25odXRoYW5odHJ1bmcxNDA5QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJNYXR0aGV3IE5nbyIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiNDU3Y2MxNWMtNGQ1ZC00MGM2LTgyZTctMDgxNGI3NWRkYTE2In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NTI4MzczMTl9XSwic2Vzc2lvbl9pZCI6IjNjY2U1Y2E1LTZjNDYtNGU0NS05ODg2LTE5ZTlhNDgwZTlkNyIsImlzX2Fub255bW91cyI6ZmFsc2V9.oj1nbI0VlOHU9mnc1vnuRLYwQJWrwBU5GlnJpoV85z4'
 };
 
 // Utility functions
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Function to extract token from browser cookie
+const extractTokenFromCookie = (cookieString) => {
+  try {
+    // The cookie contains base64 encoded JSON
+    const base64Token = cookieString.split('base64-')[1];
+    if (!base64Token) throw new Error('No base64 token found');
+    
+    const decoded = Buffer.from(base64Token, 'base64').toString();
+    const tokenData = JSON.parse(decoded);
+    console.log("ACCESS_TOKEN FOUND!", tokenData.access_token);
+    return tokenData.access_token;
+  } catch (error) {
+    console.warn('Failed to extract token from cookie:', error.message);
+    return null;
+  }
+};
+
+// Function to get authentication headers
+const getAuthHeaders = () => {
+  // Option 1: Use token from environment variable
+  if (process.env.AUTH_TOKEN) {
+    return { 'Authorization': `Bearer ${process.env.AUTH_TOKEN}` };
+  }
+  
+  // Option 2: Use token from config (you need to update this manually)
+  if (CONFIG.AUTH_TOKEN) {
+    return { 'Authorization': `Bearer ${CONFIG.AUTH_TOKEN}` };
+  }
+  
+  // Option 3: Extract from browser cookie (if you pass it as env var)
+  if (process.env.BROWSER_COOKIE) {
+    const token = extractTokenFromCookie(process.env.BROWSER_COOKIE);
+    if (token) {
+      return { 'Authorization': `Bearer ${token}` };
+    }
+  }
+  
+  throw new Error('No authentication token available. Please set AUTH_TOKEN environment variable or update CONFIG.AUTH_TOKEN');
+};
 
 const makeApiRequest = async (text, userPreferences = {}) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
 
   try {
+    const authHeaders = getAuthHeaders();
+    
     const response = await fetch(CONFIG.API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Note: In real implementation, you'd need to handle authentication
-        // For testing, you might need to set up test user credentials
+        'Accept': '*/*',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
+        ...authHeaders
       },
       body: JSON.stringify({
         text,
@@ -44,7 +90,22 @@ const makeApiRequest = async (text, userPreferences = {}) => {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorBody = await response.text();
+        if (errorBody) {
+          errorMessage += ` - ${errorBody}`;
+        }
+      } catch (e) {
+        // Ignore error parsing error body
+      }
+      
+      // Special handling for 401 errors
+      if (response.status === 401) {
+        errorMessage += '\n\nAuthentication failed. Please:\n1. Update AUTH_TOKEN in config\n2. Set AUTH_TOKEN environment variable\n3. Or pass BROWSER_COOKIE environment variable';
+      }
+      
+      throw new Error(errorMessage);
     }
 
     return await response.json();
@@ -235,7 +296,7 @@ const runSingleTest = async (testCase, retryCount = 0) => {
     return result;
 
   } catch (error) {
-    if (retryCount < CONFIG.MAX_RETRIES) {
+    if (retryCount < CONFIG.MAX_RETRIES && !error.message.includes('401')) {
       console.log(`Test ${testCase.id} failed, retrying... (${retryCount + 1}/${CONFIG.MAX_RETRIES})`);
       await sleep(CONFIG.RETRY_DELAY);
       return runSingleTest(testCase, retryCount + 1);

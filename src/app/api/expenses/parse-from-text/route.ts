@@ -399,7 +399,8 @@ export async function POST(request: NextRequest) {
         allCategories,
         wallets,
         validatedData,
-        user
+        user,
+        supabase
       })
     } else {
       // Non-streaming fallback
@@ -528,10 +529,11 @@ async function handleStreamingResponse(
     allCategories: any[],
     wallets: any[],
     validatedData: any,
-    user: any
+    user: any,
+    supabase: any
   }
 ) {
-  const { allCategories, wallets, validatedData, user } = context
+  const { allCategories, wallets, validatedData, user, supabase } = context
   
   // Create a ReadableStream for server-sent events
   const stream = new ReadableStream({
