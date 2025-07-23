@@ -6,11 +6,13 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { getHours, format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
@@ -23,8 +25,10 @@ import { useTranslations } from 'next-intl'
 import { ReceiptImageUpload, ReceiptImage } from '@/components/ui/receipt-image-upload'
 import { useIntelligentSuggestions } from '@/hooks/useIntelligentSuggestions'
 import { useTagSuggestions } from '@/hooks/useTagSuggestions'
+import { useRecentTransactions } from '@/hooks/useRecentTransactions'
 import { ConversationalTransactionDialog } from './ConversationalTransactionDialog'
 import { SkeletonTransactionLoader } from '@/components/ui/skeleton-transaction-loader'
+import { OnboardingHelper } from './OnboardingHelper'
 import { 
   Calculator, 
   Camera, 
@@ -50,7 +54,14 @@ import {
   Settings,
   MessageCircle,
   Send,
-  Loader2
+  Loader2,
+  Coffee,
+  Utensils,
+  Sun,
+  Moon,
+  AlertCircle,
+  HelpCircle,
+  RefreshCw
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -145,6 +156,18 @@ export function UnifiedTransactionForm({
   const [streamingStatus, setStreamingStatus] = useState('')
   const [streamingProgress, setStreamingProgress] = useState<{ current: number; estimated: number } | null>(null)
   
+  // Error handling state
+  const [parsingError, setParsingError] = useState<{
+    type: 'parsing_failed' | 'network_error' | 'no_transactions' | 'ai_unavailable'
+    message: string
+    suggestions: string[]
+    canRetry: boolean
+  } | null>(null)
+  
+  // Onboarding state
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false)
+  
   // Receipt and OCR state
   const [receiptImages, setReceiptImages] = useState<ReceiptImage[]>([])
   const [isProcessingOCR, setIsProcessingOCR] = useState(false)
@@ -195,6 +218,19 @@ export function UnifiedTransactionForm({
     addTagToSuggestions, 
     getFilteredSuggestions 
   } = useTagSuggestions({ userId })
+
+  // Hook for recent transactions and personalized suggestions
+  const {
+    recentTransactions,
+    loading: recentTransactionsLoading,
+    getPersonalizedSuggestions,
+    getSmartDefaults,
+    isSimilarToRecent,
+    hasRecentTransactions
+  } = useRecentTransactions({ 
+    userId, 
+    enabled: conversationalMode 
+  })
 
   // Update transaction type state when form changes
   useEffect(() => {
@@ -275,6 +311,38 @@ export function UnifiedTransactionForm({
     }
   }, [currentTransactionType, aiMode, getAmountSuggestions])
 
+  // Check if user should see onboarding
+  useEffect(() => {
+    // Show onboarding if:
+    // 1. Conversational mode is enabled for the first time
+    // 2. User has no recent transactions (first-time user)
+    // 3. User hasn't seen onboarding before (stored in localStorage)
+    
+    const hasSeenOnboardingKey = `finhome_onboarding_seen_${userId}`
+    const hasSeenBefore = localStorage.getItem(hasSeenOnboardingKey) === 'true'
+    
+    setHasSeenOnboarding(hasSeenBefore)
+    
+    if (conversationalMode && !hasSeenBefore && !hasRecentTransactions && !recentTransactionsLoading) {
+      // Small delay to let the UI settle
+      setTimeout(() => setShowOnboarding(true), 500)
+    }
+  }, [conversationalMode, hasRecentTransactions, recentTransactionsLoading, userId])
+
+  // Handle onboarding completion
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false)
+    const hasSeenOnboardingKey = `finhome_onboarding_seen_${userId}`
+    localStorage.setItem(hasSeenOnboardingKey, 'true')
+    setHasSeenOnboarding(true)
+  }
+
+  // Handle onboarding example click
+  const handleOnboardingExampleClick = (example: string) => {
+    setConversationalText(example)
+    // Don't auto-submit, let user trigger it manually for better control
+  }
+
   const handleQuickAmount = (amount: number) => {
     const currentAmount = getValues('amount') || 0
     setValue('amount', currentAmount + amount)
@@ -307,13 +375,23 @@ export function UnifiedTransactionForm({
   // Handle conversational text parsing with streaming support
   const handleConversationalSubmit = async () => {
     if (!conversationalText.trim()) {
-      toast.error('Please enter some text to analyze')
+      setParsingError({
+        type: 'no_transactions',
+        message: 'Hãy nhập nội dung để AI phân tích.',
+        suggestions: [
+          'Mô tả giao dịch của bạn bằng tiếng Việt',
+          'Ví dụ: "ăn trưa 50k" hoặc "nhận lương 15tr"',
+          'Bao gồm số tiền và hoạt động'
+        ],
+        canRetry: false
+      })
       return
     }
 
     setIsParsingText(true)
     setStreamingTransactions([])
     setStreamingStatus('Starting AI analysis...')
+    setParsingError(null) // Clear previous errors
     
     try {
       const response = await fetch('/api/expenses/parse-from-text', {
@@ -333,7 +411,8 @@ export function UnifiedTransactionForm({
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to parse text')
+        const errorMessage = errorData.error || 'Failed to parse text'
+        throw new Error(errorMessage)
       }
 
       // Handle streaming response
@@ -352,7 +431,11 @@ export function UnifiedTransactionForm({
       }
     } catch (error) {
       console.error('Error parsing conversational text:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to parse your message')
+      const errorFeedback = createErrorFeedback(error, conversationalText)
+      setParsingError(errorFeedback)
+      
+      // Still show toast for immediate feedback, but Alert provides more guidance
+      toast.error('AI parsing failed - see guidance below')
     } finally {
       setIsParsingText(false)
     }
@@ -726,6 +809,250 @@ export function UnifiedTransactionForm({
     )
   }
 
+  // Generate dynamic conversational examples based on time of day and user patterns
+  const getDynamicConversationalExamples = () => {
+    const currentHour = getHours(new Date())
+    const personalizedSuggestions = hasRecentTransactions ? getPersonalizedSuggestions() : []
+    
+    // Start with time-based suggestions
+    let timeBasedSuggestions = []
+    
+    // Morning (6AM - 11AM)
+    if (currentHour >= 6 && currentHour < 11) {
+      timeBasedSuggestions = [
+        {
+          text: "cà phê sáng 25k",
+          icon: Coffee,
+          color: "text-amber-600",
+          type: "time_based"
+        },
+        {
+          text: "ăn sáng phở 45k",
+          icon: Utensils,
+          color: "text-orange-600",
+          type: "time_based"
+        },
+        {
+          text: "đổ xăng đi làm 200k",
+          icon: Target,
+          color: "text-blue-600",
+          type: "time_based"
+        }
+      ]
+    }
+    // Lunch time (11AM - 2PM)
+    else if (currentHour >= 11 && currentHour < 14) {
+      timeBasedSuggestions = [
+        {
+          text: "cơm trưa văn phòng 50k",
+          icon: Utensils,
+          color: "text-green-600",
+          type: "time_based"
+        },
+        {
+          text: "gọi món trà sữa 35k",
+          icon: Coffee,
+          color: "text-pink-600",
+          type: "time_based"
+        },
+        {
+          text: "taxi về nhà 80k",
+          icon: Target,
+          color: "text-blue-600",
+          type: "time_based"
+        }
+      ]
+    }
+    // Afternoon (2PM - 6PM)
+    else if (currentHour >= 14 && currentHour < 18) {
+      timeBasedSuggestions = [
+        {
+          text: "mua sắm tạp hóa 150k",
+          icon: Target,
+          color: "text-purple-600",
+          type: "time_based"
+        },
+        {
+          text: "cà phê chiều với đồng nghiệp 40k",
+          icon: Coffee,
+          color: "text-amber-600",
+          type: "time_based"
+        },
+        {
+          text: "nhận thưởng dự án 2 triệu",
+          icon: TrendingUp,
+          color: "text-green-600",
+          type: "time_based"
+        }
+      ]
+    }
+    // Evening/Night (6PM - 12AM)
+    else {
+      timeBasedSuggestions = [
+        {
+          text: "ăn tối gia đình 200k",
+          icon: Moon,
+          color: "text-indigo-600",
+          type: "time_based"
+        },
+        {
+          text: "xem phim rạp 120k",
+          icon: Target,
+          color: "text-red-600",
+          type: "time_based"
+        },
+        {
+          text: "nhận lương tháng 15 triệu",
+          icon: TrendingUp,
+          color: "text-green-600",
+          type: "time_based"
+        }
+      ]
+    }
+
+    // Convert personalized suggestions to the same format
+    const personalizedConverted = personalizedSuggestions.slice(0, 2).map(suggestion => ({
+      text: suggestion.text,
+      icon: suggestion.icon === '🔄' ? History : 
+            suggestion.icon === '🏪' ? Target : 
+            suggestion.icon === '💰' ? TrendingUp : History,
+      color: "text-purple-600",
+      type: "personalized",
+      frequency: suggestion.frequency,
+      confidence: suggestion.confidence
+    }))
+
+    // Merge suggestions: prioritize personalized if available, then time-based
+    const allSuggestions = []
+    
+    // Add personalized suggestions first (highest priority)
+    if (personalizedConverted.length > 0) {
+      allSuggestions.push(...personalizedConverted)
+    }
+    
+    // Add time-based suggestions to fill remaining slots
+    const remainingSlots = 3 - allSuggestions.length
+    allSuggestions.push(...timeBasedSuggestions.slice(0, remainingSlots))
+
+    return allSuggestions
+  }
+
+  // Helper function to create constructive error messages
+  const createErrorFeedback = (error: any, inputText: string) => {
+    const baseExamples = [
+      "ăn phở 50k",
+      "mua sách 150k", 
+      "nhận lương 15 triệu",
+      "taxi 80k"
+    ]
+
+    // Network or server errors
+    if (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) {
+      return {
+        type: 'network_error' as const,
+        message: 'Không thể kết nối đến AI. Hãy kiểm tra kết nối mạng.',
+        suggestions: [
+          'Kiểm tra kết nối internet của bạn',
+          'Thử lại sau vài giây',
+          'Hoặc sử dụng form thủ công bên dưới'
+        ],
+        canRetry: true
+      }
+    }
+
+    // AI service unavailable
+    if (error.message?.includes('AI service') || error.message?.includes('500')) {
+      return {
+        type: 'ai_unavailable' as const,
+        message: 'Dịch vụ AI tạm thời không khả dụng.',
+        suggestions: [
+          'Hệ thống AI đang được bảo trì',
+          'Hãy thử lại sau vài phút',
+          'Hoặc nhập giao dịch thủ công'
+        ],
+        canRetry: true
+      }
+    }
+
+    // No transactions found
+    if (error.message?.includes('No transactions found') || error.message?.includes('not found')) {
+      const dynamicExamples = getDynamicConversationalExamples()
+      return {
+        type: 'no_transactions' as const,
+        message: 'AI không tìm thấy giao dịch nào trong văn bản của bạn.',
+        suggestions: [
+          `Thử diễn đạt rõ ràng hơn: "${dynamicExamples[0]?.text}"`,
+          'Bao gồm số tiền và mô tả hoạt động',
+          'Ví dụ tốt: "ăn trưa 50k" hoặc "nhận lương 15tr"',
+          'Tránh từ ngữ mơ hồ như "chi tiêu vặt"'
+        ],
+        canRetry: true
+      }
+    }
+
+    // Generic parsing failure
+    return {
+      type: 'parsing_failed' as const,
+      message: 'AI gặp khó khăn hiểu ý bạn.',
+      suggestions: [
+        'Thử viết đơn giản hơn: "ăn phở 45k"',
+        'Bao gồm số tiền rõ ràng: "25k", "150 nghìn", "2tr"',
+        'Mô tả hoạt động cụ thể: "mua sắm", "ăn uống", "đi lại"',
+        'Hoặc chuyển sang nhập thủ công'
+      ],
+      canRetry: true
+    }
+  }
+
+  // Retry parsing with the same text
+  const retryParsing = () => {
+    setParsingError(null)
+    handleConversationalSubmit()
+  }
+
+  // Switch to manual entry mode
+  const switchToManualEntry = () => {
+    setParsingError(null)
+    setConversationalMode(false)
+    toast.info('Đã chuyển sang chế độ nhập thủ công')
+  }
+
+  // Get time-based greeting and context
+  const getTimeBasedContext = () => {
+    const currentHour = getHours(new Date())
+    const timeOfDay = format(new Date(), 'HH:mm')
+    
+    if (currentHour >= 6 && currentHour < 11) {
+      return {
+        greeting: "Good morning!",
+        context: "Start your day by tracking morning expenses",
+        icon: Sun,
+        color: "text-amber-500"
+      }
+    } else if (currentHour >= 11 && currentHour < 14) {
+      return {
+        greeting: "Lunch time!",
+        context: "Don't forget to log your lunch expenses",
+        icon: Utensils,
+        color: "text-green-500"
+      }
+    } else if (currentHour >= 14 && currentHour < 18) {
+      return {
+        greeting: "Good afternoon!",
+        context: "Track your afternoon activities",
+        icon: Sun,
+        color: "text-orange-500"
+      }
+    } else {
+      return {
+        greeting: "Good evening!",
+        context: "Wind down by recording today's transactions",
+        icon: Moon,
+        color: "text-indigo-500"
+      }
+    }
+  }
+
   return (
     <Card className={cn("w-full max-w-md mx-auto", quickMode && "shadow-sm", className)}>
       <CardHeader className={cn("pb-3", quickMode && "pb-2 pt-4")}>
@@ -802,6 +1129,18 @@ export function UnifiedTransactionForm({
                 <Badge variant="secondary" className="text-xs">
                   NEW
                 </Badge>
+                {conversationalMode && !hasSeenOnboarding && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowOnboarding(true)}
+                    className="text-xs h-5 px-2 ml-2"
+                  >
+                    <HelpCircle className="h-3 w-3 mr-1" />
+                    Help
+                  </Button>
+                )}
               </div>
             </div>
             
@@ -857,10 +1196,25 @@ export function UnifiedTransactionForm({
               <Label className="text-sm font-medium flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 text-blue-500" />
                 Tell me about your transactions
+                {(() => {
+                  const timeContext = getTimeBasedContext()
+                  const IconComponent = timeContext.icon
+                  return (
+                    <div className="flex items-center gap-1 ml-auto">
+                      <IconComponent className={cn("h-3 w-3", timeContext.color)} />
+                      <span className={cn("text-xs", timeContext.color)}>
+                        {timeContext.greeting}
+                      </span>
+                    </div>
+                  )
+                })()}
               </Label>
               <div className="relative">
                 <Textarea
-                  placeholder="Example: 'tiêu 25k trà sữa với bạn bè' or 'hôm nay được thưởng 5 triệu, sếp thật tuyệt vời' or 'ăn sáng phở 40k, đổ xăng 50k, và nhận lương 15tr'"
+                  placeholder={(() => {
+                    const examples = getDynamicConversationalExamples()
+                    return `Try: "${examples[0].text}" or describe multiple transactions naturally`
+                  })()}
                   value={conversationalText}
                   onChange={(e) => setConversationalText(e.target.value)}
                   className="min-h-[100px] pr-12 resize-none"
@@ -894,6 +1248,63 @@ export function UnifiedTransactionForm({
               </kbd>
             </div>
 
+            {/* Enhanced Error Feedback */}
+            {parsingError && (
+              <Alert variant={parsingError.type === 'network_error' ? 'destructive' : 'default'} className="border-orange-200 bg-orange-50">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="font-medium text-orange-800 mb-2">{parsingError.message}</p>
+                      <div className="text-sm text-orange-700">
+                        <p className="mb-2 font-medium">Hãy thử:</p>
+                        <ul className="space-y-1 list-disc list-inside">
+                          {parsingError.suggestions.map((suggestion, index) => (
+                            <li key={index}>{suggestion}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 pt-2 border-t border-orange-200">
+                      {parsingError.canRetry && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={retryParsing}
+                          disabled={isParsingText}
+                          className="text-orange-700 border-orange-300 hover:bg-orange-100"
+                        >
+                          <RefreshCw className="h-3 w-3 mr-1" />
+                          Thử lại
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={switchToManualEntry}
+                        className="text-orange-700 border-orange-300 hover:bg-orange-100"
+                      >
+                        <Settings className="h-3 w-3 mr-1" />
+                        Nhập thủ công
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setParsingError(null)}
+                        className="text-orange-600 hover:bg-orange-100 ml-auto"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* Show streaming progress when parsing */}
             {isParsingText && (
               <div className="mt-4">
@@ -905,27 +1316,73 @@ export function UnifiedTransactionForm({
               </div>
             )}
 
-            {/* Example suggestions */}
+            {/* Dynamic personalized and time-based example suggestions */}
             <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Try these examples:</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {hasRecentTransactions ? 'Personalized for you:' : 'Perfect for now:'}
+                </p>
+                {hasRecentTransactions ? (
+                  <Brain className="h-3 w-3 text-purple-500" />
+                ) : (
+                  <>
+                    <Clock className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(), 'HH:mm')}
+                    </span>
+                  </>
+                )}
+                {recentTransactionsLoading && (
+                  <div className="w-3 h-3 border border-purple-200 border-t-purple-500 rounded-full animate-spin" />
+                )}
+              </div>
               <div className="grid grid-cols-1 gap-2">
-                {[
-                  "tiêu 25k trà sữa với bạn bè",
-                  "hôm nay được thưởng 5 triệu, sếp thật tuyệt vời", 
-                  "ăn sáng phở 40k, đổ xăng 50k, và nhận lương 15tr"
-                ].map((example, index) => (
-                  <Button
-                    key={index}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setConversationalText(example)}
-                    className="justify-start text-left h-auto py-2 px-3 text-xs whitespace-normal"
-                  >
-                    <MessageCircle className="h-3 w-3 mr-2 flex-shrink-0" />
-                    "{example}"
-                  </Button>
-                ))}
+                {getDynamicConversationalExamples().map((example, index) => {
+                  const IconComponent = example.icon
+                  const isPersonalized = example.type === 'personalized'
+                  
+                  return (
+                    <Button
+                      key={index}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setConversationalText(example.text)}
+                      className={cn(
+                        "justify-start text-left h-auto py-2 px-3 text-xs whitespace-normal transition-all duration-200",
+                        isPersonalized 
+                          ? "border-purple-200 bg-purple-50 hover:bg-purple-100 hover:border-purple-300" 
+                          : "border-dashed hover:border-solid"
+                      )}
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <IconComponent className={cn("h-3 w-3 flex-shrink-0", example.color)} />
+                        <div className="flex-1">
+                          <span className="text-muted-foreground">"</span>
+                          <span>{example.text}</span>
+                          <span className="text-muted-foreground">"</span>
+                        </div>
+                        {isPersonalized && (
+                          <div className="flex items-center gap-1 ml-2">
+                            <Badge variant="secondary" className="text-xs px-1 h-4">
+                              <History className="h-2 w-2 mr-0.5" />
+                              {example.frequency}x
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+                    </Button>
+                  )
+                })}
+              </div>
+              <div className="text-xs text-muted-foreground text-center pt-1 border-t border-dashed">
+                <p className="flex items-center justify-center gap-1">
+                  <Sparkles className="h-3 w-3" />
+                  {hasRecentTransactions 
+                    ? 'AI learns from your patterns and suggests based on time of day'
+                    : 'Examples change based on time of day for better relevance'
+                  }
+                </p>
               </div>
             </div>
 
@@ -1535,6 +1992,15 @@ export function UnifiedTransactionForm({
           onConfirm={handleConfirmedTransactions}
           onCorrection={handleCorrection}
           originalText={conversationalText}
+        />
+
+        {/* First-Time User Onboarding Helper */}
+        <OnboardingHelper
+          isVisible={showOnboarding}
+          onClose={handleOnboardingComplete}
+          onExampleClick={handleOnboardingExampleClick}
+          userHasTransactions={hasRecentTransactions}
+          currentMode={conversationalMode ? 'conversational' : 'traditional'}
         />
       </CardContent>
     </Card>

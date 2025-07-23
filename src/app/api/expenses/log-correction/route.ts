@@ -113,8 +113,8 @@ async function createLearningPattern(
     const { original_suggestion, corrected_data, input_text } = correctionData
 
     // Determine pattern type based on correction
-    let patternType = 'merchant_category'
-    let triggerText = input_text.toLowerCase()
+    const patternType = 'merchant_category'
+    const triggerText = input_text.toLowerCase()
 
     // Extract meaningful keywords from input text
     const keywords = extractKeywords(input_text)

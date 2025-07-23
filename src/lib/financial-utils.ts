@@ -230,7 +230,7 @@ export function parseVietnameseCurrency(input: string): number {
   if (!input) return 0;
   
   // Remove currency symbols and normalize
-  let cleaned = input
+  const cleaned = input
     .replace(/[₫,.\s]/g, '')
     .replace(/tỷ/g, '000000000')
     .replace(/triệu/g, '000000')

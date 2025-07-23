@@ -555,7 +555,7 @@ async function handleStreamingResponse(
 
         let accumulatedText = ''
         let transactionBuffer = ''
-        let currentTransaction: any = null
+        const currentTransaction: any = null
         let transactionsFound = 0
 
         // Process each chunk from the stream

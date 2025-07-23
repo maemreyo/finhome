@@ -194,7 +194,7 @@ export class OnboardingService {
       }
 
       // Try new onboarding_progress column first
-      let updateData: any = {}
+      const updateData: any = {}
       
       if (preferences && 'onboarding_progress' in preferences) {
         // Use the dedicated onboarding_progress column
