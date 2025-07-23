@@ -69,7 +69,5 @@ FROM expense_budgets b;
 -- Grant access to the view
 GRANT SELECT ON budget_overview TO authenticated;
 
--- Create RLS policy for the view
-ALTER TABLE budget_overview ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can view own budget overview" ON budget_overview
-    FOR SELECT USING (auth.uid() = user_id);
+-- Note: Views inherit RLS from underlying tables (expense_budgets)
+-- No need to enable RLS on the view itself

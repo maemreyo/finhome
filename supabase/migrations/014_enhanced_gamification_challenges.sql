@@ -528,7 +528,7 @@ CREATE TRIGGER trigger_check_no_spend_challenges
 
 -- Index for challenge requirement queries
 CREATE INDEX IF NOT EXISTS idx_expense_challenges_requirement_type 
-ON expense_challenges USING GIN ((requirement_description->>'type'));
+ON expense_challenges ((requirement_description->>'type'));
 
 -- Index for active challenges
 CREATE INDEX IF NOT EXISTS idx_expense_challenges_active_type 
