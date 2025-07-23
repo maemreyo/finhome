@@ -13,6 +13,7 @@ const parseTextSchema = z.object({
     timezone: z.string().optional(),
     currency: z.string().default('VND'),
   }).optional(),
+  stream: z.boolean().default(true), // Enable streaming by default
 })
 
 // Schema for the AI response
@@ -38,14 +39,62 @@ const aiResponseSchema = z.object({
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '')
 
+// Helper function to get relevant categories based on input text
+function getRelevantCategories(inputText: string, allCategories: any[]): any[] {
+  const text = inputText.toLowerCase()
+  const relevantCategories: any[] = []
+  
+  // Keywords mapping for efficient category selection
+  const categoryKeywords = {
+    food_dining: ['ăn', 'uống', 'trà', 'cà phê', 'phở', 'cơm', 'bún', 'quán', 'nhà hàng', 'food', 'drink'],
+    transportation: ['xe', 'grab', 'taxi', 'xăng', 'gas', 'uber', 'bus', 'metro'],
+    shopping: ['mua', 'shopping', 'shopee', 'lazada', 'mall', 'siêu thị'],
+    entertainment: ['phim', 'game', 'net', 'nhậu', 'karaoke', 'bar', 'club', 'giải trí'],
+    healthcare: ['bệnh viện', 'khám', 'thuốc', 'doctor', 'hospital', 'medicine'],
+    education: ['học', 'trường', 'sách', 'school', 'course', 'class'],
+    utilities: ['điện', 'nước', 'internet', 'phone', 'electric', 'water'],
+    salary: ['lương', 'salary', 'thưởng', 'bonus'],
+    investment: ['đầu tư', 'invest', 'stock', 'crypto', 'bitcoin']
+  }
+  
+  // Find categories that match keywords in the text
+  for (const [categoryKey, keywords] of Object.entries(categoryKeywords)) {
+    if (keywords.some(keyword => text.includes(keyword))) {
+      const matchingCategories = allCategories.filter(cat => 
+        cat.category_key === categoryKey || 
+        keywords.some(keyword => 
+          cat.name_vi.toLowerCase().includes(keyword) || 
+          cat.name_en.toLowerCase().includes(keyword)
+        )
+      )
+      relevantCategories.push(...matchingCategories)
+    }
+  }
+  
+  // Always include most common categories as fallback
+  const commonCategories = allCategories.filter(cat => 
+    ['food_dining', 'transportation', 'shopping', 'salary', 'other'].includes(cat.category_key)
+  ).slice(0, 10)
+  
+  // Combine and deduplicate
+  const allRelevant = [...relevantCategories, ...commonCategories]
+  const uniqueCategories = allRelevant.filter((cat, index, self) => 
+    index === self.findIndex(c => c.id === cat.id)
+  )
+  
+  // Limit to 15 most relevant categories to reduce prompt size
+  return uniqueCategories.slice(0, 15)
+}
+
 async function buildAIPrompt(
   inputText: string, 
   categories: any[], 
   wallets: any[], 
   userCorrections: any[] = []
 ): Promise<string> {
-  // Build category mapping for AI reference
-  const categoryMapping = categories.map(cat => ({
+  // Optimize category mapping - only include relevant categories based on input text
+  const relevantCategories = getRelevantCategories(inputText, categories)
+  const categoryMapping = relevantCategories.map(cat => ({
     id: cat.id,
     name_vi: cat.name_vi,
     name_en: cat.name_en,
@@ -53,17 +102,21 @@ async function buildAIPrompt(
     type: cat.category_type || 'expense'
   }))
 
-  // Build wallet mapping
-  const walletMapping = wallets.map(wallet => ({
+  // Optimize wallet mapping - limit to essential info
+  const walletMapping = wallets.slice(0, 5).map(wallet => ({
     id: wallet.id,
     name: wallet.name,
     type: wallet.wallet_type
   }))
 
-  // Build user correction context
-  const correctionContext = userCorrections.length > 0 
-    ? `\nUser Correction History (learn from these patterns):\n${userCorrections.map(c => 
-        `"${c.input_text}" -> ${c.corrected_category} (was: ${c.original_category})`
+  // Build user correction context - limit to most recent and relevant
+  const relevantCorrections = userCorrections
+    .filter(c => c.input_text && c.corrected_category)
+    .slice(0, 5) // Limit to 5 most recent corrections
+  
+  const correctionContext = relevantCorrections.length > 0 
+    ? `\nRecent Corrections (learn from these patterns):\n${relevantCorrections.map(c => 
+        `"${c.input_text.substring(0, 50)}" -> ${c.corrected_category}`
       ).join('\n')}`
     : ''
 
@@ -142,6 +195,7 @@ Remember: Return ONLY the JSON response, no additional text or explanation.`
 
 export async function POST(request: NextRequest) {
   try {
+    console.time('gemini_processing')
     const supabase = await createClient()
     
     // Get authenticated user
@@ -160,6 +214,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     console.log('Parse text request body:', body)
     const validatedData = parseTextSchema.parse(body)
+    
+    // Check if streaming is requested
+    const useStreaming = validatedData.stream !== false // Default to streaming
 
     // Fetch categories (both expense and income) - these are global categories
     const [expenseCategoriesResult, incomeCategoriesResult] = await Promise.all([
@@ -247,21 +304,31 @@ export async function POST(request: NextRequest) {
       userCorrections
     )
 
-    // Call Gemini AI
+    // Call Gemini AI with streaming support
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
     
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.1, // Low temperature for consistent parsing
-        topK: 1,
-        topP: 0.1,
-        maxOutputTokens: 2048,
-      },
-    })
+    if (useStreaming) {
+      return handleStreamingResponse(model, prompt, {
+        allCategories,
+        wallets,
+        validatedData,
+        user
+      })
+    } else {
+      // Non-streaming fallback
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.1, // Low temperature for consistent parsing
+          topK: 1,
+          topP: 0.1,
+          maxOutputTokens: 2048,
+        },
+      })
 
-    const response = await result.response
-    const aiResponseText = response.text()
+      const response = await result.response
+      const aiResponseText = response.text()
+      console.timeEnd('gemini_processing')
 
     // Parse AI response
     let aiParsedData
@@ -332,7 +399,9 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
+    }
   } catch (error) {
+    console.timeEnd('gemini_processing')
     console.error('Parse from text API error:', error)
     
     if (error instanceof z.ZodError) {
@@ -354,4 +423,234 @@ export async function POST(request: NextRequest) {
       message: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
+}
+
+// Streaming response handler
+async function handleStreamingResponse(
+  model: any,
+  prompt: string,
+  context: {
+    allCategories: any[],
+    wallets: any[],
+    validatedData: any,
+    user: any
+  }
+) {
+  const { allCategories, wallets, validatedData, user } = context
+  
+  // Create a ReadableStream for server-sent events
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        // Send initial status
+        controller.enqueue(new TextEncoder().encode(
+          `data: ${JSON.stringify({ type: 'status', message: 'Starting AI analysis...' })}\n\n`
+        ))
+
+        // Start streaming from Gemini
+        const result = await model.generateContentStream({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.1,
+            topK: 1,
+            topP: 0.1,
+            maxOutputTokens: 2048,
+          },
+        })
+
+        let accumulatedText = ''
+        let transactionBuffer = ''
+        let currentTransaction: any = null
+        let transactionsFound = 0
+
+        // Process each chunk from the stream
+        for await (const chunk of result.stream) {
+          const chunkText = chunk.text()
+          accumulatedText += chunkText
+          transactionBuffer += chunkText
+
+          // Try to parse partial transactions as they come in
+          const partialTransactions = extractPartialTransactions(transactionBuffer, allCategories, wallets)
+          
+          if (partialTransactions.length > transactionsFound) {
+            // New complete transaction found
+            const newTransactions = partialTransactions.slice(transactionsFound)
+            transactionsFound = partialTransactions.length
+
+            for (const transaction of newTransactions) {
+              // Send each completed transaction immediately
+              controller.enqueue(new TextEncoder().encode(
+                `data: ${JSON.stringify({ 
+                  type: 'transaction', 
+                  data: transaction,
+                  progress: {
+                    current: transactionsFound,
+                    estimated: Math.max(transactionsFound, estimateTransactionCount(validatedData.text))
+                  }
+                })}\n\n`
+              ))
+            }
+          }
+
+          // Send progress updates
+          if (chunkText.trim()) {
+            controller.enqueue(new TextEncoder().encode(
+              `data: ${JSON.stringify({ 
+                type: 'progress', 
+                message: 'Processing...', 
+                chunk: chunkText.substring(0, 50) + (chunkText.length > 50 ? '...' : '')
+              })}\n\n`
+            ))
+          }
+        }
+
+        console.timeEnd('gemini_processing')
+
+        // Final processing of complete response
+        try {
+          const cleanedResponse = accumulatedText
+            .replace(/```json\n?/g, '')
+            .replace(/```\n?/g, '')
+            .trim()
+          
+          const aiParsedData = JSON.parse(cleanedResponse)
+          const validatedAIResponse = aiResponseSchema.parse(aiParsedData)
+          
+          if (!validatedAIResponse.transactions || validatedAIResponse.transactions.length === 0) {
+            throw new Error('No transactions found in AI response')
+          }
+          
+          // Process any remaining transactions
+          const processedTransactions = validatedAIResponse.transactions.map(transaction => {
+            const matchedCategory = allCategories.find(cat => 
+              cat.id === transaction.suggested_category_id ||
+              cat.name_vi.toLowerCase().includes(transaction.suggested_category_name?.toLowerCase() || '') ||
+              cat.name_en.toLowerCase().includes(transaction.suggested_category_name?.toLowerCase() || '')
+            )
+
+            return {
+              ...transaction,
+              suggested_category_id: matchedCategory?.id || null,
+              suggested_category_name: matchedCategory?.name_vi || transaction.suggested_category_name,
+              suggested_wallet_id: transaction.suggested_wallet_id || wallets[0]?.id || null,
+              parsing_context: {
+                original_text: validatedData.text,
+                processing_timestamp: new Date().toISOString(),
+                user_id: user.id
+              }
+            }
+          })
+
+          // Send final result
+          controller.enqueue(new TextEncoder().encode(
+            `data: ${JSON.stringify({
+              type: 'final',
+              data: {
+                transactions: processedTransactions,
+                analysis_summary: validatedAIResponse.analysis_summary,
+                metadata: {
+                  total_transactions: processedTransactions.length,
+                  processing_time: new Date().toISOString(),
+                  ai_model: "gemini-2.5-flash",
+                  streaming: true
+                }
+              }
+            })}\n\n`
+          ))
+
+        } catch (parseError) {
+          console.error('Failed to parse streaming AI response:', parseError)
+          controller.enqueue(new TextEncoder().encode(
+            `data: ${JSON.stringify({
+              type: 'error',
+              error: 'AI response could not be parsed',
+              details: 'The AI service returned an unexpected format. Please try rephrasing your input.',
+              debug_info: process.env.NODE_ENV === 'development' ? {
+                raw_response: accumulatedText.substring(0, 500),
+                parse_error: parseError instanceof Error ? parseError.message : 'Unknown parsing error'
+              } : undefined
+            })}\n\n`
+          ))
+        }
+
+        // Send completion signal
+        controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'))
+        controller.close()
+
+      } catch (error) {
+        console.timeEnd('gemini_processing')
+        console.error('Streaming error:', error)
+        
+        controller.enqueue(new TextEncoder().encode(
+          `data: ${JSON.stringify({
+            type: 'error',
+            error: 'Streaming failed',
+            message: error instanceof Error ? error.message : 'Unknown streaming error'
+          })}\n\n`
+        ))
+        
+        controller.close()
+      }
+    }
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  })
+}
+
+// Helper function to extract partial transactions from accumulated text
+function extractPartialTransactions(text: string, allCategories: any[], wallets: any[]): any[] {
+  try {
+    // Look for transaction objects in the accumulated text
+    const transactionRegex = /{[^{}]*"transaction_type"[^{}]*}/g
+    const matches = text.match(transactionRegex) || []
+    
+    const validTransactions: any[] = []
+    
+    for (const match of matches) {
+      try {
+        const transaction = JSON.parse(match)
+        if (transaction.transaction_type && transaction.amount && transaction.description) {
+          // Basic validation passed, add to valid transactions
+          validTransactions.push(transaction)
+        }
+      } catch {
+        // Skip invalid JSON
+        continue
+      }
+    }
+    
+    return validTransactions
+  } catch {
+    return []
+  }
+}
+
+// Helper function to estimate transaction count from input text
+function estimateTransactionCount(text: string): number {
+  // Simple heuristic: count common transaction indicators
+  const indicators = [
+    /\d+k/gi,           // amounts like "25k"
+    /\d+\s*triệu/gi,    // amounts like "5 triệu"
+    /\d+tr/gi,          // amounts like "15tr"
+    /tiêu|mua|ăn|uống/gi, // expense keywords
+    /nhận|lương|thưởng/gi, // income keywords
+    /,\s*(?=\w)/g       // commas separating transactions
+  ]
+  
+  let count = 0
+  for (const indicator of indicators) {
+    const matches = text.match(indicator)
+    if (matches) count += matches.length
+  }
+  
+  // Return estimated count (minimum 1, maximum based on heuristics)
+  return Math.max(1, Math.min(Math.ceil(count / 3), 10))
 }

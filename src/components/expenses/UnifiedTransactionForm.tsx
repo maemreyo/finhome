@@ -24,6 +24,7 @@ import { ReceiptImageUpload, ReceiptImage } from '@/components/ui/receipt-image-
 import { useIntelligentSuggestions } from '@/hooks/useIntelligentSuggestions'
 import { useTagSuggestions } from '@/hooks/useTagSuggestions'
 import { ConversationalTransactionDialog } from './ConversationalTransactionDialog'
+import { SkeletonTransactionLoader } from '@/components/ui/skeleton-transaction-loader'
 import { 
   Calculator, 
   Camera, 
@@ -138,6 +139,11 @@ export function UnifiedTransactionForm({
   const [parsedData, setParsedData] = useState<any>(null)
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
   const [corrections, setCorrections] = useState<any[]>([])
+  
+  // Streaming state
+  const [streamingTransactions, setStreamingTransactions] = useState<any[]>([])
+  const [streamingStatus, setStreamingStatus] = useState('')
+  const [streamingProgress, setStreamingProgress] = useState<{ current: number; estimated: number } | null>(null)
   
   // Receipt and OCR state
   const [receiptImages, setReceiptImages] = useState<ReceiptImage[]>([])
@@ -298,7 +304,7 @@ export function UnifiedTransactionForm({
     setValue('tags', newTags)
   }
 
-  // Handle conversational text parsing
+  // Handle conversational text parsing with streaming support
   const handleConversationalSubmit = async () => {
     if (!conversationalText.trim()) {
       toast.error('Please enter some text to analyze')
@@ -306,6 +312,9 @@ export function UnifiedTransactionForm({
     }
 
     setIsParsingText(true)
+    setStreamingTransactions([])
+    setStreamingStatus('Starting AI analysis...')
+    
     try {
       const response = await fetch('/api/expenses/parse-from-text', {
         method: 'POST',
@@ -318,6 +327,7 @@ export function UnifiedTransactionForm({
             default_wallet_id: wallets[0]?.id,
             currency: 'VND',
           },
+          stream: true, // Enable streaming
         }),
       })
 
@@ -326,22 +336,119 @@ export function UnifiedTransactionForm({
         throw new Error(errorData.error || 'Failed to parse text')
       }
 
-      const result = await response.json()
-      
-      if (result.success && result.data) {
-        setParsedData(result.data)
-        setShowConfirmationDialog(true)
-        
-        // Create parsing session log
-        await logParsingSession(result.data, conversationalText)
+      // Handle streaming response
+      if (response.headers.get('content-type')?.includes('text/event-stream')) {
+        await handleStreamingResponse(response)
       } else {
-        throw new Error('No transactions found in the text')
+        // Fallback to non-streaming
+        const result = await response.json()
+        if (result.success && result.data) {
+          setParsedData(result.data)
+          setShowConfirmationDialog(true)
+          await logParsingSession(result.data, conversationalText)
+        } else {
+          throw new Error('No transactions found in the text')
+        }
       }
     } catch (error) {
       console.error('Error parsing conversational text:', error)
       toast.error(error instanceof Error ? error.message : 'Failed to parse your message')
     } finally {
       setIsParsingText(false)
+    }
+  }
+
+  // Handle streaming response from the API
+  const handleStreamingResponse = async (response: Response) => {
+    const reader = response.body?.getReader()
+    if (!reader) throw new Error('No response body')
+
+    const decoder = new TextDecoder()
+    let buffer = ''
+    
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        
+        if (done) break
+        
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        
+        // Keep the last incomplete line in the buffer
+        buffer = lines.pop() || ''
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            
+            if (data === '[DONE]') {
+              // Stream completed
+              return
+            }
+            
+            try {
+              const parsed = JSON.parse(data)
+              
+              switch (parsed.type) {
+                case 'status':
+                  setStreamingStatus(parsed.message)
+                  break
+                  
+                case 'progress':
+                  setStreamingStatus(parsed.message)
+                  if (parsed.chunk) {
+                    // Show that the AI is actively processing
+                    setStreamingStatus(`Processing: "${parsed.chunk}"`)
+                  }
+                  break
+                  
+                case 'transaction':
+                  // Add new transaction as it's completed
+                  setStreamingTransactions(prev => {
+                    const exists = prev.some(t => 
+                      t.description === parsed.data.description && 
+                      t.amount === parsed.data.amount
+                    )
+                    if (exists) return prev
+                    return [...prev, parsed.data]
+                  })
+                  
+                  if (parsed.progress) {
+                    setStreamingProgress(parsed.progress)
+                  }
+                  
+                  // Show immediate feedback
+                  toast.success(`Found transaction: ${parsed.data.description} (${parsed.data.amount.toLocaleString()} VND)`)
+                  break
+                  
+                case 'final':
+                  // Final result received
+                  setParsedData(parsed.data)
+                  setShowConfirmationDialog(true)
+                  
+                  // Log parsing session
+                  await logParsingSession(parsed.data, conversationalText)
+                  
+                  // Clear streaming state
+                  setTimeout(() => {
+                    setStreamingTransactions([])
+                    setStreamingStatus('')
+                    setStreamingProgress(null)
+                  }, 1000)
+                  break
+                  
+                case 'error':
+                  throw new Error(parsed.error || 'Streaming error occurred')
+              }
+            } catch (parseError) {
+              console.error('Error parsing streaming data:', parseError)
+            }
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock()
     }
   }
 
@@ -786,6 +893,17 @@ export function UnifiedTransactionForm({
                 ⌘↵ to parse
               </kbd>
             </div>
+
+            {/* Show streaming progress when parsing */}
+            {isParsingText && (
+              <div className="mt-4">
+                <SkeletonTransactionLoader
+                  status={streamingStatus || 'Starting AI analysis...'}
+                  progress={streamingProgress}
+                  streamingTransactions={streamingTransactions}
+                />
+              </div>
+            )}
 
             {/* Example suggestions */}
             <div className="space-y-2">
