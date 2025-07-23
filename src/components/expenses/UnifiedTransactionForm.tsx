@@ -66,6 +66,7 @@ import {
   RefreshCw
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useUser } from '@/components/providers/SupabaseProvider'
 
 const unifiedTransactionSchema = z.object({
   wallet_id: z.string().min(1, 'Please select a wallet'),
@@ -130,6 +131,7 @@ export function UnifiedTransactionForm({
   defaultConversationalMode = false
 }: UnifiedTransactionFormProps) {
   const t = useTranslations('UnifiedTransactionForm')
+  const user = useUser()
   
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -779,7 +781,7 @@ export function UnifiedTransactionForm({
         },
         body: JSON.stringify({
           user_id: user?.id,
-          wallet_id: transaction_data.wallet_id || defaultWallet.id,
+          wallet_id: selectedWalletId || defaultWallet.id,
           transactions: batchTransactions
         }),
       })
