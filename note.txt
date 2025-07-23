@@ -1,3 +1,21 @@
 Check @supabase/migrations/ @src/types/ @src/lib/supabase/types.ts @src/lib/services before processing
 I've implemented i18n already, you need to follow when you implement from now on
 Remember to add new case in @src/lib/i18n-utils.ts if needed
+
+
+
+
+
+
+Check @supabase/migrations/ @src/types/ @src/lib/supabase/types.ts @src/lib/services before processing
+Make sure you check these tickets
+```
+docs/tickets/ticket_1_quick_transaction_entry_enhancement.md
+docs/tickets/ticket_2_intelligent_transaction_entry_suggestions.md
+docs/tickets/ticket_3_attach_receipt_images.md
+docs/tickets/ticket_6_optimized_shared_wallets.md
+docs/tickets/ticket_12_ocr_automatic_data_extraction.md
+```
+to have a clear view about the code you'll work on
+
+Currently, I have error when I clicked on create expenses in the form

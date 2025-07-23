@@ -249,29 +249,70 @@ export function QuickTransactionForm({
     setIsSubmitting(true)
 
     try {
+      // Validate required fields based on transaction type
+      if (data.transaction_type === 'expense' && !data.expense_category_id) {
+        toast.error('Please select an expense category')
+        setIsSubmitting(false)
+        return
+      }
+      if (data.transaction_type === 'income' && !data.income_category_id) {
+        toast.error('Please select an income category')
+        setIsSubmitting(false)
+        return
+      }
+      if (data.transaction_type === 'transfer' && !data.transfer_to_wallet_id) {
+        toast.error('Please select a destination wallet for transfer')
+        setIsSubmitting(false)
+        return
+      }
+
       // Get receipt image URLs from uploaded images
       const receiptImageUrls = receiptImages
         .filter(img => img.uploaded && img.url)
         .map(img => img.url!)
+
+      // Prepare transaction data
+      const transactionData = {
+        wallet_id: data.wallet_id,
+        transaction_type: data.transaction_type,
+        amount: data.amount,
+        description: data.description || '',
+        notes: data.notes || '',
+        expense_category_id: data.expense_category_id || null,
+        income_category_id: data.income_category_id || null,
+        transfer_to_wallet_id: data.transfer_to_wallet_id || null,
+        transfer_fee: data.transfer_fee || 0,
+        transaction_date: data.transaction_date || new Date().toISOString().split('T')[0],
+        merchant_name: data.merchant_name || '',
+        tags: selectedTags,
+        receipt_images: receiptImageUrls,
+      }
+
+      // Remove null/undefined fields to avoid API validation issues
+      Object.keys(transactionData).forEach(key => {
+        if (transactionData[key as keyof typeof transactionData] === null || 
+            transactionData[key as keyof typeof transactionData] === undefined) {
+          delete transactionData[key as keyof typeof transactionData]
+        }
+      })
+
+      console.log('Submitting transaction data:', transactionData) // Debug log
 
       const response = await fetch('/api/expenses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...data,
-          tags: selectedTags,
-          receipt_images: receiptImageUrls,
-        }),
+        body: JSON.stringify(transactionData),
       })
 
       if (!response.ok) {
         const errorData = await response.json()
+        console.error('API Error Response:', errorData) // Debug log
         throw new Error(errorData.error || 'Failed to create transaction')
       }
 
-      const result = await response.json()
+      await response.json()
 
       toast.success(
         transactionType === 'expense' 
@@ -635,7 +676,7 @@ export function QuickTransactionForm({
                           onClick={() => addTag()}
                         >
                           <Plus className="h-3 w-3 mr-2" />
-                          Create "{customTag}"
+                          Create &quot;{customTag}&quot;
                         </Button>
                       </div>
                     )}
@@ -728,7 +769,14 @@ export function QuickTransactionForm({
             )}
             <Button 
               type="submit" 
-              disabled={isSubmitting || !watch('wallet_id') || !watch('amount')} 
+              disabled={
+                isSubmitting || 
+                !watch('wallet_id') || 
+                !watch('amount') || 
+                (transactionType === 'expense' && !watch('expense_category_id')) ||
+                (transactionType === 'income' && !watch('income_category_id')) ||
+                (transactionType === 'transfer' && !watch('transfer_to_wallet_id'))
+              } 
               className={cn("flex-1 font-medium", quickMode && "h-8 text-sm")}
             >
               {isSubmitting ? (

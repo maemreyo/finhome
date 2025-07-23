@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         *,
         expense_category:expense_categories(*),
         income_category:income_categories(*),
-        wallet:expense_wallets(*),
+        wallet:expense_wallets!expense_transactions_wallet_id_fkey(*),
         transfer_wallet:expense_wallets!expense_transactions_transfer_to_wallet_id_fkey(*)
       `)
       .eq('user_id', user.id)
@@ -143,7 +143,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
+    console.log('Received transaction data:', body) // Debug log
     const validatedData = createTransactionSchema.parse(body)
+    console.log('Validated transaction data:', validatedData) // Debug log
 
     // Validate business rules
     if (validatedData.transaction_type === 'expense' && !validatedData.expense_category_id) {
@@ -190,6 +192,8 @@ export async function POST(request: NextRequest) {
       transaction_time: validatedData.transaction_time || new Date().toISOString().split('T')[1].split('.')[0],
     }
 
+    console.log('Transaction data being inserted:', transactionData) // Debug log
+    
     const { data: transaction, error: createError } = await supabase
       .from('expense_transactions')
       .insert([transactionData])
@@ -197,14 +201,15 @@ export async function POST(request: NextRequest) {
         *,
         expense_category:expense_categories(*),
         income_category:income_categories(*),
-        wallet:expense_wallets(*),
+        wallet:expense_wallets!expense_transactions_wallet_id_fkey(*),
         transfer_wallet:expense_wallets!expense_transactions_transfer_to_wallet_id_fkey(*)
       `)
       .single()
 
     if (createError) {
       console.error('Error creating transaction:', createError)
-      return NextResponse.json({ error: 'Failed to create transaction' }, { status: 500 })
+      console.error('Transaction data that failed:', transactionData) // Debug log
+      return NextResponse.json({ error: 'Failed to create transaction', details: createError.message }, { status: 500 })
     }
 
     // Update user activity tracking
