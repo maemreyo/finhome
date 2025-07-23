@@ -1,45 +1,111 @@
-## Ticket 31: Xây dựng và Tinh chỉnh Prompt cho Mô hình AI (Prompt Engineering for AI Model)
+## Ticket 31: Tinh chỉnh, Kiểm thử và Tối ưu hóa Prompt cho Mô hình AI (Prompt Engineering)
 
-**Mục tiêu:** Xây dựng, kiểm thử và tối ưu hóa một prompt (câu lệnh đầu vào) mạnh mẽ và chi tiết cho Gemini AI. Chất lượng của prompt này sẽ quyết định trực tiếp đến độ chính xác, tính linh hoạt và hiệu suất của toàn bộ tính năng nhập liệu hội thoại (Ticket 21).
+**Mục tiêu:** Tối ưu hóa và kiểm thử nghiêm ngặt prompt (câu lệnh đầu vào) hiện có cho Gemini AI để đảm bảo độ chính xác, linh hoạt và hiệu suất cao nhất cho tính năng nhập liệu hội thoại (đã được triển khai trong commit `44a416f`).
 
-**Mô tả:**
-Prompt là "bộ não" của tính năng AI. Một prompt được thiết kế tốt sẽ hướng dẫn AI hiểu đúng ý định của người dùng, trích xuất chính xác thông tin giao dịch, và xử lý được các cách diễn đạt đa dạng, từ đơn giản đến phức tạp, bao gồm cả tiếng lóng và nhiều giao dịch trong một câu. Công việc này không chỉ là viết một câu lệnh, mà là một quy trình kỹ thuật bao gồm thiết kế, kiểm thử nghiêm ngặt và tinh chỉnh liên tục để đạt được kết quả mong muốn.
+**Mô tả & Hiện trạng:**
+Một hệ thống nhập liệu hội thoại cơ bản đã được triển khai. Prompt hiện tại được xây dựng động trong hàm `buildAIPrompt` (tại `src/app/api/expenses/parse-from-text/route.ts`). Nó đã bao gồm các yếu tố phức tạp như: vai trò, quy tắc, định dạng JSON đầu ra, và ngữ cảnh động (danh sách danh mục, ví, và lịch sử sửa lỗi của người dùng).
+
+Tuy nhiên, prompt này chưa được kiểm thử một cách có hệ thống và có thể tiềm ẩn rủi ro về chi phí (do prompt quá dài) và độ chính xác (với các trường hợp phức tạp). Công việc của ticket này là chuyển từ giai đoạn "xây dựng" sang "**tinh chỉnh, kiểm thử và làm cứng**" (refine, test, and harden) prompt hiện có.
 
 **Các công việc cần thực hiện:**
 
-1.  **Thiết kế Prompt Phiên bản Đầu tiên (v1):**
-    -   **Xây dựng bộ chỉ dẫn cốt lõi (Core Instructions):** Viết các quy tắc và hướng dẫn rõ ràng cho AI, định nghĩa vai trò của nó là một "trợ lý tài chính chuyên nghiệp".
-    -   **Định nghĩa Cấu trúc JSON đầu ra:** Chỉ định rõ ràng định dạng JSON mà AI phải trả về, bao gồm các trường: `transaction_type`, `amount`, `description`, `suggested_category_id`, `suggested_tags`, `suggested_wallet_id`.
-    -   **Cung cấp Ví dụ "Few-Shot":** Đưa vào prompt một vài ví dụ mẫu (input -> output) chất lượng cao để "dạy" AI cách xử lý các trường hợp phổ biến nhất.
+1.  **Xây dựng Bộ Kiểm thử (Test Suite) Toàn diện:**
+    - **Nhiệm vụ:** Tạo một file `prompt-test-suite.json` trong codebase. File này sẽ chứa một danh sách lớn các chuỗi văn bản đầu vào và kết quả JSON mong đợi.
+    - **Các loại Test Case cần có:**
+      - **Cơ bản:** `ăn trưa 50k`, `được thưởng 2 triệu`
+      - **Nhiều giao dịch:** `ăn sáng 40k, đổ xăng 100k, nhận lương 18tr`
+      - **Tiếng lóng/Từ địa phương:** `nhậu với mấy đứa bạn hết 2 xị`, `bay 5 lít tiền net`
+      - **Trường hợp mơ hồ:** `chuyển tiền cho mẹ 500k` (AI có xác định được ví nguồn/đích không?), `hôm nay tiêu hơi nhiều` (AI có bỏ qua không?)
+      - **Trường hợp không phải giao dịch:** `sếp thật tuyệt vời`, `hy vọng không đu đỉnh` (AI phải trả về mảng rỗng).
+      - **Giao dịch có điều kiện/tương lai:** `nếu mai trời đẹp thì đi chơi 300k` (AI phải bỏ qua).
+      - **Số tiền phức tạp:** `chuyển khoản 1tr550`, `tốn một triệu rưỡi`
 
-2.  **Xây dựng Bộ Kiểm thử (Test Suite):**
-    -   **Nhiệm vụ:** Tạo một file hoặc bộ dữ liệu chứa hàng loạt các chuỗi văn bản đầu vào đa dạng để kiểm thử prompt.
-    -   **Các loại Test Case cần có:**
-        -   **Cơ bản:** `ăn trưa 50k`, `được thưởng 2 triệu`
-        -   **Có mô tả & thẻ:** `mua sách trên Tiki 350k #sách_vở #tiki`
-        -   **Nhiều giao dịch:** `ăn sáng 40k, đổ xăng 100k, nhận lương 18tr`
-        -   **Tiếng lóng/Từ địa phương:** `nhậu với mấy đứa bạn hết 2 xị`, `trà đá 5 cành`
-        -   **Số tiền phức tạp:** `chuyển khoản 1tr5`, `tốn một triệu rưỡi`
-        -   **Trường hợp mơ hồ:** `chuyển tiền cho mẹ` (thiếu số tiền), `hôm nay tiêu hơi nhiều`
-        -   **Trường hợp không phải giao dịch:** `sếp thật tuyệt vời`, `hy vọng không đu đỉnh`
+2.  **Tạo Script Kiểm thử Tự động:**
+    - **Nhiệm vụ:** Viết một script (có thể dùng `pnpm exec`) để tự động:
+      1.  Đọc file `prompt-test-suite.json`.
+      2.  Lặp qua từng test case, gọi đến API endpoint `/api/expenses/parse-from-text`.
+      3.  So sánh kết quả thực tế từ API với kết quả mong đợi trong file test.
+      4.  Tạo một báo cáo tóm tắt (ví dụ: "Passed: 95/100, Failed: 5/100") và ghi lại các trường hợp thất bại.
 
 3.  **Quy trình Tinh chỉnh Lặp lại (Iterative Refinement Cycle):**
-    -   Tạo một script tự động để chạy toàn bộ Test Suite với phiên bản prompt hiện tại.
-    -   Phân tích kết quả đầu ra, xác định các trường hợp AI xử lý sai hoặc không chính xác.
-    -   Cập nhật và tinh chỉnh lại prompt (thêm quy tắc, sửa đổi ví dụ, làm rõ hướng dẫn).
-    -   Chạy lại Test Suite và lặp lại quy trình cho đến khi độ chính xác đạt mục tiêu đề ra (ví dụ: 95% các test case phổ biến được xử lý đúng).
+    - Chạy script kiểm thử để đánh giá hiệu suất của prompt hiện tại.
+    - Phân tích các trường hợp thất bại.
+    - **Hành động tinh chỉnh:** Sửa đổi logic trong hàm `buildAIPrompt` hoặc nội dung của prompt. Các hành động có thể bao gồm:
+      - **Làm rõ quy tắc:** Sửa đổi các quy tắc để xử lý các trường hợp mơ hồ.
+      - **Thêm ví dụ "Few-Shot":** Thêm các cặp `input -> output` mẫu vào prompt để "dạy" AI cách xử lý các trường hợp khó.
+      - **Tối ưu hóa Token:** Nghiên cứu cách rút gọn ngữ cảnh (ví dụ: chỉ gửi 10 danh mục được dùng nhiều nhất thay vì tất cả) để giảm chi phí và độ trễ.
+    - Chạy lại script kiểm thử và lặp lại quy trình cho đến khi độ chính xác đạt mục tiêu đề ra.
 
 4.  **Quản lý phiên bản Prompt:**
-    -   Lưu trữ các phiên bản của prompt trong hệ thống quản lý phiên bản (ví dụ: Git).
-    -   Ghi lại nhật ký thay đổi (changelog) cho mỗi phiên bản để tiện theo dõi và phục hồi khi cần.
+    - Lưu các phiên bản khác nhau của prompt (ví dụ: `transaction-parser-v1.1.txt`, `transaction-parser-v1.2.txt`) trong Git.
+    - Ghi lại nhật ký thay đổi (changelog) cho mỗi phiên bản, giải thích lý do thay đổi và kết quả cải thiện.
 
-**Ngữ cảnh Schema:**
--   Prompt cần được cung cấp danh sách các `expense_categories` và `income_categories` (bao gồm `id` và `name`) để có thể đề xuất `suggested_category_id` một cách chính xác. Điều này có thể yêu cầu một cơ chế để đưa danh sách danh mục vào prompt một cách linh động.
+**Ngữ cảnh Schema & Codebase:**
+
+- **Code chính:** `src/app/api/expenses/parse-from-text/route.ts` (đặc biệt là hàm `buildAIPrompt`).
+- **Schema DB:** Các bảng `expense_categories`, `income_categories`, `expense_wallets` được dùng để xây dựng ngữ cảnh cho prompt. Bảng `user_ai_corrections` cũng được dùng để đưa vào prompt.
 
 **Đầu ra mong đợi:**
--   Một prompt hoàn chỉnh, được kiểm thử kỹ lưỡng và sẵn sàng để đưa vào sử dụng trong môi trường production.
--   Một bộ Test Suite toàn diện có thể được tái sử dụng để kiểm thử hồi quy mỗi khi prompt được cập nhật.
--   Tài liệu ghi lại các quyết định thiết kế quan trọng và các phiên bản của prompt.
--   Độ chính xác cao trong việc phân tích và phân loại giao dịch từ văn bản tự nhiên của người dùng.
 
-**Ưu tiên:** P0 - Cực kỳ quan trọng. Đây là công việc nền tảng và là yếu tố rủi ro lớn nhất của Ticket 21. Cần được bắt đầu và hoàn thành sớm nhất có thể.
+- Một prompt được tối ưu hóa, kiểm thử kỹ lưỡng, sẵn sàng cho production.
+- Một bộ Test Suite toàn diện có thể tái sử dụng để kiểm thử hồi quy mỗi khi prompt được cập nhật.
+- Một script tự động để chạy bộ test.
+- Tài liệu ghi lại các quyết định tinh chỉnh và hiệu suất của từng phiên bản prompt.
+- Độ chính xác cao và ổn định trong việc phân tích giao dịch, đồng thời tối ưu hóa chi phí API.
+
+**Ưu tiên:** P0 - Cực kỳ quan trọng. Đây là công việc nền tảng để đảm bảo tính năng AI (Ticket 21) hoạt động đáng tin cậy và hiệu quả. Cần được bắt đầu và hoàn thành sớm nhất có thể.
+
+<!--  -->
+
+✅ Completed Tasks:
+
+1. Comprehensive Test Suite (prompt-test-suite.json)
+
+- 25+ test cases covering all scenarios mentioned in the ticket
+- Basic transactions, multiple transactions, Vietnamese slang, ambiguous cases
+- Non-transaction text, conditional/future transactions, complex amount formats
+- Real-world scenarios with merchants, dates, and context
+
+2. Automated Testing Script (scripts/test-ai-prompt.js)
+
+- Full-featured testing engine with retry logic and timeout handling
+- Detailed scoring system with weighted criteria (Transaction Detection 30%, Amount Parsing 25%, etc.)
+- Comprehensive reporting with failed test analysis and recommendations
+- Results saved to timestamped files for version tracking
+
+3. Convenient Test Runner (scripts/run-prompt-tests.sh)
+
+- User-friendly wrapper with colored output
+- Automatic dev server health checking
+- Clear success/failure reporting with actionable next steps
+
+4. Version Management System
+
+- Current prompt saved as transaction-parser-v1.0.txt
+- Comprehensive changelog tracking improvements and test results
+- Git-friendly versioning for prompt iterations
+
+5. Complete Documentation
+
+- Detailed README with usage instructions and troubleshooting
+- Performance optimization tips and workflow guidance
+- Clear scoring criteria and success thresholds
+
+6. Package.json Integration
+
+pnpm test:ai-prompt:run # Recommended: Full wrapper with checks
+pnpm test:ai-prompt # Direct execution  
+ pnpm test:ai-prompt:dev # Development mode with debug info
+
+🎯 Ready for Use:
+
+The system is now ready for the iterative refinement cycle mentioned in the ticket:
+
+1. Run baseline tests to establish current performance
+2. Analyze failures using the automated reporting
+3. Refine prompts based on recommendations
+4. Re-test and iterate until 85% threshold is met
+5. Version and document successful improvements
+
+The infrastructure fully supports the P0 priority goals of ensuring the AI feature operates reliably and cost-effectively, with comprehensive testing coverage for
+Vietnamese transaction parsing scenarios.

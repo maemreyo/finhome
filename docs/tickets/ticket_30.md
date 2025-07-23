@@ -1,4 +1,4 @@
-## Ticket 30: Phân tích và Giảm thiểu Rủi ro Quyền riêng tư Dữ liệu với Nhà cung cấp AI (Analyze and Mitigate Data Privacy Risks with AI Provider)
+## Ticket 30: Phân tích và Giảm thiểu Rủi ro Quyền riêng tư Dữ liệu với Nhà cung cấp AI (Analyze and Mitigate Data Privacy Risks with AI Provider) (SKIPPED)
 
 **Mục tiêu:** Đảm bảo tính năng nhập liệu hội thoại (Ticket 21) tuân thủ các tiêu chuẩn cao nhất về quyền riêng tư và bảo mật dữ liệu người dùng, bằng cách chủ động phân tích, đánh giá và triển khai các biện pháp giảm thiểu rủi ro khi làm việc với API của bên thứ ba (Gemini AI).
 

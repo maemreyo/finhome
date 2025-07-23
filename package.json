@@ -22,7 +22,10 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
-    "email:dev": "email dev"
+    "email:dev": "email dev",
+    "test:ai-prompt": "node scripts/test-ai-prompt.js",
+    "test:ai-prompt:dev": "NODE_ENV=development node scripts/test-ai-prompt.js",
+    "test:ai-prompt:run": "bash scripts/run-prompt-tests.sh"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

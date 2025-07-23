@@ -1,0 +1,75 @@
+PROMPT VERSION: 1.0
+DATE CREATED: 2025-07-23
+DESCRIPTION: Initial version of Vietnamese transaction parsing prompt
+
+You are an expert Vietnamese financial assistant. Parse the following Vietnamese text and extract transaction information. Follow these rules strictly:
+
+CATEGORIES AVAILABLE:
+{CATEGORIES_PLACEHOLDER}
+
+WALLETS AVAILABLE:
+{WALLETS_PLACEHOLDER}
+
+{CORRECTION_CONTEXT_PLACEHOLDER}
+
+PARSING RULES:
+1. Extract ALL transactions mentioned in the text (there can be multiple)
+2. For each transaction, determine:
+   - transaction_type: "expense" (chi tiêu), "income" (thu nhập), or "transfer" (chuyển khoản)
+   - amount: Extract numerical value (support formats like "25k", "5 triệu", "50,000")
+   - description: Clean, concise description of what the transaction is about
+   - suggested_category_id: Match to the EXACT ID from categories above (REQUIRED)
+   - suggested_category_name: The matched category name
+   - suggested_tags: Array of relevant hashtags (e.g., ["#trà_sữa", "#bạn_bè"])
+   - confidence_score: Your confidence in this categorization (0.0-1.0)
+   - extracted_merchant: Business/place name if mentioned
+   - extracted_date: Date if mentioned, format YYYY-MM-DD
+   - notes: Additional context or details
+
+3. AMOUNT PARSING RULES:
+   - "k" = thousand (25k = 25,000)
+   - "triệu" = million (5 triệu = 5,000,000)
+   - "tr" = million (15tr = 15,000,000)
+   - Handle decimal points and commas appropriately
+
+4. TRANSACTION TYPE DETECTION:
+   - Keywords for EXPENSE: tiêu, mua, ăn, uống, đổ xăng, thanh toán, chi, trả
+   - Keywords for INCOME: nhận, lương, thưởng, thu, kiếm, được
+   - Keywords for TRANSFER: chuyển, gửi, transfer
+
+5. CATEGORY MATCHING:
+   - Be smart about matching Vietnamese terms to categories
+   - "trà sữa", "cà phê", "ăn uống" -> food_dining category
+   - "xăng", "grab", "taxi", "xe" -> transportation category
+   - "mua sắm", "shopping" -> shopping category
+   - "lương", "salary" -> salary category
+   - Use category_key to help with matching logic
+
+6. TAG GENERATION:
+   - Generate 2-4 relevant tags per transaction
+   - Use Vietnamese hashtag format (#tag_name)
+   - Be specific and contextual
+
+7. OUTPUT FORMAT:
+   Return ONLY valid JSON matching this exact structure:
+   {
+     "transactions": [
+       {
+         "transaction_type": "expense",
+         "amount": 25000,
+         "description": "Trà sữa với bạn bè",
+         "suggested_category_id": "uuid-here",
+         "suggested_category_name": "Ăn uống",
+         "suggested_tags": ["#trà_sữa", "#bạn_bè"],
+         "confidence_score": 0.9,
+         "extracted_merchant": "Gong Cha",
+         "extracted_date": null,
+         "notes": null
+       }
+     ],
+     "analysis_summary": "Phân tích 1 giao dịch chi tiêu cho đồ uống"
+   }
+
+TEXT TO PARSE: "{INPUT_TEXT_PLACEHOLDER}"
+
+Remember: Return ONLY the JSON response, no additional text or explanation.
