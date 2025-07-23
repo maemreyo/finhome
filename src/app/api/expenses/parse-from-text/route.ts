@@ -29,6 +29,8 @@ const aiTransactionSchema = z.object({
   extracted_merchant: z.string().nullable().optional(),
   extracted_date: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
+  is_unusual: z.boolean().default(false),
+  unusual_reasons: z.array(z.string()).default([]),
 })
 
 const aiResponseSchema = z.object({
@@ -84,6 +86,91 @@ function getRelevantCategories(inputText: string, allCategories: any[]): any[] {
   
   // Limit to 15 most relevant categories to reduce prompt size
   return uniqueCategories.slice(0, 15)
+}
+
+// Helper function to detect unusual transactions
+async function detectUnusualTransactions(
+  transactions: any[], 
+  user: any, 
+  supabase: any
+): Promise<any[]> {
+  const LARGE_AMOUNT_THRESHOLD = 5000000 // 5 million VND
+  const LOW_CONFIDENCE_THRESHOLD = 0.5
+  
+  return Promise.all(transactions.map(async (transaction) => {
+    const unusualReasons: string[] = []
+    let isUnusual = false
+    
+    // Check 1: Large amount threshold
+    if (transaction.amount > LARGE_AMOUNT_THRESHOLD) {
+      unusualReasons.push(`Large amount: ${transaction.amount.toLocaleString('vi-VN')} VND exceeds ${LARGE_AMOUNT_THRESHOLD.toLocaleString('vi-VN')} VND threshold`)
+      isUnusual = true
+    }
+    
+    // Check 2: Low confidence score
+    if (transaction.confidence_score < LOW_CONFIDENCE_THRESHOLD) {
+      unusualReasons.push(`Low AI confidence: ${Math.round(transaction.confidence_score * 100)}% confidence is below ${LOW_CONFIDENCE_THRESHOLD * 100}% threshold`)
+      isUnusual = true
+    }
+    
+    // Check 3: Compare with user's spending patterns (if available)
+    try {
+      if (transaction.suggested_category_id && transaction.transaction_type === 'expense') {
+        // Get user's average spending for this category over the last 3 months
+        const threeMonthsAgo = new Date()
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+        
+        const { data: recentTransactions, error } = await supabase
+          .from('expense_transactions')
+          .select('amount')
+          .eq('user_id', user.id)
+          .eq('expense_category_id', transaction.suggested_category_id)
+          .gte('transaction_date', threeMonthsAgo.toISOString().split('T')[0])
+          .order('transaction_date', { ascending: false })
+          .limit(50)
+        
+        if (!error && recentTransactions && recentTransactions.length >= 5) {
+          const amounts = recentTransactions.map(t => t.amount)
+          const average = amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length
+          const standardDeviation = Math.sqrt(
+            amounts.reduce((sum, amount) => sum + Math.pow(amount - average, 2), 0) / amounts.length
+          )
+          
+          // Flag as unusual if more than 2.5 standard deviations above average
+          const threshold = average + (2.5 * standardDeviation)
+          if (transaction.amount > threshold && transaction.amount > average * 3) {
+            unusualReasons.push(`Unusually high for category: ${transaction.amount.toLocaleString('vi-VN')} VND is ${Math.round(transaction.amount / average)}x your average of ${Math.round(average).toLocaleString('vi-VN')} VND`)
+            isUnusual = true
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Error analyzing spending patterns:', error)
+      // Don't fail the entire process if pattern analysis fails
+    }
+    
+    // Check 4: Unusual transaction patterns
+    const suspiciousPatterns = [
+      /\b(test|testing|fake|dummy)\b/i,
+      /\b999+\b/, // Repeated 9s often indicate test data
+      /\b(lorem|ipsum)\b/i, // Lorem ipsum text
+    ]
+    
+    const textToCheck = `${transaction.description} ${transaction.notes || ''}`
+    for (const pattern of suspiciousPatterns) {
+      if (pattern.test(textToCheck)) {
+        unusualReasons.push(`Suspicious pattern detected in description: "${transaction.description}"`)
+        isUnusual = true
+        break
+      }
+    }
+    
+    return {
+      ...transaction,
+      is_unusual: isUnusual,
+      unusual_reasons: unusualReasons
+    }
+  }))
 }
 
 async function buildAIPrompt(
@@ -372,15 +459,23 @@ export async function POST(request: NextRequest) {
         }
       })
 
+      // Detect unusual transactions
+      const transactionsWithUnusualFlags = await detectUnusualTransactions(
+        processedTransactions, 
+        user, 
+        supabase
+      )
+
       return NextResponse.json({
         success: true,
         data: {
-          transactions: processedTransactions,
+          transactions: transactionsWithUnusualFlags,
           analysis_summary: validatedAIResponse.analysis_summary,
           metadata: {
-            total_transactions: processedTransactions.length,
+            total_transactions: transactionsWithUnusualFlags.length,
+            unusual_count: transactionsWithUnusualFlags.filter(t => t.is_unusual).length,
             processing_time: new Date().toISOString(),
-            ai_model: "gemini-1.5-flash"
+            ai_model: "gemini-2.5-flash"
           }
         }
       })
@@ -541,15 +636,23 @@ async function handleStreamingResponse(
             }
           })
 
+          // Detect unusual transactions
+          const transactionsWithUnusualFlags = await detectUnusualTransactions(
+            processedTransactions, 
+            user, 
+            supabase
+          )
+
           // Send final result
           controller.enqueue(new TextEncoder().encode(
             `data: ${JSON.stringify({
               type: 'final',
               data: {
-                transactions: processedTransactions,
+                transactions: transactionsWithUnusualFlags,
                 analysis_summary: validatedAIResponse.analysis_summary,
                 metadata: {
-                  total_transactions: processedTransactions.length,
+                  total_transactions: transactionsWithUnusualFlags.length,
+                  unusual_count: transactionsWithUnusualFlags.filter(t => t.is_unusual).length,
                   processing_time: new Date().toISOString(),
                   ai_model: "gemini-2.5-flash",
                   streaming: true

@@ -26,7 +26,8 @@
     "test:ai-prompt": "node scripts/test-ai-prompt.js",
     "test:ai-prompt:dev": "NODE_ENV=development node scripts/test-ai-prompt.js",
     "test:ai-prompt:run": "bash scripts/run-prompt-tests.sh",
-    "test:streaming": "node scripts/test-streaming-performance.js"
+    "test:streaming": "node scripts/test-streaming-performance.js",
+    "test:automation-bias": "node scripts/test-automation-bias.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

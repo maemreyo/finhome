@@ -64,6 +64,8 @@ interface ParsedTransaction {
   extracted_merchant?: string
   extracted_date?: string
   notes?: string
+  is_unusual?: boolean
+  unusual_reasons?: string[]
   parsing_context?: {
     original_text: string
     processing_timestamp: string
@@ -305,7 +307,12 @@ export function ConversationalTransactionDialog({
                 if (!editing) return null
 
                 return (
-                  <Card key={index} className="border-2">
+                  <Card key={index} className={cn(
+                    "border-2 transition-all duration-200",
+                    original.is_unusual 
+                      ? "border-red-400 bg-red-50/30 dark:bg-red-900/10 shadow-red-100 dark:shadow-red-900/20 shadow-lg" 
+                      : "border-gray-200 dark:border-gray-700"
+                  )}>
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-base flex items-center gap-2">
@@ -328,33 +335,106 @@ export function ConversationalTransactionDialog({
                       </div>
                     </CardHeader>
 
-                    <CardContent className="space-y-4">
-                      {/* Amount */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label className="text-sm font-medium flex items-center gap-1">
-                            <DollarSign className="h-3 w-3" />
-                            Amount
-                          </Label>
+                    {/* UNUSUAL TRANSACTION WARNING - Most Important */}
+                    {original.is_unusual && (
+                      <div className="mx-6 -mt-2 mb-4">
+                        <Alert variant="destructive" className="border-2 border-red-500 bg-red-50 dark:bg-red-900/20">
+                          <AlertCircle className="h-5 w-5" />
+                          <AlertDescription className="font-semibold">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-red-800 dark:text-red-200 text-base font-bold">
+                                ⚠️ UNUSUAL TRANSACTION DETECTED
+                              </span>
+                              <Badge variant="destructive" className="text-xs">
+                                VERIFY CAREFULLY
+                              </Badge>
+                            </div>
+                            <div className="space-y-1 text-sm">
+                              {original.unusual_reasons?.map((reason, i) => (
+                                <div key={i} className="flex items-start gap-2">
+                                  <span className="text-red-600 dark:text-red-400">•</span>
+                                  <span className="text-red-700 dark:text-red-300">{reason}</span>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-300">
+                              <div className="flex items-center gap-2 text-yellow-800 dark:text-yellow-200 text-sm font-medium">
+                                <Sparkles className="h-4 w-4" />
+                                Please double-check the amount: <span className="font-bold text-lg">{editing.amount.toLocaleString('vi-VN')} VND</span>
+                              </div>
+                            </div>
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    )}
+
+                    <CardContent className="space-y-6">
+                      {/* CRITICAL SECTION: Amount - Most Important Field */}
+                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-4 rounded-lg border-2 border-blue-200 dark:border-blue-700">
+                        <Label className="text-base font-bold text-primary flex items-center gap-2 mb-3">
+                          <DollarSign className="h-5 w-5 text-blue-600" />
+                          Amount (VND)
+                          <Badge variant="outline" className="ml-2 text-xs border-orange-300 text-orange-700 bg-orange-50">
+                            Critical - Verify carefully
+                          </Badge>
+                        </Label>
+                        <div className="flex items-center gap-3">
                           <Input
                             type="number"
                             value={editing.amount}
                             onChange={(e) => updateTransaction(index, 'amount', parseFloat(e.target.value) || 0)}
-                            className="mt-1"
+                            className="text-2xl font-bold h-14 text-center border-2 focus:border-blue-500"
+                            style={{ fontSize: '1.5rem' }}
                           />
+                          <div className="text-lg font-semibold text-muted-foreground">
+                            = {editing.amount.toLocaleString('vi-VN')} VND
+                          </div>
+                        </div>
+                        {/* Visual comparison with original if different */}
+                        {original.amount !== editing.amount && (
+                          <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border-l-4 border-yellow-400">
+                            <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+                              <AlertCircle className="h-4 w-4" />
+                              Original AI suggestion: {original.amount.toLocaleString('vi-VN')} VND
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Transaction Type & Wallet - Secondary Important */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border">
+                          <Label className="text-sm font-semibold flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                            <div className={cn(
+                              "w-4 h-4 rounded-full",
+                              editing.transaction_type === 'expense' ? "bg-red-500" :
+                              editing.transaction_type === 'income' ? "bg-green-500" :
+                              "bg-blue-500"
+                            )} />
+                            Transaction Type
+                          </Label>
+                          <div className={cn(
+                            "mt-2 py-2 px-3 rounded-md text-center font-bold text-sm",
+                            editing.transaction_type === 'expense' ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200" :
+                            editing.transaction_type === 'income' ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200" :
+                            "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200"
+                          )}>
+                            {editing.transaction_type === 'expense' ? '💸 EXPENSE' : 
+                             editing.transaction_type === 'income' ? '💰 INCOME' : '🔄 TRANSFER'}
+                          </div>
                         </div>
 
                         {/* Wallet */}
-                        <div>
-                          <Label className="text-sm font-medium flex items-center gap-1">
-                            <Wallet className="h-3 w-3" />
-                            Wallet
+                        <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border">
+                          <Label className="text-sm font-semibold flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                            <Wallet className="h-4 w-4 text-blue-600" />
+                            Wallet Source
                           </Label>
                           <Select 
                             value={editing.wallet_id} 
                             onValueChange={(value) => updateTransaction(index, 'wallet_id', value)}
                           >
-                            <SelectTrigger className="mt-1">
+                            <SelectTrigger className="mt-2 h-10 font-medium">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -365,7 +445,10 @@ export function ConversationalTransactionDialog({
                                       className="w-3 h-3 rounded-full"
                                       style={{ backgroundColor: wallet.color }}
                                     />
-                                    {wallet.name}
+                                    <span className="font-medium">{wallet.name}</span>
+                                    <span className="text-xs text-muted-foreground ml-2">
+                                      {wallet.balance.toLocaleString('vi-VN')} VND
+                                    </span>
                                   </div>
                                 </SelectItem>
                               ))}
@@ -374,29 +457,41 @@ export function ConversationalTransactionDialog({
                         </div>
                       </div>
 
-                      {/* Description */}
-                      <div>
-                        <Label className="text-sm font-medium flex items-center gap-1">
-                          <Edit3 className="h-3 w-3" />
-                          Description
+                      {/* Description - Important Field */}
+                      <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-700">
+                        <Label className="text-sm font-semibold flex items-center gap-2 text-blue-800 dark:text-blue-200">
+                          <Edit3 className="h-4 w-4 text-blue-600" />
+                          Transaction Description
+                          <Badge variant="outline" className="ml-2 text-xs border-blue-300 text-blue-700 bg-blue-50">
+                            Important
+                          </Badge>
                         </Label>
                         <Input
                           value={editing.description}
                           onChange={(e) => updateTransaction(index, 'description', e.target.value)}
-                          className="mt-1"
-                          placeholder="Transaction description..."
+                          className="mt-2 h-10 font-medium text-base"
+                          placeholder="What was this transaction for?"
                         />
+                        {/* Show AI suggestion if different */}
+                        {original.description !== editing.description && (
+                          <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                            💡 AI suggested: "{original.description}"
+                          </div>
+                        )}
                       </div>
 
-                      {/* Category */}
+                      {/* Category - Important Field */}
                       {editing.transaction_type !== 'transfer' && (
-                        <div>
-                          <Label className="text-sm font-medium flex items-center gap-1">
-                            <Tag className="h-3 w-3" />
+                        <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-700">
+                          <Label className="text-sm font-semibold flex items-center gap-2 text-green-800 dark:text-green-200">
+                            <Tag className="h-4 w-4 text-green-600" />
                             Category
+                            <Badge variant="outline" className="ml-2 text-xs border-green-300 text-green-700 bg-green-50">
+                              Important
+                            </Badge>
                             {original.suggested_category_name && (
-                              <Badge variant="outline" className="ml-2 text-xs">
-                                AI suggested: {original.suggested_category_name}
+                              <Badge variant="secondary" className="ml-2 text-xs">
+                                💡 AI suggested: {original.suggested_category_name}
                               </Badge>
                             )}
                           </Label>
@@ -407,7 +502,7 @@ export function ConversationalTransactionDialog({
                               updateTransaction(index, field, value)
                             }}
                           >
-                            <SelectTrigger className="mt-1">
+                            <SelectTrigger className="mt-2 h-10 font-medium">
                               <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                             <SelectContent>
@@ -415,10 +510,10 @@ export function ConversationalTransactionDialog({
                                 <SelectItem key={category.id} value={category.id}>
                                   <div className="flex items-center gap-2">
                                     <div 
-                                      className="w-3 h-3 rounded-full"
+                                      className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
                                       style={{ backgroundColor: category.color }}
                                     />
-                                    {category.name_vi}
+                                    <span className="font-medium">{category.name_vi}</span>
                                   </div>
                                 </SelectItem>
                               ))}
