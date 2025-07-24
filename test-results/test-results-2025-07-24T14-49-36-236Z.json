@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "total_tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "accuracy": "100.00%",
+    "precision": "100.00%",
+    "recall": "100.00%",
+    "execution_time": "26.76s"
+  },
+  "category_breakdown": {
+    "edge_cases": {
+      "accuracy": "100.0%",
+      "average_score": "1.000",
+      "execution_time": "26.24s"
+    }
+  },
+  "failures": []
+}

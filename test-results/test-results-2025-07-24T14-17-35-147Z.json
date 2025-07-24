@@ -1,0 +1,78 @@
+{
+  "summary": {
+    "total_tests": 5,
+    "passed": 0,
+    "failed": 5,
+    "accuracy": "0.00%",
+    "precision": "0.00%",
+    "recall": "0.00%",
+    "execution_time": "4.03s"
+  },
+  "category_breakdown": {
+    "basic_transactions": {
+      "accuracy": "0.0%",
+      "average_score": "0.000",
+      "execution_time": "3.52s"
+    }
+  },
+  "failures": [
+    {
+      "input": "mua cafe 25k",
+      "category": "basic_transactions",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "type": "expense",
+        "amount": 25000,
+        "category_type": "food_dining",
+        "confidence": "high"
+      }
+    },
+    {
+      "input": "chuyển tiền cho mẹ 500k",
+      "category": "basic_transactions",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "type": "transfer",
+        "amount": 500000,
+        "confidence": "high"
+      }
+    },
+    {
+      "input": "nhận lương tháng 15tr",
+      "category": "basic_transactions",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "type": "income",
+        "amount": 15000000,
+        "confidence": "high"
+      }
+    },
+    {
+      "input": "đổ xăng 200k",
+      "category": "basic_transactions",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "type": "expense",
+        "amount": 200000,
+        "category_type": "transportation",
+        "confidence": "high"
+      }
+    },
+    {
+      "input": "mua thuốc cảm 50k",
+      "category": "basic_transactions",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "type": "expense",
+        "amount": 50000,
+        "category_type": "healthcare",
+        "confidence": "high"
+      }
+    }
+  ]
+}

@@ -5,9 +5,9 @@ import { z } from 'zod'
 
 const parsingSessionSchema = z.object({
   input_text: z.string(),
-  transactions_parsed: z.number(),
-  avg_confidence: z.number(),
-  parsed_transactions: z.array(z.any()),
+  transactions_parsed: z.number().min(0), // Ensure non-negative
+  avg_confidence: z.number().min(0).max(1).default(0), // Default to 0 if invalid, constrain to 0-1 range
+  parsed_transactions: z.array(z.any()).default([]), // Default to empty array
   parsing_duration_ms: z.number().optional(),
   success: z.boolean().optional()
 })

@@ -80,7 +80,7 @@ async function processReceiptWithGemini(imageUrl: string): Promise<OCRResult> {
     const mimeType = imageResponse.headers.get('content-type') || 'image/jpeg'
 
     // Create Gemini model
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
     // Craft prompt for Vietnamese receipt extraction
     const prompt = `

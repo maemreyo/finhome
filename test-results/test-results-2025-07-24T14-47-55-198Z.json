@@ -1,0 +1,61 @@
+{
+  "summary": {
+    "total_tests": 3,
+    "passed": 2,
+    "failed": 1,
+    "accuracy": "66.67%",
+    "precision": "66.67%",
+    "recall": "66.67%",
+    "execution_time": "41.45s"
+  },
+  "category_breakdown": {
+    "stress_tests": {
+      "accuracy": "66.7%",
+      "average_score": "0.867",
+      "execution_time": "41.14s"
+    }
+  },
+  "failures": [
+    {
+      "input": "đi chợ mua: rau 20k, thịt 150k, cá 80k, trứng 25k, gia vị 15k, bánh 30k, nước mắm 40k, gạo 200k, đường 25k, muối 10k",
+      "category": "stress_tests",
+      "error": "Transaction count mismatch: expected 10, got 1",
+      "expected": {
+        "transaction_count": 10,
+        "category_type": "shopping",
+        "confidence": "high"
+      },
+      "actual": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 595000,
+            "description": "Đi chợ mua thực phẩm và nhu yếu phẩm",
+            "suggested_category_id": null,
+            "suggested_category_name": "Mua sắm",
+            "suggested_tags": [
+              "#Chợ",
+              "#ThựcPhẩm",
+              "#NhuYếuPhẩm"
+            ],
+            "confidence_score": 0.9,
+            "extracted_merchant": "Chợ",
+            "extracted_date": "2025-07-24",
+            "notes": "Các mặt hàng bao gồm: rau, thịt, cá, trứng, gia vị, bánh, nước mắm, gạo, đường, muối."
+          }
+        ],
+        "analysis_summary": "Successfully identified a single shopping transaction at the market, summing all listed items into one total expense. The transaction is categorized under 'Mua sắm' with high confidence.",
+        "parsing_metadata": {
+          "total_transactions_found": 1,
+          "high_confidence_count": 1,
+          "average_confidence": 0.9,
+          "parsing_notes": "Multiple grocery items purchased in a single 'đi chợ' event were grouped into one transaction. Amounts converted from 'k' to VND. Date defaulted to current date.",
+          "time_expressions_found": [],
+          "dates_calculated": [
+            "2025-07-24"
+          ]
+        }
+      }
+    }
+  ]
+}

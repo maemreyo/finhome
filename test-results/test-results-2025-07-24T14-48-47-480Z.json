@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "total_tests": 3,
+    "passed": 3,
+    "failed": 0,
+    "accuracy": "100.00%",
+    "precision": "100.00%",
+    "recall": "100.00%",
+    "execution_time": "21.12s"
+  },
+  "category_breakdown": {
+    "multi_transaction": {
+      "accuracy": "100.0%",
+      "average_score": "0.933",
+      "execution_time": "20.81s"
+    }
+  },
+  "failures": []
+}

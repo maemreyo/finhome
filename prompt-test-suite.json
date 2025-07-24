@@ -1,52 +1,419 @@
 {
-  "test_suite_version": "1.0.0",
-  "created_date": "2025-07-23",
-  "description": "Comprehensive test suite for AI prompt optimization - Vietnamese transaction parsing",
-  "test_cases": [
-    {
-      "id": "complex_amount_001",
-      "category": "complex_amounts",
-      "input": "chuyển khoản 1tr550",
-      "expected": {
-        "transactions": [
-          {
-            "transaction_type": "transfer",
-            "amount": 1550000,
-            "description": "Chuyển khoản",
-            "suggested_tags": ["#chuyển_khoản"],
-            "confidence_score": 0.9
-          }
-        ]
+  "version": "1.0",
+  "created": "2025-07-24",
+  "description": "Comprehensive test suite for Vietnamese transaction parsing prompt validation",
+  "test_categories": {
+    "basic_transactions": [
+      {
+        "input": "mua cafe 25k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "expense",
+          "amount": 25000,
+          "category_type": "food_dining",
+          "confidence": "high"
+        }
+      },
+      {
+        "input": "chuyển tiền cho mẹ 500k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "transfer",
+          "amount": 500000,
+          "confidence": "high"
+        }
+      },
+      {
+        "input": "nhận lương tháng 15tr",
+        "expected": {
+          "transaction_count": 1,
+          "type": "income",
+          "amount": 15000000,
+          "confidence": "high"
+        }
+      },
+      {
+        "input": "đổ xăng 200k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "expense",
+          "amount": 200000,
+          "category_type": "transportation",
+          "confidence": "high"
+        }
+      },
+      {
+        "input": "mua thuốc cảm 50k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "expense",
+          "amount": 50000,
+          "category_type": "healthcare",
+          "confidence": "high"
+        }
       }
-    }
-  ],
-  "scoring_criteria": {
-    "transaction_detection": {
-      "weight": 0.3,
-      "description": "Correctly identifies when text contains transactions vs non-transactions"
-    },
-    "amount_parsing": {
-      "weight": 0.25,
-      "description": "Accurately extracts numerical amounts in various Vietnamese formats"
-    },
-    "category_matching": {
-      "weight": 0.2,
-      "description": "Maps transactions to appropriate categories"
-    },
-    "transaction_type": {
-      "weight": 0.15,
-      "description": "Correctly identifies expense/income/transfer type"
-    },
-    "context_extraction": {
-      "weight": 0.1,
-      "description": "Extracts merchant, date, and other contextual information"
-    }
+    ],
+    "vietnamese_slang": [
+      {
+        "input": "bay màu 50k hôm qua",
+        "expected": {
+          "transaction_count": 1,
+          "type": "expense",
+          "amount": 50000,
+          "confidence": "medium",
+          "note": "Vietnamese slang for losing money"
+        }
+      },
+      {
+        "input": "cháy túi rồi, vay bạn 100k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "expense",
+          "amount": 100000,
+          "confidence": "medium"
+        }
+      },
+      {
+        "input": "móc hầu bao mua đồ 80k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "expense",
+          "amount": 80000,
+          "confidence": "medium",
+          "note": "Slang for digging into wallet"
+        }
+      },
+      {
+        "input": "ném tiền qua cửa sổ 200k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "expense",
+          "amount": 200000,
+          "confidence": "medium",
+          "note": "Slang for wasting money"
+        }
+      },
+      {
+        "input": "tiêu xài tè le 300k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "expense",
+          "amount": 300000,
+          "confidence": "medium",
+          "note": "Slang for spending carelessly"
+        }
+      },
+      {
+        "input": "cháy túi rồi không còn xu nào",
+        "expected": {
+          "transaction_count": 0,
+          "note": "Just expressing being broke, no specific transaction"
+        }
+      }
+    ],
+    "stress_tests": [
+      {
+        "input": "sáng: cf 25k, bánh mì 15k, grab 30k, trưa: cơm 45k, nước 10k, chiều: trà sữa 35k, pizza 120k, tối: bia 60k, nhậu 200k, về: grab 40k, đêm: tăng lực 15k, snack 20k",
+        "expected": {
+          "transaction_count": 12,
+          "total_amount": 615000,
+          "confidence": "medium",
+          "note": "Complex multi-transaction parsing"
+        }
+      },
+      {
+        "input": "đi chợ mua: rau 20k, thịt 150k, cá 80k, trứng 25k, gia vị 15k, bánh 30k, nước mắm 40k, gạo 200k, đường 25k, muối 10k",
+        "expected": {
+          "transaction_count": 10,
+          "category_type": "shopping",
+          "confidence": "high"
+        }
+      },
+      {
+        "input": "đi du lịch Đà Lạt: vé xe 300k, khách sạn 800k, ăn sáng 50k, cafe 30k, ăn trưa 120k, vé vào cửa 40k, ăn tối 200k, quà 150k, vé về 300k",
+        "expected": {
+          "transaction_count": 9,
+          "total_amount": 1990000,
+          "confidence": "high"
+        }
+      }
+    ],
+    "time_expressions": [
+      {
+        "input": "hôm qua mua trà sữa 35k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 35000,
+          "has_date": true,
+          "date_type": "yesterday",
+          "confidence": "high"
+        }
+      },
+      {
+        "input": "sáng nay uống cafe 25k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 25000,
+          "has_date": true,
+          "date_type": "today",
+          "time_context": "morning",
+          "confidence": "high"
+        }
+      },
+      {
+        "input": "tuần trước mua sách 200k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 200000,
+          "has_date": true,
+          "date_type": "last_week",
+          "confidence": "medium"
+        }
+      },
+      {
+        "input": "chiều hôm qua đi ăn 150k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 150000,
+          "has_date": true,
+          "date_type": "yesterday",
+          "time_context": "afternoon",
+          "confidence": "high"
+        }
+      }
+    ],
+    "multi_transaction": [
+      {
+        "input": "sáng cafe 25k, trưa cơm 45k",
+        "expected": {
+          "transaction_count": 2,
+          "amounts": [25000, 45000],
+          "confidence": "high"
+        }
+      },
+      {
+        "input": "mua đồ ăn và xăng xe tổng 200k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 200000,
+          "note": "Grouped expense",
+          "confidence": "medium"
+        }
+      },
+      {
+        "input": "ăn sáng trưa tối hôm qua 150k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 150000,
+          "note": "Daily meals grouped",
+          "confidence": "medium"
+        }
+      }
+    ],
+    "regional_variations": [
+      {
+        "input": "ăn xôi sáng 15k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 15000,
+          "category_type": "food_dining",
+          "note": "Northern Vietnamese breakfast"
+        }
+      },
+      {
+        "input": "uống trà đá 5k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 5000,
+          "category_type": "food_dining",
+          "note": "Vietnamese iced tea"
+        }
+      },
+      {
+        "input": "ra phiên mua đồ 100k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 100000,
+          "category_type": "shopping",
+          "note": "Rural market shopping"
+        }
+      }
+    ],
+    "edge_cases": [
+      {
+        "input": "mất tiền 100k",
+        "expected": {
+          "transaction_count": 0,
+          "note": "Unintentional loss, not a transaction"
+        }
+      },
+      {
+        "input": "bị lừa mất 200k",
+        "expected": {
+          "transaction_count": 0,
+          "note": "Fraud/theft, not intentional transaction"
+        }
+      },
+      {
+        "input": "hôm nay tiêu nhiều",
+        "expected": {
+          "transaction_count": 0,
+          "note": "Vague expression without specific amount"
+        }
+      },
+      {
+        "input": "nợ bạn 150k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "expense",
+          "amount": 150000,
+          "note": "Debt represents financial outflow"
+        }
+      },
+      {
+        "input": "hoàn tiền 80k",
+        "expected": {
+          "transaction_count": 1,
+          "type": "income",
+          "amount": 80000,
+          "note": "Refund received"
+        }
+      }
+    ],
+    "destructive_inputs": [
+      {
+        "input": "!@#$%^&*()",
+        "expected": {
+          "transaction_count": 0,
+          "note": "Invalid characters"
+        }
+      },
+      {
+        "input": "",
+        "expected": {
+          "transaction_count": 0,
+          "note": "Empty input"
+        }
+      },
+      {
+        "input": "mua mua mua mua 25k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 25000,
+          "note": "Repetitive pattern handled gracefully"
+        }
+      },
+      {
+        "input": "cafe cafe cafe 25k 25k 25k",
+        "expected": {
+          "transaction_count": 3,
+          "amounts": [25000, 25000, 25000],
+          "note": "Multiple duplicate transactions or single transaction"
+        }
+      }
+    ],
+    "amount_variations": [
+      {
+        "input": "mua đồ 2tr5",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 2500000,
+          "note": "Mixed format: 2.5 million"
+        }
+      },
+      {
+        "input": "chi khoảng 50k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 50000,
+          "note": "Approximate amount",
+          "confidence": "medium"
+        }
+      },
+      {
+        "input": "tiêu tầm 100k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 100000,
+          "note": "Approximate amount",
+          "confidence": "medium"
+        }
+      },
+      {
+        "input": "mua đồ hai lăm",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 25000,
+          "note": "Vietnamese number pronunciation: 25k"
+        }
+      }
+    ],
+    "cultural_context": [
+      {
+        "input": "đi nhậu 300k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 300000,
+          "category_type": "entertainment",
+          "note": "Vietnamese drinking culture"
+        }
+      },
+      {
+        "input": "mua vàng cưới 50tr",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 50000000,
+          "category_type": "shopping",
+          "note": "Wedding gold purchase"
+        }
+      },
+      {
+        "input": "lì xì tết 200k",
+        "expected": {
+          "transaction_count": 1,
+          "amount": 200000,
+          "type": "expense",
+          "note": "Lunar New Year money gift"
+        }
+      }
+    ]
   },
-  "pass_threshold": 0.85,
-  "notes": [
-    "Test cases cover basic scenarios, edge cases, slang, and complex multi-transaction inputs",
-    "Expected results may need adjustment based on actual category IDs in database",
-    "Confidence scores are indicative - actual scores may vary based on prompt optimization",
-    "Some test cases focus on ensuring AI correctly rejects non-transaction inputs"
-  ]
+  "performance_benchmarks": {
+    "accuracy_target": 0.90,
+    "coverage_target": 0.95,
+    "response_time_ms": 3000,
+    "slang_support_count": 50,
+    "max_transactions_per_input": 20
+  },
+  "validation_rules": {
+    "required_fields": [
+      "transactions",
+      "analysis_summary", 
+      "parsing_metadata"
+    ],
+    "transaction_required_fields": [
+      "transaction_type",
+      "amount",
+      "description",
+      "confidence_score"
+    ],
+    "valid_transaction_types": ["expense", "income", "transfer"],
+    "confidence_range": [0.0, 1.0],
+    "amount_range": [1, 1000000000]
+  },
+  "test_statistics": {
+    "total_test_cases": 40,
+    "categories": {
+      "basic_transactions": 5,
+      "vietnamese_slang": 6,
+      "stress_tests": 3,
+      "time_expressions": 4, 
+      "multi_transaction": 3,
+      "regional_variations": 3,
+      "edge_cases": 5,
+      "destructive_inputs": 4,
+      "amount_variations": 4,
+      "cultural_context": 3
+    }
+  }
 }

@@ -1,0 +1,63 @@
+{
+  "summary": {
+    "total_tests": 4,
+    "passed": 3,
+    "failed": 1,
+    "accuracy": "75.00%",
+    "precision": "75.00%",
+    "recall": "75.00%",
+    "execution_time": "26.19s"
+  },
+  "category_breakdown": {
+    "destructive_inputs": {
+      "accuracy": "75.0%",
+      "average_score": "0.825",
+      "execution_time": "25.79s"
+    }
+  },
+  "failures": [
+    {
+      "input": "cafe cafe cafe 25k 25k 25k",
+      "category": "destructive_inputs",
+      "error": "Transaction count mismatch: expected 3, got 1, Multiple amounts mismatch: expected 25000,25000,25000, got 25000",
+      "expected": {
+        "transaction_count": 3,
+        "amounts": [
+          25000,
+          25000,
+          25000
+        ],
+        "note": "Multiple duplicate transactions or single transaction"
+      },
+      "actual": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 25000,
+            "description": "Mua cà phê",
+            "suggested_category_id": null,
+            "suggested_category_name": "Ăn uống",
+            "suggested_tags": [
+              "#CàPhê"
+            ],
+            "confidence_score": 0.9,
+            "extracted_merchant": null,
+            "extracted_date": "2025-07-24",
+            "notes": "Lặp lại từ 'cafe' và '25k', được hiểu là một giao dịch mua cà phê duy nhất."
+          }
+        ],
+        "analysis_summary": "Detected a single expense for coffee. The repeated terms were interpreted as emphasis rather than multiple distinct transactions due to lack of explicit separators.",
+        "parsing_metadata": {
+          "total_transactions_found": 1,
+          "high_confidence_count": 1,
+          "average_confidence": 0.9,
+          "parsing_notes": "Repetitive phrasing ('cafe cafe cafe 25k 25k 25k') was interpreted as a single transaction representing a coffee purchase. This approach prioritizes understanding the core financial event (coffee for 25k) over literal pattern repetition when distinct transaction markers are absent.",
+          "time_expressions_found": [],
+          "dates_calculated": [
+            "2025-07-24"
+          ]
+        }
+      }
+    }
+  ]
+}

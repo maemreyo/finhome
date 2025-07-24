@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "total_tests": 3,
+    "passed": 1,
+    "failed": 2,
+    "accuracy": "33.33%",
+    "precision": "33.33%",
+    "recall": "33.33%",
+    "execution_time": "16.11s"
+  },
+  "category_breakdown": {
+    "stress_tests": {
+      "accuracy": "33.3%",
+      "average_score": "0.300",
+      "execution_time": "15.80s"
+    }
+  },
+  "failures": [
+    {
+      "input": "đi chợ mua: rau 20k, thịt 150k, cá 80k, trứng 25k, gia vị 15k, bánh 30k, nước mắm 40k, gạo 200k, đường 25k, muối 10k",
+      "category": "stress_tests",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"10\"}]},{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"49s\"}]",
+      "expected": {
+        "transaction_count": 10,
+        "category_type": "shopping",
+        "confidence": "high"
+      }
+    },
+    {
+      "input": "đi du lịch Đà Lạt: vé xe 300k, khách sạn 800k, ăn sáng 50k, cafe 30k, ăn trưa 120k, vé vào cửa 40k, ăn tối 200k, quà 150k, vé về 300k",
+      "category": "stress_tests",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"10\"}]},{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"48s\"}]",
+      "expected": {
+        "transaction_count": 9,
+        "total_amount": 1990000,
+        "confidence": "high"
+      }
+    }
+  ]
+}

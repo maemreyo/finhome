@@ -704,6 +704,21 @@ export function UnifiedTransactionForm({
   // Log parsing session for analytics
   const logParsingSession = async (data: any, inputText: string) => {
     try {
+      // Handle cases where there are no transactions (empty array)
+      const transactionCount = data.transactions?.length || 0
+      let avgConfidence = 0
+      
+      if (transactionCount > 0) {
+        const totalConfidence = data.transactions.reduce((acc: number, t: any) => {
+          // Ensure confidence_score is a valid number, default to 0.5 if not
+          const confidence = typeof t.confidence_score === 'number' && !isNaN(t.confidence_score) 
+            ? t.confidence_score 
+            : 0.5
+          return acc + confidence
+        }, 0)
+        avgConfidence = totalConfidence / transactionCount
+      }
+      
       await fetch('/api/expenses/parsing-sessions', {
         method: 'POST',
         headers: {
@@ -711,15 +726,15 @@ export function UnifiedTransactionForm({
         },
         body: JSON.stringify({
           input_text: inputText,
-          transactions_parsed: data.transactions.length,
-          avg_confidence: data.transactions.reduce((acc: number, t: any) => acc + t.confidence_score, 0) / data.transactions.length,
-          parsed_transactions: data.transactions,
-          ai_model_used: data.metadata?.ai_model || 'gemini-1.5-flash',
+          transactions_parsed: transactionCount,
+          avg_confidence: avgConfidence, // Always a valid number, never NaN
+          parsed_transactions: data.transactions || [],
+          ai_model_used: data.metadata?.ai_model || 'gemini-2.5-flash',
         }),
       })
     } catch (error) {
       console.error('Error logging parsing session:', error)
-      // Don't show error to user - this is just for analytics
+      // Don't throw - logging failures shouldn't break the main flow
     }
   }
 
@@ -753,25 +768,50 @@ export function UnifiedTransactionForm({
       }
 
       // Transform transactions for batch API
-      const batchTransactions = transactions.map(transaction => ({
-        transaction_type: transaction.transaction_type,
-        amount: transaction.amount,
-        currency: transaction.currency || 'VND',
-        description: transaction.description || '',
-        notes: transaction.notes || '',
-        expense_category_key: transaction.expense_category_key,
-        income_category_key: transaction.income_category_key,
-        custom_category: transaction.custom_category,
-        tags: transaction.tags || [],
-        transfer_to_wallet_id: transaction.transfer_to_wallet_id,
-        transfer_fee: transaction.transfer_fee || 0,
-        transaction_date: transaction.transaction_date || format(new Date(), 'yyyy-MM-dd'),
-        transaction_time: transaction.transaction_time || format(new Date(), 'HH:mm:ss'),
-        receipt_images: transaction.receipt_images || [],
-        location: transaction.location,
-        merchant_name: transaction.merchant_name,
-        is_confirmed: transaction.is_confirmed !== false
-      }))
+      const batchTransactions = transactions.map(transaction => {
+        // Handle AI-parsed transactions that have suggested_category_id
+        let expenseCategoryKey = transaction.expense_category_key;
+        let incomeCategoryKey = transaction.income_category_key;
+        
+        // If we have suggested_category_id from AI parsing, convert it to category key
+        if (transaction.suggested_category_id && !expenseCategoryKey && !incomeCategoryKey) {
+          if (transaction.transaction_type === 'expense') {
+            // Find the expense category by ID and get its key
+            const category = expenseCategories.find(cat => cat.id === transaction.suggested_category_id);
+            expenseCategoryKey = category?.category_key;
+            if (!expenseCategoryKey) {
+              console.warn(`No expense category found for ID: ${transaction.suggested_category_id}`);
+            }
+          } else if (transaction.transaction_type === 'income') {
+            // Find the income category by ID and get its key  
+            const category = incomeCategories.find(cat => cat.id === transaction.suggested_category_id);
+            incomeCategoryKey = category?.category_key;
+            if (!incomeCategoryKey) {
+              console.warn(`No income category found for ID: ${transaction.suggested_category_id}`);
+            }
+          }
+        }
+        
+        return {
+          transaction_type: transaction.transaction_type,
+          amount: transaction.amount,
+          currency: transaction.currency || 'VND',
+          description: transaction.description || '',
+          notes: transaction.notes || '',
+          expense_category_key: expenseCategoryKey,
+          income_category_key: incomeCategoryKey,
+          custom_category: transaction.custom_category,
+          tags: transaction.tags || [],
+          transfer_to_wallet_id: transaction.transfer_to_wallet_id,
+          transfer_fee: transaction.transfer_fee || 0,
+          transaction_date: transaction.transaction_date || format(new Date(), 'yyyy-MM-dd'),
+          transaction_time: transaction.transaction_time || format(new Date(), 'HH:mm:ss'),
+          receipt_images: transaction.receipt_images || [],
+          location: transaction.location,
+          merchant_name: transaction.merchant_name,
+          is_confirmed: transaction.is_confirmed !== false
+        };
+      });
 
       // Send atomic batch request
       const response = await fetch('/api/transactions/batch', {

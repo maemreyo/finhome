@@ -1,0 +1,42 @@
+{
+  "summary": {
+    "total_tests": 3,
+    "passed": 1,
+    "failed": 2,
+    "accuracy": "33.33%",
+    "precision": "33.33%",
+    "recall": "33.33%",
+    "execution_time": "10.45s"
+  },
+  "category_breakdown": {
+    "cultural_context": {
+      "accuracy": "33.3%",
+      "average_score": "0.333",
+      "execution_time": "10.14s"
+    }
+  },
+  "failures": [
+    {
+      "input": "mua vàng cưới 50tr",
+      "category": "cultural_context",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"10\"}]},{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"55s\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "amount": 50000000,
+        "category_type": "shopping",
+        "note": "Wedding gold purchase"
+      }
+    },
+    {
+      "input": "lì xì tết 200k",
+      "category": "cultural_context",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"10\"}]},{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"54s\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "amount": 200000,
+        "type": "expense",
+        "note": "Lunar New Year money gift"
+      }
+    }
+  ]
+}

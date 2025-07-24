@@ -27,10 +27,10 @@ const aiTransactionSchema = z.object({
   transaction_type: z.enum(["expense", "income", "transfer"]),
   amount: z.number().min(0), // Allow zero amounts for ambiguous cases
   description: z.string(),
-  suggested_category_id: z.string().optional(),
-  suggested_category_name: z.string().optional(),
+  suggested_category_id: z.string().nullable().optional(),
+  suggested_category_name: z.string().nullable().optional(),
   suggested_tags: z.array(z.string()).default([]),
-  suggested_wallet_id: z.string().optional(),
+  suggested_wallet_id: z.string().nullable().optional(),
   confidence_score: z.number().min(0).max(1).default(0.5),
   extracted_merchant: z.string().nullable().optional(),
   extracted_date: z.string().nullable().optional(),
@@ -347,10 +347,14 @@ async function detectUnusualTransactions(
 }
 
 // Enhanced JSON parsing with fallback strategies
-function parseAIResponseWithFallback(responseText: string): any {
+function parseAIResponseWithFallback(responseText: string, originalInputText?: string): any {
   // Strategy 1: Direct JSON parsing
   try {
-    return JSON.parse(responseText);
+    const parsed = JSON.parse(responseText);
+    // Validate that we have a valid structure
+    if (parsed && typeof parsed === 'object') {
+      return parsed;
+    }
   } catch (error) {
     console.warn("🔄 Direct JSON parsing failed, trying fallback strategies...");
   }
@@ -376,33 +380,114 @@ function parseAIResponseWithFallback(responseText: string): any {
     }
     
     // Remove trailing commas
-    fixedResponse = fixedResponse.replace(/,(\s*[}\]])/g, '$1');
+    fixedResponse = fixedResponse.replace(/(,\s*[}\]])/g, '$1');
     
-    // Fix unescaped quotes in strings
-    fixedResponse = fixedResponse.replace(/(?<!\\)"/g, '\\"');
+    // Fix common quote issues in streaming responses
+    fixedResponse = fixedResponse.replace(/([^\\])"/g, '$1\\"');
     fixedResponse = fixedResponse.replace(/\\"/g, '"');
     
-    return JSON.parse(fixedResponse);
+    const parsed = JSON.parse(fixedResponse);
+    if (parsed && typeof parsed === 'object') {
+      return parsed;
+    }
   } catch (error) {
     console.warn("🔄 JSON repair strategy failed, trying extraction...");
   }
 
   // Strategy 3: Extract JSON from partial response
   try {
-    // Look for JSON-like patterns
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    // Look for JSON-like patterns, prioritize complete transactions array
+    const jsonMatch = responseText.match(/\{[\s\S]*"transactions"\s*:\s*\[[\s\S]*?\][\s\S]*?\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      const parsed = JSON.parse(jsonMatch[0]);
+      if (parsed && typeof parsed === 'object') {
+        return parsed;
+      }
+    }
+    
+    // Fallback to any JSON-like structure
+    const generalJsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (generalJsonMatch) {
+      const parsed = JSON.parse(generalJsonMatch[0]);
+      if (parsed && typeof parsed === 'object') {
+        return parsed;
+      }
     }
   } catch (error) {
     console.warn("🔄 JSON extraction failed");
   }
 
-  // Strategy 4: Return fallback structure
+  // Strategy 4: Try to extract partial transaction data from malformed response
+  try {
+    // Look for transaction-like patterns even in broken JSON
+    const transactionMatches = responseText.match(/"transaction_type"\s*:\s*"(expense|income|transfer)"/g);
+    const amountMatches = responseText.match(/"amount"\s*:\s*(\d+(?:\.\d+)?)/g);
+    const descriptionMatches = responseText.match(/"description"\s*:\s*"([^"]+)"/g);
+    
+    if (transactionMatches && amountMatches && descriptionMatches) {
+      console.log("🔧 Attempting to reconstruct transactions from partial data");
+      const transactions = [];
+      const count = Math.min(transactionMatches.length, amountMatches.length, descriptionMatches.length);
+      
+      for (let i = 0; i < count; i++) {
+        const type = transactionMatches[i].match(/"(expense|income|transfer)"/)?.[1] || 'expense';
+        const amount = parseFloat(amountMatches[i].match(/(\d+(?:\.\d+)?)/)?.[1] || '0');
+        const description = descriptionMatches[i].match(/"([^"]+)"/)?.[1] || 'Unknown transaction';
+        
+        transactions.push({
+          transaction_type: type,
+          amount: amount,
+          description: description,
+          confidence_score: 0.3, // Low confidence for reconstructed data
+          suggested_category_id: null,
+          suggested_category_name: null,
+          suggested_tags: [],
+          suggested_wallet_id: null,
+          extracted_merchant: null,
+          extracted_date: null,
+          notes: 'Reconstructed from partial AI response',
+          is_unusual: true,
+          unusual_reasons: ['Reconstructed from malformed AI response']
+        });
+      }
+      
+      if (transactions.length > 0) {
+        return {
+          transactions: transactions,
+          analysis_summary: `Partially recovered ${transactions.length} transaction(s) from malformed AI response.`
+        };
+      }
+    }
+  } catch (error) {
+    console.warn("🔄 Partial reconstruction failed");
+  }
+
+  // Strategy 5: Extract transactions directly from Vietnamese input as last resort
+  try {
+    console.log("🔧 Attempting to extract transactions directly from Vietnamese input");
+    
+    // Use the original input text if provided, fallback to response text
+    const textToExtract = originalInputText || responseText;
+    const vietnameseTransactions = extractVietnameseTransactions(textToExtract);
+    
+    if (vietnameseTransactions.length > 0) {
+      console.log(`✅ Extracted ${vietnameseTransactions.length} transactions from Vietnamese text`);
+      return {
+        transactions: vietnameseTransactions,
+        analysis_summary: `Extracted ${vietnameseTransactions.length} transaction(s) directly from Vietnamese text as fallback.`
+      };
+    }
+  } catch (error) {
+    console.warn("🔄 Vietnamese extraction failed:", error);
+  }
+
+  // Strategy 6: Return fallback structure with better error info
   console.error("❌ All JSON parsing strategies failed, returning fallback");
+  console.error("📝 Raw response (first 500 chars):", responseText.substring(0, 500));
+  
   return {
     transactions: [],
-    analysis_summary: "Failed to parse AI response. The AI may have returned malformed JSON."
+    analysis_summary: "Failed to parse AI response. The AI may have returned malformed JSON. Please try rephrasing your input or try again."
   };
 }
 
@@ -435,7 +520,7 @@ ${relevantCorrections
     categories: relevantCategories,
     wallets: wallets.slice(0, 5), // Limit to 5 wallets
     correctionContext,
-    version: "3.0", // Use the enhanced v3.0 with Vietnamese time recognition
+    version: "3.4",
     debugMode: process.env.NODE_ENV === "development" // Enable debug logging in development
   });
 }
@@ -641,7 +726,7 @@ export async function POST(request: NextRequest) {
       wallets,
       userCorrections
     );
-
+    console.log("Generated AI prompt:", prompt);
     // Call Gemini AI with streaming support and key rotation
     if (useStreaming) {
       return handleStreamingResponse(prompt, {
@@ -662,13 +747,13 @@ export async function POST(request: NextRequest) {
       let aiParsedData;
       try {
         // Clean the response (remove any markdown formatting)
-        let cleanedResponse = aiResponseText
+        const cleanedResponse = aiResponseText
           .replace(/```json\n?/g, "")
           .replace(/```\n?/g, "")
           .trim();
 
         // Try to parse JSON with multiple fallback strategies
-        aiParsedData = parseAIResponseWithFallback(cleanedResponse);
+        aiParsedData = parseAIResponseWithFallback(cleanedResponse, validatedData.text);
 
         // Validate the AI response structure
         const validatedAIResponse = aiResponseSchema.parse(aiParsedData);
@@ -867,6 +952,7 @@ async function handleStreamingResponse(
         let transactionBuffer = "";
         const currentTransaction: any = null;
         let transactionsFound = 0;
+        const streamedTransactions: any[] = []; // Collect successfully streamed transactions
 
         // Process each chunk from the stream
         for await (const chunk of result.stream) {
@@ -888,6 +974,9 @@ async function handleStreamingResponse(
             transactionsFound = partialTransactions.length;
 
             for (const transaction of newTransactions) {
+              // Store the successfully parsed transaction
+              streamedTransactions.push(transaction);
+              
               // Send each completed transaction immediately
               controller.enqueue(
                 new TextEncoder().encode(
@@ -901,7 +990,9 @@ async function handleStreamingResponse(
                         estimateTransactionCount(validatedData.text)
                       ),
                     },
-                  })}\n\n`
+                  })}
+
+`
                 )
               );
             }
@@ -927,20 +1018,70 @@ async function handleStreamingResponse(
 
         // Final processing of complete response
         try {
-          const cleanedResponse = accumulatedText
-            .replace(/```json\n?/g, "")
-            .replace(/```\n?/g, "")
-            .trim();
+          let finalTransactions = [];
+          let analysisMessage = "";
+          
+          // Priority 1: Use successfully streamed transactions if we have them
+          if (streamedTransactions.length > 0) {
+            console.log(`✅ Using ${streamedTransactions.length} successfully streamed transactions`);
+            finalTransactions = streamedTransactions;
+            analysisMessage = `Successfully processed ${streamedTransactions.length} transaction(s) via streaming.`;
+          } else {
+            // Priority 2: Fall back to parsing accumulated text
+            console.log("🔄 No streamed transactions, attempting to parse accumulated text");
+            const cleanedResponse = accumulatedText
+              .replace(/```json\n?/g, "")
+              .replace(/```\n?/g, "")
+              .trim();
 
-          // Use the same robust parsing function for streaming
-          const aiParsedData = parseAIResponseWithFallback(cleanedResponse);
-          const validatedAIResponse = aiResponseSchema.parse(aiParsedData);
+            const aiParsedData = parseAIResponseWithFallback(cleanedResponse, validatedData.text);
+            const validatedAIResponse = aiResponseSchema.parse(aiParsedData);
+            finalTransactions = validatedAIResponse.transactions || [];
+            analysisMessage = validatedAIResponse.analysis_summary || "AI parsing completed.";
+          }
+
+          // Priority 3: Check if we have fewer transactions than expected and use Vietnamese fallback
+          const expectedCount = estimateTransactionCount(validatedData.text);
+          if (finalTransactions.length > 0 && finalTransactions.length < expectedCount) {
+            console.log(`⚠️  Found ${finalTransactions.length} transactions but expected ${expectedCount}, trying Vietnamese fallback`);
+            
+            try {
+              const vietnameseTransactions = extractVietnameseTransactions(validatedData.text);
+              
+              if (vietnameseTransactions.length > finalTransactions.length) {
+                console.log(`✅ Vietnamese fallback found ${vietnameseTransactions.length} transactions, using fallback`);
+                
+                // Process Vietnamese transactions with proper formatting
+                const processedVietnameseTransactions = vietnameseTransactions.map((transaction, index) => {
+                  // Find matching category
+                  const matchedCategory = allCategories.find(cat => 
+                    cat.name_vi.toLowerCase().includes(transaction.suggested_category_name?.toLowerCase() || '') ||
+                    cat.name_en.toLowerCase().includes(transaction.suggested_category_name?.toLowerCase() || '')
+                  );
+                  
+                  return {
+                    ...transaction,
+                    suggested_category_id: matchedCategory?.id || null,
+                    suggested_category_name: matchedCategory?.name_vi || transaction.suggested_category_name,
+                    suggested_wallet_id: wallets[0]?.id || null,
+                    parsing_context: {
+                      original_text: validatedData.text,
+                      processing_timestamp: new Date().toISOString(),
+                      user_id: user.id,
+                    },
+                  };
+                });
+                
+                finalTransactions = processedVietnameseTransactions;
+                analysisMessage = `Extracted ${vietnameseTransactions.length} transaction(s) using Vietnamese fallback after streaming detected only ${streamedTransactions.length}.`;
+              }
+            } catch (vietnameseError) {
+              console.warn("Vietnamese fallback failed:", vietnameseError);
+            }
+          }
 
           // Handle case where no transactions are found (valid for non-transaction text)
-          if (
-            !validatedAIResponse.transactions ||
-            validatedAIResponse.transactions.length === 0
-          ) {
+          if (!finalTransactions || finalTransactions.length === 0) {
             console.log("✅ No transactions detected in streaming - this is valid for non-transaction text");
             
             // Send final result with empty transactions
@@ -950,14 +1091,14 @@ async function handleStreamingResponse(
                   type: "final",
                   data: {
                     transactions: [],
-                    analysis_summary: validatedAIResponse.analysis_summary || "No financial transactions detected in the provided text.",
+                    analysis_summary: "No financial transactions detected in the provided text.",
                     metadata: {
                       total_transactions: 0,
                       unusual_count: 0,
                       processing_time: new Date().toISOString(),
                       ai_model: "gemini-2.5-flash",
                       streaming: true,
-                      parsing_metadata: aiParsedData.parsing_metadata || null
+                      parsing_metadata: null
                     },
                   },
                 })}
@@ -973,7 +1114,7 @@ async function handleStreamingResponse(
           }
 
           // Process any remaining transactions
-          const processedTransactions = validatedAIResponse.transactions.map(
+          const processedTransactions = finalTransactions.map(
             (transaction) => {
               const matchedCategory = allCategories.find(
                 (cat) =>
@@ -1021,7 +1162,7 @@ async function handleStreamingResponse(
                 type: "final",
                 data: {
                   transactions: transactionsWithUnusualFlags,
-                  analysis_summary: validatedAIResponse.analysis_summary,
+                  analysis_summary: analysisMessage,
                   metadata: {
                     total_transactions: transactionsWithUnusualFlags.length,
                     unusual_count: transactionsWithUnusualFlags.filter(
@@ -1160,22 +1301,133 @@ function extractPartialTransactions(
 
 // Helper function to estimate transaction count from input text
 function estimateTransactionCount(text: string): number {
-  // Simple heuristic: count common transaction indicators
-  const indicators = [
-    /\d+k/gi, // amounts like "25k"
-    /\d+\s*triệu/gi, // amounts like "5 triệu"
-    /\d+tr/gi, // amounts like "15tr"
-    /tiêu|mua|ăn|uống/gi, // expense keywords
-    /nhận|lương|thưởng/gi, // income keywords
-    /,\s*(?=\w)/g, // commas separating transactions
+  // Strategy 1: Count monetary amounts (most reliable indicator)
+  const amountPatterns = [
+    /\d+k\b/gi,           // amounts like "25k", "30k"
+    /\d+\s*triệu\b/gi,    // amounts like "5 triệu"
+    /\d+tr\b/gi,          // amounts like "15tr"
+    /\d+\s*đồng\b/gi,     // amounts like "1000 đồng"
+    /\d+\s*vnd\b/gi,      // amounts like "50000 VND"
   ];
-
-  let count = 0;
-  for (const indicator of indicators) {
-    const matches = text.match(indicator);
-    if (matches) count += matches.length;
+  
+  let amountCount = 0;
+  for (const pattern of amountPatterns) {
+    const matches = text.match(pattern);
+    if (matches) amountCount += matches.length;
   }
+  
+  // Strategy 2: Count comma separators (reliable for list format)
+  // Count all commas, but exclude trailing commas that don't separate transactions
+  const allCommas = text.match(/,/g) || [];
+  let separatorCount = allCommas.length;
+  
+  // If text ends with comma and optional whitespace, subtract 1 as it's not a separator
+  if (/,\s*$/.test(text.trim())) {
+    separatorCount = Math.max(0, separatorCount - 1);
+  }
+  
+  // Strategy 3: Count transaction keywords
+  const expenseKeywords = /tiêu|mua|ăn|uống|đi|taxi|grab|xem|chơi/gi;
+  const incomeKeywords = /nhận|lương|thưởng|bán|thu/gi;
+  
+  const expenseMatches = text.match(expenseKeywords) || [];
+  const incomeMatches = text.match(incomeKeywords) || [];
+  const keywordCount = expenseMatches.length + incomeMatches.length;
+  
+  // Use the most reliable indicator
+  let estimate = amountCount; // Start with amount count as it's most reliable
+  
+  // If we have comma separators, there are likely separatorCount + 1 transactions
+  if (separatorCount > 0) {
+    const commaBasedEstimate = separatorCount + 1;
+    // Use the higher of amount count or comma-based estimate
+    estimate = Math.max(estimate, commaBasedEstimate);
+  }
+  
+  // Sanity check with keyword count
+  if (keywordCount > estimate) {
+    estimate = Math.min(estimate + 1, keywordCount);
+  }
+  
+  // Return estimated count (minimum 1, maximum 10)
+  return Math.max(1, Math.min(estimate, 10));
+}
 
-  // Return estimated count (minimum 1, maximum based on heuristics)
-  return Math.max(1, Math.min(Math.ceil(count / 3), 10));
+// Helper function to extract transactions directly from Vietnamese text as fallback
+function extractVietnameseTransactions(text: string): any[] {
+  try {
+    const transactions: any[] = [];
+    
+    // Strategy 1: Parse comma-separated Vietnamese transaction descriptions
+    // Clean the text first to remove trailing commas and extra whitespace
+    const cleanedText = text.trim().replace(/,\s*$/, '');
+    const segments = cleanedText.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    
+    for (const segment of segments) {
+      // Look for amount patterns in Vietnamese
+      const amountMatch = segment.match(/(\d+(?:\.\d+)?)\s*(k|triệu|tr|đồng|vnd|000)?/i);
+      
+      if (amountMatch) {
+        let amount = parseFloat(amountMatch[1]);
+        const unit = amountMatch[2]?.toLowerCase();
+        
+        // Convert to VND
+        if (unit === 'k') {
+          amount *= 1000;
+        } else if (unit === 'triệu') {
+          amount *= 1000000;
+        } else if (unit === 'tr') {
+          amount *= 1000000;
+        }
+        
+        // Extract description (everything before the amount)
+        const description = segment.replace(/\d+(?:\.\d+)?\s*(k|triệu|tr|đồng|vnd|000)?\s*$/i, '').trim();
+        
+        if (description && amount > 0) {
+          // Determine category based on Vietnamese keywords
+          let suggestedCategory = 'Khác'; // Default to "Other"
+          
+          if (/ăn|uống|trà|cà phê|phở|cơm|bún|quán|nhà hàng|food|drink/i.test(description)) {
+            suggestedCategory = 'Ăn uống';
+          } else if (/xe|grab|taxi|xăng|gas|uber|bus|metro/i.test(description)) {
+            suggestedCategory = 'Di chuyển';
+          } else if (/mua|shopping|shopee|lazada|mall|siêu thị/i.test(description)) {
+            suggestedCategory = 'Mua sắm';
+          } else if (/phim|game|net|nhậu|karaoke|bar|club|giải trí/i.test(description)) {
+            suggestedCategory = 'Giải trí';
+          }
+          
+          let transactionType: 'expense' | 'income' | 'transfer' = 'expense'; // Default to expense
+
+          // Determine transaction type based on keywords
+          if (/nhận|lương|thưởng|bán|thu/i.test(description)) {
+            transactionType = 'income';
+          } else if (/chuyển|gửi/i.test(description)) {
+            transactionType = 'transfer';
+          }
+
+          transactions.push({
+            transaction_type: transactionType,
+            amount: amount,
+            description: description,
+            confidence_score: 0.6, // Medium confidence for direct extraction
+            suggested_category_id: null,
+            suggested_category_name: suggestedCategory,
+            suggested_tags: [],
+            suggested_wallet_id: null,
+            extracted_merchant: null,
+            extracted_date: null,
+            notes: 'Extracted directly from Vietnamese text',
+            is_unusual: false,
+            unusual_reasons: []
+          });
+        }
+      }
+    }
+    
+    return transactions;
+  } catch (error) {
+    console.error('Error extracting Vietnamese transactions:', error);
+    return [];
+  }
 }

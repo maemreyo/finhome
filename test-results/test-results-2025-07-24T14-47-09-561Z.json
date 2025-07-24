@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "total_tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "accuracy": "100.00%",
+    "precision": "100.00%",
+    "recall": "100.00%",
+    "execution_time": "46.72s"
+  },
+  "category_breakdown": {
+    "vietnamese_slang": {
+      "accuracy": "100.0%",
+      "average_score": "0.917",
+      "execution_time": "46.10s"
+    }
+  },
+  "failures": []
+}

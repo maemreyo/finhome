@@ -1,0 +1,58 @@
+{
+  "summary": {
+    "total_tests": 4,
+    "passed": 1,
+    "failed": 3,
+    "accuracy": "25.00%",
+    "precision": "25.00%",
+    "recall": "25.00%",
+    "execution_time": "6.84s"
+  },
+  "category_breakdown": {
+    "time_expressions": {
+      "accuracy": "25.0%",
+      "average_score": "0.250",
+      "execution_time": "6.43s"
+    }
+  },
+  "failures": [
+    {
+      "input": "sáng nay uống cafe 25k",
+      "category": "time_expressions",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-2.5-flash\",\"location\":\"global\"},\"quotaValue\":\"10\"}]},{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"59s\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "amount": 25000,
+        "has_date": true,
+        "date_type": "today",
+        "time_context": "morning",
+        "confidence": "high"
+      }
+    },
+    {
+      "input": "tuần trước mua sách 200k",
+      "category": "time_expressions",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"10\"}]},{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"58s\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "amount": 200000,
+        "has_date": true,
+        "date_type": "last_week",
+        "confidence": "medium"
+      }
+    },
+    {
+      "input": "chiều hôm qua đi ăn 150k",
+      "category": "time_expressions",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"10\"}]},{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"57s\"}]",
+      "expected": {
+        "transaction_count": 1,
+        "amount": 150000,
+        "has_date": true,
+        "date_type": "yesterday",
+        "time_context": "afternoon",
+        "confidence": "high"
+      }
+    }
+  ]
+}

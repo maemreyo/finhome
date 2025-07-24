@@ -33,7 +33,10 @@
     "prompts:list": "tsx scripts/manage-prompts.ts list",
     "prompts:create": "tsx scripts/manage-prompts.ts create",
     "prompts:view": "tsx scripts/manage-prompts.ts view",
-    "prompts:test": "tsx scripts/manage-prompts.ts test"
+    "prompts:test": "tsx scripts/manage-prompts.ts test",
+    "test-prompt": "node scripts/test-prompt-performance.js",
+    "test-prompt-category": "node scripts/test-prompt-performance.js --category",
+    "compare-prompts": "node scripts/test-prompt-performance.js --compare"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

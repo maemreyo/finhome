@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "total_tests": 3,
+    "passed": 3,
+    "failed": 0,
+    "accuracy": "100.00%",
+    "precision": "100.00%",
+    "recall": "100.00%",
+    "execution_time": "40.35s"
+  },
+  "category_breakdown": {
+    "stress_tests": {
+      "accuracy": "100.0%",
+      "average_score": "0.967",
+      "execution_time": "40.05s"
+    }
+  },
+  "failures": []
+}

@@ -1,0 +1,18 @@
+
+## Test Failure Analysis - 2025-07-24
+
+### 1. Stress Test Failure
+
+- **File:** `test-results/test-results-2025-07-24T14-47-55-198Z.json`
+- **Input:** "đi chợ mua: rau 20k, thịt 150k, cá 80k, trứng 25k, gia vị 15k, bánh 30k, nước mắm 40k, gạo 200k, đường 25k, muối 10k"
+- **Expected:** `transaction_count`: 10
+- **Actual:** `transaction_count`: 1
+- **Root Cause:** The model incorrectly aggregated all items into a single transaction. The prompt seems to favor summarization over itemization when presented with a list of items and their prices. It lacks a clear instruction to treat each item as a distinct transaction.
+
+### 2. Destructive Input Failure
+
+- **File:** `test-results/test-results-2025-07-24T14-50-06-435Z.json`
+- **Input:** "cafe cafe cafe 25k 25k 25k"
+- **Expected:** `transaction_count`: 3
+- **Actual:** `transaction_count`: 1
+- **Root Cause:** The model interpreted the repeated words and amounts as emphasis on a single transaction rather than three separate transactions. The prompt needs a rule to handle repeated patterns as distinct entries.

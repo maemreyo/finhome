@@ -171,7 +171,7 @@ const prompt = await PromptService.getTransactionParsingPrompt({
 
 **1. Template Not Found**
 ```bash
-Error: Prompt template not found: transaction-parser-v3.0
+Error: Prompt template not found: transaction-parser-v3.2
 ```
 Solution: Check available templates with `pnpm prompts:list`
 
