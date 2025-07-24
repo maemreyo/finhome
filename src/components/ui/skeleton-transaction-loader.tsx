@@ -5,7 +5,9 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Brain, Sparkles, Zap } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Brain, Sparkles, Zap, CheckCircle, AlertCircle, AlertTriangle, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SkeletonTransactionLoaderProps {
@@ -82,6 +84,142 @@ export function SkeletonTransactionLoader({
   )
 }
 
+// Compact Confidence Score Display Component
+interface ConfidenceScoreProps {
+  score: number;
+  isUnusual?: boolean;
+  unusualReasons?: string[];
+  showTooltip?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+export function ConfidenceScore({ 
+  score, 
+  isUnusual = false, 
+  unusualReasons = [], 
+  showTooltip = true,
+  size = 'md' 
+}: ConfidenceScoreProps) {
+  const percentage = Math.round(score * 100);
+  
+  // Determine color based on confidence level
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 80) return 'text-green-600 bg-green-50 border-green-200';
+    if (confidence >= 60) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+    return 'text-red-600 bg-red-50 border-red-200';
+  };
+
+  // Size variants
+  const sizeClasses = {
+    sm: 'text-xs px-1.5 py-0.5',
+    md: 'text-sm px-2 py-1',
+    lg: 'text-base px-3 py-1.5'
+  };
+
+  const confidenceClass = getConfidenceColor(percentage);
+  const sizeClass = sizeClasses[size];
+
+  const badge = (
+    <div className={cn(
+      'inline-flex items-center gap-1 rounded-full border font-medium',
+      confidenceClass,
+      sizeClass,
+      isUnusual && 'ring-2 ring-amber-200 ring-offset-1'
+    )}>
+      {/* Confidence indicator icon */}
+      {percentage >= 80 ? (
+        <CheckCircle className="h-3 w-3" />
+      ) : percentage >= 60 ? (
+        <AlertCircle className="h-3 w-3" />
+      ) : (
+        <AlertTriangle className="h-3 w-3" />
+      )}
+      
+      <span>{percentage}%</span>
+      
+      {/* Human review flag */}
+      {isUnusual && (
+        <Eye className="h-3 w-3 text-amber-600" title="Needs human review" />
+      )}
+    </div>
+  );
+
+  if (!showTooltip) return badge;
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          {badge}
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+          <div className="space-y-2">
+            <div className="font-medium">
+              AI Confidence: {percentage}%
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {percentage >= 80 && "High confidence - AI is very sure about this categorization"}
+              {percentage >= 60 && percentage < 80 && "Medium confidence - AI has some uncertainty"}
+              {percentage < 60 && "Low confidence - Review recommended"}
+            </div>
+            {isUnusual && unusualReasons.length > 0 && (
+              <div className="border-t pt-2">
+                <div className="font-medium text-amber-600 mb-1">Review needed:</div>
+                <ul className="text-sm space-y-1">
+                  {unusualReasons.map((reason, index) => (
+                    <li key={index} className="flex items-start gap-1">
+                      <span className="text-amber-500 mt-0.5">•</span>
+                      <span>{reason}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+// Human-in-the-Loop Review Flag Component
+interface ReviewFlagProps {
+  isRequired: boolean;
+  reasons: string[];
+  onReviewComplete?: () => void;
+  className?: string;
+}
+
+export function ReviewFlag({ 
+  isRequired, 
+  reasons, 
+  onReviewComplete,
+  className 
+}: ReviewFlagProps) {
+  if (!isRequired) return null;
+
+  return (
+    <div className={cn(
+      'inline-flex items-center gap-2 px-2 py-1 rounded-md',
+      'bg-amber-50 border border-amber-200 text-amber-800',
+      className
+    )}>
+      <Eye className="h-4 w-4" />
+      <span className="text-sm font-medium">Review Needed</span>
+      {onReviewComplete && (
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={onReviewComplete}
+          className="h-6 px-2 text-xs hover:bg-amber-100"
+        >
+          Mark Reviewed
+        </Button>
+      )}
+    </div>
+  );
+}
+
 interface TransactionSkeletonProps {
   transaction?: any
   isComplete: boolean
@@ -100,9 +238,12 @@ function TransactionSkeleton({ transaction, isComplete }: TransactionSkeletonPro
                transaction.transaction_type === 'income' ? 'Income' : 'Transfer'}
             </span>
             {transaction.confidence_score && (
-              <Badge variant="outline" className="text-xs border-green-300 text-green-700">
-                {Math.round(transaction.confidence_score * 100)}% confident
-              </Badge>
+              <ConfidenceScore 
+                score={transaction.confidence_score}
+                isUnusual={transaction.is_unusual}
+                unusualReasons={transaction.unusual_reasons}
+                size="sm"
+              />
             )}
           </div>
           <div className="text-right">

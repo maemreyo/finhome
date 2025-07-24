@@ -1,0 +1,115 @@
+tôi sẽ giải thích toàn bộ luồng xử lý trong file src/app/api/expenses/parse-from-text/route.ts, đặc biệt tập trung vào các đoạn code có thể "override" hoặc là cơ chế "fallback" cho nhau.
+
+  Đây là một API endpoint nhận văn bản tiếng Việt và chuyển đổi nó thành dữ liệu giao dịch có cấu trúc bằng cách sử dụng Gemini AI.
+
+  Luồng xử lý chính trong hàm POST
+
+   1. Xác thực người dùng (Authentication):
+       * API cố gắng lấy thông tin người dùng từ session hiện có của Supabase.
+       * Nếu không có session, nó sẽ cố gắng trích xuất auth-token từ cookie trong header của request để xác thực thủ công.
+       * Override/Fallback: Nếu không tìm thấy người dùng hợp lệ bằng cả hai cách, request sẽ bị từ chối với lỗi 401 (Unauthorized).
+
+   2. Kiểm tra cấu hình AI Service:
+       * Đảm bảo rằng keyManager đã được khởi tạo hoặc GEMINI_API_KEY đã được cấu hình.
+       * Override/Fallback: Nếu không có khóa API, request sẽ bị từ chối với lỗi 503 (Service Unavailable).
+
+   3. Xác thực đầu vào (Input Validation):
+       * Dữ liệu từ request body được xác thực bằng parseTextSchema (sử dụng Zod).
+       * Override/Fallback: Nếu dữ liệu đầu vào không hợp lệ, request sẽ bị từ chối với lỗi 400 (Bad Request).
+
+   4. Lấy dữ liệu danh mục và ví (Data Fetching):
+       * API gọi Supabase để lấy tất cả các danh mục chi tiêu (expense_categories) và danh mục thu nhập (income_categories).
+       * Lấy danh sách ví của người dùng (expense_wallets).
+       * Override/Fallback: Nếu không tìm thấy ví nào, request sẽ bị từ chối với lỗi 400 (NO\_WALLETS).
+       * Cố gắng lấy các chỉnh sửa gần đây của người dùng (user_ai_corrections) để AI học hỏi. Đây là tùy chọn, nếu bảng không tồn tại hoặc có lỗi, quá trình vẫn tiếp tục.
+
+   5. Xây dựng Prompt cho AI (`buildAIPrompt`):
+       * Hàm này tạo ra prompt hoàn chỉnh sẽ gửi đến Gemini AI.
+       * Nó chọn lọc các danh mục liên quan (getRelevantCategories) dựa trên văn bản đầu vào để giảm kích thước prompt.
+       * Nó cũng thêm ngữ cảnh từ các chỉnh sửa trước đây của người dùng (userCorrections).
+       * Sử dụng PromptService.getTransactionParsingPrompt để tạo prompt cuối cùng, bao gồm cả phiên bản prompt (v3.4 hiện tại).
+
+   6. Gọi Gemini AI (`makeGeminiRequest`):
+       * Đây là hàm trung tâm để tương tác với Gemini API.
+       * Quản lý khóa và giới hạn tốc độ (Key Rotation & Rate Limiting): Nếu keyManager và rateLimiter được khởi tạo, nó sẽ sử dụng cơ chế xoay vòng khóa và giới hạn tốc độ để tránh bị chặn API.
+       * Fallback: Nếu keyManager hoặc rateLimiter không hoạt động, nó sẽ quay lại sử dụng một khóa API duy nhất mà không có quản lý nâng cao.
+       * Caching: Đối với các request không streaming và không bị vô hiệu hóa cache, nó sẽ kiểm tra cache trước. Nếu có kết quả trong cache, nó sẽ trả về ngay lập tức mà không gọi AI.
+       * Streaming vs. Non-streaming:
+           * Nếu useStreaming là true (mặc định), nó sẽ gọi handleStreamingResponse.
+           * Nếu useStreaming là false, nó sẽ chờ phản hồi hoàn chỉnh từ AI.
+
+  Xử lý phản hồi AI (Streaming vs. Non-streaming)
+
+  A. Luồng Non-streaming (trong hàm POST):
+
+   1. Phân tích phản hồi AI (`parseAIResponseWithFallback`):
+       * Đây là điểm override/fallback quan trọng nhất cho phản hồi của AI. Hàm này cố gắng phân tích văn bản thô từ AI thành JSON có cấu trúc với nhiều chiến lược:
+           * Chiến lược 1: Phân tích JSON trực tiếp: Cố gắng parse trực tiếp văn bản.
+           * Chiến lược 2: Sửa lỗi JSON phổ biến: Nếu parse trực tiếp thất bại, nó cố gắng sửa các lỗi JSON phổ biến (thiếu dấu ngoặc, dấu phẩy thừa, lỗi quote).
+           * Chiến lược 3: Trích xuất JSON từ phản hồi một phần: Tìm kiếm các mẫu giống JSON trong văn bản và cố gắng trích xuất.
+           * Chiến lược 4: Tái tạo giao dịch từ dữ liệu một phần: Nếu JSON bị hỏng nặng, nó cố gắng tìm các mẫu transaction_type, amount, description và tái tạo lại các giao dịch.
+           * Chiến lược 5: Trích xuất giao dịch trực tiếp từ văn bản tiếng Việt (`extractVietnameseTransactions`): Đây là fallback cuối cùng và quan trọng nhất. Nếu tất cả các chiến lược trên thất bại, hoặc nếu số lượng giao dịch được AI trả về ít hơn đáng kể so với ước tính ban đầu,
+             nó sẽ sử dụng hàm extractVietnameseTransactions để phân tích lại văn bản đầu vào gốc của người dùng. Hàm này sử dụng các quy tắc dựa trên từ khóa tiếng Việt để trích xuất giao dịch. Đây là nơi lỗi "nhận thưởng" đã được sửa, vì nó không còn mặc định là expense nữa.
+           * Override/Fallback: Nếu tất cả các chiến lược đều thất bại, nó sẽ trả về một cấu trúc lỗi với thông báo rằng phản hồi AI không thể phân tích được.
+
+   2. Xác thực cấu trúc phản hồi AI (`aiResponseSchema.parse`):
+       * Sau khi phân tích, dữ liệu được xác thực lại bằng Zod để đảm bảo nó tuân thủ cấu trúc mong muốn.
+       * Override/Fallback: Nếu xác thực thất bại (ví dụ: số tiền không hợp lệ), nó sẽ trả về lỗi 400 hoặc 500.
+
+   3. Hậu xử lý giao dịch (Post-processing):
+       * Các giao dịch được xử lý để đảm bảo suggested_category_id và suggested_category_name khớp với các danh mục có sẵn.
+       * suggested_wallet_id được gán (mặc định là ví đầu tiên của người dùng).
+       * detectUnusualTransactions: Hàm này phân tích từng giao dịch để gắn cờ các giao dịch bất thường (ví dụ: số tiền lớn, độ tin cậy thấp, không khớp với mẫu chi tiêu của người dùng).
+
+  B. Luồng Streaming (handleStreamingResponse):
+
+   1. Gửi trạng thái ban đầu: Gửi thông báo "Starting AI analysis..." đến client.
+   2. Streaming từ Gemini: Gọi makeGeminiRequest với streaming: true.
+   3. Xử lý từng chunk:
+       * Mỗi chunk văn bản từ AI được thêm vào accumulatedText và transactionBuffer.
+       * extractPartialTransactions: Hàm này cố gắng trích xuất các giao dịch JSON hoàn chỉnh từ transactionBuffer khi chúng xuất hiện.
+       * Override/Fallback: Nếu các giao dịch hoàn chỉnh được tìm thấy, chúng sẽ được gửi ngay lập tức đến client.
+       * Gửi cập nhật tiến độ (progress) đến client.
+   4. Xử lý cuối cùng sau khi streaming hoàn tất:
+       * Ưu tiên 1: Giao dịch đã được stream thành công: Nếu có các giao dịch đã được extractPartialTransactions xử lý và gửi đi trong quá trình streaming, chúng sẽ được sử dụng làm kết quả cuối cùng.
+       * Ưu tiên 2: Phân tích văn bản tích lũy: Nếu không có giao dịch nào được stream thành công, nó sẽ cố gắng phân tích toàn bộ accumulatedText bằng parseAIResponseWithFallback (tương tự như luồng non-streaming).
+       * Ưu tiên 3: Fallback tiếng Việt (`extractVietnameseTransactions`): Đây là điểm override/fallback quan trọng nhất trong luồng streaming. Nếu số lượng giao dịch cuối cùng (từ streaming hoặc từ accumulatedText) ít hơn so với ước tính ban đầu từ văn bản gốc, nó sẽ gọi
+         extractVietnameseTransactions để phân tích lại văn bản đầu vào gốc của người dùng. Điều này đảm bảo rằng ngay cả khi AI gặp khó khăn trong việc tạo JSON streaming hoàn chỉnh, chúng ta vẫn có thể trích xuất các giao dịch cơ bản.
+       * Hậu xử lý: Tương tự như luồng non-streaming, các giao dịch được xử lý và gắn cờ bất thường.
+       * Gửi kết quả cuối cùng (final) và tín hiệu hoàn thành ([DONE]) đến client.
+
+  Tóm tắt các điểm "Override" và "Fallback":
+
+   * Xác thực: Nếu xác thực đầu vào hoặc xác thực người dùng thất bại, request sẽ bị từ chối ngay lập tức.
+   * AI Key/Rate Limiting: Có cơ chế fallback nếu quản lý khóa nâng cao thất bại.
+   * Caching: Cache sẽ override cuộc gọi AI nếu có kết quả hợp lệ.
+   * Phân tích phản hồi AI (`parseAIResponseWithFallback`): Đây là chuỗi các chiến lược fallback. Nếu một chiến lược thất bại, nó sẽ thử chiến lược tiếp theo.
+   * Fallback tiếng Việt (`extractVietnameseTransactions`): Đây là một fallback mạnh mẽ, có thể override kết quả của AI (cả streaming và non-streaming) nếu AI không trả về đủ số lượng giao dịch hoặc trả về JSON bị hỏng. Nó phân tích lại văn bản gốc của người dùng.
+
+
+
+
+nghiên cứu xem có cách nào để đảm bảo chính xác response từ AI không? vì nếu nhiều fallback thế kia thì rất dễ bị override issue như trên
+
+-> Chắc chỉ có Kỹ thuật Prompt Engineering Nâng cao là sẽ cải thiện được, vì tiếng việt còn rất nhiều case phức tạp khác
+-> Cải thiện độ tin cậy của Fallback (Làm cho Fallback hỗ trợ hơn, ít "override" hơn)
+
+  Mặc dù mục tiêu là giảm sự phụ thuộc vào fallback, nhưng khi chúng được sử dụng, chúng cần phải đáng tin cậy và minh bạch.
+
+   * Sử dụng Confidence Score của AI:
+       * Nếu AI cung cấp điểm tin cậy (confidence score), hãy sử dụng nó để quyết định khi nào nên tin tưởng hoàn toàn vào AI và khi nào nên dựa nhiều hơn vào logic fallback. Ví dụ, nếu điểm tin cậy cao (>0.8), hãy ưu tiên kết quả của AI. Nếu thấp (<0.5), hãy xem xét kỹ hơn hoặc sử
+         dụng fallback.
+   * Tiếp cận lai (Hybrid Approach):
+       * Thay vì ghi đè hoàn toàn (full override), các cơ chế fallback có thể bổ sung hoặc chỉnh sửa các trường cụ thể trong đầu ra của AI thay vì phân tích lại mọi thứ từ đầu. Ví dụ, nếu AI phân loại sai loại giao dịch nhưng đúng số tiền, fallback chỉ cần sửa loại giao dịch đó.
+   * Con người trong vòng lặp (Human-in-the-Loop):
+       * Đối với các trường hợp có độ tin cậy thấp hoặc mơ hồ, hãy gắn cờ chúng để con người xem xét/chỉnh sửa. Phản hồi này sau đó có thể được sử dụng để cải thiện prompt hoặc fine-tune model.
+   * Logic Fallback minh bạch và được kiểm thử:
+       * Đảm bảo rằng logic fallback của chính nó được kiểm thử kỹ lưỡng và minh bạch. Việc sửa lỗi trong extractVietnameseTransactions là một bước đi đúng hướng để làm cho cơ chế fallback này đáng tin cậy hơn.
+
+  Kết nối với vấn đề hiện tại:
+
+  Việc bạn phát hiện ra lỗi "nhận thưởng" bị phân loại sai là một ví dụ điển hình cho thấy sự cần thiết của việc kiểm tra kỹ lưỡng cả prompt và logic hậu xử lý. Việc sửa lỗi trong extractVietnameseTransactions đã giúp cơ chế fallback này chính xác hơn. Tuy nhiên, mục tiêu cuối cùng
+  là làm cho AI tự nó phân loại đúng ngay từ đầu, để chúng ta không cần phải dựa vào fallback này thường xuyên.
+
+
+Ý bạn sao? Tạo các ticket bổ sung để cải thiện các phần này. Cần có chỗ hiển thị confidence scrore 1 cách compact, áp dụng human in the loop đúng lúc.

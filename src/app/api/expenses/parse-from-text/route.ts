@@ -348,20 +348,197 @@ async function detectUnusualTransactions(
 
 // Enhanced JSON parsing with fallback strategies
 function parseAIResponseWithFallback(responseText: string, originalInputText?: string): any {
-  // Strategy 1: Direct JSON parsing
+  console.log("🔄 Starting enhanced AI response parsing with hybrid fallback approach...");
+  
+  // Strategy 1: Direct JSON parsing with confidence assessment
   try {
     const parsed = JSON.parse(responseText);
+    
     // Validate that we have a valid structure
-    if (parsed && typeof parsed === 'object') {
-      return parsed;
+    if (parsed && typeof parsed === 'object' && parsed.transactions) {
+      console.log("✅ Direct JSON parsing successful");
+      
+      // Check if AI provided confidence metadata
+      const avgConfidence = parsed.parsing_metadata?.average_confidence || 
+        (parsed.transactions.reduce((sum: number, t: any) => sum + (t.confidence_score || 0.5), 0) / parsed.transactions.length);
+      
+      // If confidence is high enough, trust the AI completely
+      if (avgConfidence >= 0.75) {
+        console.log(`🎯 High confidence AI response (${(avgConfidence * 100).toFixed(1)}%) - using directly`);
+        return parsed;
+      }
+      
+      console.log(`⚠️ Medium confidence AI response (${(avgConfidence * 100).toFixed(1)}%) - will validate and enhance`);
+      return enhanceAIResponse(parsed, originalInputText);
     }
   } catch (error) {
-    console.warn("🔄 Direct JSON parsing failed, trying fallback strategies...");
+    console.warn("🔄 Direct JSON parsing failed, trying repair strategies...");
   }
 
-  // Strategy 2: Try to fix common JSON issues
+  // Strategy 2: Intelligent JSON repair
   try {
-    let fixedResponse = responseText;
+    const repairedJson = repairMalformedJson(responseText);
+    if (repairedJson) {
+      console.log("🔧 JSON repair successful");
+      return enhanceAIResponse(repairedJson, originalInputText);
+    }
+  } catch (error) {
+    console.warn("🔄 JSON repair failed, trying extraction...");
+  }
+
+  // Strategy 3: Smart JSON extraction from partial response
+  try {
+    const extractedJson = extractJsonFromPartialResponse(responseText);
+    if (extractedJson) {
+      console.log("📤 JSON extraction successful");
+      return enhanceAIResponse(extractedJson, originalInputText);
+    }
+  } catch (error) {
+    console.warn("🔄 JSON extraction failed, trying partial reconstruction...");
+  }
+
+  // Strategy 4: Hybrid reconstruction - combine AI partial data with rule-based extraction
+  try {
+    const hybridResult = performHybridReconstruction(responseText, originalInputText);
+    if (hybridResult && hybridResult.transactions.length > 0) {
+      console.log(`🔀 Hybrid reconstruction successful - ${hybridResult.transactions.length} transactions`);
+      return hybridResult;
+    }
+  } catch (error) {
+    console.warn("🔄 Hybrid reconstruction failed, falling back to Vietnamese extraction...");
+  }
+
+  // Strategy 5: Enhanced Vietnamese fallback with confidence tracking
+  try {
+    console.log("🇻🇳 Attempting enhanced Vietnamese extraction as final fallback");
+    
+    const textToExtract = originalInputText || responseText;
+    const vietnameseTransactions = extractVietnameseTransactions(textToExtract);
+    
+    if (vietnameseTransactions.length > 0) {
+      console.log(`✅ Vietnamese extraction successful - ${vietnameseTransactions.length} transactions`);
+      
+      // Enhance Vietnamese results with metadata
+      return {
+        transactions: vietnameseTransactions.map(t => ({
+          ...t,
+          confidence_score: t.confidence_score || 0.4, // Lower confidence for fallback
+          notes: t.notes ? `${t.notes} (Extracted via fallback)` : 'Extracted via Vietnamese fallback system',
+          validation_passed: false // Mark as needing validation
+        })),
+        analysis_summary: `Extracted ${vietnameseTransactions.length} transaction(s) using Vietnamese rule-based fallback system.`,
+        parsing_metadata: {
+          total_transactions_found: vietnameseTransactions.length,
+          high_confidence_count: 0,
+          medium_confidence_count: vietnameseTransactions.length,
+          low_confidence_count: 0,
+          average_confidence: 0.4,
+          parsing_quality: "needs_review",
+          validation_checks_passed: 0,
+          potential_issues: ["AI parsing failed", "Using rule-based fallback"],
+          fallback_risk: "high",
+          fallback_method: "vietnamese_extraction"
+        }
+      };
+    }
+  } catch (error) {
+    console.warn("🔄 Vietnamese extraction failed:", error);
+  }
+
+  // Strategy 6: Return structured error with debugging info
+  console.error("❌ All parsing strategies failed, returning error structure");
+  
+  return {
+    transactions: [],
+    analysis_summary: "Failed to parse AI response. Multiple parsing strategies attempted but none succeeded.",
+    parsing_metadata: {
+      total_transactions_found: 0,
+      high_confidence_count: 0,
+      medium_confidence_count: 0,
+      low_confidence_count: 0,
+      average_confidence: 0,
+      parsing_quality: "failed",
+      validation_checks_passed: 0,
+      potential_issues: [
+        "Direct JSON parsing failed",
+        "JSON repair failed", 
+        "JSON extraction failed",
+        "Hybrid reconstruction failed",
+        "Vietnamese fallback failed"
+      ],
+      fallback_risk: "critical",
+      debug_info: {
+        response_length: responseText.length,
+        response_preview: responseText.substring(0, 200),
+        original_input: originalInputText?.substring(0, 100) || "not_provided"
+      }
+    }
+  };
+}
+
+// Enhanced AI response validation and improvement
+function enhanceAIResponse(aiResponse: any, originalInputText?: string): any {
+  console.log("🔍 Enhancing AI response with hybrid validation...");
+  
+  if (!aiResponse.transactions || !Array.isArray(aiResponse.transactions)) {
+    return aiResponse;
+  }
+
+  const enhancedTransactions = aiResponse.transactions.map((transaction: any, index: number) => {
+    const enhanced = { ...transaction };
+    
+    // Validate and enhance confidence scores
+    if (!enhanced.confidence_score || enhanced.confidence_score < 0.5) {
+      // Use rule-based confidence assessment
+      enhanced.confidence_score = assessTransactionConfidence(enhanced, originalInputText);
+      enhanced.confidence_reasoning = "Enhanced by hybrid validation system";
+    }
+    
+    // Flag for human review if confidence is low
+    if (enhanced.confidence_score < 0.6) {
+      enhanced.validation_passed = false;
+      enhanced.notes = enhanced.notes ? 
+        `${enhanced.notes} (Low confidence - review recommended)` : 
+        'Low confidence - human review recommended';
+    } else {
+      enhanced.validation_passed = true;
+    }
+    
+    return enhanced;
+  });
+
+  // Update metadata
+  const confidenceScores = enhancedTransactions.map((t: any) => t.confidence_score);
+  const avgConfidence = confidenceScores.reduce((sum: number, score: number) => sum + score, 0) / confidenceScores.length;
+  
+  return {
+    ...aiResponse,
+    transactions: enhancedTransactions,
+    parsing_metadata: {
+      ...aiResponse.parsing_metadata,
+      average_confidence: avgConfidence,
+      high_confidence_count: confidenceScores.filter(s => s >= 0.8).length,
+      medium_confidence_count: confidenceScores.filter(s => s >= 0.6 && s < 0.8).length,
+      low_confidence_count: confidenceScores.filter(s => s < 0.6).length,
+      parsing_quality: avgConfidence >= 0.8 ? "excellent" : avgConfidence >= 0.6 ? "good" : "needs_review",
+      fallback_risk: avgConfidence >= 0.8 ? "low" : avgConfidence >= 0.6 ? "medium" : "high",
+      enhancement_applied: true
+    }
+  };
+}
+
+// Intelligent JSON repair
+function repairMalformedJson(jsonText: string): any | null {
+  try {
+    let fixedResponse = jsonText.trim();
+    
+    // Fix common streaming issues
+    if (!fixedResponse.startsWith('{')) {
+      const jsonStart = fixedResponse.indexOf('{');
+      if (jsonStart !== -1) {
+        fixedResponse = fixedResponse.substring(jsonStart);
+      }
+    }
     
     // Fix missing closing braces/brackets
     const openBraces = (fixedResponse.match(/\{/g) || []).length;
@@ -369,68 +546,148 @@ function parseAIResponseWithFallback(responseText: string, originalInputText?: s
     const openBrackets = (fixedResponse.match(/\[/g) || []).length;
     const closeBrackets = (fixedResponse.match(/\]/g) || []).length;
     
+    // Add missing closing brackets first
+    for (let i = 0; i < openBrackets - closeBrackets; i++) {
+      fixedResponse += ']';
+    }
+    
     // Add missing closing braces
     for (let i = 0; i < openBraces - closeBraces; i++) {
       fixedResponse += '}';
     }
     
-    // Add missing closing brackets
-    for (let i = 0; i < openBrackets - closeBrackets; i++) {
-      fixedResponse += ']';
-    }
+    // Remove trailing commas before closing brackets/braces
+    fixedResponse = fixedResponse.replace(/,(\s*[}\]])/g, '$1');
     
-    // Remove trailing commas
-    fixedResponse = fixedResponse.replace(/(,\s*[}\]])/g, '$1');
+    // Fix incomplete string values
+    fixedResponse = fixedResponse.replace(/"[^"]*$/g, '""');
     
-    // Fix common quote issues in streaming responses
-    fixedResponse = fixedResponse.replace(/([^\\])"/g, '$1\\"');
-    fixedResponse = fixedResponse.replace(/\\"/g, '"');
-    
-    const parsed = JSON.parse(fixedResponse);
-    if (parsed && typeof parsed === 'object') {
-      return parsed;
-    }
+    return JSON.parse(fixedResponse);
   } catch (error) {
-    console.warn("🔄 JSON repair strategy failed, trying extraction...");
+    return null;
   }
+}
 
-  // Strategy 3: Extract JSON from partial response
+// Smart JSON extraction from partial responses
+function extractJsonFromPartialResponse(responseText: string): any | null {
   try {
-    // Look for JSON-like patterns, prioritize complete transactions array
-    const jsonMatch = responseText.match(/\{[\s\S]*"transactions"\s*:\s*\[[\s\S]*?\][\s\S]*?\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
-      if (parsed && typeof parsed === 'object') {
-        return parsed;
+    // Look for complete transaction structures
+    const transactionPattern = /"transactions"\s*:\s*\[([^\]]+)\]/;
+    const match = responseText.match(transactionPattern);
+    
+    if (match) {
+      const transactionsText = match[1];
+      const transactions = [];
+      
+      // Extract individual transaction objects
+      const transactionMatches = transactionsText.match(/\{[^}]+\}/g);
+      if (transactionMatches) {
+        for (const transMatch of transactionMatches) {
+          try {
+            const transaction = JSON.parse(transMatch);
+            transactions.push(transaction);
+          } catch (e) {
+            // Skip malformed transactions
+          }
+        }
       }
+      
+      return {
+        transactions,
+        analysis_summary: `Extracted ${transactions.length} transactions from partial AI response`,
+        parsing_metadata: {
+          extraction_method: "partial_json_extraction",
+          partial_response_length: responseText.length
+        }
+      };
     }
     
-    // Fallback to any JSON-like structure
-    const generalJsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (generalJsonMatch) {
-      const parsed = JSON.parse(generalJsonMatch[0]);
-      if (parsed && typeof parsed === 'object') {
-        return parsed;
-      }
-    }
+    return null;
   } catch (error) {
-    console.warn("🔄 JSON extraction failed");
+    return null;
   }
+}
 
-  // Strategy 4: Try to extract partial transaction data from malformed response
+// Hybrid reconstruction combining AI partial data with rule-based extraction
+function performHybridReconstruction(aiResponse: string, originalInputText?: string): any | null {
+  if (!originalInputText) return null;
+  
   try {
-    // Look for transaction-like patterns even in broken JSON
-    const transactionMatches = responseText.match(/"transaction_type"\s*:\s*"(expense|income|transfer)"/g);
+    console.log("🔀 Performing hybrid reconstruction...");
+    
+    // Extract what we can from AI response
+    const aiTransactions = extractPartialTransactionData(aiResponse);
+    
+    // Extract transactions using rule-based system
+    const ruleBasedTransactions = extractVietnameseTransactions(originalInputText);
+    
+    // Merge and enhance results
+    const hybridTransactions = mergeTransactionResults(aiTransactions, ruleBasedTransactions);
+    
+    if (hybridTransactions.length > 0) {
+      return {
+        transactions: hybridTransactions,
+        analysis_summary: `Hybrid analysis found ${hybridTransactions.length} transactions combining AI and rule-based extraction`,
+        parsing_metadata: {
+          total_transactions_found: hybridTransactions.length,
+          ai_extracted: aiTransactions.length,
+          rule_based_extracted: ruleBasedTransactions.length,
+          hybrid_merged: hybridTransactions.length,
+          parsing_quality: "hybrid_reconstruction",
+          fallback_risk: "medium"
+        }
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn("Hybrid reconstruction failed:", error);
+    return null;
+  }
+}
+
+// Assess transaction confidence using rules
+function assessTransactionConfidence(transaction: any, originalInputText?: string): number {
+  let confidence = 0.5; // Base confidence
+  
+  // Amount confidence
+  if (transaction.amount && transaction.amount > 0) {
+    confidence += 0.2;
+  }
+  
+  // Description confidence
+  if (transaction.description && transaction.description.length > 5) {
+    confidence += 0.1;
+  }
+  
+  // Category confidence
+  if (transaction.suggested_category_id && transaction.suggested_category_name) {
+    confidence += 0.15;
+  }
+  
+  // Transaction type confidence
+  if (transaction.transaction_type && ['expense', 'income', 'transfer'].includes(transaction.transaction_type)) {
+    confidence += 0.05;
+  }
+  
+  return Math.min(confidence, 1.0);
+}
+
+// Extract partial transaction data from malformed AI responses
+function extractPartialTransactionData(responseText: string): any[] {
+  const transactions = [];
+  
+  try {
+    // Look for transaction_type patterns
+    const typeMatches = responseText.match(/"transaction_type"\s*:\s*"(expense|income|transfer)"/g);
     const amountMatches = responseText.match(/"amount"\s*:\s*(\d+(?:\.\d+)?)/g);
     const descriptionMatches = responseText.match(/"description"\s*:\s*"([^"]+)"/g);
     
-    if (transactionMatches && amountMatches && descriptionMatches) {
-      console.log("🔧 Attempting to reconstruct transactions from partial data");
-      const transactions = [];
-      const count = Math.min(transactionMatches.length, amountMatches.length, descriptionMatches.length);
+    if (typeMatches && amountMatches && descriptionMatches) {
+      const count = Math.min(typeMatches.length, amountMatches.length, descriptionMatches.length);
       
       for (let i = 0; i < count; i++) {
-        const type = transactionMatches[i].match(/"(expense|income|transfer)"/)?.[1] || 'expense';
+        const type = typeMatches[i].match(/"(expense|income|transfer)"/)?.[1] || 'expense';
         const amount = parseFloat(amountMatches[i].match(/(\d+(?:\.\d+)?)/)?.[1] || '0');
         const description = descriptionMatches[i].match(/"([^"]+)"/)?.[1] || 'Unknown transaction';
         
@@ -438,57 +695,55 @@ function parseAIResponseWithFallback(responseText: string, originalInputText?: s
           transaction_type: type,
           amount: amount,
           description: description,
-          confidence_score: 0.3, // Low confidence for reconstructed data
+          confidence_score: 0.4, // Medium-low confidence for partial extraction
           suggested_category_id: null,
           suggested_category_name: null,
           suggested_tags: [],
           suggested_wallet_id: null,
           extracted_merchant: null,
           extracted_date: null,
-          notes: 'Reconstructed from partial AI response',
-          is_unusual: true,
-          unusual_reasons: ['Reconstructed from malformed AI response']
+          notes: 'Reconstructed from partial AI response'
         });
       }
-      
-      if (transactions.length > 0) {
-        return {
-          transactions: transactions,
-          analysis_summary: `Partially recovered ${transactions.length} transaction(s) from malformed AI response.`
-        };
-      }
     }
   } catch (error) {
-    console.warn("🔄 Partial reconstruction failed");
+    console.warn("Partial transaction extraction failed:", error);
   }
-
-  // Strategy 5: Extract transactions directly from Vietnamese input as last resort
-  try {
-    console.log("🔧 Attempting to extract transactions directly from Vietnamese input");
-    
-    // Use the original input text if provided, fallback to response text
-    const textToExtract = originalInputText || responseText;
-    const vietnameseTransactions = extractVietnameseTransactions(textToExtract);
-    
-    if (vietnameseTransactions.length > 0) {
-      console.log(`✅ Extracted ${vietnameseTransactions.length} transactions from Vietnamese text`);
-      return {
-        transactions: vietnameseTransactions,
-        analysis_summary: `Extracted ${vietnameseTransactions.length} transaction(s) directly from Vietnamese text as fallback.`
-      };
-    }
-  } catch (error) {
-    console.warn("🔄 Vietnamese extraction failed:", error);
-  }
-
-  // Strategy 6: Return fallback structure with better error info
-  console.error("❌ All JSON parsing strategies failed, returning fallback");
-  console.error("📝 Raw response (first 500 chars):", responseText.substring(0, 500));
   
-  return {
-    transactions: [],
-    analysis_summary: "Failed to parse AI response. The AI may have returned malformed JSON. Please try rephrasing your input or try again."
-  };
+  return transactions;
+}
+
+// Merge AI and rule-based transaction results intelligently
+function mergeTransactionResults(aiTransactions: any[], ruleBasedTransactions: any[]): any[] {
+  if (aiTransactions.length === 0) return ruleBasedTransactions;
+  if (ruleBasedTransactions.length === 0) return aiTransactions;
+  
+  // If AI has more complete data, prefer AI results
+  const aiCompleteness = calculateTransactionCompleteness(aiTransactions);
+  const ruleBasedCompleteness = calculateTransactionCompleteness(ruleBasedTransactions);
+  
+  if (aiCompleteness >= ruleBasedCompleteness) {
+    return aiTransactions.map(t => ({ ...t, confidence_score: Math.min((t.confidence_score || 0.5) + 0.1, 1.0) }));
+  } else {
+    return ruleBasedTransactions.map(t => ({ ...t, confidence_score: Math.min((t.confidence_score || 0.4) + 0.05, 1.0) }));
+  }
+}
+
+// Calculate how complete transaction data is
+function calculateTransactionCompleteness(transactions: any[]): number {
+  if (transactions.length === 0) return 0;
+  
+  const completenessScores = transactions.map(t => {
+    let score = 0;
+    if (t.amount > 0) score += 0.3;
+    if (t.description) score += 0.2;
+    if (t.transaction_type) score += 0.2;
+    if (t.suggested_category_id) score += 0.2;
+    if (t.suggested_category_name) score += 0.1;
+    return score;
+  });
+  
+  return completenessScores.reduce((sum, score) => sum + score, 0) / completenessScores.length;
 }
 
 async function buildAIPrompt(
@@ -520,7 +775,7 @@ ${relevantCorrections
     categories: relevantCategories,
     wallets: wallets.slice(0, 5), // Limit to 5 wallets
     correctionContext,
-    version: "3.4",
+    version: "3.6",
     debugMode: process.env.NODE_ENV === "development" // Enable debug logging in development
   });
 }

@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ConfidenceScore, ReviewFlag } from "@/components/ui/skeleton-transaction-loader";
 
 const ScrollbarStyles = () => (
   <style>{`
@@ -283,7 +284,23 @@ export function ConversationalTransactionDialog({
                                             {wallet && <span className="flex items-center gap-1"><LucideIcons.Wallet className="h-3 w-3" /> {wallet.name}</span>}
                                             <span>•</span>
                                             <span>{new Date(editing.transaction_date).toLocaleDateString("vi-VN")}</span>
+                                            <span>•</span>
+                                            <ConfidenceScore 
+                                              score={original.confidence_score}
+                                              isUnusual={original.is_unusual}
+                                              unusualReasons={original.unusual_reasons}
+                                              size="sm"
+                                            />
                                         </div>
+                                        {original.is_unusual && (
+                                          <div className="mt-2">
+                                            <ReviewFlag 
+                                              isRequired={true}
+                                              reasons={original.unusual_reasons || []}
+                                              className="text-xs"
+                                            />
+                                          </div>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-2 ml-4">
                                         <span className={cn("font-bold text-base", editing.transaction_type === 'expense' ? "text-red-600" : "text-green-600")}>
