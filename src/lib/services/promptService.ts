@@ -148,7 +148,7 @@ export class PromptService {
     version?: string;
     debugMode?: boolean; // New: Enable debug output
   }): Promise<string> {
-    const templateName = `transaction-parser-v${data.version || "3.3"}`;
+        const templateName = `transaction-parser-v${data.version || "3.4"}`;
     console.log(`Using prompt template: ${templateName}`);
     try {
       const template = await this.loadPromptTemplate(templateName);

@@ -596,7 +596,7 @@ Examples:
 
         const promptVersion = args.includes("--prompt")
       ? args[args.indexOf("--prompt") + 1]
-      : "v3.3";
+      : "v3.4";
     const category = args.includes("--category")
       ? args[args.indexOf("--category") + 1]
       : null;

@@ -136,6 +136,16 @@
           "total_amount": 1990000,
           "confidence": "high"
         }
+      },
+      {
+        "input": "nhận thưởng 1 triệu, ăn sáng 30k, uống cà phê 25k, taxi 80k, ăn trưa 40k, ăn vặt 100k, bơm xe 5k, trả nợ 5 triệu",
+        "expected": {
+          "transaction_count": 8,
+          "amounts": [1000000, 30000, 25000, 80000, 40000, 100000, 5000, 5000000],
+          "total_amount": 6280000,
+          "confidence": "high",
+          "note": "Mixed income and expense transactions"
+        }
       }
     ],
     "time_expressions": [
