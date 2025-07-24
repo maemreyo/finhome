@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { z } from 'zod'
+import { createGeminiKeyManager } from '@/lib/gemini-key-manager'
+import { RateLimiter, RequestCache } from '@/lib/rate-limiter'
 
 // Validation schema for the input
 const parseTextSchema = z.object({
@@ -38,8 +40,102 @@ const aiResponseSchema = z.object({
   analysis_summary: z.string().optional(),
 })
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '')
+// Initialize Gemini Key Manager and Rate Limiting
+let keyManager: any = null
+let rateLimiter: RateLimiter | null = null
+let requestCache: RequestCache | null = null
+
+try {
+  keyManager = createGeminiKeyManager()
+  rateLimiter = new RateLimiter({
+    maxRequestsPerSecond: 1,
+    maxConcurrentRequests: 2,
+    baseDelay: 2000,
+    maxBackoffDelay: 60000,
+  })
+  requestCache = new RequestCache({
+    maxSize: 500,
+    ttl: 600000, // 10 minutes
+  })
+  console.log('✅ Gemini Key Manager and Rate Limiter initialized successfully')
+} catch (error) {
+  console.warn('⚠️ Failed to initialize key manager, falling back to single key:', error)
+  // Fallback to single key
+  keyManager = null
+}
+
+// Helper function to make Gemini API calls with key rotation and rate limiting
+async function makeGeminiRequest(prompt: string, streaming: boolean = false) {
+  const cacheKey = streaming ? null : prompt.substring(0, 100) // Only cache non-streaming requests
+  
+  // Check cache first for non-streaming requests
+  if (!streaming && requestCache && cacheKey) {
+    const cached = requestCache.get(cacheKey)
+    if (cached) {
+      return cached
+    }
+  }
+  
+  const requestFn = async (apiKey?: string) => {
+    const currentKey = apiKey || process.env.GEMINI_API_KEY || ''
+    if (!currentKey) {
+      throw new Error('No Gemini API key available')
+    }
+    
+    const genAI = new GoogleGenerativeAI(currentKey)
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
+    
+    const generationConfig = {
+      temperature: 0.1,
+      topK: 1,
+      topP: 0.1,
+      maxOutputTokens: 2048,
+    }
+    
+    if (streaming) {
+      return await model.generateContentStream({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig,
+      })
+    } else {
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig,
+      })
+      return await result.response
+    }
+  }
+  
+  let result
+  
+  if (keyManager && rateLimiter) {
+    // Use key rotation and rate limiting
+    try {
+      keyManager.printStatus() // Log current status
+      
+      result = await rateLimiter.throttleRequest(async () => {
+        return await keyManager.queueRequest(requestFn)
+      })
+    } catch (error) {
+      console.error('🚫 Key manager request failed:', error)
+      
+      // Fallback to single key with rate limiting
+      console.log('🔄 Falling back to single key with rate limiting...')
+      result = await rateLimiter.throttleRequest(() => requestFn())
+    }
+  } else {
+    // Fallback: single key without advanced rate limiting
+    console.log('🔄 Using single key fallback...')
+    result = await requestFn()
+  }
+  
+  // Cache non-streaming results
+  if (!streaming && requestCache && cacheKey && result) {
+    requestCache.set(cacheKey, result)
+  }
+  
+  return result
+}
 
 // Helper function to get relevant categories based on input text
 function getRelevantCategories(inputText: string, allCategories: any[]): any[] {
@@ -283,16 +379,73 @@ Remember: Return ONLY the JSON response, no additional text or explanation.`
 export async function POST(request: NextRequest) {
   try {
     console.time('gemini_processing')
-    const supabase = await createClient()
     
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Handle cookie-based authentication
+    let supabase = await createClient()
+    let user = null
+    
+    // First try to get user from existing session
+    const { data: { user: sessionUser }, error: sessionError } = await supabase.auth.getUser()
+    
+    if (sessionUser && !sessionError) {
+      user = sessionUser
+    } else {
+      // If no session user, try to extract from cookie header
+      const cookieHeader = request.headers.get('cookie')
+      if (cookieHeader) {
+        // Parse the sb-*-auth-token cookie
+        const authTokenMatch = cookieHeader.match(/sb-[^-]+-[^-]+-auth-token=([^;]+)/)
+        if (authTokenMatch) {
+          try {
+            const tokenValue = decodeURIComponent(authTokenMatch[1])
+            // Remove the base64- prefix if present
+            const cleanToken = tokenValue.replace(/^base64-/, '')
+            const sessionData = JSON.parse(atob(cleanToken))
+            
+            if (sessionData.access_token) {
+              // Create a new supabase client with the token
+              const { createServerClient } = await import('@supabase/ssr')
+              
+              supabase = createServerClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                {
+                  cookies: {
+                    getAll() {
+                      return []
+                    },
+                    setAll() {
+                      // No-op for manual token setup
+                    },
+                  },
+                }
+              )
+              
+              // Set the session manually
+              await supabase.auth.setSession({
+                access_token: sessionData.access_token,
+                refresh_token: sessionData.refresh_token
+              })
+              
+              // Get user from the new session
+              const { data: { user: tokenUser }, error: tokenError } = await supabase.auth.getUser()
+              if (tokenUser && !tokenError) {
+                user = tokenUser
+              }
+            }
+          } catch (error) {
+            console.error('Error parsing auth token from cookie:', error)
+          }
+        }
+      }
+    }
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized - No valid authentication found' }, { status: 401 })
     }
 
-    // Check if Gemini API key is configured
-    if (!process.env.GEMINI_API_KEY) {
+    // Check if Gemini API key is configured (or key manager is available)
+    if (!keyManager && !process.env.GEMINI_API_KEY) {
       return NextResponse.json({ 
         error: 'AI service not configured. Please contact support.' 
       }, { status: 503 })
@@ -391,11 +544,9 @@ export async function POST(request: NextRequest) {
       userCorrections
     )
 
-    // Call Gemini AI with streaming support
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
-    
+    // Call Gemini AI with streaming support and key rotation
     if (useStreaming) {
-      return handleStreamingResponse(model, prompt, {
+      return handleStreamingResponse(prompt, {
         allCategories,
         wallets,
         validatedData,
@@ -403,18 +554,8 @@ export async function POST(request: NextRequest) {
         supabase
       })
     } else {
-      // Non-streaming fallback
-      const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.1, // Low temperature for consistent parsing
-          topK: 1,
-          topP: 0.1,
-          maxOutputTokens: 2048,
-        },
-      })
-
-      const response = await result.response
+      // Non-streaming fallback with key rotation
+      const response = await makeGeminiRequest(prompt, false)
       const aiResponseText = response.text()
       console.timeEnd('gemini_processing')
 
@@ -523,7 +664,6 @@ export async function POST(request: NextRequest) {
 
 // Streaming response handler
 async function handleStreamingResponse(
-  model: any,
   prompt: string,
   context: {
     allCategories: any[],
@@ -544,16 +684,8 @@ async function handleStreamingResponse(
           `data: ${JSON.stringify({ type: 'status', message: 'Starting AI analysis...' })}\n\n`
         ))
 
-        // Start streaming from Gemini
-        const result = await model.generateContentStream({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.1,
-            topK: 1,
-            topP: 0.1,
-            maxOutputTokens: 2048,
-          },
-        })
+        // Start streaming from Gemini with key rotation
+        const result = await makeGeminiRequest(prompt, true)
 
         let accumulatedText = ''
         let transactionBuffer = ''

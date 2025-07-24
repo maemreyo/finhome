@@ -23,9 +23,10 @@
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "email:dev": "email dev",
-    "test:ai-prompt": "node scripts/test-ai-prompt.js",
-    "test:ai-prompt:dev": "NODE_ENV=development node scripts/test-ai-prompt.js",
+    "test:ai-prompt": "tsx scripts/test-ai-prompt.ts",
+    "test:ai-prompt:dev": "NODE_ENV=development tsx scripts/test-ai-prompt.ts",
     "test:ai-prompt:run": "bash scripts/run-prompt-tests.sh",
+    "test:key-manager": "tsx test-key-manager.ts",
     "test:streaming": "node scripts/test-streaming-performance.js",
     "test:automation-bias": "node scripts/test-automation-bias.js"
   },
@@ -108,6 +109,7 @@
     "eslint-config-next": "15.3.5",
     "react-email": "^3.0.1",
     "tailwindcss": "^4",
+    "tsx": "^4.20.3",
     "tw-animate-css": "^1.3.5",
     "typescript": "^5"
   },

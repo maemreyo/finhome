@@ -30,11 +30,12 @@ import {
 import { PasswordChangeForm } from '@/components/settings/PasswordChangeForm'
 import { ExportDataDialog } from '@/components/settings/ExportDataDialog'
 import { DeleteAccountDialog } from '@/components/settings/DeleteAccountDialog'
+import { AdminSettings } from '@/components/admin/AdminSettings'
 
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.Settings')
   const { user } = useAuth()
-  
+  console.log(user)
   // User preferences state
   const [emailNotifications, setEmailNotifications] = useState(true)
   const [pushNotifications, setPushNotifications] = useState(true)
@@ -57,6 +58,9 @@ export default function SettingsPage() {
   const [district, setDistrict] = useState('')
   const [address, setAddress] = useState('')
   
+  // Admin access state
+  const [isAdmin, setIsAdmin] = useState(false)
+  
   // Loading states
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -69,12 +73,12 @@ export default function SettingsPage() {
       try {
         setLoading(true)
         
-        // Load user preferences and profile in parallel
+        // Load user preferences and profile in parallel  
         const [preferences, profile] = await Promise.all([
           DashboardService.getUserPreferences(user.id),
           DashboardService.getUserProfile(user.id)
         ])
-
+        
         // Update preferences state
         setEmailNotifications(preferences.email_notifications)
         setPushNotifications(preferences.push_notifications)
@@ -96,6 +100,9 @@ export default function SettingsPage() {
         setCity(profile.city || '')
         setDistrict(profile.district || '')
         setAddress(profile.address || '')
+        
+        // Update admin status
+        setIsAdmin(profile.is_admin || false)
       } catch (error) {
         console.error('Error loading settings:', error)
         toast.error(t('general.loadError'))
@@ -198,12 +205,14 @@ export default function SettingsPage() {
       description={t('description')}
     >
       <Tabs defaultValue="general" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
           <TabsTrigger value="general">{t('tabs.general')}</TabsTrigger>
           <TabsTrigger value="notifications">{t('tabs.notifications')}</TabsTrigger>
           <TabsTrigger value="security">{t('tabs.security')}</TabsTrigger>
           <TabsTrigger value="preferences">{t('tabs.preferences')}</TabsTrigger>
           <TabsTrigger value="account">{t('tabs.account')}</TabsTrigger>
+          {isAdmin && <TabsTrigger value="admin">Admin</TabsTrigger>}
+          {/* <TabsTrigger value="admin" className="">Admin</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="general" className="space-y-4">
@@ -533,6 +542,10 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="admin" className="space-y-4">
+          <AdminSettings />
         </TabsContent>
       </Tabs>
     </DashboardShell>
