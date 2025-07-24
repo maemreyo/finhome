@@ -1,0 +1,22 @@
+{
+  "summary": {
+    "total_tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "pass_rate": 100,
+    "overall_score": 91.66666666666666,
+    "meets_threshold": true
+  },
+  "category_breakdown": {
+    "complex_amounts": {
+      "total": 1,
+      "passed": 1,
+      "totalScore": 91.66666666666666,
+      "passRate": 100,
+      "avgScore": 91.66666666666666
+    }
+  },
+  "failed_tests": [],
+  "recommendations": [],
+  "timestamp": "2025-07-24T07:08:24.673Z"
+}

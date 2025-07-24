@@ -283,9 +283,9 @@ export class GeminiKeyManager {
   // Print status to console
   printStatus(): void {
     const status = this.getStatus();
-    console.log('\n📊 Gemini Key Manager Status:');
-    console.log(`   Total Keys: ${status.totalKeys} | Active: ${status.activeKeys} | Available: ${status.availableKeys}`);
-    console.log(`   Queued Requests: ${status.queuedRequests}`);
+    // console.log('\n📊 Gemini Key Manager Status:');
+    // console.log(`   Total Keys: ${status.totalKeys} | Active: ${status.activeKeys} | Available: ${status.availableKeys}`);
+    // console.log(`   Queued Requests: ${status.queuedRequests}`);
     
     status.keys.forEach((key, index) => {
       const prefix = index === this.currentKeyIndex ? '→' : ' ';

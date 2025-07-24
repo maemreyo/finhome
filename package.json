@@ -28,7 +28,12 @@
     "test:ai-prompt:run": "bash scripts/run-prompt-tests.sh",
     "test:key-manager": "tsx test-key-manager.ts",
     "test:streaming": "node scripts/test-streaming-performance.js",
-    "test:automation-bias": "node scripts/test-automation-bias.js"
+    "test:automation-bias": "node scripts/test-automation-bias.js",
+    "manage-prompts": "tsx scripts/manage-prompts.ts",
+    "prompts:list": "tsx scripts/manage-prompts.ts list",
+    "prompts:create": "tsx scripts/manage-prompts.ts create",
+    "prompts:view": "tsx scripts/manage-prompts.ts view",
+    "prompts:test": "tsx scripts/manage-prompts.ts test"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

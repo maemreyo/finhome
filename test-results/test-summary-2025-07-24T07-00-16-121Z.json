@@ -1,0 +1,89 @@
+{
+  "summary": {
+    "total_tests": 17,
+    "passed": 16,
+    "failed": 1,
+    "pass_rate": 94.11764705882352,
+    "overall_score": 89.50980392156863,
+    "meets_threshold": true
+  },
+  "category_breakdown": {
+    "ambiguous": {
+      "total": 2,
+      "passed": 2,
+      "totalScore": 183.33333333333334,
+      "passRate": 100,
+      "avgScore": 91.66666666666667
+    },
+    "non_transaction": {
+      "total": 2,
+      "passed": 2,
+      "totalScore": 200,
+      "passRate": 100,
+      "avgScore": 100
+    },
+    "conditional_future": {
+      "total": 2,
+      "passed": 2,
+      "totalScore": 200,
+      "passRate": 100,
+      "avgScore": 100
+    },
+    "complex_amounts": {
+      "total": 2,
+      "passed": 1,
+      "totalScore": 88.33333333333333,
+      "passRate": 50,
+      "avgScore": 44.166666666666664
+    },
+    "with_date": {
+      "total": 6,
+      "passed": 6,
+      "totalScore": 560,
+      "passRate": 100,
+      "avgScore": 93.33333333333333
+    },
+    "complex_scenario": {
+      "total": 1,
+      "passed": 1,
+      "totalScore": 90,
+      "passRate": 100,
+      "avgScore": 90
+    },
+    "edge_cases": {
+      "total": 2,
+      "passed": 2,
+      "totalScore": 200,
+      "passRate": 100,
+      "avgScore": 100
+    }
+  },
+  "failed_tests": [
+    {
+      "id": "complex_amount_001",
+      "category": "complex_amounts",
+      "input": "chuyển khoản 1tr550",
+      "error": null,
+      "score": 0,
+      "issues": [
+        {
+          "aspect": "transaction_count",
+          "message": "Expected 1 transactions, got 0"
+        },
+        {
+          "aspect": "transaction_0",
+          "message": "Missing actual transaction"
+        }
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "medium",
+      "category": "Category: complex_amounts",
+      "issue": "Low pass rate (50.0%) for complex_amounts tests",
+      "suggestion": "Review and improve handling of complex_amounts scenarios. Consider adding few-shot examples."
+    }
+  ],
+  "timestamp": "2025-07-24T07:00:16.120Z"
+}

@@ -1,0 +1,146 @@
+{
+  "summary": {
+    "total_tests": 12,
+    "passed": 8,
+    "failed": 4,
+    "pass_rate": 66.66666666666666,
+    "overall_score": 64.16666666666667,
+    "meets_threshold": false
+  },
+  "category_breakdown": {
+    "ambiguous": {
+      "total": 2,
+      "passed": 0,
+      "totalScore": 0,
+      "passRate": 0,
+      "avgScore": 0
+    },
+    "non_transaction": {
+      "total": 2,
+      "passed": 2,
+      "totalScore": 200,
+      "passRate": 100,
+      "avgScore": 100
+    },
+    "conditional_future": {
+      "total": 2,
+      "passed": 2,
+      "totalScore": 200,
+      "passRate": 100,
+      "avgScore": 100
+    },
+    "complex_amounts": {
+      "total": 2,
+      "passed": 2,
+      "totalScore": 180,
+      "passRate": 100,
+      "avgScore": 90
+    },
+    "with_date": {
+      "total": 1,
+      "passed": 1,
+      "totalScore": 100,
+      "passRate": 100,
+      "avgScore": 100
+    },
+    "complex_scenario": {
+      "total": 1,
+      "passed": 1,
+      "totalScore": 90,
+      "passRate": 100,
+      "avgScore": 90
+    },
+    "edge_cases": {
+      "total": 2,
+      "passed": 0,
+      "totalScore": 0,
+      "passRate": 0,
+      "avgScore": 0
+    }
+  },
+  "failed_tests": [
+    {
+      "id": "ambiguous_001",
+      "category": "ambiguous",
+      "input": "chuyển tiền cho mẹ 500k",
+      "error": null,
+      "score": 0,
+      "issues": [
+        {
+          "aspect": "transaction_count",
+          "message": "Expected 1 transactions, got 0"
+        },
+        {
+          "aspect": "transaction_0",
+          "message": "Missing actual transaction"
+        }
+      ]
+    },
+    {
+      "id": "ambiguous_002",
+      "category": "ambiguous",
+      "input": "hôm nay tiêu hơi nhiều",
+      "error": null,
+      "score": 0,
+      "issues": [
+        {
+          "aspect": "transaction_count",
+          "message": "Expected 0 transactions, got 1"
+        },
+        {
+          "aspect": "transaction_0",
+          "message": "Unexpected extra transaction"
+        }
+      ]
+    },
+    {
+      "id": "edge_case_001",
+      "category": "edge_cases",
+      "input": "mất tiền 100k",
+      "error": null,
+      "score": 0,
+      "issues": [
+        {
+          "aspect": "transaction_count",
+          "message": "Expected 0 transactions, got 1"
+        },
+        {
+          "aspect": "transaction_0",
+          "message": "Unexpected extra transaction"
+        }
+      ]
+    },
+    {
+      "id": "edge_case_002",
+      "category": "edge_cases",
+      "input": "nợ bạn 200k",
+      "error": null,
+      "score": 0,
+      "issues": [
+        {
+          "aspect": "transaction_count",
+          "message": "Expected 1 transactions, got 0"
+        },
+        {
+          "aspect": "transaction_0",
+          "message": "Missing actual transaction"
+        }
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "medium",
+      "category": "Category: ambiguous",
+      "issue": "Low pass rate (0.0%) for ambiguous tests",
+      "suggestion": "Review and improve handling of ambiguous scenarios. Consider adding few-shot examples."
+    },
+    {
+      "priority": "medium",
+      "category": "Category: edge_cases",
+      "issue": "Low pass rate (0.0%) for edge_cases tests",
+      "suggestion": "Review and improve handling of edge_cases scenarios. Consider adding few-shot examples."
+    }
+  ],
+  "timestamp": "2025-07-24T06:00:29.516Z"
+}

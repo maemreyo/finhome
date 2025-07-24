@@ -21,7 +21,7 @@ const CONFIG = {
   TIMEOUT: 30000, // Increased timeout for rate limiting
   
   // Authentication - Hardcoded cookie for testing
-  HARDCODED_COOKIE: 'base64-eyJhY2Nlc3NfdG9rZW4iOiJleUpoYkdjaU9pSklVekkxTmlJc0ltdHBaQ0k2SWpCaVRsRk1ZVzFtTjJSMmVYbEJSbFVpTENKMGVYQWlPaUpLVjFRaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDJkMmFXWnpaMjUyZG5kbGNYWjJkSGgzY0hKekxuTjFjR0ZpWVhObExtTnZMMkYxZEdodmRqRWlMQ0p6ZFdJaU9pSTBOVGRqWXpFMVl5MDBaRFZrTFRRd1l6WXRPREpsTnkwd09ERTBZamMxWkdSaE1UWWlMQ0poZFdRaU9pSmhkWFJvWlc1MGFXTmhkR1ZrSWl3aVpYaHdJam94TnpVek1qazBNekkyTENKcFlYUWlPakUzTlRNeU9UQTNNallzSW1WdFlXbHNJam9pYm1kdmJtaDFkR2hoYm1oMGNuVnVaekUwTURsQVoyMWhhV3d1WTI5dElpd2ljR2h2Ym1VaU9pSWlMQ0poY0hCZmJXVjBZV1JoZEdFaU9uc2ljSEp2ZG1sa1pYSWlPaUpsYldGcGJDSXNJbkJ5YjNacFpHVnljeUk2V3lKbGJXRnBiQ0pkZlN3aWRYTmxjbDl0WlhSaFpHRjBZU0k2ZXlKbGJXRnBiQ0k2SW01bmIyNW9kWFJvWVc1b2RISjFibWN4TkRBNVFHZHRZV2xzTG1OdmJTSXNJbVZ0WVdsc1gzWmxjbWxtYVdWa0lqcDBjblZsTENKbWRXeHNYMjVoYldVaU9pSk5ZWFIwYUdWM0lFNW5ieUlzSW5Cb2IyNWxYM1psY21sbWFXVmtJanBtWVd4elpTd2ljM1ZpSWpvaU5EVTNZMk14TldNdE5HUTFaQzAwTUdNMkxUZ3laVGN0TURneE5HSTNOV1JrWVRFMkluMHNJbkp2YkdVaU9pSmhkWFJvWlc1MGFXTmhkR1ZrSWl3aVlXRnNJam9pWVdGc01TSXNJbUZ0Y2lJNlczc2liV1YwYUc5a0lqb2ljR0Z6YzNkdmNtUWlMQ0owYVcxbGMzUmhiWEFpT2pFM05USTRNemN6TVRsOVhTd2ljMlZ6YzJsdmJsOXBaQ0k2SWpOalkyVTFZMkUxTFRaak5EWXROR1UwTlMwNU9EZzJMVEU1WlRsaE5EZ3daVGxrTnlJc0ltbHpYMkZ1YjI1NWJXOTFjeUk2Wm1Gc2MyVjkuZ3dpQ21peElYTktMcXJRS3lkRDUyalNsbGluLTRYcXdJNnMxSkM5UjMtSSIsInRva2VuX3R5cGUiOiJiZWFyZXIiLCJleHBpcmVzX2luIjozNjAwLCJleHBpcmVzX2F0IjoxNzUzMjk0MzI2LCJyZWZyZXNoX3Rva2VuIjoidnZoajR4ZnBiN3FwIiwidXNlciI6eyJpZCI6IjQ1N2NjMTVjLTRkNWQtNDBjNi04MmU3LTA4MTRiNzVkZGExNiIsImF1ZCI6ImF1dGhlbnRpY2F0ZWQiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImVtYWlsIjoibmdvbmh1dGhhbmh0cnVuZzE0MDlAZ21haWwuY29tIiwiZW1haWxfY29uZmlybWVkX2F0IjoiMjAyNS0wNy0xOFQwMzowNzoyMS44MTE4MVoiLCJwaG9uZSI6IiIsImNvbmZpcm1hdGlvbl9zZW50X2F0IjoiMjAyNS0wNy0xOFQwMzowNzowNC43OTE1NThaIiwiY29uZmlybWVkX2F0IjoiMjAyNS0wNy0xOFQwMzowNzoyMS44MTE4MVoiLCJsYXN0X3NpZ25faW5fYXQiOiIyMDI1LTA3LTE5VDA4OjEzOjU1Ljc2ODYxNVoiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6Im5nb25odXRoYW5odHJ1bmcxNDA5QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJNYXR0aGV3IE5nbyIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiNDU3Y2MxNWMtNGQ1ZC00MGM2LTgyZTctMDgxNGI3NWRkYTE2In0sImlkZW50aXRpZXMiOlt7ImlkZW50aXR5X2lkIjoiYzczZWMzZjUtYWFjYi00MTJhLWJlODAtZDUzZDQ0MDIwZDk5IiwiaWQiOiI0NTdjYzE1Yy00ZDVkLTQwYzYtODJlNy0wODE0Yjc1ZGRhMTYiLCJ1c2VyX2lkIjoiNDU3Y2MxNWMtNGQ1ZC00MGM2LTgyZTctMDgxNGI3NWRkYTE2IiwiaWRlbnRpdHlfZGF0YSI6eyJlbWFpbCI6Im5nb25odXRoYW5odHJ1bmcxNDA5QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJNYXR0aGV3IE5nbyIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiNDU3Y2MxNWMtNGQ1ZC00MGM2LTgyZTctMDgxNGI3NWRkYTE2In0sInByb3ZpZGVyIjoiZW1haWwiLCJsYXN0X3NpZ25faW5fYXQiOiIyMDI1LTA3LTE4VDAzOjA3OjA0Ljc4MjgyMVoiLCJjcmVhdGVkX2F0IjoiMjAyNS0wNy0xOFQwMzowNzowNC43ODI4N1oiLCJ1cGRhdGVkX2F0IjoiMjAyNS0wNy0xOFQwMzowNzowNC43ODI4N1oiLCJlbWFpbCI6Im5nb25odXRoYW5odHJ1bmcxNDA5QGdtYWlsLmNvbSJ9XSwiY3JlYXRlZF9hdCI6IjIwMjUtMDctMThUMDM6MDc6MDQuNzQzNjI0WiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA3LTIzVDE3OjEyOjA2Ljc4ODM1OFoiLCJpc19hbm9ueW1vdXMiOmZhbHNlfX0',
+  HARDCODED_COOKIE: 'base64-eyJhY2Nlc3NfdG9rZW4iOiJleUpoYkdjaU9pSklVekkxTmlJc0ltdHBaQ0k2SWpCaVRsRk1ZVzFtTjJSMmVYbEJSbFVpTENKMGVYQWlPaUpLVjFRaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDJkMmFXWnpaMjUyZG5kbGNYWjJkSGgzY0hKekxuTjFjR0ZpWVhObExtTnZMMkYxZEdndmRqRWlMQ0p6ZFdJaU9pSTBOVGRqWXpFMVl5MDBaRFZrTFRRd1l6WXRPREpsTnkwd09ERTBZamMxWkdSaE1UWWlMQ0poZFdRaU9pSmhkWFJvWlc1MGFXTmhkR1ZrSWl3aVpYaHdJam94TnpVek16STFPVGMwTENKcFlYUWlPakUzTlRNek1qSXpOelFzSW1WdFlXbHNJam9pYm1kdmJtaDFkR2hoYm1oMGNuVnVaekUwTURsQVoyMWhhV3d1WTI5dElpd2ljR2h2Ym1VaU9pSWlMQ0poY0hCZmJXVjBZV1JoZEdFaU9uc2ljSEp2ZG1sa1pYSWlPaUpsYldGcGJDSXNJbkJ5YjNacFpHVnljeUk2V3lKbGJXRnBiQ0pkZlN3aWRYTmxjbDl0WlhSaFpHRjBZU0k2ZXlKbGJXRnBiQ0k2SW01bmIyNW9kWFJvWVc1b2RISjFibWN4TkRBNVFHZHRZV2xzTG1OdmJTSXNJbVZ0WVdsc1gzWmxjbWxtYVdWa0lqcDBjblZsTENKbWRXeHNYMjVoYldVaU9pSk5ZWFIwYUdWM0lFNW5ieUlzSW5Cb2IyNWxYM1psY21sbWFXVmtJanBtWVd4elpTd2ljM1ZpSWpvaU5EVTNZMk14TldNdE5HUTFaQzAwTUdNMkxUZ3laVGN0TURneE5HSTNOV1JrWVRFMkluMHNJbkp2YkdVaU9pSmhkWFJvWlc1MGFXTmhkR1ZrSWl3aVlXRnNJam9pWVdGc01TSXNJbUZ0Y2lJNlczc2liV1YwYUc5a0lqb2ljR0Z6YzNkdmNtUWlMQ0owYVcxbGMzUmhiWEFpT2pFM05UTXpNakl6TnpSOVhTd2ljMlZ6YzJsdmJsOXBaQ0k2SW1KbU9HUXpObVEwTFRnMk9UTXROR0prWlMwNE1tSTBMVFppTURGa09XTmlNakUxWXlJc0ltbHpYMkZ1YjI1NWJXOTFjeUk2Wm1Gc2MyVjkuVnJrLWpXQ1N1a1piY3VhNnAxWFdralJGNzRzRWt5Qk5vWDI3VE1XYUxJWSIsInRva2VuX3R5cGUiOiJiZWFyZXIiLCJleHBpcmVzX2luIjozNjAwLCJleHBpcmVzX2F0IjoxNzUzMzI1OTc0LCJyZWZyZXNoX3Rva2VuIjoidDRjc2hhbTVhNWkzIiwidXNlciI6eyJpZCI6IjQ1N2NjMTVjLTRkNWQtNDBjNi04MmU3LTA4MTRiNzVkZGExNiIsImF1ZCI6ImF1dGhlbnRpY2F0ZWQiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImVtYWlsIjoibmdvbmh1dGhhbmh0cnVuZzE0MDlAZ21haWwuY29tIiwiZW1haWxfY29uZmlybWVkX2F0IjoiMjAyNS0wNy0xOFQwMzowNzoyMS44MTE4MTVaIiwicGhvbmUiOiIiLCJjb25maXJtYXRpb25fc2VudF9hdCI6IjIwMjUtMDctMThUMDM6MDc6MDQuNzkxNTU4WiIsImNvbmZpcm1lZF9hdCI6IjIwMjUtMDctMThUMDM6MDc6MjEuODExODE1WiIsImxhc3Rfc2lnbl9pbl9hdCI6IjIwMjUtMDctMjRUMDE6NTk6MzQuMjU2Nzk4MzcxWiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsIjoibmdvbmh1dGhhbmh0cnVuZzE0MDlAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6Ik1hdHRoZXcgTmdvIiwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiI0NTdjYzE1Yy00ZDVkLTQwYzYtODJlNy0wODE0Yjc1ZGRhMTYifSwiaWRlbnRpdGllcyI6W3siaWRlbnRpdHlfaWQiOiJjNzNlYzNmNS1hYWNiLTQxMmEtYmU4MC1kNTNkNDQwMjBkOTkiLCJpZCI6IjQ1N2NjMTVjLTRkNWQtNDBjNi04MmU3LTA4MTRiNzVkZGExNiIsInVzZXJfaWQiOiI0NTdjYzE1Yy00ZDVkLTQwYzYtODJlNy0wODE0Yjc1ZGRhMTYiLCJpZGVudGl0eV9kYXRhIjp7ImVtYWlsIjoibmdvbmh1dGhhbmh0cnVuZzE0MDlAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6Ik1hdHRoZXcgTmdvIiwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiI0NTdjYzE1Yy00ZDVkLTQwYzYtODJlNy0wODE0Yjc1ZGRhMTYifSwicHJvdmlkZXIiOiJlbWFpbCIsImxhc3Rfc2lnbl9pbl9hdCI6IjIwMjUtMDctMThUMDM6MDc6MDQuNzgyODIxWiIsImNyZWF0ZWRfYXQiOiIyMDI1LTA3LTE4VDAzOjA3OjA0Ljc4Mjg3WiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA3LTE4VDAzOjA3OjA0Ljc4Mjg3WiIsImVtYWlsIjoibmdvbmh1dGhhbmh0cnVuZzE0MDlAZ21haWwuY29tIn1dLCJjcmVhdGVkX2F0IjoiMjAyNS0wNy0xOFQwMzowNzowNC43NDM2MjRaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDctMjRUMDE6NTk6MzQuMjcyMTVaIiwiaXNfYW5vbnltb3VzIjpmYWxzZX19',
   
   // Rate limiting settings for test script
   RATE_LIMITING: {
@@ -143,7 +143,8 @@ const makeApiRequest = async (text: string, userPreferences: UserPreferences = {
         body: JSON.stringify({
           text,
           user_preferences: userPreferences,
-          stream: false  // Disable streaming for testing
+          stream: false,  // Disable streaming for testing
+          disable_cache: true  // Disable cache for testing to ensure fresh responses
         }),
         signal: controller.signal
       });
@@ -584,7 +585,75 @@ const printSummary = (report: any): void => {
 // Main execution
 const main = async (): Promise<void> => {
   try {
-    console.log('Starting AI Prompt Test Suite...\n');
+    // Check if user wants to test a specific input
+    const customInput = process.argv[2];
+    
+    if (customInput) {
+      console.log('🇻🇳 Testing Custom Input with Enhanced v3.0 Prompt');
+      console.log('=' .repeat(60));
+      console.log(`Input: "${customInput}"`);
+      console.log('');
+      
+      try {
+        const startTime = Date.now();
+        const response = await makeApiRequest(customInput);
+        const endTime = Date.now();
+        
+        if (response.success) {
+          console.log('✅ Success! AI Response:');
+          console.log('─'.repeat(40));
+          
+          response.data.transactions.forEach((transaction: any, index: number) => {
+            console.log(`
+🔹 Transaction ${index + 1}:`);
+            console.log(`   Type: ${transaction.transaction_type}`);
+            console.log(`   Amount: ${transaction.amount.toLocaleString('vi-VN')} VND`);
+            console.log(`   Description: ${transaction.description}`);
+            console.log(`   Category: ${transaction.suggested_category_name || 'N/A'}`);
+            console.log(`   Date: ${transaction.extracted_date || 'No date extracted'}`);
+            console.log(`   Notes: ${transaction.notes || 'None'}`);
+            console.log(`   Tags: ${transaction.suggested_tags?.join(', ') || 'None'}`);
+            console.log(`   Confidence: ${Math.round(transaction.confidence_score * 100)}%`);
+            
+            // Highlight Vietnamese time parsing success
+            if (transaction.extracted_date && (customInput.includes('hôm qua') || customInput.includes('sáng nay') || customInput.includes('chiều') || customInput.includes('tuần trước'))) {
+              console.log(`   🎯 Vietnamese time parsing successful!`);
+            }
+            
+            if (transaction.is_unusual) {
+              console.log(`   ⚠️  Flagged as unusual: ${transaction.unusual_reasons?.join(', ')}`);
+            }
+          });
+          
+          if (response.data.analysis_summary) {
+            console.log(`
+📊 AI Analysis: ${response.data.analysis_summary}`);
+          }
+          
+          if (response.data.parsing_metadata) {
+            console.log(`
+🔍 Parsing Metadata:`);
+            console.log(`   Time expressions found: ${response.data.parsing_metadata.time_expressions_found?.join(', ') || 'None'}`);
+            console.log(`   Dates calculated: ${response.data.parsing_metadata.dates_calculated?.join(', ') || 'None'}`);
+            console.log(`   Average confidence: ${Math.round((response.data.parsing_metadata.average_confidence || 0) * 100)}%`);
+          }
+          
+          console.log(`
+⏱️  Processing time: ${endTime - startTime}ms`);
+        } else {
+          console.log(`❌ Failed: ${response.error}`);
+          if (response.details) {
+            console.log(`Details: ${JSON.stringify(response.details, null, 2)}`);
+          }
+        }
+      } catch (error) {
+        console.error(`❌ Error: ${(error as Error).message}`);
+      }
+      
+      return;
+    }
+    
+    console.log('Starting AI Prompt Test Suite...');
 
     // Load test suite
     const testSuiteContent = await fs.readFile(CONFIG.TEST_SUITE_PATH, 'utf8');

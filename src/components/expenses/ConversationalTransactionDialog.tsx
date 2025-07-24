@@ -401,6 +401,49 @@ export function ConversationalTransactionDialog({
                         )}
                       </div>
 
+                      {/* DATE INFORMATION - Show extracted time data prominently */}
+                      {editing.transaction_date && (
+                        <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border-2 border-green-200 dark:border-green-700">
+                          <Label className="text-base font-bold text-green-800 dark:text-green-200 flex items-center gap-2 mb-3">
+                            <Calendar className="h-5 w-5 text-green-600" />
+                            Transaction Date
+                            <Badge variant="outline" className="ml-2 text-xs border-green-300 text-green-700 bg-green-50">
+                              Time Data Found
+                            </Badge>
+                          </Label>
+                          <div className="flex items-center gap-3">
+                            <Input
+                              type="date"
+                              value={editing.transaction_date}
+                              onChange={(e) => updateTransaction(index, 'transaction_date', e.target.value)}
+                              className="text-lg font-bold h-12 border-2 focus:border-green-500"
+                            />
+                            <div className="text-base font-semibold text-green-700 dark:text-green-300">
+                              {new Date(editing.transaction_date).toLocaleDateString('vi-VN', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                            </div>
+                          </div>
+                          {/* Show AI extracted date info */}
+                          {original.extracted_date && (
+                            <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded border-l-4 border-blue-400">
+                              <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-200">
+                                <Brain className="h-4 w-4" />
+                                AI detected date from: "{originalText}"
+                              </div>
+                              {original.notes && original.notes.includes('hôm') && (
+                                <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                  💡 Vietnamese time expression processed: {original.notes}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Transaction Type & Wallet - Secondary Important */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border">

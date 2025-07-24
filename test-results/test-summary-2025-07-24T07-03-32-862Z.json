@@ -1,0 +1,47 @@
+{
+  "summary": {
+    "total_tests": 1,
+    "passed": 0,
+    "failed": 1,
+    "pass_rate": 0,
+    "overall_score": 0,
+    "meets_threshold": false
+  },
+  "category_breakdown": {
+    "complex_amounts": {
+      "total": 1,
+      "passed": 0,
+      "totalScore": 0,
+      "passRate": 0,
+      "avgScore": 0
+    }
+  },
+  "failed_tests": [
+    {
+      "id": "complex_amount_001",
+      "category": "complex_amounts",
+      "input": "chuyển khoản 1tr550",
+      "error": null,
+      "score": 0,
+      "issues": [
+        {
+          "aspect": "transaction_count",
+          "message": "Expected 1 transactions, got 0"
+        },
+        {
+          "aspect": "transaction_0",
+          "message": "Missing actual transaction"
+        }
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "medium",
+      "category": "Category: complex_amounts",
+      "issue": "Low pass rate (0.0%) for complex_amounts tests",
+      "suggestion": "Review and improve handling of complex_amounts scenarios. Consider adding few-shot examples."
+    }
+  ],
+  "timestamp": "2025-07-24T07:03:32.861Z"
+}

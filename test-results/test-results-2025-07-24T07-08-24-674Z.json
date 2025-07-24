@@ -1,0 +1,121 @@
+{
+  "report": {
+    "summary": {
+      "total_tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "pass_rate": 100,
+      "overall_score": 91.66666666666666,
+      "meets_threshold": true
+    },
+    "category_breakdown": {
+      "complex_amounts": {
+        "total": 1,
+        "passed": 1,
+        "totalScore": 91.66666666666666,
+        "passRate": 100,
+        "avgScore": 91.66666666666666
+      }
+    },
+    "failed_tests": [],
+    "recommendations": [],
+    "timestamp": "2025-07-24T07:08:24.673Z"
+  },
+  "detailed_results": [
+    {
+      "id": "complex_amount_001",
+      "category": "complex_amounts",
+      "input": "chuyển khoản 1tr550",
+      "expected": {
+        "transactions": [
+          {
+            "transaction_type": "transfer",
+            "amount": 1550000,
+            "description": "Chuyển khoản",
+            "suggested_tags": [
+              "#chuyển_khoản"
+            ],
+            "confidence_score": 0.9
+          }
+        ]
+      },
+      "actual": {
+        "transactions": [
+          {
+            "transaction_type": "transfer",
+            "amount": 1550000,
+            "description": "Chuyển khoản",
+            "suggested_category_id": null,
+            "suggested_category_name": "Chuyển khoản",
+            "suggested_tags": [
+              "#chuyển_khoản"
+            ],
+            "confidence_score": 0.95,
+            "extracted_merchant": null,
+            "extracted_date": null,
+            "notes": null,
+            "is_unusual": false,
+            "unusual_reasons": [],
+            "suggested_wallet_id": "84ccf154-a16f-4754-9317-b755b7ba60ad",
+            "parsing_context": {
+              "original_text": "chuyển khoản 1tr550",
+              "processing_timestamp": "2025-07-24T07:08:24.651Z",
+              "user_id": "457cc15c-4d5d-40c6-82e7-0814b75dda16"
+            }
+          }
+        ],
+        "analysis_summary": "Giao dịch chuyển khoản với số tiền 1.55 triệu VND",
+        "metadata": {
+          "total_transactions": 1,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T07:08:24.653Z",
+          "ai_model": "gemini-2.5-flash"
+        }
+      },
+      "processing_time": 15034,
+      "timestamp": "2025-07-24T07:08:24.671Z",
+      "success": true,
+      "error": null,
+      "pass": true,
+      "score": {
+        "total": 55,
+        "max": 60,
+        "details": {
+          "transaction_count": {
+            "pass": true,
+            "score": 10,
+            "max": 10
+          },
+          "transaction_0": {
+            "total": 45,
+            "max": 50,
+            "details": {
+              "type": {
+                "pass": true,
+                "score": 15,
+                "max": 15
+              },
+              "amount": {
+                "pass": true,
+                "score": 20,
+                "max": 20
+              },
+              "category": {
+                "pass": true,
+                "score": 5,
+                "max": 10,
+                "message": "Category not specified"
+              },
+              "description": {
+                "pass": true,
+                "score": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "percentage": 91.66666666666666
+      }
+    }
+  ]
+}

@@ -1,0 +1,1090 @@
+{
+  "report": {
+    "summary": {
+      "total_tests": 12,
+      "passed": 8,
+      "failed": 4,
+      "pass_rate": 66.66666666666666,
+      "overall_score": 64.16666666666667,
+      "meets_threshold": false
+    },
+    "category_breakdown": {
+      "ambiguous": {
+        "total": 2,
+        "passed": 0,
+        "totalScore": 0,
+        "passRate": 0,
+        "avgScore": 0
+      },
+      "non_transaction": {
+        "total": 2,
+        "passed": 2,
+        "totalScore": 200,
+        "passRate": 100,
+        "avgScore": 100
+      },
+      "conditional_future": {
+        "total": 2,
+        "passed": 2,
+        "totalScore": 200,
+        "passRate": 100,
+        "avgScore": 100
+      },
+      "complex_amounts": {
+        "total": 2,
+        "passed": 2,
+        "totalScore": 180,
+        "passRate": 100,
+        "avgScore": 90
+      },
+      "with_date": {
+        "total": 1,
+        "passed": 1,
+        "totalScore": 100,
+        "passRate": 100,
+        "avgScore": 100
+      },
+      "complex_scenario": {
+        "total": 1,
+        "passed": 1,
+        "totalScore": 90,
+        "passRate": 100,
+        "avgScore": 90
+      },
+      "edge_cases": {
+        "total": 2,
+        "passed": 0,
+        "totalScore": 0,
+        "passRate": 0,
+        "avgScore": 0
+      }
+    },
+    "failed_tests": [
+      {
+        "id": "ambiguous_001",
+        "category": "ambiguous",
+        "input": "chuyển tiền cho mẹ 500k",
+        "error": null,
+        "score": 0,
+        "issues": [
+          {
+            "aspect": "transaction_count",
+            "message": "Expected 1 transactions, got 0"
+          },
+          {
+            "aspect": "transaction_0",
+            "message": "Missing actual transaction"
+          }
+        ]
+      },
+      {
+        "id": "ambiguous_002",
+        "category": "ambiguous",
+        "input": "hôm nay tiêu hơi nhiều",
+        "error": null,
+        "score": 0,
+        "issues": [
+          {
+            "aspect": "transaction_count",
+            "message": "Expected 0 transactions, got 1"
+          },
+          {
+            "aspect": "transaction_0",
+            "message": "Unexpected extra transaction"
+          }
+        ]
+      },
+      {
+        "id": "edge_case_001",
+        "category": "edge_cases",
+        "input": "mất tiền 100k",
+        "error": null,
+        "score": 0,
+        "issues": [
+          {
+            "aspect": "transaction_count",
+            "message": "Expected 0 transactions, got 1"
+          },
+          {
+            "aspect": "transaction_0",
+            "message": "Unexpected extra transaction"
+          }
+        ]
+      },
+      {
+        "id": "edge_case_002",
+        "category": "edge_cases",
+        "input": "nợ bạn 200k",
+        "error": null,
+        "score": 0,
+        "issues": [
+          {
+            "aspect": "transaction_count",
+            "message": "Expected 1 transactions, got 0"
+          },
+          {
+            "aspect": "transaction_0",
+            "message": "Missing actual transaction"
+          }
+        ]
+      }
+    ],
+    "recommendations": [
+      {
+        "priority": "medium",
+        "category": "Category: ambiguous",
+        "issue": "Low pass rate (0.0%) for ambiguous tests",
+        "suggestion": "Review and improve handling of ambiguous scenarios. Consider adding few-shot examples."
+      },
+      {
+        "priority": "medium",
+        "category": "Category: edge_cases",
+        "issue": "Low pass rate (0.0%) for edge_cases tests",
+        "suggestion": "Review and improve handling of edge_cases scenarios. Consider adding few-shot examples."
+      }
+    ],
+    "timestamp": "2025-07-24T06:00:29.516Z"
+  },
+  "detailed_results": [
+    {
+      "id": "ambiguous_001",
+      "category": "ambiguous",
+      "input": "chuyển tiền cho mẹ 500k",
+      "expected": {
+        "transactions": [
+          {
+            "transaction_type": "transfer",
+            "amount": 500000,
+            "description": "Chuyển tiền cho mẹ",
+            "suggested_category_name": "Chuyển khoản gia đình",
+            "suggested_tags": [
+              "#gia_đình",
+              "#chuyển_khoản"
+            ],
+            "confidence_score": 0.8,
+            "notes": "Transfer to family member"
+          }
+        ]
+      },
+      "actual": {
+        "transactions": [],
+        "analysis_summary": "Failed to parse AI response. The AI may have returned malformed JSON.",
+        "metadata": {
+          "total_transactions": 0,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T05:57:50.736Z",
+          "ai_model": "gemini-2.5-flash",
+          "parsing_metadata": null
+        }
+      },
+      "processing_time": 19619,
+      "timestamp": "2025-07-24T05:57:50.764Z",
+      "success": true,
+      "error": null,
+      "pass": false,
+      "score": {
+        "total": 0,
+        "max": 60,
+        "details": {
+          "transaction_count": {
+            "pass": false,
+            "score": 0,
+            "max": 10,
+            "message": "Expected 1 transactions, got 0"
+          },
+          "transaction_0": {
+            "pass": false,
+            "score": 0,
+            "max": 50,
+            "message": "Missing actual transaction"
+          }
+        },
+        "percentage": 0
+      }
+    },
+    {
+      "id": "ambiguous_002",
+      "category": "ambiguous",
+      "input": "hôm nay tiêu hơi nhiều",
+      "expected": {
+        "transactions": [],
+        "analysis_summary": "Không có thông tin giao dịch cụ thể để phân tích"
+      },
+      "actual": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 0,
+            "description": "Chi tiêu hôm nay",
+            "suggested_category_id": "daa3feb3-901c-4769-ad41-ef39d81db586",
+            "suggested_category_name": "Khác",
+            "suggested_tags": [
+              "#hôm_nay",
+              "#chi_tiêu",
+              "#hơi_nhiều",
+              "#không_rõ_số_tiền"
+            ],
+            "confidence_score": 0.45,
+            "extracted_merchant": null,
+            "extracted_date": "2025-07-24",
+            "notes": "Người dùng ghi nhận chi tiêu hôm nay nhưng không cung cấp số tiền cụ thể. Số tiền được đặt là 0 vì không có thông tin.",
+            "is_unusual": true,
+            "unusual_reasons": [
+              "Low AI confidence: 45% confidence is below 50% threshold"
+            ],
+            "suggested_wallet_id": "84ccf154-a16f-4754-9317-b755b7ba60ad",
+            "parsing_context": {
+              "original_text": "hôm nay tiêu hơi nhiều",
+              "processing_timestamp": "2025-07-24T05:58:06.330Z",
+              "user_id": "457cc15c-4d5d-40c6-82e7-0814b75dda16"
+            }
+          }
+        ],
+        "analysis_summary": "Phân tích 1 giao dịch chi tiêu hôm nay nhưng không có số tiền cụ thể.",
+        "metadata": {
+          "total_transactions": 1,
+          "unusual_count": 1,
+          "processing_time": "2025-07-24T05:58:06.593Z",
+          "ai_model": "gemini-2.5-flash"
+        }
+      },
+      "processing_time": 15850,
+      "timestamp": "2025-07-24T05:58:06.616Z",
+      "success": true,
+      "error": null,
+      "pass": false,
+      "score": {
+        "total": 0,
+        "max": 60,
+        "details": {
+          "transaction_count": {
+            "pass": false,
+            "score": 0,
+            "max": 10,
+            "message": "Expected 0 transactions, got 1"
+          },
+          "transaction_0": {
+            "pass": false,
+            "score": 0,
+            "max": 50,
+            "message": "Unexpected extra transaction"
+          }
+        },
+        "percentage": 0
+      }
+    },
+    {
+      "id": "non_transaction_001",
+      "category": "non_transaction",
+      "input": "sếp thật tuyệt vời",
+      "expected": {
+        "transactions": [],
+        "analysis_summary": "Không phát hiện giao dịch tài chính trong văn bản"
+      },
+      "actual": {
+        "transactions": [],
+        "analysis_summary": "Không tìm thấy thông tin giao dịch nào trong văn bản. Văn bản chỉ chứa lời khen về sếp.",
+        "metadata": {
+          "total_transactions": 0,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T05:58:16.840Z",
+          "ai_model": "gemini-2.5-flash",
+          "parsing_metadata": {
+            "total_transactions_found": 0,
+            "high_confidence_count": 0,
+            "average_confidence": 0,
+            "parsing_notes": "Văn bản 'sếp thật tuyệt vời' không chứa bất kỳ thông tin tài chính, số tiền, hoặc hành động giao dịch nào. Đây là một câu cảm thán hoặc lời khen.",
+            "time_expressions_found": [],
+            "dates_calculated": []
+          }
+        }
+      },
+      "processing_time": 10231,
+      "timestamp": "2025-07-24T05:58:16.847Z",
+      "success": true,
+      "error": null,
+      "pass": true,
+      "score": {
+        "total": 10,
+        "max": 10,
+        "details": {
+          "transaction_count": {
+            "pass": true,
+            "score": 10,
+            "max": 10
+          }
+        },
+        "percentage": 100
+      }
+    },
+    {
+      "id": "non_transaction_002",
+      "category": "non_transaction",
+      "input": "hy vọng không đu đỉnh",
+      "expected": {
+        "transactions": [],
+        "analysis_summary": "Không có thông tin giao dịch để phân tích"
+      },
+      "actual": {
+        "transactions": [],
+        "analysis_summary": "Không tìm thấy giao dịch tài chính cụ thể nào trong văn bản. Văn bản là một bình luận hoặc cảm thán liên quan đến thị trường tài chính.",
+        "metadata": {
+          "total_transactions": 0,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T05:58:27.650Z",
+          "ai_model": "gemini-2.5-flash",
+          "parsing_metadata": {
+            "total_transactions_found": 0,
+            "high_confidence_count": 0,
+            "average_confidence": 0,
+            "parsing_notes": "Văn bản chứa thuật ngữ tài chính 'đu đỉnh' (mua ở đỉnh giá) nhưng không mô tả một giao dịch chi tiêu, thu nhập hay chuyển khoản cụ thể nào.",
+            "time_expressions_found": [],
+            "dates_calculated": []
+          }
+        }
+      },
+      "processing_time": 10805,
+      "timestamp": "2025-07-24T05:58:27.652Z",
+      "success": true,
+      "error": null,
+      "pass": true,
+      "score": {
+        "total": 10,
+        "max": 10,
+        "details": {
+          "transaction_count": {
+            "pass": true,
+            "score": 10,
+            "max": 10
+          }
+        },
+        "percentage": 100
+      }
+    },
+    {
+      "id": "conditional_001",
+      "category": "conditional_future",
+      "input": "nếu mai trời đẹp thì đi chơi 300k",
+      "expected": {
+        "transactions": [],
+        "analysis_summary": "Giao dịch có điều kiện/tương lai - không phân tích"
+      },
+      "actual": {
+        "transactions": [],
+        "analysis_summary": "Failed to parse AI response. The AI may have returned malformed JSON.",
+        "metadata": {
+          "total_transactions": 0,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T05:58:44.849Z",
+          "ai_model": "gemini-2.5-flash",
+          "parsing_metadata": null
+        }
+      },
+      "processing_time": 17212,
+      "timestamp": "2025-07-24T05:58:44.864Z",
+      "success": true,
+      "error": null,
+      "pass": true,
+      "score": {
+        "total": 10,
+        "max": 10,
+        "details": {
+          "transaction_count": {
+            "pass": true,
+            "score": 10,
+            "max": 10
+          }
+        },
+        "percentage": 100
+      }
+    },
+    {
+      "id": "conditional_002",
+      "category": "conditional_future",
+      "input": "dự định mua xe 500 triệu",
+      "expected": {
+        "transactions": [],
+        "analysis_summary": "Giao dịch dự định/tương lai - không phân tích"
+      },
+      "actual": {
+        "transactions": [],
+        "analysis_summary": "Văn bản mô tả một dự định chi tiêu trong tương lai, không phải giao dịch tài chính đã xảy ra hoặc đang diễn ra. Do đó, không có giao dịch nào được trích xuất.",
+        "metadata": {
+          "total_transactions": 0,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T05:58:57.253Z",
+          "ai_model": "gemini-2.5-flash",
+          "parsing_metadata": {
+            "total_transactions_found": 0,
+            "high_confidence_count": 0,
+            "average_confidence": 0,
+            "parsing_notes": "Văn bản chứa cụm từ 'dự định' cho thấy đây là một kế hoạch hoặc ý định, không phải một giao dịch thực tế. Hệ thống chỉ trích xuất các giao dịch đã hoàn thành hoặc đang diễn ra.",
+            "time_expressions_found": [],
+            "dates_calculated": []
+          }
+        }
+      },
+      "processing_time": 12395,
+      "timestamp": "2025-07-24T05:58:57.260Z",
+      "success": true,
+      "error": null,
+      "pass": true,
+      "score": {
+        "total": 10,
+        "max": 10,
+        "details": {
+          "transaction_count": {
+            "pass": true,
+            "score": 10,
+            "max": 10
+          }
+        },
+        "percentage": 100
+      }
+    },
+    {
+      "id": "complex_amount_001",
+      "category": "complex_amounts",
+      "input": "chuyển khoản 1tr550",
+      "expected": {
+        "transactions": [
+          {
+            "transaction_type": "transfer",
+            "amount": 1550000,
+            "description": "Chuyển khoản",
+            "suggested_tags": [
+              "#chuyển_khoản"
+            ],
+            "confidence_score": 0.9
+          }
+        ]
+      },
+      "actual": {
+        "transactions": [
+          {
+            "transaction_type": "transfer",
+            "amount": 1550000,
+            "description": "Chuyển khoản",
+            "suggested_category_id": "daa3feb3-901c-4769-ad41-ef39d81db586",
+            "suggested_category_name": "Khác",
+            "suggested_tags": [
+              "#chuyển_khoản",
+              "#chuyển_tiền"
+            ],
+            "confidence_score": 0.95,
+            "extracted_merchant": null,
+            "extracted_date": "2025-07-24",
+            "notes": "Giao dịch chuyển khoản",
+            "is_unusual": false,
+            "unusual_reasons": [],
+            "suggested_wallet_id": "84ccf154-a16f-4754-9317-b755b7ba60ad",
+            "parsing_context": {
+              "original_text": "chuyển khoản 1tr550",
+              "processing_timestamp": "2025-07-24T05:59:13.526Z",
+              "user_id": "457cc15c-4d5d-40c6-82e7-0814b75dda16"
+            }
+          }
+        ],
+        "analysis_summary": "Phân tích 1 giao dịch chuyển khoản với số tiền 1.55 triệu VND.",
+        "metadata": {
+          "total_transactions": 1,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T05:59:13.526Z",
+          "ai_model": "gemini-2.5-flash"
+        }
+      },
+      "processing_time": 16273,
+      "timestamp": "2025-07-24T05:59:13.533Z",
+      "success": true,
+      "error": null,
+      "pass": true,
+      "score": {
+        "total": 55,
+        "max": 60,
+        "details": {
+          "transaction_count": {
+            "pass": true,
+            "score": 10,
+            "max": 10
+          },
+          "transaction_0": {
+            "total": 45,
+            "max": 50,
+            "details": {
+              "type": {
+                "pass": true,
+                "score": 15,
+                "max": 15
+              },
+              "amount": {
+                "pass": true,
+                "score": 20,
+                "max": 20
+              },
+              "category": {
+                "pass": true,
+                "score": 5,
+                "max": 10,
+                "message": "Category not specified"
+              },
+              "description": {
+                "pass": true,
+                "score": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "percentage": 91.66666666666666
+      }
+    },
+    {
+      "id": "complex_amount_002",
+      "category": "complex_amounts",
+      "input": "tốn một triệu rưỡi",
+      "expected": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 1500000,
+            "description": "Chi tiêu",
+            "confidence_score": 0.8
+          }
+        ]
+      },
+      "actual": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 1500000,
+            "description": "Khoản chi tiêu không rõ chi tiết",
+            "suggested_category_id": "daa3feb3-901c-4769-ad41-ef39d81db586",
+            "suggested_category_name": "Khác",
+            "suggested_tags": [
+              "#chi_phí_khác",
+              "#không_rõ_chi_tiết",
+              "#số_tiền_lớn"
+            ],
+            "confidence_score": 0.7,
+            "extracted_merchant": null,
+            "extracted_date": "2025-07-24",
+            "notes": "Khoản chi tiêu không rõ mục đích hoặc thời gian cụ thể. Ngày được gán mặc định là hôm nay do không có thông tin thời gian.",
+            "is_unusual": true,
+            "unusual_reasons": [
+              "Unusually high for category: 1.500.000 VND is 14x your average of 106.875 VND"
+            ],
+            "suggested_wallet_id": "84ccf154-a16f-4754-9317-b755b7ba60ad",
+            "parsing_context": {
+              "original_text": "tốn một triệu rưỡi",
+              "processing_timestamp": "2025-07-24T05:59:30.356Z",
+              "user_id": "457cc15c-4d5d-40c6-82e7-0814b75dda16"
+            }
+          }
+        ],
+        "analysis_summary": "Phân tích 1 giao dịch chi tiêu với số tiền rõ ràng nhưng không có thông tin chi tiết về mục đích hoặc thời gian.",
+        "metadata": {
+          "total_transactions": 1,
+          "unusual_count": 1,
+          "processing_time": "2025-07-24T05:59:30.710Z",
+          "ai_model": "gemini-2.5-flash"
+        }
+      },
+      "processing_time": 17181,
+      "timestamp": "2025-07-24T05:59:30.714Z",
+      "success": true,
+      "error": null,
+      "pass": true,
+      "score": {
+        "total": 53,
+        "max": 60,
+        "details": {
+          "transaction_count": {
+            "pass": true,
+            "score": 10,
+            "max": 10
+          },
+          "transaction_0": {
+            "total": 43,
+            "max": 50,
+            "details": {
+              "type": {
+                "pass": true,
+                "score": 15,
+                "max": 15
+              },
+              "amount": {
+                "pass": true,
+                "score": 20,
+                "max": 20
+              },
+              "category": {
+                "pass": true,
+                "score": 5,
+                "max": 10,
+                "message": "Category not specified"
+              },
+              "description": {
+                "pass": true,
+                "score": 3,
+                "max": 5,
+                "message": "Partial match"
+              }
+            }
+          }
+        },
+        "percentage": 88.33333333333333
+      }
+    },
+    {
+      "id": "date_001",
+      "category": "with_date",
+      "input": "hôm qua ăn tối 120k",
+      "expected": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 120000,
+            "description": "Ăn tối",
+            "suggested_category_name": "Ăn uống",
+            "suggested_tags": [
+              "#tối",
+              "#ăn_uống"
+            ],
+            "extracted_date": "yesterday",
+            "confidence_score": 0.9
+          }
+        ]
+      },
+      "actual": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 120000,
+            "description": "Ăn tối",
+            "suggested_category_id": "97f421c6-5df7-4125-920f-869b003fa5eb",
+            "suggested_category_name": "Ăn uống",
+            "suggested_tags": [
+              "#ăn_tối",
+              "#hôm_qua",
+              "#tối"
+            ],
+            "confidence_score": 0.98,
+            "extracted_merchant": null,
+            "extracted_date": "2025-07-23",
+            "notes": "Ăn tối hôm qua",
+            "is_unusual": false,
+            "unusual_reasons": [],
+            "suggested_wallet_id": "84ccf154-a16f-4754-9317-b755b7ba60ad",
+            "parsing_context": {
+              "original_text": "hôm qua ăn tối 120k",
+              "processing_timestamp": "2025-07-24T05:59:44.352Z",
+              "user_id": "457cc15c-4d5d-40c6-82e7-0814b75dda16"
+            }
+          }
+        ],
+        "analysis_summary": "Phân tích 1 giao dịch chi tiêu cho bữa tối hôm qua.",
+        "metadata": {
+          "total_transactions": 1,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T05:59:44.643Z",
+          "ai_model": "gemini-2.5-flash"
+        }
+      },
+      "processing_time": 13940,
+      "timestamp": "2025-07-24T05:59:44.655Z",
+      "success": true,
+      "error": null,
+      "pass": true,
+      "score": {
+        "total": 60,
+        "max": 60,
+        "details": {
+          "transaction_count": {
+            "pass": true,
+            "score": 10,
+            "max": 10
+          },
+          "transaction_0": {
+            "total": 50,
+            "max": 50,
+            "details": {
+              "type": {
+                "pass": true,
+                "score": 15,
+                "max": 15
+              },
+              "amount": {
+                "pass": true,
+                "score": 20,
+                "max": 20
+              },
+              "category": {
+                "pass": true,
+                "score": 10,
+                "max": 10
+              },
+              "description": {
+                "pass": true,
+                "score": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "percentage": 100
+      }
+    },
+    {
+      "id": "complex_scenario_001",
+      "category": "complex_scenario",
+      "input": "sáng ăn phở 35k ở quán Hà Nội, chiều uống trà sữa Gong Cha 55k với bạn, tối về Grab 90k",
+      "expected": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 35000,
+            "description": "Ăn phở",
+            "suggested_category_name": "Ăn uống",
+            "suggested_tags": [
+              "#phở",
+              "#sáng"
+            ],
+            "extracted_merchant": "Quán Hà Nội"
+          },
+          {
+            "transaction_type": "expense",
+            "amount": 55000,
+            "description": "Uống trà sữa",
+            "suggested_category_name": "Ăn uống",
+            "suggested_tags": [
+              "#trà_sữa",
+              "#bạn_bè"
+            ],
+            "extracted_merchant": "Gong Cha"
+          },
+          {
+            "transaction_type": "expense",
+            "amount": 90000,
+            "description": "Đi Grab",
+            "suggested_category_name": "Di chuyển",
+            "suggested_tags": [
+              "#grab",
+              "#di_chuyển"
+            ],
+            "extracted_merchant": "Grab"
+          }
+        ]
+      },
+      "actual": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 35000,
+            "description": "Ăn phở ở quán Hà Nội",
+            "suggested_category_id": "97f421c6-5df7-4125-920f-869b003fa5eb",
+            "suggested_category_name": "Ăn uống",
+            "suggested_tags": [
+              "#phở",
+              "#ăn_sáng",
+              "#quán_Hà_Nội",
+              "#hôm_nay"
+            ],
+            "confidence_score": 0.98,
+            "extracted_merchant": "quán Hà Nội",
+            "extracted_date": "2025-07-24",
+            "notes": "Sáng hôm nay",
+            "is_unusual": false,
+            "unusual_reasons": [],
+            "suggested_wallet_id": "84ccf154-a16f-4754-9317-b755b7ba60ad",
+            "parsing_context": {
+              "original_text": "sáng ăn phở 35k ở quán Hà Nội, chiều uống trà sữa Gong Cha 55k với bạn, tối về Grab 90k",
+              "processing_timestamp": "2025-07-24T05:59:59.195Z",
+              "user_id": "457cc15c-4d5d-40c6-82e7-0814b75dda16"
+            }
+          },
+          {
+            "transaction_type": "expense",
+            "amount": 55000,
+            "description": "Uống trà sữa Gong Cha với bạn",
+            "suggested_category_id": "97f421c6-5df7-4125-920f-869b003fa5eb",
+            "suggested_category_name": "Ăn uống",
+            "suggested_tags": [
+              "#trà_sữa",
+              "#Gong_Cha",
+              "#chiều",
+              "#hôm_nay",
+              "#bạn_bè"
+            ],
+            "confidence_score": 0.98,
+            "extracted_merchant": "Gong Cha",
+            "extracted_date": "2025-07-24",
+            "notes": "Chiều hôm nay",
+            "is_unusual": false,
+            "unusual_reasons": [],
+            "suggested_wallet_id": "84ccf154-a16f-4754-9317-b755b7ba60ad",
+            "parsing_context": {
+              "original_text": "sáng ăn phở 35k ở quán Hà Nội, chiều uống trà sữa Gong Cha 55k với bạn, tối về Grab 90k",
+              "processing_timestamp": "2025-07-24T05:59:59.195Z",
+              "user_id": "457cc15c-4d5d-40c6-82e7-0814b75dda16"
+            }
+          },
+          {
+            "transaction_type": "expense",
+            "amount": 90000,
+            "description": "Đi Grab về nhà",
+            "suggested_category_id": "2908dc0d-5aa6-4151-b61b-2fa409603936",
+            "suggested_category_name": "Đi lại",
+            "suggested_tags": [
+              "#Grab",
+              "#đi_lại",
+              "#tối",
+              "#hôm_nay"
+            ],
+            "confidence_score": 0.98,
+            "extracted_merchant": "Grab",
+            "extracted_date": "2025-07-24",
+            "notes": "Tối hôm nay",
+            "is_unusual": false,
+            "unusual_reasons": [],
+            "suggested_wallet_id": "84ccf154-a16f-4754-9317-b755b7ba60ad",
+            "parsing_context": {
+              "original_text": "sáng ăn phở 35k ở quán Hà Nội, chiều uống trà sữa Gong Cha 55k với bạn, tối về Grab 90k",
+              "processing_timestamp": "2025-07-24T05:59:59.195Z",
+              "user_id": "457cc15c-4d5d-40c6-82e7-0814b75dda16"
+            }
+          }
+        ],
+        "analysis_summary": "Phân tích 3 giao dịch chi tiêu trong ngày hôm nay, bao gồm ăn uống và đi lại, với thời gian cụ thể (sáng, chiều, tối).",
+        "metadata": {
+          "total_transactions": 3,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T05:59:59.483Z",
+          "ai_model": "gemini-2.5-flash"
+        }
+      },
+      "processing_time": 14834,
+      "timestamp": "2025-07-24T05:59:59.489Z",
+      "success": true,
+      "error": null,
+      "pass": true,
+      "score": {
+        "total": 144,
+        "max": 160,
+        "details": {
+          "transaction_count": {
+            "pass": true,
+            "score": 10,
+            "max": 10
+          },
+          "transaction_0": {
+            "total": 48,
+            "max": 50,
+            "details": {
+              "type": {
+                "pass": true,
+                "score": 15,
+                "max": 15
+              },
+              "amount": {
+                "pass": true,
+                "score": 20,
+                "max": 20
+              },
+              "category": {
+                "pass": true,
+                "score": 10,
+                "max": 10
+              },
+              "description": {
+                "pass": true,
+                "score": 3,
+                "max": 5,
+                "message": "Partial match"
+              }
+            }
+          },
+          "transaction_1": {
+            "total": 48,
+            "max": 50,
+            "details": {
+              "type": {
+                "pass": true,
+                "score": 15,
+                "max": 15
+              },
+              "amount": {
+                "pass": true,
+                "score": 20,
+                "max": 20
+              },
+              "category": {
+                "pass": true,
+                "score": 10,
+                "max": 10
+              },
+              "description": {
+                "pass": true,
+                "score": 3,
+                "max": 5,
+                "message": "Partial match"
+              }
+            }
+          },
+          "transaction_2": {
+            "total": 38,
+            "max": 50,
+            "details": {
+              "type": {
+                "pass": true,
+                "score": 15,
+                "max": 15
+              },
+              "amount": {
+                "pass": true,
+                "score": 20,
+                "max": 20
+              },
+              "category": {
+                "pass": false,
+                "score": 0,
+                "max": 10,
+                "message": "Expected category: Di chuyển, got: Đi lại"
+              },
+              "description": {
+                "pass": true,
+                "score": 3,
+                "max": 5,
+                "message": "Partial match"
+              }
+            }
+          }
+        },
+        "percentage": 90
+      }
+    },
+    {
+      "id": "edge_case_001",
+      "category": "edge_cases",
+      "input": "mất tiền 100k",
+      "expected": {
+        "transactions": [],
+        "analysis_summary": "Mất tiền không phải là giao dịch tài chính có chủ ý"
+      },
+      "actual": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 100000,
+            "description": "Mất tiền 100k",
+            "suggested_category_id": "daa3feb3-901c-4769-ad41-ef39d81db586",
+            "suggested_category_name": "Khác",
+            "suggested_tags": [
+              "#chi_tiêu",
+              "#khoản_khác",
+              "#tiền_mặt"
+            ],
+            "confidence_score": 0.8,
+            "extracted_merchant": null,
+            "extracted_date": "2025-07-24",
+            "notes": "Không có thông tin ngày cụ thể, mặc định là hôm nay.",
+            "is_unusual": false,
+            "unusual_reasons": [],
+            "suggested_wallet_id": "84ccf154-a16f-4754-9317-b755b7ba60ad",
+            "parsing_context": {
+              "original_text": "mất tiền 100k",
+              "processing_timestamp": "2025-07-24T06:00:11.568Z",
+              "user_id": "457cc15c-4d5d-40c6-82e7-0814b75dda16"
+            }
+          }
+        ],
+        "analysis_summary": "Phân tích 1 giao dịch chi tiêu không rõ mục đích với số tiền 100k, mặc định ngày hôm nay.",
+        "metadata": {
+          "total_transactions": 1,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T06:00:11.911Z",
+          "ai_model": "gemini-2.5-flash"
+        }
+      },
+      "processing_time": 12427,
+      "timestamp": "2025-07-24T06:00:11.916Z",
+      "success": true,
+      "error": null,
+      "pass": false,
+      "score": {
+        "total": 0,
+        "max": 60,
+        "details": {
+          "transaction_count": {
+            "pass": false,
+            "score": 0,
+            "max": 10,
+            "message": "Expected 0 transactions, got 1"
+          },
+          "transaction_0": {
+            "pass": false,
+            "score": 0,
+            "max": 50,
+            "message": "Unexpected extra transaction"
+          }
+        },
+        "percentage": 0
+      }
+    },
+    {
+      "id": "edge_case_002",
+      "category": "edge_cases",
+      "input": "nợ bạn 200k",
+      "expected": {
+        "transactions": [
+          {
+            "transaction_type": "expense",
+            "amount": 200000,
+            "description": "Nợ bạn",
+            "suggested_category_name": "Khác",
+            "suggested_tags": [
+              "#nợ",
+              "#bạn_bè"
+            ],
+            "confidence_score": 0.6,
+            "notes": "Debt to friend"
+          }
+        ]
+      },
+      "actual": {
+        "transactions": [],
+        "analysis_summary": "Failed to parse AI response. The AI may have returned malformed JSON.",
+        "metadata": {
+          "total_transactions": 0,
+          "unusual_count": 0,
+          "processing_time": "2025-07-24T06:00:29.509Z",
+          "ai_model": "gemini-2.5-flash",
+          "parsing_metadata": null
+        }
+      },
+      "processing_time": 17597,
+      "timestamp": "2025-07-24T06:00:29.513Z",
+      "success": true,
+      "error": null,
+      "pass": false,
+      "score": {
+        "total": 0,
+        "max": 60,
+        "details": {
+          "transaction_count": {
+            "pass": false,
+            "score": 0,
+            "max": 10,
+            "message": "Expected 1 transactions, got 0"
+          },
+          "transaction_0": {
+            "pass": false,
+            "score": 0,
+            "max": 50,
+            "message": "Missing actual transaction"
+          }
+        },
+        "percentage": 0
+      }
+    }
+  ]
+}
