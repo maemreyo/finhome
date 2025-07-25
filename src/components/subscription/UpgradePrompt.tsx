@@ -29,7 +29,7 @@ import {
   formatPrice,
   calculateYearlyDiscount,
 } from "@/config/subscriptionPlans";
-import { UserSubscriptionTier } from "@/lib/supabase/types";
+import { UserSubscriptionTier } from "@/src/types/supabase";
 
 interface UpgradePromptProps {
   featureKey: FeatureKey;

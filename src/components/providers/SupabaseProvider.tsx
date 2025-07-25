@@ -6,7 +6,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User, AuthError, Session } from '@supabase/supabase-js'
-import type { Database } from '@/lib/supabase/types'
+import type { Database } from '@/src/types/supabase'
 
 type SupabaseClient = ReturnType<typeof createClient>
 

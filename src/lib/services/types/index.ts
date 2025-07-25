@@ -412,15 +412,3 @@ export function isValidDate(dateString: string): boolean {
 
 // Export commonly used types (schemas and api modules don't exist yet)
 
-// Re-export commonly used types
-export type {
-  User,
-  Category,
-  Wallet,
-  Transaction,
-  ParsedTransaction,
-  ParsedResponse,
-  ParsingMetadata,
-  ApiResponse,
-  StreamingResponse
-};

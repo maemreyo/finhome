@@ -2,7 +2,7 @@
 // Service for financial scenario management and analysis
 
 import { createClient } from '@/lib/supabase/client'
-import { Database } from '@/lib/supabase/types'
+import { Database } from '@/src/types/supabase'
 import type {
   FinancialScenario,
   ScenarioParameters,

@@ -11,7 +11,7 @@ import {
   SubscriptionPlan 
 } from '@/types/subscription'
 import { getPlanByTier, SUBSCRIPTION_PLANS } from '@/config/subscriptionPlans'
-import { UserSubscriptionTier } from '@/lib/supabase/types'
+import { UserSubscriptionTier } from '@/src/types/supabase'
 
 interface UseSubscriptionReturn {
   subscription: UserSubscription | null

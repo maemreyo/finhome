@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Recurring transactions API error:', error)
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid query parameters', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid query parameters', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Create recurring transaction error:', error)
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid recurring transaction data', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid recurring transaction data', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

@@ -2,7 +2,7 @@
 // Service for property search, management, and related operations
 
 import { createClient } from '@/lib/supabase/client'
-import { Database } from '@/lib/supabase/types'
+import { Database } from '@/src/types/supabase'
 import { DashboardService } from '@/lib/services/dashboardService'
 import {
   PropertySearchFilters,

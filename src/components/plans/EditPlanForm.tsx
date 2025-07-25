@@ -36,7 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "react-hot-toast";
 import { formatCurrency, parseCurrency } from "@/lib/utils";
-import { Database } from "@/lib/supabase/types";
+import { Database } from "@/src/types/supabase";
 
 type FinancialPlan = Database["public"]["Tables"]["financial_plans"]["Row"];
 

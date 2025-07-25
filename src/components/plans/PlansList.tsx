@@ -9,7 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { formatCurrency } from '@/lib/utils'
 import { Eye, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { Database } from '@/lib/supabase/types'
+import { Database } from '@/src/types/supabase'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useSubscriptionContext } from '@/components/subscription/SubscriptionProvider'

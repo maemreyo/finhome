@@ -77,6 +77,7 @@ export default async function ExpensesPage() {
           id,
           amount,
           contribution_date,
+          description,
           wallet:expense_wallets(name, icon, color)
         )
       `)
@@ -103,9 +104,41 @@ export default async function ExpensesPage() {
             wallets: wallets || [],
             expenseCategories: expenseCategories || [],
             incomeCategories: incomeCategories || [],
-            recentTransactions: recentTransactions || [],
-            currentBudgets: currentBudgets || [],
-            activeGoals: activeGoals || []
+            recentTransactions: recentTransactions?.map(transaction => ({
+              ...transaction,
+              description: transaction.description ?? undefined,
+              expense_category: transaction.expense_category 
+                ? { name_vi: transaction.expense_category.name_vi, color: transaction.expense_category.color }
+                : undefined,
+              income_category: transaction.income_category 
+                ? { name_vi: transaction.income_category.name_vi, color: transaction.income_category.color }
+                : undefined,
+            })) || [],
+            currentBudgets: currentBudgets?.map(budget => ({
+              ...budget,
+              description: budget.description ?? undefined,
+              alert_threshold_percentage: budget.alert_threshold_percentage ?? undefined,
+              total_spent: 0, // TODO: Calculate actual spending from transactions
+              remaining_amount: budget.total_budget - 0, // TODO: Calculate based on actual spending
+              progress_percentage: 0, // TODO: Calculate based on actual spending
+            })) || [],
+            activeGoals: activeGoals?.map(goal => ({
+              ...goal,
+              description: goal.description ?? undefined,
+              monthly_target: goal.monthly_target ?? undefined,
+              target_date: goal.target_date ?? undefined,
+              deadline: goal.deadline ?? undefined,
+              icon: goal.icon ?? undefined,
+              color: goal.color ?? undefined,
+              months_remaining: goal.months_remaining ?? undefined,
+              required_monthly_savings: goal.required_monthly_savings ?? undefined,
+              is_on_track: goal.is_on_track ?? undefined,
+              completed_at: goal.completed_at ?? undefined,
+              contributions: goal.contributions?.map(contrib => ({
+                ...contrib,
+                description: contrib.description ?? undefined,
+              })) ?? undefined,
+            })) || []
           }}
         />
       </Suspense>

@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { Database } from '@/lib/supabase/types';
+import { Database } from '@/src/types/supabase';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Encryption utilities (same as in main route)
@@ -66,14 +66,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch the encrypted key from database
-    const { data: keyData, error: fetchError } = await supabase
-      .from('gemini_api_keys')
-      .select('encrypted_key, encryption_iv, encryption_tag, name')
-      .eq('id', keyId)
-      .single();
+    let keyData;
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('gemini_api_keys')
+        .select('encrypted_key, encryption_iv, encryption_tag, name, failure_count')
+        .eq('id', keyId)
+        .single();
 
-    if (fetchError || !keyData) {
-      return NextResponse.json({ error: 'API key not found' }, { status: 404 });
+      if (fetchError || !data) {
+        return NextResponse.json({ error: 'API key not found' }, { status: 404 });
+      }
+      keyData = data;
+    } catch (error) {
+      console.error('Database error while fetching API key:', error);
+      return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
     try {
@@ -94,27 +101,32 @@ export async function POST(request: NextRequest) {
       const text = response.text();
 
       // Update last_used timestamp and test success
-      await supabase
-        .from('gemini_api_keys')
-        .update({ 
-          last_used: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', keyId);
+      try {
+        await supabase
+          .from('gemini_api_keys')
+          .update({ 
+            last_used: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', keyId);
 
-      // Log the test action
-      await supabase
-        .from('gemini_key_audit_log')
-        .insert({
-          key_id: keyId,
-          action: 'tested',
-          user_id: user.id,
-          details: { 
-            name: keyData.name,
-            test_result: 'success',
-            response_preview: text.substring(0, 50)
-          }
-        });
+        // Log the test action
+        await supabase
+          .from('gemini_key_audit_log')
+          .insert({
+            key_id: keyId,
+            action: 'used',
+            user_id: user.id,
+            details: { 
+              name: keyData.name,
+              test_result: 'success',
+              response_preview: text.substring(0, 50)
+            }
+          });
+      } catch (dbError) {
+        console.log('Could not update database after successful test:', dbError);
+        // Continue - the test was successful even if we can't log it
+      }
 
       return NextResponse.json({ 
         success: true,
@@ -126,26 +138,31 @@ export async function POST(request: NextRequest) {
       console.error('API key test failed:', testError);
       
       // Update failure count
-      await supabase
-        .from('gemini_api_keys')
-        .update({ 
-          failure_count: keyData.failure_count ? keyData.failure_count + 1 : 1,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', keyId);
+      try {
+        await supabase
+          .from('gemini_api_keys')
+          .update({ 
+            failure_count: keyData.failure_count ? keyData.failure_count + 1 : 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', keyId);
 
-      // Log the failed test
-      await supabase
-        .from('gemini_key_audit_log')
-        .insert({
-          key_id: keyId,
-          action: 'test_failed',
-          user_id: user.id,
-          details: { 
-            name: keyData.name,
-            error: testError instanceof Error ? testError.message : 'Unknown error'
-          }
-        });
+        // Log the failed test
+        await supabase
+          .from('gemini_key_audit_log')
+          .insert({
+            key_id: keyId,
+            action: 'failed',
+            user_id: user.id,
+            details: { 
+              name: keyData.name,
+              error: testError instanceof Error ? testError.message : 'Unknown error'
+            }
+          });
+      } catch (dbError) {
+        console.log('Could not update database after failed test:', dbError);
+        // Continue - we still want to return the test failure
+      }
 
       return NextResponse.json({ 
         success: false,

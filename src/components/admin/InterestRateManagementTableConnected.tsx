@@ -5,7 +5,7 @@
 
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { BankInterestRate } from '@/lib/supabase/types'
+import type { BankInterestRate } from '@/src/types/supabase'
 
 interface InterestRateManagementTableConnectedProps {
   initialData: BankInterestRate[]

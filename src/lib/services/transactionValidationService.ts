@@ -135,10 +135,10 @@ export class TransactionValidationService {
       }
 
       // Statistical analysis
-      const amounts = recentTransactions.map((t) => t.amount);
-      const average = amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length;
+      const amounts = recentTransactions.map((t: any) => t.amount);
+      const average = amounts.reduce((sum: number, amount: number) => sum + amount, 0) / amounts.length;
       const standardDeviation = Math.sqrt(
-        amounts.reduce((sum, amount) => sum + Math.pow(amount - average, 2), 0) / amounts.length
+        amounts.reduce((sum: number, amount: number) => sum + Math.pow(amount - average, 2), 0) / amounts.length
       );
 
       // Flag as unusual if significantly above normal spending

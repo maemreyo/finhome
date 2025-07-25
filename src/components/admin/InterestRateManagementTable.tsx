@@ -58,7 +58,7 @@ import {
   Building2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { BankInterestRate } from '@/lib/supabase/types'
+import type { BankInterestRate } from '@/src/types/supabase'
 
 // Mock data based on your database schema
 const mockInterestRates: (BankInterestRate & { bank_name?: string; bank_code?: string })[] = [

@@ -1,7 +1,8 @@
 // src/types/subscription.ts
 // Types for subscription and monetization system
 
-import { UserSubscriptionTier } from '@/lib/supabase/types'
+import { UserSubscriptionTier } from "../lib/supabase/types"
+
 
 export interface SubscriptionPlan {
   id: string

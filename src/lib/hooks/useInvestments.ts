@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { DashboardService } from '@/lib/services/dashboardService'
 import { createClient } from '@/lib/supabase/client'
 import { plansAPI } from '@/lib/api/plans'
-import type { FinancialPlan, Property } from '@/lib/supabase/types'
+import type { FinancialPlan, Property } from '@/src/types/supabase'
 
 export interface Investment {
   id: string

@@ -213,7 +213,7 @@ export async function PUT(
   } catch (error) {
     console.error('Update recurring transaction error:', error)
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid recurring transaction data', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid recurring transaction data', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

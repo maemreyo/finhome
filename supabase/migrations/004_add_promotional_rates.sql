@@ -1,3 +1,4 @@
+-- 004_add_promotional_rates.sql
 -- Migration: Add promotional rate fields to bank_interest_rates table
 -- This addresses the missing promotional rate fields identified in the log analysis
 

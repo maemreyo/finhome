@@ -241,7 +241,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid invitation data", details: error.errors },
+        { error: "Invalid invitation data", details: error.issues },
         { status: 400 }
       );
     }

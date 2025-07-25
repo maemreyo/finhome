@@ -1,3 +1,4 @@
+-- 005_add_plan_progress_tracking
 -- Migration: Add plan progress tracking capabilities
 -- This addresses the missing plan progress, milestones, and favorites functionality
 

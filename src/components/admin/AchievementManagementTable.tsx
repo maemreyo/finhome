@@ -57,7 +57,7 @@ import {
   BookOpen
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { Achievement } from '@/lib/supabase/types'
+import type { Achievement } from '@/src/types/supabase'
 
 // Mock data based on your database schema
 const mockAchievements: Achievement[] = [

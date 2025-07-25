@@ -1,4 +1,4 @@
-Check @supabase/migrations/ @src/types/ @src/lib/supabase/types.ts @src/lib/services before processing
+Check @supabase/migrations/ @src/types/ @src/src/types/supabase.ts @src/lib/services before processing
 I've implemented i18n already, you need to follow when you implement from now on
 Remember to add new case in @src/lib/i18n-utils.ts if needed
 
@@ -7,7 +7,7 @@ Remember to add new case in @src/lib/i18n-utils.ts if needed
 
 
 
-Check @supabase/migrations/ @src/types/ @src/lib/supabase/types.ts @src/lib/services before processing
+Check @supabase/migrations/ @src/types/ @src/src/types/supabase.ts @src/lib/services before processing
 Make sure you check these tickets
 ```
 docs/tickets/ticket_1_quick_transaction_entry_enhancement.md

@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Suggestion API error:', error)
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid query parameters', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid query parameters', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

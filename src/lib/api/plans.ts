@@ -1,7 +1,7 @@
 // src/lib/api/plans.ts
 // API client for financial plans - using database types directly
 
-import { type FinancialPlan, type FinancialPlanInsert } from '@/lib/supabase/types'
+import { type FinancialPlan, type FinancialPlanInsert } from '@/src/types/supabase'
 
 // Extend database plan with calculated metrics for API responses
 export interface FinancialPlanWithMetrics extends FinancialPlan {

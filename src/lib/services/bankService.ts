@@ -2,7 +2,7 @@
 // Service for bank interest rates and loan products management
 
 import { createClient } from '@/lib/supabase/client'
-import { Database } from '@/lib/supabase/types'
+import { Database } from '@/src/types/supabase'
 
 type InterestRateRow = Database['public']['Tables']['bank_interest_rates']['Row']
 type InterestRateInsert = Database['public']['Tables']['bank_interest_rates']['Insert']

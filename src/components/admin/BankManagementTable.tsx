@@ -55,7 +55,7 @@ import {
   Mail
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { Bank } from '@/lib/supabase/types'
+import type { Bank } from '@/src/types/supabase'
 
 // Mock data based on your database schema
 const mockBanks: Bank[] = [

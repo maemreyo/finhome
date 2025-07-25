@@ -2,7 +2,7 @@
 // Configuration for subscription plans and features
 
 import { SubscriptionPlan, FeatureGate } from '@/types/subscription'
-import { UserSubscriptionTier } from '@/lib/supabase/types'
+import { UserSubscriptionTier } from '../lib/supabase/types'
 
 // Subscription plans configuration based on monetization strategy
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [

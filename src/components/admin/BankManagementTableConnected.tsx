@@ -60,7 +60,7 @@ import { useRealtimeBanks } from '@/lib/hooks/useRealtimeData'
 import { ExportImportUtils } from '@/lib/utils/export-import'
 import { useToast } from '@/hooks/use-toast'
 import { AdminQueriesClient } from '@/lib/supabase/admin-queries-client'
-import type { Bank } from '@/lib/supabase/types'
+import type { Bank } from '@/src/types/supabase'
 
 interface BankManagementTableConnectedProps {
   initialData: Bank[]

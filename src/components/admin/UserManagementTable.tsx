@@ -61,7 +61,7 @@ import {
   Calendar
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { UserProfile } from '@/lib/supabase/types'
+import type { UserProfile } from '@/src/types/supabase'
 
 // Mock data based on your database schema
 const mockUsers: UserProfile[] = [

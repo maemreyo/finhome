@@ -1,7 +1,7 @@
 // src/app/api/expenses/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 
 
@@ -132,9 +132,9 @@ export async function PUT(
     return NextResponse.json({ transaction });
   } catch (error) {
     console.error("Update transaction error:", error);
-    if (error instanceof z.ZodError) {
+    if (error instanceof ZodError) {
       return NextResponse.json(
-        { error: "Invalid update data", details: error.errors },
+        { error: "Invalid update data", details: error.issues },
         { status: 400 }
       );
     }

@@ -27,6 +27,7 @@ export default async function ExpenseGoalsPage() {
           id,
           amount,
           contribution_date,
+          description,
           wallet:expense_wallets(name, icon, color)
         )
       `
@@ -46,7 +47,34 @@ export default async function ExpenseGoalsPage() {
   return (
     <div className="space-y-6 p-6">
       <Suspense fallback={<GoalsSkeleton />}>
-        <GoalManager goals={activeGoals || []} wallets={wallets || []} />
+        <GoalManager 
+          goals={activeGoals?.map(goal => ({
+            ...goal,
+            description: goal.description ?? undefined,
+            monthly_target: goal.monthly_target ?? undefined,
+            target_date: goal.target_date ?? undefined,
+            deadline: goal.deadline ?? undefined,
+            icon: goal.icon ?? undefined,
+            color: goal.color ?? undefined,
+            house_purchase_data: goal.house_purchase_data ? (goal.house_purchase_data as {
+              property_type?: string
+              preferred_location?: string
+              budget_range?: { min?: number; max?: number }
+              timeline_months?: number
+              down_payment_percentage?: number
+              funnel_stage?: string
+            }) : undefined,
+            months_remaining: goal.months_remaining ?? undefined,
+            required_monthly_savings: goal.required_monthly_savings ?? undefined,
+            is_on_track: goal.is_on_track ?? undefined,
+            completed_at: goal.completed_at ?? undefined,
+            contributions: goal.contributions?.map(contrib => ({
+              ...contrib,
+              description: contrib.description ?? undefined,
+            })) ?? undefined,
+          })) || []} 
+          wallets={wallets || []} 
+        />
       </Suspense>
     </div>
   );

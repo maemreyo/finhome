@@ -6,7 +6,7 @@ import { headers } from 'next/headers'
 import Stripe from 'stripe'
 import { createServerClient } from '@supabase/ssr'
 import { SubscriptionService } from '@/lib/services/subscriptionService'
-import { UserSubscriptionTier } from '@/lib/supabase/types'
+import { UserSubscriptionTier } from '@/src/types/supabase'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-06-30.basil'

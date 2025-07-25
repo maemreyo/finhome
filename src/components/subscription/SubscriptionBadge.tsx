@@ -6,7 +6,7 @@
 import React from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Crown, Star, Zap, Gem, Shield, Timer } from 'lucide-react'
-import { UserSubscriptionTier } from '@/lib/supabase/types'
+import { UserSubscriptionTier } from '@/src/types/supabase'
 import { FeatureKey } from '@/types/subscription'
 import { useSubscriptionContext } from './SubscriptionProvider'
 import { useTranslations } from 'next-intl'

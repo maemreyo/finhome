@@ -7,7 +7,7 @@ import React, { createContext, useContext, useCallback } from 'react'
 import { useSubscription, useSubscriptionPlans } from '@/hooks/useSubscription'
 import { SubscriptionService } from '@/lib/services/subscriptionService'
 import { UserSubscription, SubscriptionPlan, FeatureKey, FeatureAccess } from '@/types/subscription'
-import { UserSubscriptionTier } from '@/lib/supabase/types'
+import { UserSubscriptionTier } from '@/src/types/supabase'
 
 interface SubscriptionContextType {
   // Subscription state

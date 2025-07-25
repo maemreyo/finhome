@@ -60,7 +60,7 @@ import {
   TrendingUp
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { Notification } from '@/lib/supabase/types'
+import type { Notification } from '@/src/types/supabase'
 
 // Mock data based on your database schema - representing notification templates/campaigns
 const mockNotifications: (Notification & { recipient_count?: number; sent_count?: number; open_rate?: number })[] = [

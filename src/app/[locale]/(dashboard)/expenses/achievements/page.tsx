@@ -76,11 +76,34 @@ export default async function ExpenseAchievementsPage() {
       triggers_funnel_action: false,
       is_active: true
     },
-    current_progress: achievement.progress_data?.current_progress || 0,
-    required_progress: achievement.progress_data?.required_progress || 1,
-    progress_percentage: achievement.progress_data?.progress_percentage || 0,
+    current_progress: achievement.current_progress || 0,
+    required_progress: achievement.required_progress || 1,
+    progress_percentage: achievement.progress_percentage || 0,
     is_unlocked: !!achievement.unlocked_at,
-    unlocked_at: achievement.unlocked_at
+    unlocked_at: achievement.unlocked_at ?? undefined
+  })) || [];
+
+  // Transform challenges data to match expected interface
+  const transformedChallenges = challenges?.map(challenge => ({
+    ...challenge,
+    completed_at: challenge.completed_at ?? undefined,
+    progress_data: (challenge.progress_data as Record<string, any>) || {},
+    challenge: {
+      ...challenge.challenge,
+      target_value: challenge.challenge.target_value ?? undefined,
+      completion_badge: challenge.challenge.completion_badge ?? undefined,
+      start_date: challenge.challenge.start_date ?? undefined,
+      end_date: challenge.challenge.end_date ?? undefined
+    }
+  })) || [];
+
+  // Transform available challenges data to match expected interface  
+  const transformedAvailableChallenges = availableChallenges?.map(challenge => ({
+    ...challenge,
+    target_value: challenge.target_value ?? undefined,
+    completion_badge: challenge.completion_badge ?? undefined,
+    start_date: challenge.start_date ?? undefined,
+    end_date: challenge.end_date ?? undefined
   })) || [];
 
   return (
@@ -99,8 +122,8 @@ export default async function ExpenseAchievementsPage() {
             }
           }
           achievements={transformedAchievements}
-          challenges={challenges || []}
-          availableChallenges={availableChallenges || []}
+          challenges={transformedChallenges}
+          availableChallenges={transformedAvailableChallenges}
         />
       </Suspense>
     </div>

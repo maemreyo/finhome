@@ -1,7 +1,9 @@
 // src/types/scenario.ts
 // Scenario types aligned with database schema
 
-import type { FinancialPlan, LoanCalculation, Database } from '@/lib/supabase/types'
+import { FinancialPlan, LoanCalculation } from "../lib/supabase/types"
+import { Database } from "./supabase"
+
 
 // Extract plan status from database enum
 export type PlanStatus = Database['public']['Enums']['plan_status']

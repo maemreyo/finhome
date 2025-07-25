@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import type { Database } from '@/lib/supabase/types'
+import type { Database } from '@/src/types/supabase'
 
 type TableName = keyof Database['public']['Tables']
 type TableRow<T extends TableName> = Database['public']['Tables'][T]['Row']

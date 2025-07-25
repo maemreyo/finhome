@@ -29,7 +29,7 @@ import {
   QrCode
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
-import { Database } from '@/lib/supabase/types'
+import { Database } from '@/src/types/supabase'
 
 type FinancialPlan = Database['public']['Tables']['financial_plans']['Row']
 

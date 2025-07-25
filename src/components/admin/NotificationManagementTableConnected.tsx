@@ -5,7 +5,7 @@
 
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Notification } from '@/lib/supabase/types'
+import type { Notification } from '@/src/types/supabase'
 
 interface NotificationManagementTableConnectedProps {
   initialData: Notification[]

@@ -18,7 +18,7 @@ import {
   formatPrice,
   calculateYearlyDiscount,
 } from "@/config/subscriptionPlans";
-import { UserSubscriptionTier } from "@/lib/supabase/types";
+import { UserSubscriptionTier } from "@/src/types/supabase";
 
 export function SubscriptionPlansCard() {
   const tSubscriptionCommon = useTranslations("SubscriptionCommon");

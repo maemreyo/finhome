@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EditPlanForm } from '@/components/plans/EditPlanForm'
-import { Database } from '@/lib/supabase/types'
+import { Database } from '@/src/types/supabase'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'

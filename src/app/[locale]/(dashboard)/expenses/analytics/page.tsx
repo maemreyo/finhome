@@ -17,7 +17,7 @@ export default async function ExpenseAnalyticsPage() {
   }
 
   // Fetch all transactions for analytics
-  const { data: allTransactions } = await supabase
+  const { data: rawTransactions } = await supabase
     .from("expense_transactions")
     .select(
       `
@@ -30,11 +30,26 @@ export default async function ExpenseAnalyticsPage() {
     .eq("user_id", user.id)
     .order("transaction_date", { ascending: false });
 
+  // Transform transactions to match the expected interface
+  const allTransactions = rawTransactions?.map((transaction) => ({
+    ...transaction,
+    expense_category: transaction.expense_category ? {
+      id: transaction.expense_category.id,
+      name_vi: transaction.expense_category.name_vi,
+      color: transaction.expense_category.color,
+    } : undefined,
+    income_category: transaction.income_category ? {
+      id: transaction.income_category.id,
+      name_vi: transaction.income_category.name_vi,
+      color: transaction.income_category.color,
+    } : undefined,
+  })) || [];
+
   return (
     <div className="space-y-6 p-6">
       <Suspense fallback={<AnalyticsSkeleton />}>
         <ExpenseAnalytics
-          transactions={allTransactions || []}
+          transactions={allTransactions}
           loading={false}
         />
       </Suspense>

@@ -2,7 +2,7 @@
 // Service for managing subscriptions, billing, and feature access
 
 import { supabase } from '@/lib/supabase/client'
-import { UserSubscriptionTier, UserProfile, Subscription, BillingHistory } from '@/lib/supabase/types'
+import { UserSubscriptionTier, UserProfile, Subscription, BillingHistory } from '@/src/types/supabase'
 import { 
   UserSubscription, 
   BillingDetails, 

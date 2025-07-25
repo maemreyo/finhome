@@ -50,21 +50,32 @@ CREATE TRIGGER update_plan_shares_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Add user tracking to plan_status_history table
-ALTER TABLE plan_status_history 
-ADD COLUMN changed_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+-- Check if column already exists before adding
+DO $$
+BEGIN
+    -- Attempt to add column only if it doesn't already exist
+    IF NOT EXISTS (
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name='plan_status_history' 
+        AND column_name='changed_by'
+    ) THEN
+        ALTER TABLE plan_status_history 
+        ADD COLUMN changed_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
 
--- Update existing records to have a default user (first admin user or system)
-UPDATE plan_status_history 
-SET changed_by = (
-    SELECT id FROM auth.users 
-    WHERE email LIKE '%admin%' 
-    LIMIT 1
-)
-WHERE changed_by IS NULL;
+        -- Update existing records to have a default user (first admin user or system)
+        UPDATE plan_status_history 
+        SET changed_by = (
+            SELECT id FROM auth.users 
+            WHERE email LIKE '%admin%' 
+            LIMIT 1
+        )
+        WHERE changed_by IS NULL;
 
--- Add index for performance
-CREATE INDEX idx_plan_status_history_changed_by ON plan_status_history(changed_by);
+        -- Add index for performance
+        CREATE INDEX idx_plan_status_history_changed_by ON plan_status_history(changed_by);
+    END IF;
+END $$;
 
 -- Add a view to get plan shares with user information
 CREATE VIEW plan_shares_with_users AS

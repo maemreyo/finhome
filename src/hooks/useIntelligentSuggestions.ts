@@ -39,8 +39,8 @@ export function useIntelligentSuggestions({
   const [suggestions, setSuggestions] = useState<SuggestionResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const debounceRef = useRef<NodeJS.Timeout>()
-  const abortControllerRef = useRef<AbortController>()
+  const debounceRef = useRef<NodeJS.Timeout>(null)
+  const abortControllerRef = useRef<AbortController>(null)
 
   // Fetch suggestions from API
   const fetchSuggestions = useCallback(async (

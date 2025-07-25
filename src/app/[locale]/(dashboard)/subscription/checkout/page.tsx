@@ -15,7 +15,7 @@ import { Loader2, Check, CreditCard, Shield, ArrowLeft } from 'lucide-react'
 import { useSubscriptionContext } from '@/components/subscription/SubscriptionProvider'
 import { useAuth } from '@/hooks/useAuth'
 import { SUBSCRIPTION_PLANS, formatPrice, calculateYearlyDiscount } from '@/config/subscriptionPlans'
-import { UserSubscriptionTier } from '@/lib/supabase/types'
+import { UserSubscriptionTier } from '@/src/types/supabase'
 
 export default function CheckoutPage() {
   const t = useTranslations('subscription')

@@ -360,7 +360,7 @@ export function useProfile() {
 }
 
 // Subscription hook
-import { Database } from '@/lib/supabase/types'
+import { Database } from '@/src/types/supabase'
 
 type Subscription = Database['public']['Tables']['subscriptions']['Row'];
 

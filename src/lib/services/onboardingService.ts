@@ -2,7 +2,7 @@
 // Service for managing onboarding data and analytics
 
 import { supabase } from '@/lib/supabase/client'
-import { UserProfile } from '@/lib/supabase/types'
+import { UserProfile } from '@/src/types/supabase'
 
 export interface OnboardingAnalytics {
   tourId: string

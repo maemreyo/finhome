@@ -5,7 +5,7 @@
 
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Achievement } from '@/lib/supabase/types'
+import type { Achievement } from '@/src/types/supabase'
 
 interface AchievementManagementTableConnectedProps {
   initialData: Achievement[]

@@ -46,7 +46,11 @@ export default async function ExpenseBudgetsPage() {
       <Suspense fallback={<BudgetsSkeleton />}>
         <BudgetManager
           categories={expenseCategories || []}
-          initialBudgets={currentBudgets || []}
+          initialBudgets={currentBudgets?.map(budget => ({
+            ...budget,
+            description: budget.description ?? undefined,
+            alert_threshold_percentage: budget.alert_threshold_percentage ?? undefined,
+          })) || []}
         />
       </Suspense>
     </div>

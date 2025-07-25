@@ -5,7 +5,7 @@
 
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { UserProfile } from '@/lib/supabase/types'
+import type { UserProfile } from '@/src/types/supabase'
 
 interface UserManagementTableConnectedProps {
   initialData: UserProfile[]

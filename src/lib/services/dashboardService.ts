@@ -18,7 +18,7 @@ import type {
   PlanMilestoneUpdate,
   UserFavorite,
   UserFavoriteInsert
-} from '@/lib/supabase/types'
+} from '@/src/types/supabase'
 
 export class DashboardService {
   private static getClient() {

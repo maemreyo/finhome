@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Database } from '@/lib/supabase/types'
+import { Database } from '@/src/types/supabase'
 import { toast } from 'sonner'
 
 type Property = Database['public']['Tables']['properties']['Row']
