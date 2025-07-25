@@ -669,6 +669,17 @@ export function UnifiedTransactionForm({
                   
                 case 'final':
                   // Final result received
+                  console.log('🔍 FINAL EVENT DEBUG:', {
+                    eventType: parsed.type,
+                    dataKeys: Object.keys(parsed.data || {}),
+                    transactionCount: parsed.data?.transactions?.length || 0,
+                    hasMetadata: !!parsed.data?.metadata,
+                    fullData: parsed.data
+                  })
+                  
+                  // ✅ FIX: Pass the correct data structure to dialog
+                  // The dialog expects { transactions: [...], analysis_summary: "", metadata: {...} }
+                  // But parsed.data already has this structure, so pass it directly
                   setParsedData(parsed.data)
                   setShowConfirmationDialog(true)
                   

@@ -125,6 +125,9 @@ importers:
       framer-motion:
         specifier: 11.15.0
         version: 11.15.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      jsonrepair:
+        specifier: ^3.13.0
+        version: 3.13.0
       jspdf:
         specifier: ^3.0.1
         version: 3.0.1
@@ -3551,6 +3554,10 @@ packages:
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
+    hasBin: true
+
+  jsonrepair@3.13.0:
+    resolution: {integrity: sha512-5YRzlAQ7tuzV1nAJu3LvDlrKtBFIALHN2+a+I1MGJCt3ldRDBF/bZuvIPzae8Epot6KBXd0awRZZcuoeAsZ/mw==}
     hasBin: true
 
   jspdf-autotable@5.0.2:
@@ -8169,6 +8176,8 @@ snapshots:
       minimist: 1.2.8
 
   json5@2.2.3: {}
+
+  jsonrepair@3.13.0: {}
 
   jspdf-autotable@5.0.2(jspdf@3.0.1):
     dependencies:

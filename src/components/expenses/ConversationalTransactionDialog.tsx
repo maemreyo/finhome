@@ -230,6 +230,15 @@ export function ConversationalTransactionDialog({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   useEffect(() => {
+    console.log('🔍 DIALOG DEBUG - parsedData received:', {
+      hasData: !!parsedData,
+      dataKeys: parsedData ? Object.keys(parsedData) : [],
+      transactionCount: parsedData?.transactions?.length || 0,
+      hasTransactions: !!parsedData?.transactions,
+      firstTransaction: parsedData?.transactions?.[0],
+      fullParsedData: parsedData
+    })
+    
     if (parsedData?.transactions) {
       const initialTransactions = parsedData.transactions.map((t) => ({
         transaction_type: t.transaction_type, amount: t.amount, description: t.description,

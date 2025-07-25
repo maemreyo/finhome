@@ -1,2 +1,0 @@
-Double check xem tại sao khi quá trình parse-from-text xong, tôi thấy dialog hiển thị nhưng thông tin bị trống, có vẻ như mismatch type gì đó ở bước truyền thông tin sang rồi. Kiểm tra 2 routes cũ và mới, Cũ vẫn pop lên với đầy đủ thông tin, còn mới thì trắng thông tin: src/app/api/expenses/parse-from-text/route-original-backup.ts
-src/app/api/expenses/parse-from-text/route.ts

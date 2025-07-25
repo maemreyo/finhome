@@ -47,7 +47,7 @@ export class AIParsingService {
     temperature: 0.1,
     topK: 1,
     topP: 0.1,
-    maxOutputTokens: 2048,
+    maxOutputTokens: 64000,
     model: "gemini-2.5-flash"
   };
 
@@ -131,17 +131,17 @@ export class AIParsingService {
         maxOutputTokens: finalConfig.maxOutputTokens,
       };
 
-      if (streaming) {
+        if (streaming) {
         return await model.generateContentStream({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig,
-        });
-      } else {
-        const result = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig,
-        });
-        return await result.response;
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig,
+          });
+        } else {
+          const result = await model.generateContent({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig,
+          });
+          return await result.response;
       }
     };
 

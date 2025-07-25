@@ -80,7 +80,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const startTime = Date.now();
   
   try {
-    console.time("transaction_parsing");
+    const timingLabel = `transaction_parsing_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    console.time(timingLabel);
     
     // Initialize services
     initializeServices();
@@ -188,12 +189,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         wallets.data,
         userCorrections.data,
         debugMode,
-        startTime
+        startTime,
+        supabase
       );
     }
 
   } catch (error) {
-    console.timeEnd("transaction_parsing");
+    console.timeEnd(timingLabel);
     console.error("❌ Transaction parsing API error:", error);
 
     return NextResponse.json(
@@ -213,7 +215,8 @@ async function handleNonStreamingResponse(
   wallets: Wallet[],
   userCorrections: any[],
   debugMode: boolean,
-  startTime: number
+  startTime: number,
+  supabase: any
 ): Promise<NextResponse> {
   
   try {
@@ -351,7 +354,7 @@ async function handleNonStreamingResponse(
       }
     );
 
-    console.timeEnd("transaction_parsing");
+    console.timeEnd("");
     console.log("✅ Transaction parsing completed successfully");
 
     return NextResponse.json(
