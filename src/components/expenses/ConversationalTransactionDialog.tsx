@@ -28,12 +28,17 @@ import { ConfidenceScore, ReviewFlag } from "@/components/ui/skeleton-transactio
 
 const ScrollbarStyles = () => (
   <style>{`
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #d1d5db transparent;
+    }
     .custom-scrollbar::-webkit-scrollbar {
       width: 8px;
       height: 8px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
       background-color: transparent;
+      border-radius: 10px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
       background-color: #d1d5db;
@@ -42,6 +47,28 @@ const ScrollbarStyles = () => (
       background-clip: content-box;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: #9ca3af;
+    }
+    .custom-scrollbar::-webkit-scrollbar-corner {
+      background-color: transparent;
+    }
+    /* Ensure ScrollArea viewport is scrollable */
+    [data-radix-scroll-area-viewport] {
+      scrollbar-width: thin;
+      scrollbar-color: #d1d5db transparent;
+    }
+    [data-radix-scroll-area-viewport]::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    [data-radix-scroll-area-viewport]::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+    [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+      background-color: #d1d5db;
+      border-radius: 10px;
+    }
+    [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
       background-color: #9ca3af;
     }
   `}</style>
@@ -116,22 +143,80 @@ function TransactionEditForm({
     <div className="bg-slate-100 p-4 rounded-lg border animate-in fade-in-0 duration-300">
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div><Label htmlFor="amount">Số tiền</Label><Input id="amount" type="number" value={transaction.amount} onChange={(e) => onUpdate("amount", parseFloat(e.target.value) || 0)} className="text-lg font-bold"/></div>
-          <div><Label htmlFor="description">Mô tả</Label><Input id="description" value={transaction.description} onChange={(e) => onUpdate("description", e.target.value)} /></div>
+          <div>
+            <Input 
+              id="amount" 
+              type="number" 
+              value={transaction.amount} 
+              onChange={(e) => onUpdate("amount", parseFloat(e.target.value) || 0)} 
+              className="text-lg font-bold"
+              placeholder="Nhập số tiền..."
+            />
+          </div>
+          <div>
+            <Input 
+              id="description" 
+              value={transaction.description} 
+              onChange={(e) => onUpdate("description", e.target.value)}
+              placeholder="Mô tả giao dịch..." 
+            />
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label>Danh mục</Label>
-            <Select value={transaction.transaction_type === "expense" ? transaction.expense_category_id : transaction.income_category_id} onValueChange={(value) => { const field = transaction.transaction_type === "expense" ? "expense_category_id" : "income_category_id"; onUpdate(field, value); }}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{categories.map((cat) => (<SelectItem key={cat.id} value={cat.id}><div className="flex items-center gap-2"><DynamicIcon name={cat.icon} className="h-4 w-4" /><span>{cat.name_vi}</span></div></SelectItem>))}</SelectContent>
+            <Select 
+              value={transaction.transaction_type === "expense" ? transaction.expense_category_id : transaction.income_category_id} 
+              onValueChange={(value) => { 
+                const field = transaction.transaction_type === "expense" ? "expense_category_id" : "income_category_id"; 
+                onUpdate(field, value); 
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn danh mục..." />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    <div className="flex items-center gap-2">
+                      <DynamicIcon name={cat.icon} className="h-4 w-4" />
+                      <span>{cat.name_vi}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
-          <div><Label>Ví</Label><Select value={transaction.wallet_id} onValueChange={(value) => onUpdate("wallet_id", value)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{wallets.map((w) => <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>)}</SelectContent></Select></div>
-          <div><Label>Ngày</Label><Input type="date" value={transaction.transaction_date} onChange={(e) => onUpdate("transaction_date", e.target.value)} /></div>
+          <div>
+            <Select value={transaction.wallet_id} onValueChange={(value) => onUpdate("wallet_id", value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn ví..." />
+              </SelectTrigger>
+              <SelectContent>
+                {wallets.map((w) => 
+                  <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <div className="relative">
+              <Input 
+                type="date" 
+                value={transaction.transaction_date} 
+                onChange={(e) => onUpdate("transaction_date", e.target.value)}
+                className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <LucideIcons.Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
         </div>
       </div>
-      <div className="flex justify-end gap-2 mt-4"><Button variant="ghost" onClick={onCancel}>Hủy</Button><Button onClick={onSave}><LucideIcons.Save className="mr-2 h-4 w-4" /> Lưu</Button></div>
+      <div className="flex justify-end gap-2 mt-4">
+        <Button variant="ghost" onClick={onCancel}>Hủy</Button>
+        <Button onClick={onSave}>
+          <LucideIcons.Save className="mr-2 h-4 w-4" /> Lưu
+        </Button>
+      </div>
     </div>
   );
 }
@@ -212,7 +297,21 @@ export function ConversationalTransactionDialog({
   }, [transactions, expenseCategories, incomeCategories, parsedData]);
   
   const totalAmount = totalIncome - totalExpense;
-  const handleConfirm = async () => { /* ... */ };
+  const handleConfirm = async () => {
+    if (transactions.length === 0) return;
+    
+    setIsSubmitting(true);
+    try {
+      await onConfirm(transactions);
+      toast.success(`Đã lưu ${transactions.length} giao dịch thành công!`);
+      onClose();
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi lưu giao dịch. Vui lòng thử lại.");
+      console.error("Error confirming transactions:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!parsedData) return null;
 
@@ -254,8 +353,8 @@ export function ConversationalTransactionDialog({
           </div>
 
           {/* Right Column: Transaction Details */}
-          <div className="flex flex-col bg-white">
-            <ScrollArea className="flex-1 h-full custom-scrollbar">
+          <div className="flex flex-col bg-white min-h-0">
+            <ScrollArea className="flex-1 overflow-auto custom-scrollbar" style={{ height: 'calc(85vh - 200px)' }}>
               <div className="p-6 space-y-4">
                 {Object.entries(groupedTransactions).map(([key, group]) => (
                     <div key={key} className="bg-white rounded-xl border border-gray-200/80 overflow-hidden">
