@@ -73,9 +73,9 @@ export type ExpenseAchievement = Database['public']['Tables']['expense_achieveme
 export type ExpenseAchievementInsert = Database['public']['Tables']['expense_achievements']['Insert']
 export type ExpenseChallenge = Database['public']['Tables']['expense_challenges']['Row']
 export type ExpenseChallengeInsert = Database['public']['Tables']['expense_challenges']['Insert']
-export type UserChallenge = Database['public']['Tables']['user_challenges']['Row']
-export type UserChallengeInsert = Database['public']['Tables']['user_challenges']['Insert']
-export type UserChallengeUpdate = Database['public']['Tables']['user_challenges']['Update']
+export type UserChallenge = Database['public']['Tables']['user_expense_challenges']['Row']
+export type UserChallengeInsert = Database['public']['Tables']['user_expense_challenges']['Insert']
+export type UserChallengeUpdate = Database['public']['Tables']['user_expense_challenges']['Update']
 export type BudgetCategory = Database['public']['Tables']['budget_categories']['Row']
 export type BudgetCategoryInsert = Database['public']['Tables']['budget_categories']['Insert']
 

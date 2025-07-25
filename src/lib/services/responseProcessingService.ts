@@ -19,6 +19,7 @@ export interface ParsedResponse {
     potential_issues: string[];
     fallback_risk: string;
     fallback_method?: string;
+    repair_method?: string;
     debug_info?: {
       response_length: number;
       response_preview: string;

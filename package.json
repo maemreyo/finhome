@@ -22,6 +22,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
+    "type:gen": "pnpm supabase gen types typescript --local > src/types/supabase.ts",
     "email:dev": "email dev",
     "test:ai-prompt": "tsx scripts/test-ai-prompt.ts",
     "test:ai-prompt:dev": "NODE_ENV=development tsx scripts/test-ai-prompt.ts",

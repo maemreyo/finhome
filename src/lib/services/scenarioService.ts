@@ -692,7 +692,7 @@ class ScenarioService {
     
     return {
       planName: scenario.plan_name,
-      planType: scenario.plan_type,
+      planType: scenario.plan_type || 'home_purchase',
       scenarioType: scenario.scenarioType,
       
       purchasePrice: scenario.purchase_price || 0,
@@ -711,7 +711,7 @@ class ScenarioService {
       expectedRentalIncome: scenario.expected_rental_income || undefined,
       expectedAppreciationRate: scenario.expected_appreciation_rate || undefined,
       
-      riskTolerance: scenario.risk_tolerance || 'moderate',
+      riskTolerance: (scenario.risk_tolerance as 'conservative' | 'moderate' | 'aggressive') || 'moderate',
       investmentHorizonMonths: scenario.investment_horizon_months || undefined,
       
       emergencyFundTarget: scenario.emergency_fund_target || undefined,

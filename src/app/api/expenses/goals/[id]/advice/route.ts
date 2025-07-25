@@ -94,14 +94,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (action === 'accept_recommendation' && category_id) {
       const { error: planError } = await supabase
         .from('expense_budgets')
-        .upsert({
+        .insert({
           user_id: user.id,
-          category_id,
-          amount: body.new_budget_limit || 0,
-          period_type: 'monthly',
+          name: `Budget from Goal Advice - ${new Date().toISOString().split('T')[0]}`,
+          total_budget: body.new_budget_limit || 0,
+          budget_period: 'monthly',
+          budget_method: 'manual',
+          start_date: new Date().toISOString().split('T')[0],
+          end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
           is_active: true,
-          created_from: 'goal_advice',
-          metadata: {
+          budget_allocation: {
             goal_id: goalId,
             recommendation_type: 'spending_reduction',
             original_spending: body.original_spending,

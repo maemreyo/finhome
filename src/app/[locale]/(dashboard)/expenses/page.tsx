@@ -101,7 +101,13 @@ export default async function ExpensesPage() {
         <ExpenseTrackingDashboard
           userId={user.id}
           initialData={{
-            wallets: wallets || [],
+            wallets: wallets?.map(wallet => ({
+              ...wallet,
+              balance: wallet.balance || 0,
+              icon: wallet.icon || 'wallet',
+              color: wallet.color || '#000000',
+              currency: wallet.currency || 'VND'
+            })) || [],
             expenseCategories: expenseCategories || [],
             incomeCategories: incomeCategories || [],
             recentTransactions: recentTransactions?.map(transaction => ({
@@ -113,6 +119,12 @@ export default async function ExpensesPage() {
               income_category: transaction.income_category 
                 ? { name_vi: transaction.income_category.name_vi, color: transaction.income_category.color }
                 : undefined,
+              wallet: {
+                id: transaction.wallet?.id || '',
+                name: transaction.wallet?.name || 'Unknown Wallet',
+                icon: transaction.wallet?.icon || 'wallet',
+                color: transaction.wallet?.color || '#000000'
+              }
             })) || [],
             currentBudgets: currentBudgets?.map(budget => ({
               ...budget,
@@ -130,9 +142,8 @@ export default async function ExpensesPage() {
               deadline: goal.deadline ?? undefined,
               icon: goal.icon ?? undefined,
               color: goal.color ?? undefined,
-              months_remaining: goal.months_remaining ?? undefined,
-              required_monthly_savings: goal.required_monthly_savings ?? undefined,
-              is_on_track: goal.is_on_track ?? undefined,
+              current_amount: goal.current_amount || 0,
+              progress_percentage: goal.progress_percentage || 0,
               completed_at: goal.completed_at ?? undefined,
               contributions: goal.contributions?.map(contrib => ({
                 ...contrib,

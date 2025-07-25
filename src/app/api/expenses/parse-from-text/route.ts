@@ -152,10 +152,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Combine categories
+    // Combine categories with type assertion to handle service interface mismatch
     const allCategories: Category[] = [
-      ...expenseCategories.data.map(cat => ({ ...cat, category_type: 'expense' })),
-      ...incomeCategories.data.map(cat => ({ ...cat, category_type: 'income' }))
+      ...expenseCategories.data.map(cat => ({ ...cat, category_type: 'expense', user_id: user.id } as Category)),
+      ...incomeCategories.data.map(cat => ({ ...cat, category_type: 'income', user_id: user.id } as Category))
     ];
 
     console.log("📊 Data loaded:", {
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         validatedData,
         user,
         allCategories,
-        wallets.data,
+        wallets.data.map(wallet => ({ ...wallet, user_id: user.id } as Wallet)),
         userCorrections.data,
         debugMode,
         startTime,
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         validatedData,
         user,
         allCategories,
-        wallets.data,
+        wallets.data.map(wallet => ({ ...wallet, user_id: user.id } as Wallet)),
         userCorrections.data,
         debugMode,
         startTime,
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
   } catch (error) {
-    console.timeEnd(timingLabel);
+    console.timeEnd("");
     console.error("❌ Transaction parsing API error:", error);
 
     return NextResponse.json(
@@ -247,10 +247,10 @@ async function handleNonStreamingResponse(
     }
 
     // 3. PARSE AI RESPONSE - Using ResponseProcessingService
-    const parsedResponse: ParsedResponse = responseProcessingService!.parseWithFallbacks(
+    const parsedResponse = responseProcessingService!.parseWithFallbacks(
       aiResponseText,
       requestData.text
-    );
+    ) as ParsedResponse;
 
     // 4. VALIDATE STRUCTURE
     const validatedResponse = ParsedResponseSchema.parse(parsedResponse);
@@ -310,19 +310,19 @@ async function handleNonStreamingResponse(
 
     // 6. DETECT UNUSUAL TRANSACTIONS - Using TransactionValidationService
     const transactionsWithFlags = await transactionValidationService!.detectUnusualTransactions(
-      processedTransactions,
+      processedTransactions as any,
       user,
       supabase // Use actual Supabase client instead of mock
     );
 
     // 7. SORT BY RELEVANCE - Using TransactionUtils
-    const sortedTransactions = TransactionUtils.sortTransactionsByRelevance(transactionsWithFlags);
+    const sortedTransactions = TransactionUtils.sortTransactionsByRelevance(transactionsWithFlags as any);
 
     // 8. MERGE DUPLICATES - Using TransactionUtils
-    const finalTransactions = TransactionUtils.mergeDuplicateTransactions(sortedTransactions);
+    const finalTransactions = TransactionUtils.mergeDuplicateTransactions(sortedTransactions as any);
 
     // 9. GENERATE SUMMARY - Using TransactionUtils
-    const transactionSummary = TransactionUtils.generateTransactionSummary(finalTransactions);
+    const transactionSummary = TransactionUtils.generateTransactionSummary(finalTransactions as any);
 
     // 10. SAVE TO DATABASE (if requested)
     if (requestData.save_to_database) {
@@ -481,13 +481,13 @@ async function handleStreamingResponse(
         });
 
         const transactionsWithFlags = await transactionValidationService!.detectUnusualTransactions(
-          processedTransactions,
+          processedTransactions as any,
           user,
           supabase
         );
 
         const finalTransactions = TransactionUtils.mergeDuplicateTransactions(
-          TransactionUtils.sortTransactionsByRelevance(transactionsWithFlags)
+          TransactionUtils.sortTransactionsByRelevance(transactionsWithFlags as any) as any
         );
 
         // 6. Send final results
@@ -497,7 +497,7 @@ async function handleStreamingResponse(
               analysis_summary: parsedResponse.analysis_summary,
               ...parsedResponse.parsing_metadata,
               processing_time_ms: Date.now() - startTime,
-              transaction_summary: TransactionUtils.generateTransactionSummary(finalTransactions)
+              transaction_summary: TransactionUtils.generateTransactionSummary(finalTransactions as any)
             })
           )
         );

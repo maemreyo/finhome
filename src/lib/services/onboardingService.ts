@@ -2,7 +2,9 @@
 // Service for managing onboarding data and analytics
 
 import { supabase } from '@/lib/supabase/client'
-import { UserProfile } from '@/src/types/supabase'
+import { Database } from '@/src/types/supabase'
+
+type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 
 export interface OnboardingAnalytics {
   tourId: string
@@ -48,7 +50,7 @@ export class OnboardingService {
       // Show onboarding if not completed or user is new (created within last 7 days)
       if (!data.onboarding_completed) return true
       
-      const createdAt = new Date(data.created_at)
+      const createdAt = new Date(data.created_at || new Date())
       const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       
       return createdAt > weekAgo

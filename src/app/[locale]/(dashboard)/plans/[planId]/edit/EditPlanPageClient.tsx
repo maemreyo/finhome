@@ -24,7 +24,7 @@ export function EditPlanPageClient({ plan, locale }: EditPlanPageClientProps) {
   const [isLoading, setIsLoading] = useState(false)
   const supabase = createClient()
 
-  const getPlanTypeLabel = (type: string) => {
+  const getPlanTypeLabel = (type: string | null) => {
     switch (type) {
       case 'home_purchase': return tCommon('types.homePurchase')
       case 'investment': return tCommon('types.investment')

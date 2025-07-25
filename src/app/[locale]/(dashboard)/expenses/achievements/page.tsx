@@ -32,13 +32,13 @@ export default async function ExpenseAchievementsPage() {
 
     // User achievements
     supabase
-      .from("user_achievements")
+      .from("user_expense_achievements")
       .select("*")
       .eq("user_id", user.id),
 
     // User challenges
     supabase
-      .from("user_challenges")
+      .from("user_expense_challenges")
       .select(
         `
         *,
@@ -78,30 +78,54 @@ export default async function ExpenseAchievementsPage() {
     },
     current_progress: achievement.current_progress || 0,
     required_progress: achievement.required_progress || 1,
-    progress_percentage: achievement.progress_percentage || 0,
+    progress_percentage: Math.round(((achievement.current_progress || 0) / (achievement.required_progress || 1)) * 100),
     is_unlocked: !!achievement.unlocked_at,
     unlocked_at: achievement.unlocked_at ?? undefined
   })) || [];
 
   // Transform challenges data to match expected interface
   const transformedChallenges = challenges?.map(challenge => ({
-    ...challenge,
-    completed_at: challenge.completed_at ?? undefined,
-    progress_data: (challenge.progress_data as Record<string, any>) || {},
+    id: challenge.id,
+    challenge_id: challenge.challenge_id,
     challenge: {
-      ...challenge.challenge,
+      id: challenge.challenge.id,
+      name_en: challenge.challenge.name_en || 'Challenge',
+      name_vi: challenge.challenge.name_vi || 'Thử thách',
+      description_en: challenge.challenge.description_en || 'Challenge description',
+      description_vi: challenge.challenge.description_vi || 'Mô tả thử thách',
+      challenge_type: (challenge.challenge.challenge_type as 'daily' | 'weekly' | 'monthly' | 'special') || 'daily',
+      category: (challenge.challenge.category as 'budgeting' | 'saving' | 'tracking' | 'house_goal') || 'budgeting',
       target_value: challenge.challenge.target_value ?? undefined,
+      duration_days: challenge.challenge.duration_days || 1,
+      experience_points: challenge.challenge.experience_points || 0,
       completion_badge: challenge.challenge.completion_badge ?? undefined,
+      is_active: challenge.challenge.is_active ?? true,
       start_date: challenge.challenge.start_date ?? undefined,
       end_date: challenge.challenge.end_date ?? undefined
-    }
+    },
+    started_at: challenge.started_at || new Date().toISOString(),
+    completed_at: challenge.completed_at ?? undefined,
+    current_progress: challenge.current_progress || 0,
+    target_progress: challenge.target_progress || 1,
+    is_completed: challenge.is_completed || false,
+    is_abandoned: challenge.is_abandoned || false,
+    progress_data: (challenge.progress_data as Record<string, any>) || {}
   })) || [];
 
   // Transform available challenges data to match expected interface  
   const transformedAvailableChallenges = availableChallenges?.map(challenge => ({
-    ...challenge,
+    id: challenge.id,
+    name_en: challenge.name_en || 'Challenge',
+    name_vi: challenge.name_vi || 'Thử thách',
+    description_en: challenge.description_en || 'Challenge description',
+    description_vi: challenge.description_vi || 'Mô tả thử thách',
+    challenge_type: (challenge.challenge_type as 'daily' | 'weekly' | 'monthly' | 'special') || 'daily',
+    category: (challenge.category as 'budgeting' | 'saving' | 'tracking' | 'house_goal') || 'budgeting',
     target_value: challenge.target_value ?? undefined,
+    duration_days: challenge.duration_days || 1,
+    experience_points: challenge.experience_points || 0,
     completion_badge: challenge.completion_badge ?? undefined,
+    is_active: challenge.is_active ?? true,
     start_date: challenge.start_date ?? undefined,
     end_date: challenge.end_date ?? undefined
   })) || [];
@@ -111,7 +135,16 @@ export default async function ExpenseAchievementsPage() {
       <Suspense fallback={<AchievementsSkeleton />}>
         <GamificationCenter
           userLevel={
-            userLevel || {
+            userLevel ? {
+              ...userLevel,
+              current_level: userLevel.current_level || 1,
+              total_experience: userLevel.total_experience || 0,
+              experience_in_level: userLevel.experience_in_level || 0,
+              experience_to_next_level: userLevel.experience_to_next_level || 100,
+              current_login_streak: userLevel.current_login_streak || 0,
+              longest_login_streak: userLevel.longest_login_streak || 0,
+              achievements_unlocked: userLevel.achievements_unlocked || 0,
+            } : {
               current_level: 1,
               total_experience: 0,
               experience_in_level: 0,

@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Update the recurring transaction
-        const newOccurrencesCount = recurringTransaction.occurrences_created + 1
+        const newOccurrencesCount = (recurringTransaction.occurrences_created || 0) + 1
         const shouldEnd = shouldEndRecurring(recurringTransaction, newOccurrencesCount)
         
         const updateData: any = {
@@ -119,11 +119,11 @@ export async function POST(request: NextRequest) {
           updateData.is_active = false
         } else {
           // Calculate next due date
-          const currentDueDate = new Date(recurringTransaction.next_due_date)
+          const currentDueDate = new Date(recurringTransaction.next_due_date || today)
           const nextDueDate = calculateNextDueDate(
             currentDueDate, 
             recurringTransaction.frequency, 
-            recurringTransaction.frequency_interval
+            recurringTransaction.frequency_interval || 1
           )
           updateData.next_due_date = nextDueDate.toISOString().split('T')[0]
         }

@@ -2,7 +2,7 @@
 // Service for managing subscriptions, billing, and feature access
 
 import { supabase } from '@/lib/supabase/client'
-import { UserSubscriptionTier, UserProfile, Subscription, BillingHistory } from '@/src/types/supabase'
+import { Database } from '@/src/types/supabase'
 import { 
   UserSubscription, 
   BillingDetails, 
@@ -41,7 +41,7 @@ export class SubscriptionService {
         status: data.status,
         currentPeriodStart: data.current_period_start ? new Date(data.current_period_start) : null,
         currentPeriodEnd: data.current_period_end ? new Date(data.current_period_end) : null,
-        cancelAtPeriodEnd: data.cancel_at_period_end,
+        cancelAtPeriodEnd: data.cancel_at_period_end || false,
         trialStart: data.trial_start ? new Date(data.trial_start) : null,
         trialEnd: data.trial_end ? new Date(data.trial_end) : null,
         stripeCustomerId: data.stripe_customer_id,
@@ -59,7 +59,7 @@ export class SubscriptionService {
   /**
    * Get user's subscription tier from user_profiles
    */
-  static async getUserTier(userId: string): Promise<UserSubscriptionTier> {
+  static async getUserTier(userId: string): Promise<'free' | 'premium' | 'professional'> {
     try {
       const { data, error } = await supabase
         .from('user_profiles')
@@ -82,7 +82,7 @@ export class SubscriptionService {
   /**
    * Update user's subscription tier
    */
-  static async updateUserTier(userId: string, tier: UserSubscriptionTier): Promise<void> {
+  static async updateUserTier(userId: string, tier: 'free' | 'premium' | 'professional'): Promise<void> {
     try {
       const { error } = await supabase
         .from('user_profiles')
@@ -126,13 +126,13 @@ export class SubscriptionService {
    * Evaluate feature access based on tier, usage, and limits
    */
   private static evaluateFeatureAccess(
-    tier: UserSubscriptionTier,
+    tier: 'free' | 'premium' | 'professional',
     featureKey: FeatureKey,
     usage: FeatureUsage | null,
     context?: any
   ): FeatureAccess {
     // Define feature access rules
-    const accessRules: Record<FeatureKey, { requiredTier: UserSubscriptionTier; limit?: number }> = {
+    const accessRules: Record<FeatureKey, { requiredTier: 'free' | 'premium' | 'professional'; limit?: number }> = {
       unlimited_plans: { requiredTier: 'premium' },
       advanced_calculations: { requiredTier: 'premium' },
       scenario_comparison: { requiredTier: 'premium' },
@@ -157,7 +157,11 @@ export class SubscriptionService {
       custom_branding: { requiredTier: 'professional' },
       ad_free_experience: { requiredTier: 'premium' },
       exclusive_badges: { requiredTier: 'premium' },
-      experience_boost: { requiredTier: 'premium' }
+      experience_boost: { requiredTier: 'premium' },
+      ai_insights: { requiredTier: 'premium' },
+      ai_financial_advisor: { requiredTier: 'premium' },
+      ai_budget_optimization: { requiredTier: 'premium' },
+      ai_spending_analysis: { requiredTier: 'premium' }
     }
 
     const rule = accessRules[featureKey]
@@ -166,7 +170,7 @@ export class SubscriptionService {
     }
 
     // Check tier requirement
-    const tierOrder: UserSubscriptionTier[] = ['free', 'premium', 'professional']
+    const tierOrder: ('free' | 'premium' | 'professional')[] = ['free', 'premium', 'professional']
     const userTierIndex = tierOrder.indexOf(tier)
     const requiredTierIndex = tierOrder.indexOf(rule.requiredTier)
 
@@ -520,7 +524,7 @@ export class SubscriptionService {
         .from('feature_usage')
         .select('*')
         .eq('user_id', userId)
-        .eq('feature_name', featureKey)
+        .eq('feature_key', featureKey)
         .gte('created_at', startOfMonth.toISOString())
         .lte('created_at', endOfMonth.toISOString())
         .order('created_at', { ascending: false })
@@ -536,7 +540,7 @@ export class SubscriptionService {
         .from('feature_usage')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .eq('feature_name', featureKey)
+        .eq('feature_key', featureKey)
         .gte('created_at', startOfMonth.toISOString())
         .lte('created_at', endOfMonth.toISOString())
 
@@ -565,6 +569,7 @@ export class SubscriptionService {
         .insert({
           user_id: userId,
           feature_key: featureKey,
+          feature_name: featureKey,
           usage_count: 1,
           period_type: 'monthly',
           period_start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),

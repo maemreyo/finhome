@@ -50,7 +50,33 @@ export default async function ExpenseBudgetsPage() {
             ...budget,
             description: budget.description ?? undefined,
             alert_threshold_percentage: budget.alert_threshold_percentage ?? undefined,
+            budget_period: budget.budget_period as 'weekly' | 'monthly' | 'yearly',
+            remaining_amount: budget.remaining_amount || 0,
+            is_active: budget.is_active || false,
+            current_spent: 0, // TODO: Calculate from transactions
+            progress_percentage: 0, // TODO: Calculate from current spent
+            budget_allocation: budget.budget_allocation as Record<string, number> | undefined,
+            category_mapping: budget.category_mapping as Record<string, string> | undefined,
+            category_allocations: budget.category_allocations?.map(allocation => ({
+              id: allocation.id,
+              allocated_amount: allocation.allocated_amount,
+              spent_amount: allocation.spent_amount || 0,
+              remaining_amount: allocation.remaining_amount || 0,
+              category: allocation.category || {
+                id: allocation.category_id || '',
+                name_vi: 'Unknown Category',
+                name_en: 'Unknown Category',
+                color: '#000000',
+                icon: 'category',
+                sort_order: 0,
+                is_active: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                category_key: 'other' as const
+              }
+            })) || []
           })) || []}
+
         />
       </Suspense>
     </div>

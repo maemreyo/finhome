@@ -70,8 +70,8 @@ export async function GET(request: NextRequest) {
       merchant_name: transaction.merchant_name || '',
       transaction_date: transaction.transaction_date,
       category_name: transaction.transaction_type === 'expense' 
-        ? transaction.expense_categories?.name_vi 
-        : transaction.income_categories?.name_vi
+        ? (transaction.expense_categories as any)?.name_vi 
+        : (transaction.income_categories as any)?.name_vi
     })) || []
 
     // Remove duplicate patterns (same description and similar amount)

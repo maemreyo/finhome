@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (goalType) {
-      query = query.eq('goal_type', goalType)
+      query = query.eq('goal_type', goalType as any)
     }
 
     const { data: goals, error } = await query
@@ -144,7 +144,8 @@ export async function POST(request: NextRequest) {
       } as any
 
       // Validate house purchase specific data
-      if (!validatedData.house_purchase_data?.budget_range?.min && 
+      if (validatedData.house_purchase_data && 
+          !validatedData.house_purchase_data?.budget_range?.min && 
           !validatedData.house_purchase_data?.budget_range?.max) {
         // Provide default budget range based on target amount
         const estimatedPropertyPrice = Number(validatedData.target_amount) * 4 // Assuming 25% down payment
@@ -229,7 +230,7 @@ export async function POST(request: NextRequest) {
           })
 
           // Update user experience
-          await supabase.rpc('increment_user_experience', {
+          await supabase.rpc('update_user_experience' as any, {
             user_uuid: user.id,
             points: achievement.experience_points
           })

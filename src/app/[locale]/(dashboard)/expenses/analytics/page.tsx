@@ -24,7 +24,7 @@ export default async function ExpenseAnalyticsPage() {
       *,
       expense_category:expense_categories(*),
       income_category:income_categories(*),
-      wallet:expense_wallets(*)
+      wallet:expense_wallets!expense_transactions_wallet_id_fkey(*)
     `
     )
     .eq("user_id", user.id)
@@ -43,6 +43,9 @@ export default async function ExpenseAnalyticsPage() {
       name_vi: transaction.income_category.name_vi,
       color: transaction.income_category.color,
     } : undefined,
+    wallet: {
+      name: transaction.wallet?.name || 'Unknown Wallet',
+    },
   })) || [];
 
   return (

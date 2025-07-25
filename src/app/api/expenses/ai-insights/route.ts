@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
 
     if (cachedInsights && cachedInsights.length > 0) {
       return NextResponse.json({
-        insights: JSON.parse(cachedInsights[0].insights_data),
+        insights: JSON.parse(cachedInsights[0].insight_text),
         cached: true,
         generated_at: cachedInsights[0].generated_at,
       });
@@ -148,12 +148,12 @@ export async function GET(request: NextRequest) {
       await supabase.from("ai_financial_insights").insert({
         user_id: user.id,
         insight_type: validatedData.insight_type,
-        insights_data: JSON.stringify(aiInsights),
+        insight_text: JSON.stringify(aiInsights),
         metadata: {
           time_period: validatedData.time_period,
           focus_areas: validatedData.focus_areas,
           data_points: financialData.summary.total_transactions,
-        },
+        } as any,
       });
     } catch (error) {
       console.log("Could not cache AI insights:", error);
@@ -244,16 +244,16 @@ async function prepareFinancialDataForAI(
 
   // Aggregate and analyze data
   const expenses =
-    transactions?.filter((t) => t.transaction_type === "expense") || [];
+    transactions?.filter((t: any) => t.transaction_type === "expense") || [];
   const income =
-    transactions?.filter((t) => t.transaction_type === "income") || [];
+    transactions?.filter((t: any) => t.transaction_type === "income") || [];
 
-  const totalExpenses = expenses.reduce((sum, t) => sum + Number(t.amount), 0);
-  const totalIncome = income.reduce((sum, t) => sum + Number(t.amount), 0);
+  const totalExpenses = expenses.reduce((sum: number, t: any) => sum + Number(t.amount), 0);
+  const totalIncome = income.reduce((sum: number, t: any) => sum + Number(t.amount), 0);
 
   // Category breakdown
   const expenseByCategory = expenses.reduce(
-    (acc, t) => {
+    (acc: Record<string, number>, t: any) => {
       const categoryName = t.expense_category?.name_vi || "Khác";
       acc[categoryName] = (acc[categoryName] || 0) + Number(t.amount);
       return acc;
@@ -263,7 +263,7 @@ async function prepareFinancialDataForAI(
 
   // Spending trends (week-over-week)
   const weeklySpending = expenses.reduce(
-    (acc, t) => {
+    (acc: Record<string, number>, t: any) => {
       const week = getWeekKey(new Date(t.transaction_date));
       acc[week] = (acc[week] || 0) + Number(t.amount);
       return acc;
@@ -273,7 +273,7 @@ async function prepareFinancialDataForAI(
 
   // Budget performance
   const budgetPerformance =
-    budgets?.map((budget) => ({
+    budgets?.map((budget: any) => ({
       name: budget.name,
       budgeted: Number(budget.total_budget),
       spent: Number(budget.total_spent),
@@ -284,7 +284,7 @@ async function prepareFinancialDataForAI(
 
   // Goal progress
   const goalProgress =
-    goals?.map((goal) => ({
+    goals?.map((goal: any) => ({
       name: goal.name,
       target: Number(goal.target_amount),
       current: Number(goal.current_amount),
@@ -312,9 +312,9 @@ async function prepareFinancialDataForAI(
       average_transaction:
         expenses.length > 0 ? totalExpenses / expenses.length : 0,
       largest_expenses: expenses
-        .sort((a, b) => Number(b.amount) - Number(a.amount))
+        .sort((a: any, b: any) => Number(b.amount) - Number(a.amount))
         .slice(0, 5)
-        .map((t) => ({
+        .map((t: any) => ({
           amount: Number(t.amount),
           description: t.description,
           category: t.expense_category?.name_vi,
@@ -325,21 +325,21 @@ async function prepareFinancialDataForAI(
       active_budgets: budgets?.length || 0,
       budget_performance: budgetPerformance,
       over_budget_categories: budgetPerformance.filter(
-        (b) => b.performance_percentage > 100
+        (b: any) => b.performance_percentage > 100
       ),
       under_budget_categories: budgetPerformance.filter(
-        (b) => b.performance_percentage < 80
+        (b: any) => b.performance_percentage < 80
       ),
     },
     goal_analysis: {
       active_goals: goals?.length || 0,
       goal_progress: goalProgress,
-      on_track_goals: goalProgress.filter((g) => {
-        const monthsToTarget = goal.target_date
+      on_track_goals: goalProgress.filter((g: any) => {
+        const monthsToTarget = g.target_date
           ? Math.max(
               1,
               Math.ceil(
-                (new Date(goal.target_date).getTime() - Date.now()) /
+                (new Date(g.target_date).getTime() - Date.now()) /
                   (30 * 24 * 60 * 60 * 1000)
               )
             )
@@ -347,7 +347,7 @@ async function prepareFinancialDataForAI(
         const requiredMonthlyProgress = (g.target - g.current) / monthsToTarget;
         return g.monthly_target >= requiredMonthlyProgress * 0.8; // 80% tolerance
       }),
-      behind_goals: goalProgress.filter((g) => g.progress_percentage < 50),
+      behind_goals: goalProgress.filter((g: any) => g.progress_percentage < 50),
     },
     monthly_analytics: monthlyAnalytics || [],
   };

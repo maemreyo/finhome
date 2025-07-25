@@ -266,7 +266,7 @@ export class PropertyService {
       comparableProperties: comparable.map(p => ({
         id: p.id,
         soldPrice: p.listed_price || 0,
-        soldDate: new Date(p.created_at),
+        soldDate: new Date(p.created_at || new Date()),
         similarity: this.calculateSimilarity(property, p)
       })),
       factors: {

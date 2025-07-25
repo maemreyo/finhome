@@ -395,7 +395,7 @@ export class DataAccessService {
       }
 
       // Process stats
-      const logs = data || [];
+      const logs: any[] = data || [];
       const stats = {
         total_attempts: logs.length,
         successful_parses: logs.filter(l => l.parsing_metadata?.total_transactions_found > 0).length,

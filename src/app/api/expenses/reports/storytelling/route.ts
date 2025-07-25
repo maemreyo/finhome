@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
           name_vi,
           color
         ),
-        wallet:expense_wallets(
+        wallet:expense_wallets!expense_transactions_wallet_id_fkey(
           name,
           color
         )
@@ -110,8 +110,8 @@ export async function GET(request: NextRequest) {
       transaction_type: t.transaction_type,
       amount: t.amount,
       transaction_date: t.transaction_date,
-      description: t.description,
-      merchant_name: t.merchant_name,
+      description: t.description || undefined,
+      merchant_name: t.merchant_name || undefined,
       expense_category: t.expense_category ? {
         id: t.expense_category.id,
         name_vi: t.expense_category.name_vi,
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
           name_vi,
           color
         ),
-        wallet:expense_wallets(
+        wallet:expense_wallets!expense_transactions_wallet_id_fkey(
           name,
           color
         )
@@ -250,8 +250,8 @@ export async function POST(request: NextRequest) {
       transaction_type: t.transaction_type,
       amount: t.amount,
       transaction_date: t.transaction_date,
-      description: t.description,
-      merchant_name: t.merchant_name,
+      description: t.description || undefined,
+      merchant_name: t.merchant_name || undefined,
       expense_category: t.expense_category ? {
         id: t.expense_category.id,
         name_vi: t.expense_category.name_vi,

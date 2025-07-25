@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/src/types/supabase": ["./src/types/supabase"]
     }
   },
   "include": ["next-env.d.ts", "src/types/next.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

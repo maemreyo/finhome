@@ -145,7 +145,7 @@ export default function AdminPropertiesPage() {
     }
   }
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | null) => {
     const statusConfig = PROPERTY_STATUSES.find(s => s.value === status)
     return (
       <Badge className={statusConfig?.color}>

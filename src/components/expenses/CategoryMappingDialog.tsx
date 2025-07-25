@@ -186,7 +186,7 @@ export function CategoryMappingDialog({
                           
                           <CardContent className="flex-1 pt-0">
                             <div
-                              {...provided.droppableRef}
+                              {...(provided as any).droppableRef}
                               className="space-y-2 min-h-[200px]"
                             >
                               <ScrollArea className="h-full">

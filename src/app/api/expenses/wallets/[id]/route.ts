@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 const updateWalletSchema = z.object({
   name: z.string().min(1, 'Wallet name is required').optional(),
-  wallet_type: z.enum(['cash', 'bank_account', 'credit_card', 'e_wallet', 'savings']).optional(),
+  wallet_type: z.enum(['cash', 'bank_account', 'credit_card', 'e_wallet', 'savings', 'investment', 'other']).optional(),
   description: z.string().optional(),
   balance: z.number().min(0).optional(),
   currency: z.string().optional(),

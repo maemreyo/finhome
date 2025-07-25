@@ -1,10 +1,14 @@
 // src/lib/api/plans.ts
 // API client for financial plans - using database types directly
 
-import { type FinancialPlan, type FinancialPlanInsert } from '@/src/types/supabase'
+import { Database } from '@/src/types/supabase'
+
+type FinancialPlan = Database['public']['Tables']['financial_plans']['Row']
+type FinancialPlanInsert = Database['public']['Tables']['financial_plans']['Insert']
 
 // Extend database plan with calculated metrics for API responses
 export interface FinancialPlanWithMetrics extends FinancialPlan {
+  // Additional computed fields not in database
   calculatedMetrics?: {
     monthlyPayment: number
     totalInterest: number

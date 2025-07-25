@@ -180,7 +180,7 @@ export default function LaboratoryPage() {
       current_monthly_income: dbPlan.current_monthly_income,
       monthly_income: dbPlan.monthly_income,
       current_monthly_expenses: dbPlan.current_monthly_expenses,
-      monthly_expenses: dbPlan.monthly_expenses,
+      monthly_expenses: dbPlan.monthly_expenses || dbPlan.current_monthly_expenses,
       current_savings: dbPlan.current_savings,
       dependents: dbPlan.dependents,
       purchase_price: dbPlan.purchase_price,
@@ -411,14 +411,14 @@ export default function LaboratoryPage() {
                     currency: "VND",
                     notation: "compact",
                   }).format(
-                    (selectedPlan.monthly_income || 0) -
-                      (selectedPlan.monthly_expenses || 0) -
+                    ((selectedPlan as any).monthly_income || 0) -
+                      ((selectedPlan as any).current_monthly_expenses || (selectedPlan as any).monthly_expenses || 0) -
                       loanDetails.monthlyPayment
                   )}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {(selectedPlan.monthly_income || 0) -
-                    (selectedPlan.monthly_expenses || 0) -
+                  {((selectedPlan as any).monthly_income || 0) -
+                    ((selectedPlan as any).current_monthly_expenses || (selectedPlan as any).monthly_expenses || 0) -
                     loanDetails.monthlyPayment >=
                   0
                     ? t("quickStats.positive")
@@ -433,8 +433,8 @@ export default function LaboratoryPage() {
         {selectedPlan && loanDetails ? (
           <FinancialLaboratory
             initialLoan={loanDetails}
-            monthlyIncome={selectedPlan.monthly_income || 0}
-            monthlyExpenses={selectedPlan.monthly_expenses || 0}
+            monthlyIncome={(selectedPlan as any).monthly_income || 0}
+            monthlyExpenses={(selectedPlan as any).current_monthly_expenses || (selectedPlan as any).monthly_expenses || 0}
           />
         ) : (
           <Card>
