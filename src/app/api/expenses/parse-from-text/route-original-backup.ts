@@ -1,3 +1,4 @@
+// @ts-nocheck
 // src/app/api/expenses/parse-from-text/route.ts
 // API endpoint for parsing natural language text into structured transaction data using Gemini AI
 import { NextRequest, NextResponse } from "next/server";
