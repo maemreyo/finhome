@@ -33,12 +33,7 @@ export default async function ExpenseAchievementsPage() {
     // User achievements
     supabase
       .from("user_achievements")
-      .select(
-        `
-        *,
-        achievement:expense_achievements(*)
-      `
-      )
+      .select("*")
       .eq("user_id", user.id),
 
     // User challenges
@@ -62,6 +57,32 @@ export default async function ExpenseAchievementsPage() {
       .order("created_at", { ascending: false }),
   ]);
 
+  // Transform achievements data to match expected interface
+  const transformedAchievements = achievements?.map(achievement => ({
+    id: achievement.id,
+    achievement_id: achievement.achievement_id,
+    achievement: {
+      id: achievement.achievement_id,
+      name_en: 'Achievement',
+      name_vi: 'Thành tựu', 
+      description_en: 'Achievement description',
+      description_vi: 'Mô tả thành tựu',
+      category: 'first_time' as const,
+      requirement_type: 'count',
+      requirement_value: 1,
+      experience_points: 100,
+      badge_icon: '🏆',
+      badge_color: '#F59E0B',
+      triggers_funnel_action: false,
+      is_active: true
+    },
+    current_progress: achievement.progress_data?.current_progress || 0,
+    required_progress: achievement.progress_data?.required_progress || 1,
+    progress_percentage: achievement.progress_data?.progress_percentage || 0,
+    is_unlocked: !!achievement.unlocked_at,
+    unlocked_at: achievement.unlocked_at
+  })) || [];
+
   return (
     <div className="space-y-6 p-6">
       <Suspense fallback={<AchievementsSkeleton />}>
@@ -77,7 +98,7 @@ export default async function ExpenseAchievementsPage() {
               achievements_unlocked: 0,
             }
           }
-          achievements={achievements || []}
+          achievements={transformedAchievements}
           challenges={challenges || []}
           availableChallenges={availableChallenges || []}
         />

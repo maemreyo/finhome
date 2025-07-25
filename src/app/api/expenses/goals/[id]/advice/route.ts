@@ -6,9 +6,9 @@ import { createClient } from '@/lib/supabase/server'
 import { GoalAdviceService } from '@/lib/services/goalAdviceService'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 // GET /api/expenses/goals/[id]/advice - Get personalized advice for a specific goal
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const goalId = params.id
+    const goalId = (await params).id
     if (!goalId) {
       return NextResponse.json({ error: 'Goal ID is required' }, { status: 400 })
     }
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const goalId = params.id
+    const goalId = (await params).id
     const body = await request.json()
     const { action, category_id, recommendation_id, feedback } = body
 

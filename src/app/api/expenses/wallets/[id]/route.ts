@@ -18,7 +18,7 @@ const updateWalletSchema = z.object({
 // PUT /api/expenses/wallets/[id] - Update wallet
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -30,7 +30,7 @@ export async function PUT(
 
     const body = await request.json()
     const validatedData = updateWalletSchema.parse(body)
-    const walletId = params.id
+    const walletId = (await params).id
 
     // First check if wallet exists and belongs to user
     const { data: existingWallet, error: fetchError } = await supabase
@@ -100,7 +100,7 @@ export async function PUT(
 // DELETE /api/expenses/wallets/[id] - Delete wallet
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -110,7 +110,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const walletId = params.id
+    const walletId = (await params).id
 
     // First check if wallet exists and belongs to user
     const { data: existingWallet, error: fetchError } = await supabase
@@ -181,7 +181,7 @@ export async function DELETE(
 // GET /api/expenses/wallets/[id] - Get single wallet
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -198,7 +198,7 @@ export async function GET(
         bank:banks(*),
         _count_transactions:expense_transactions(count)
       `)
-      .eq('id', params.id)
+      .eq('id', (await params).id)
       .eq('user_id', user.id)
       .single()
 

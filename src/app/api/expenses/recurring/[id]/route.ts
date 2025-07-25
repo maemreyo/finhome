@@ -47,7 +47,7 @@ function calculateNextDueDate(startDate: Date, frequency: string, interval: numb
 // GET /api/expenses/recurring/[id] - Get single recurring transaction
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -73,7 +73,7 @@ export async function GET(
           created_at
         )
       `)
-      .eq('id', params.id)
+      .eq('id', (await params).id)
       .eq('user_id', user.id)
       .single()
 
@@ -92,7 +92,7 @@ export async function GET(
 // PUT /api/expenses/recurring/[id] - Update recurring transaction
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -110,7 +110,7 @@ export async function PUT(
     const { data: existingTransaction, error: fetchError } = await supabase
       .from('recurring_transactions')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', (await params).id)
       .eq('user_id', user.id)
       .single()
 
@@ -179,7 +179,7 @@ export async function PUT(
     const { data: recurringTransaction, error: updateError } = await supabase
       .from('recurring_transactions')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', (await params).id)
       .eq('user_id', user.id)
       .select(`
         *,
@@ -222,7 +222,7 @@ export async function PUT(
 // DELETE /api/expenses/recurring/[id] - Delete recurring transaction
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -237,7 +237,7 @@ export async function DELETE(
     const { data: existingTransaction, error: fetchError } = await supabase
       .from('recurring_transactions')
       .select('id, name, transaction_type')
-      .eq('id', params.id)
+      .eq('id', (await params).id)
       .eq('user_id', user.id)
       .single()
 
@@ -250,7 +250,7 @@ export async function DELETE(
     const { error: deleteError } = await supabase
       .from('recurring_transactions')
       .update({ is_active: false })
-      .eq('id', params.id)
+      .eq('id', (await params).id)
       .eq('user_id', user.id)
 
     if (deleteError) {
@@ -264,7 +264,7 @@ export async function DELETE(
       activity_type: 'expense_tracking',
       action: 'delete_recurring_transaction',
       resource_type: 'recurring_transaction',
-      resource_id: params.id,
+      resource_id: (await params).id,
       metadata: {
         name: existingTransaction.name,
         transaction_type: existingTransaction.transaction_type

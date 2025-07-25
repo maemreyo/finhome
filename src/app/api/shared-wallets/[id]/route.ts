@@ -17,9 +17,9 @@ const updateSharedWalletSchema = z.object({
 })
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 // GET /api/shared-wallets/[id] - Get specific shared wallet details
@@ -29,7 +29,7 @@ export async function GET(
 ) {
   try {
     const supabase = await createClient()
-    const walletId = params.id
+    const walletId = (await params).id
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -151,7 +151,7 @@ export async function PUT(
 ) {
   try {
     const supabase = await createClient()
-    const walletId = params.id
+    const walletId = (await params).id
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -217,7 +217,7 @@ export async function DELETE(
 ) {
   try {
     const supabase = await createClient()
-    const walletId = params.id
+    const walletId = (await params).id
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

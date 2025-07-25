@@ -12,7 +12,7 @@ const updateCategorySchema = z.object({
 // PUT /api/expenses/categories/[categoryId] - Update category icon and color
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -24,7 +24,7 @@ export async function PUT(
 
     const body = await request.json()
     const validatedData = updateCategorySchema.parse(body)
-    const categoryId = params.categoryId
+    const { categoryId } = await params
 
     if (!validatedData.icon && !validatedData.color) {
       return NextResponse.json({ error: 'At least one field (icon or color) must be provided' }, { status: 400 })
@@ -79,7 +79,7 @@ export async function PUT(
 // GET /api/expenses/categories/[categoryId] - Get single category
 export async function GET(
   request: NextRequest,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -91,7 +91,7 @@ export async function GET(
 
     const { searchParams } = new URL(request.url)
     const categoryType = searchParams.get('type') as 'expense' | 'income' || 'expense'
-    const categoryId = params.categoryId
+    const { categoryId } = await params
 
     const tableName = categoryType === 'expense' ? 'expense_categories' : 'income_categories'
 

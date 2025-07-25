@@ -25,9 +25,9 @@ const createBudgetSchema = z.object({
 const updateBudgetSchema = createBudgetSchema.partial().omit({ categories: true })
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 // GET /api/shared-wallets/[id]/budgets - Get shared wallet budgets
@@ -37,7 +37,7 @@ export async function GET(
 ) {
   try {
     const supabase = await createClient()
-    const walletId = params.id
+    const walletId = (await params).id
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -151,7 +151,7 @@ export async function POST(
 ) {
   try {
     const supabase = await createClient()
-    const walletId = params.id
+    const walletId = (await params).id
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
