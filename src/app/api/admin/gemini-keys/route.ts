@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Database } from '@/lib/supabase/types';
 
 // Encryption utilities for secure key storage
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const crypto = require('crypto');
 
 const ENCRYPTION_KEY = process.env.GEMINI_KEYS_ENCRYPTION_KEY || 'default-encryption-key-change-in-production';

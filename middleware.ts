@@ -102,7 +102,7 @@ export async function middleware(request: NextRequest) {
 
   // Handle auth routes (redirect authenticated users away)
   if (isAuthRoute && user) {
-    const redirectResponse = NextResponse.redirect(new URL(`/${defaultLocale}/dashboard`, request.url));
+    const redirectResponse = NextResponse.redirect(new URL(`/${defaultLocale}/expenses`, request.url));
     // Copy cookies from the main response to maintain session
     response.cookies.getAll().forEach(cookie => {
       redirectResponse.cookies.set(cookie.name, cookie.value, cookie);

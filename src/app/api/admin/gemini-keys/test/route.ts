@@ -7,6 +7,7 @@ import { Database } from '@/lib/supabase/types';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Encryption utilities (same as in main route)
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const crypto = require('crypto');
 const ENCRYPTION_KEY = process.env.GEMINI_KEYS_ENCRYPTION_KEY || 'default-encryption-key-change-in-production';
 const ALGORITHM = 'aes-256-gcm';

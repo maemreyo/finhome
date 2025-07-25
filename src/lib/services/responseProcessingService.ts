@@ -44,6 +44,7 @@ export class ResponseProcessingService {
     console.log(`📝 Original input text: "${originalInputText}"`);
     
     // Import jsonrepair dynamically to handle ESM/CommonJS issues
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { jsonrepair } = require('jsonrepair');
     
     // Strategy 1: Direct JSON repair with jsonrepair - let it handle everything!
