@@ -172,7 +172,7 @@ export async function PUT(
       const interval = validatedData.frequency_interval || existingTransaction.frequency_interval
       
       const nextDueDate = calculateNextDueDate(startDate, frequency, interval || 1)
-      updateData.next_due_date = nextDueDate.toISOString().split('T')[0]
+      (updateData as any).next_due_date = nextDueDate.toISOString().split('T')[0]
     }
 
     // Update the recurring transaction

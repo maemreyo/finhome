@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
       const { data: expenseCategories, error: expenseCategoryError } = await supabase
         .from('expense_categories')
         .select('id, category_key')
-        .in('category_key', expenseCategoryKeys) as any
+        .in('category_key', expenseCategoryKeys as any)
       
       console.log('Expense categories query result:', { expenseCategories, expenseCategoryError })
       
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
       const { data: incomeCategories, error: incomeCategoryError } = await supabase
         .from('income_categories')
         .select('id, category_key')
-        .in('category_key', incomeCategoryKeys) as any
+        .in('category_key', incomeCategoryKeys as any)
       
       if (incomeCategoryError) {
         console.error('Error fetching income categories:', incomeCategoryError)

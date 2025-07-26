@@ -147,7 +147,7 @@ export class GoalAdviceService {
       const amount = Number(transaction.amount)
       const categoryName = (transaction.expense_categories as any)?.name_vi || 'Unknown'
 
-      if (!categorySpending[categoryId]) {
+      if (categoryId && !categorySpending[categoryId]) {
         categorySpending[categoryId] = {
           categoryName,
           monthlyAmounts: [0, 0, 0], // Last 3 months
@@ -159,10 +159,12 @@ export class GoalAdviceService {
       const transactionDate = new Date(transaction.transaction_date)
       const monthsAgo = Math.floor((Date.now() - transactionDate.getTime()) / (1000 * 60 * 60 * 24 * 30))
       
-      if (monthsAgo >= 0 && monthsAgo < 3) {
+      if (categoryId && monthsAgo >= 0 && monthsAgo < 3) {
         categorySpending[categoryId].monthlyAmounts[monthsAgo] += amount
       }
-      categorySpending[categoryId].totalAmount += amount
+      if (categoryId) {
+        categorySpending[categoryId].totalAmount += amount
+      }
     })
 
     // Convert to SpendingAnalysis array
