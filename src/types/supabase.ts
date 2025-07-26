@@ -4768,3 +4768,24 @@ export const Constants = {
   },
 } as const
 
+// Additional type exports
+export type UserSubscriptionTier = Database['public']['Enums']['user_subscription_tier']
+export type Achievement = Database['public']['Tables']['achievements']['Row']
+export type Bank = Database['public']['Tables']['banks']['Row']
+export type BankInterestRate = Database['public']['Tables']['bank_interest_rates']['Row'] 
+export type Notification = Database['public']['Tables']['notifications']['Row']
+
+// Additional missing types
+export type AnalyticsMetric = Database['public']['Tables']['analytics_metrics']['Row']
+export type FinancialScenario = Database['public']['Tables']['financial_scenarios']['Row']
+export type UserAchievement = Database['public']['Tables']['user_achievements']['Row']
+export type UserExperience = Database['public']['Tables']['user_experience']['Row']
+export type MarketInsight = Database['public']['Tables']['market_insights']['Row']
+export type FaqItem = Database['public']['Tables']['faq_items']['Row']
+export type SupportTicket = Database['public']['Tables']['support_tickets']['Row']
+export type PlanMilestone = Database['public']['Tables']['plan_milestones']['Row']
+export type PlanMilestoneInsert = Database['public']['Tables']['plan_milestones']['Insert']
+export type PlanMilestoneUpdate = Database['public']['Tables']['plan_milestones']['Update']
+export type UserFavorite = Database['public']['Tables']['user_favorites']['Row']
+export type UserFavoriteInsert = Database['public']['Tables']['user_favorites']['Insert']
+

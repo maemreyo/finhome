@@ -168,11 +168,11 @@ export async function PUT(
     const updateData = { ...validatedData }
     if (validatedData.frequency || validatedData.frequency_interval || validatedData.start_date) {
       const startDate = new Date(validatedData.start_date || existingTransaction.start_date)
-      const frequency: string = validatedData.frequency || existingTransaction.frequency
+      const frequency = validatedData.frequency || existingTransaction.frequency
       const interval = validatedData.frequency_interval || existingTransaction.frequency_interval
       
-      const nextDueDate: Date = calculateNextDueDate(startDate, frequency, interval || 1)
-      (updateData as any).next_due_date = nextDueDate.toISOString().split('T')[0]
+      const nextDueDate = calculateNextDueDate(startDate, frequency, interval || 1)
+      updateData.next_due_date = nextDueDate.toISOString().split('T')[0]
     }
 
     // Update the recurring transaction

@@ -51,7 +51,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       archived: ['draft']
     }
 
-    const allowedStatuses = validTransitions[plan.status] || []
+    const allowedStatuses = validTransitions[plan.status || 'draft'] || []
     if (!allowedStatuses.includes(status)) {
       return NextResponse.json(
         { error: `Cannot transition from ${plan.status} to ${status}` },

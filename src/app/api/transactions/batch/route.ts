@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if wallet has sufficient balance for expenses
-    if (totalExpenseAmount > wallet.balance) {
+    if (totalExpenseAmount > (wallet.balance || 0)) {
       return NextResponse.json(
         {
           error: 'Transaction batch validation failed',
@@ -129,6 +129,7 @@ export async function POST(request: NextRequest) {
       transactions
         .filter(t => t.transaction_type === 'expense' && t.expense_category_key)
         .map(t => t.expense_category_key)
+        .filter((key): key is string => typeof key === 'string')
     )
     const expenseCategoryKeys = Array.from(expenseCategoryKeysSet)
     
@@ -136,6 +137,7 @@ export async function POST(request: NextRequest) {
       transactions
         .filter(t => t.transaction_type === 'income' && t.income_category_key)
         .map(t => t.income_category_key)
+        .filter((key): key is string => typeof key === 'string')
     )
     const incomeCategoryKeys = Array.from(incomeCategoryKeysSet)
 
@@ -342,7 +344,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update wallet balance
-    const newBalance = wallet.balance - totalExpenseAmount + totalIncomeAmount
+    const newBalance = (wallet.balance || 0) - totalExpenseAmount + totalIncomeAmount
     const { error: walletUpdateError } = await supabase
       .from('expense_wallets')
       .update({ 

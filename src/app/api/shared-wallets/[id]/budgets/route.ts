@@ -61,7 +61,10 @@ export async function GET(
     // Get query parameters for filtering
     const { searchParams } = new URL(request.url)
     const includeInactive = searchParams.get('include_inactive') === 'true'
-    const period = searchParams.get('period')
+    const periodParam = searchParams.get('period')
+    const period = periodParam && ['weekly', 'monthly', 'quarterly', 'yearly', 'custom'].includes(periodParam) 
+      ? periodParam as 'weekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
+      : null
 
     let query = supabase
       .from('shared_budgets')
@@ -111,7 +114,7 @@ export async function GET(
         : 0
 
       const isOverBudget = budget.total_spent > budget.total_budget
-      const isNearLimit = spentPercentage >= budget.alert_threshold_percentage
+      const isNearLimit = spentPercentage >= (budget.alert_threshold_percentage || 80)
       
       const daysRemaining = Math.ceil(
         (new Date(budget.end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)

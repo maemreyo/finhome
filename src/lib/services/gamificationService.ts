@@ -152,7 +152,7 @@ export class GamificationService {
       throw new Error('Failed to fetch user challenges')
     }
 
-    return data || []
+    return (data || []) as UserChallenge[]
   }
 
   /**
@@ -194,7 +194,7 @@ export class GamificationService {
         user_id: userId,
         challenge_id: challengeId,
         target_progress: challenge.target_value || challenge.duration_days,
-        progress_data: initialProgressData,
+        progress_data: initialProgressData as any,
         started_at: new Date().toISOString()
       })
       .select(`
@@ -208,7 +208,7 @@ export class GamificationService {
       throw new Error('Failed to start challenge')
     }
 
-    return userChallenge
+    return userChallenge as UserChallenge
   }
 
   /**
@@ -234,13 +234,13 @@ export class GamificationService {
 
     // Merge progress data
     const updatedProgressData = {
-      ...userChallenge.progress_data,
+      ...(userChallenge.progress_data as ChallengeProgressData || {}),
       ...progressUpdate
     }
 
     // Calculate new current progress
     const newCurrentProgress = this.calculateCurrentProgress(
-      userChallenge.challenge,
+      (userChallenge as any).challenge as Challenge,
       updatedProgressData
     )
 
@@ -270,7 +270,7 @@ export class GamificationService {
 
     // If challenge was just completed, award XP
     if (isCompleted && !userChallenge.completed_at) {
-      await this.awardExperiencePoints(userId, userChallenge.challenge.experience_points)
+      await this.awardExperiencePoints(userId, ((userChallenge as any).challenge as Challenge).experience_points)
     }
   }
 
@@ -318,7 +318,7 @@ export class GamificationService {
         await this.updateChallengeProgress(userId, userChallenge.challenge_id, {
           category_budgets: adherenceData.categoryBudgets,
           daily_progress: {
-            ...userChallenge.progress_data.daily_progress,
+            ...((userChallenge.progress_data as ChallengeProgressData)?.daily_progress || {}),
             [new Date().toISOString().split('T')[0]]: adherenceData.overallAdherence
           }
         })
@@ -337,9 +337,9 @@ export class GamificationService {
       
       if (requirement.type === 'saving_streak' || requirement.type === 'daily_savings_target') {
         const todaysSavings = await this.calculateTodaysSavings(userId, requirement)
-        const progressData = userChallenge.progress_data
+        const progressData = userChallenge.progress_data as ChallengeProgressData
         
-        const currentStreak = progressData.current_streak || 0
+        const currentStreak = progressData?.current_streak || 0
         const minSavings = requirement.min_daily_savings || requirement.daily_target || 0
         
         if (todaysSavings >= minSavings) {
@@ -347,7 +347,7 @@ export class GamificationService {
             current_streak: currentStreak + 1,
             last_success_date: new Date().toISOString(),
             streak_history: [
-              ...(progressData.streak_history || []),
+              ...(progressData?.streak_history || []),
               {
                 date: new Date().toISOString().split('T')[0],
                 success: true,
@@ -360,7 +360,7 @@ export class GamificationService {
             current_streak: 0,
             last_reset_date: new Date().toISOString(),
             streak_history: [
-              ...(progressData.streak_history || []),
+              ...(progressData?.streak_history || []),
               {
                 date: new Date().toISOString().split('T')[0],
                 success: false,
