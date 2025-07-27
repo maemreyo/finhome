@@ -304,9 +304,9 @@ export const BankManagementTableConnected: React.FC<BankManagementTableConnected
         ),
         filterFn: (row, _id, value) => {
           if (value === 'all') return true
-          if (value === 'active') return row.original.is_active
+          if (value === 'active') return !!row.original.is_active
           if (value === 'inactive') return !row.original.is_active
-          if (value === 'featured') return row.original.is_featured
+          if (value === 'featured') return !!row.original.is_featured
           return true
         },
       },

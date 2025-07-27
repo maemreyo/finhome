@@ -87,7 +87,7 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
               status: 'interested', // All fetched properties are considered interested
               roiProjection: 8.0, // Default ROI projection
               priceChange: Math.random() * 6 - 2, // Random price change for demo
-              lastViewed: new Date(property.updated_at || property.created_at),
+              lastViewed: new Date(property.updated_at || property.created_at || new Date()),
               isFavorited: Math.random() > 0.5, // Random favorited status for demo
             })
           })
@@ -113,7 +113,7 @@ export const PropertyPortfolio: React.FC<PropertyPortfolioProps> = ({
                 status: plan.status === 'active' ? 'planning' : 'purchased',
                 roiProjection: plan.expected_roi || 8.0,
                 priceChange: Math.random() * 6 - 2,
-                lastViewed: new Date(plan.updated_at),
+                lastViewed: plan.updated_at ? new Date(plan.updated_at) : new Date(),
                 isFavorited: plan.status === 'active',
               })
             }

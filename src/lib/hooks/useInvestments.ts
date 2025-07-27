@@ -96,7 +96,7 @@ export const useInvestments = (options: UseInvestmentsOptions = {}) => {
               location: (plan as any).property_location || 'N/A', // property_location field doesn't exist in financial_plans
               purchasePrice,
               currentValue,
-              purchaseDate: new Date(plan.created_at),
+              purchaseDate: new Date(plan.created_at || new Date()),
               downPayment,
               loanAmount: purchasePrice - downPayment,
               monthlyPayment,
@@ -106,9 +106,9 @@ export const useInvestments = (options: UseInvestmentsOptions = {}) => {
               realizedGain: (plan as any).realized_gain || 0, // realized_gain field doesn't exist in financial_plans
               totalReturn,
               roiPercentage: totalInvestment > 0 ? (totalReturn / totalInvestment) * 100 : 0,
-              annualizedReturn: calculateAnnualizedReturnFromData(totalReturn, totalInvestment, new Date(plan.created_at)),
+              annualizedReturn: calculateAnnualizedReturnFromData(totalReturn, totalInvestment, new Date(plan.created_at || new Date())),
               cashFlow,
-              status: mapPlanStatus(plan.status),
+              status: mapPlanStatus(plan.status || 'draft'),
               riskLevel: calculateRiskLevel(plan),
               notes: plan.notes ?? undefined
             }
@@ -135,7 +135,7 @@ export const useInvestments = (options: UseInvestmentsOptions = {}) => {
               location: `${property.district}, ${property.city}`,
               purchasePrice,
               currentValue,
-              purchaseDate: new Date((property as any).purchase_date || property.created_at), // purchase_date field doesn't exist
+              purchaseDate: new Date((property as any).purchase_date || property.created_at || new Date()), // purchase_date field doesn't exist
               downPayment,
               loanAmount: purchasePrice - downPayment,
               monthlyPayment,
@@ -145,7 +145,7 @@ export const useInvestments = (options: UseInvestmentsOptions = {}) => {
               realizedGain: (property as any).realized_gain || 0, // realized_gain field doesn't exist
               totalReturn,
               roiPercentage: totalInvestment > 0 ? (totalReturn / totalInvestment) * 100 : 0,
-              annualizedReturn: calculateAnnualizedReturnFromData(totalReturn, totalInvestment, new Date((property as any).purchase_date || property.created_at)), // purchase_date field doesn't exist
+              annualizedReturn: calculateAnnualizedReturnFromData(totalReturn, totalInvestment, new Date((property as any).purchase_date || property.created_at || new Date())), // purchase_date field doesn't exist
               cashFlow,
               status: (property as any).rental_status === 'rented' ? 'rented' : 'purchased', // rental_status field doesn't exist
               riskLevel: calculatePropertyRiskLevel(property),
@@ -251,7 +251,7 @@ export const useInvestments = (options: UseInvestmentsOptions = {}) => {
         location: (newPlan as any).property_location || 'N/A', // property_location field doesn't exist
         purchasePrice: newPlan.purchase_price || 0,
         currentValue: newPlan.purchase_price || 0,
-        purchaseDate: new Date(newPlan.created_at),
+        purchaseDate: new Date(newPlan.created_at || new Date()),
         downPayment: newPlan.down_payment || 0,
         loanAmount: (newPlan.purchase_price || 0) - (newPlan.down_payment || 0),
         monthlyPayment: (newPlan as any).monthly_payment || 0, // monthly_payment field doesn't exist

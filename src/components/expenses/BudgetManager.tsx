@@ -61,6 +61,8 @@ interface Category {
   name_en: string
   icon: string
   color: string
+  is_active: boolean
+  sort_order: number
 }
 
 interface Budget {

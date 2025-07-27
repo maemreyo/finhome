@@ -16,8 +16,8 @@ import { toast } from 'sonner';
 import { DynamicIcon } from '@/lib/utils/icon-utils';
 
 const categorySchema = z.object({
-  icon: z.string().default('circle'),
-  color: z.string().default('#3B82F6'),
+  icon: z.string(),
+  color: z.string(),
   category_type: z.enum(['expense', 'income']),
 });
 

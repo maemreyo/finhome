@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { toast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 import { 
   Trophy, 
@@ -86,11 +86,7 @@ export function EnhancedGamificationCenter({ userId, className }: EnhancedGamifi
       setSuggestedChallenges(suggested)
     } catch (error) {
       console.error('Error loading challenge data:', error)
-      toast({
-        title: 'Lỗi tải dữ liệu',
-        description: 'Không thể tải thông tin thử thách',
-        variant: 'destructive'
-      })
+      toast.error('Không thể tải thông tin thử thách')
     } finally {
       setLoading(false)
     }
@@ -101,18 +97,10 @@ export function EnhancedGamificationCenter({ userId, className }: EnhancedGamifi
       const newUserChallenge = await gamificationService.startChallenge(userId, challengeId)
       setUserChallenges(prev => [...prev, newUserChallenge])
       
-      toast({
-        title: 'Thử thách đã bắt đầu!',
-        description: 'Chúc bạn may mắn với thử thách mới',
-        variant: 'default'
-      })
+      toast.success('Thử thách đã bắt đầu! Chúc bạn may mắn với thử thách mới')
     } catch (error) {
       console.error('Error starting challenge:', error)
-      toast({
-        title: 'Lỗi bắt đầu thử thách',
-        description: error instanceof Error ? error.message : 'Đã có lỗi xảy ra',
-        variant: 'destructive'
-      })
+      toast.error(error instanceof Error ? error.message : 'Đã có lỗi xảy ra khi bắt đầu thử thách')
     }
   }
 

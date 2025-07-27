@@ -84,9 +84,9 @@ export const useScenarioManagement = (t: (key: string) => string): UseScenarioMa
               return createScenarioFromData(
                 dbScenario.id,
                 dbScenario.scenario_name,
-                dbScenario.scenario_type,
+                dbScenario.scenario_type as 'baseline' | 'optimistic' | 'pessimistic' | 'alternative' | 'stress_test',
                 dbScenario.description || t('mockScenarios.noDescriptionAvailable'),
-                dbScenario.risk_level,
+                dbScenario.risk_level as 'low' | 'medium' | 'high',
                 3000000000, // Default purchase price
                 600000000,  // Default down payment
                 dbScenario.interest_rate || 8.5,

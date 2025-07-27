@@ -218,12 +218,12 @@ export function AIFinancialAdvisor() {
 
             <UpgradePrompt
               featureKey="ai_insights"
-              title="Nâng cấp để sử dụng Cố vấn AI"
-              message="Truy cập không giới hạn vào AI insights và nhiều tính năng premium khác"
-              ctaText="Nâng cấp ngay"
-              context="inline"
-              targetTier="premium"
-              urgency="medium"
+              access={{
+                hasAccess: false,
+                reason: "subscription_required",
+                upgradeRequired: "premium"
+              }}
+              style="inline"
               dismissible={false}
             />
           </div>
@@ -608,13 +608,14 @@ export function AIFinancialAdvisor() {
       {showUpgradePrompt && (
         <UpgradePrompt
           featureKey="ai_insights"
-          title="Nâng cấp để truy cập Cố vấn AI"
-          message="Nhận insight tài chính thông minh và lời khuyên được cá nhân hóa"
-          ctaText="Xem gói Premium"
-          context="modal"
-          targetTier="premium"
-          urgency="high"
+          access={{
+            hasAccess: false,
+            reason: "subscription_required",
+            upgradeRequired: "premium"
+          }}
+          style="modal"
           dismissible={true}
+          onDismiss={() => setShowUpgradePrompt(false)}
         />
       )}
     </div>

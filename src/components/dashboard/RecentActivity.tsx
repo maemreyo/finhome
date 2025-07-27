@@ -86,7 +86,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
               type: activityType,
               title: notification.title,
               description: notification.message,
-              timestamp: new Date(notification.created_at),
+              timestamp: notification.created_at ? new Date(notification.created_at) : new Date(),
               isNew: !notification.is_read,
               metadata: metadata ? {
                 amount: metadata.amount,
@@ -105,7 +105,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
                 type: 'achievement_unlocked',
                 title: t('achievementUnlocked'),
                 description: `${t('achievementUnlocked').split('!')[0]} "${userAchievement.achievements.name}"`,
-                timestamp: new Date(userAchievement.unlocked_at),
+                timestamp: userAchievement.unlocked_at ? new Date(userAchievement.unlocked_at) : new Date(),
                 metadata: {
                   achievementName: userAchievement.achievements.name
                 },
@@ -121,7 +121,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
               type: 'plan_created',
               title: t('planCreated'),
               description: plan.plan_name,
-              timestamp: new Date(plan.created_at),
+              timestamp: plan.created_at ? new Date(plan.created_at) : new Date(),
               metadata: {
                 planName: plan.plan_name,
                 amount: plan.purchase_price || 0

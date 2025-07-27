@@ -128,7 +128,7 @@ export default function InteractiveParameterSliders({
   const t = useTranslations('InteractiveParameterSliders')
   const [parameters, setParameters] = useState<ScenarioParameters>({
     planName: baseScenario.plan_name || 'Interactive Scenario',
-    planType: baseScenario.plan_type,
+    planType: baseScenario.plan_type || 'home_purchase',
     scenarioType: baseScenario.scenarioType,
     purchasePrice: baseScenario.purchase_price || 3000000000,
     downPayment: ((baseScenario.down_payment || 0) / (baseScenario.purchase_price || 1)) * 100,

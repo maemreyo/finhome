@@ -111,15 +111,15 @@ export class FinancialPlanWithMetricsPDFExporter {
     this.addSectionTitle('Plan Overview')
     
     const overviewData = [
-      ['Plan Type', this.formatPlanType(plan.plan_type)],
+      ['Plan Type', this.formatPlanType(plan.plan_type || 'home_purchase')],
       ['Property Price', formatCurrency(plan.purchase_price || 0)],
       ['Down Payment', `${formatCurrency(plan.down_payment || 0)} (${(((plan.down_payment || 0) / (plan.purchase_price || 1)) * 100).toFixed(1)}%)`],
       ['Loan Amount', formatCurrency((plan.purchase_price || 0) - (plan.down_payment || 0))],
       ['Monthly Income', formatCurrency(plan.monthly_income || 0)],
       ['Monthly Expenses', formatCurrency(plan.monthly_expenses || 0)],
       ['Current Savings', formatCurrency(plan.current_savings || 0)],
-      ['Plan Status', plan.status.toUpperCase()],
-      ['Created Date', new Date(plan.created_at).toLocaleDateString('vi-VN')]
+      ['Plan Status', plan.status ? plan.status.toUpperCase() : 'N/A'],
+      ['Created Date', plan.created_at ? new Date(plan.created_at).toLocaleDateString('vi-VN') : 'N/A']
     ]
 
     if (plan.expected_rental_income) {

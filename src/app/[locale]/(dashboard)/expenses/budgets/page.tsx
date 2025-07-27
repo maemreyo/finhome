@@ -45,7 +45,11 @@ export default async function ExpenseBudgetsPage() {
     <div className="space-y-6 p-6">
       <Suspense fallback={<BudgetsSkeleton />}>
         <BudgetManager
-          categories={expenseCategories || []}
+          categories={(expenseCategories || []).map(cat => ({
+            ...cat,
+            is_active: cat.is_active ?? false,
+            sort_order: cat.sort_order ?? 0
+          }))}
           initialBudgets={currentBudgets?.map(budget => ({
             ...budget,
             description: budget.description ?? undefined,
@@ -62,7 +66,11 @@ export default async function ExpenseBudgetsPage() {
               allocated_amount: allocation.allocated_amount,
               spent_amount: allocation.spent_amount || 0,
               remaining_amount: allocation.remaining_amount || 0,
-              category: allocation.category || {
+              category: allocation.category ? {
+                ...allocation.category,
+                is_active: allocation.category.is_active ?? false,
+                sort_order: allocation.category.sort_order ?? 0
+              } : {
                 id: allocation.category_id || '',
                 name_vi: 'Unknown Category',
                 name_en: 'Unknown Category',

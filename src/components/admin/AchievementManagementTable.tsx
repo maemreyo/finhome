@@ -248,7 +248,7 @@ export const AchievementManagementTable: React.FC = () => {
               >
                 <IconComponent 
                   className="w-5 h-5" 
-                  style={{ color: achievement.badge_color }} 
+                  style={{ color: achievement.badge_color || '#000000' }} 
                 />
               </div>
               <div>

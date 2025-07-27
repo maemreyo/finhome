@@ -261,8 +261,8 @@ class BankService {
       processingFee: rate.processing_fee || 0,
       earlyPaymentPenalty: rate.early_payment_fee || 0,
       specialConditions: undefined, // Field doesn't exist in current schema
-      isActive: rate.is_active,
-      lastUpdated: new Date(rate.updated_at)
+      isActive: !!rate.is_active,
+      lastUpdated: rate.updated_at ? new Date(rate.updated_at) : new Date()
     }
   }
 

@@ -216,10 +216,10 @@ export function AdvancedFeatureTour({
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
     const { action, index, status, type } = data
 
-    if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
+    if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
       const nextStepIndex = index + (action === ACTIONS.PREV ? -1 : 1)
       setStepIndex(nextStepIndex)
-    } else if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+    } else if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       // Tour finished or skipped
       setRun(false)
       onClose()

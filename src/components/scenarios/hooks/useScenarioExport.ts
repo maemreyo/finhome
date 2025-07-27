@@ -138,8 +138,8 @@ export const useScenarioExport = (): UseScenarioExportReturn => {
         'LTV Ratio (%)': scenario.calculatedMetrics?.ltvRatio || 0,
         'Affordability Score': scenario.calculatedMetrics?.affordabilityScore || 0,
         'Monthly Savings (VND)': scenario.calculatedMetrics?.monthlySavings || 0,
-        'Created Date': new Date(scenario.created_at).toLocaleDateString(),
-        'Updated Date': new Date(scenario.updated_at).toLocaleDateString()
+        'Created Date': scenario.created_at ? new Date(scenario.created_at).toLocaleDateString() : 'N/A',
+        'Updated Date': scenario.updated_at ? new Date(scenario.updated_at).toLocaleDateString() : 'N/A'
       }))
 
       // Create workbook with multiple sheets
@@ -335,8 +335,8 @@ export const useScenarioExport = (): UseScenarioExportReturn => {
         row.ltvRatio.toFixed(2),
         row.affordabilityScore,
         Math.round(row.monthlySavings).toLocaleString(),
-        new Date(row.createdAt).toLocaleDateString(),
-        new Date(row.updatedAt).toLocaleDateString()
+        row.createdAt ? new Date(row.createdAt).toLocaleDateString() : 'N/A',
+        row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : 'N/A'
     ])
 
     const csvContent = [

@@ -227,7 +227,7 @@ export const NotificationManagementTable: React.FC = () => {
     }
   }
 
-  const getPriorityBadge = (priority: number) => {
+  const getPriorityBadge = (priority: number | null) => {
     switch (priority) {
       case 1:
         return <Badge variant="destructive" className="text-xs">High</Badge>
@@ -413,9 +413,9 @@ export const NotificationManagementTable: React.FC = () => {
         },
         filterFn: (row, _id, value) => {
           if (value === 'all') return true
-          if (value === 'sent') return row.original.is_sent
+          if (value === 'sent') return !!row.original.is_sent
           if (value === 'pending') return !row.original.is_sent && !row.original.is_archived
-          if (value === 'archived') return row.original.is_archived
+          if (value === 'archived') return !!row.original.is_archived
           return true
         },
       },

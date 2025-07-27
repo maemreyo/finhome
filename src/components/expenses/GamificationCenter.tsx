@@ -660,6 +660,7 @@ function AchievementCard({
   achievement: UserAchievement
   status: 'unlocked' | 'progress' | 'locked' 
 }) {
+  const t = useTranslations('GamificationCenter')
   const categoryInfo = ACHIEVEMENT_CATEGORIES[achievement.achievement.category as keyof typeof ACHIEVEMENT_CATEGORIES]
 
   return (
@@ -744,6 +745,7 @@ function ChallengeCard({
   status: 'active' | 'completed'
   onComplete?: (challengeId: string) => void
 }) {
+  const t = useTranslations('GamificationCenter')
   const categoryInfo = CHALLENGE_CATEGORIES[userChallenge.challenge.category as keyof typeof CHALLENGE_CATEGORIES]
   const Icon = categoryInfo.icon
   const progress = (userChallenge.current_progress / userChallenge.target_progress) * 100
@@ -812,6 +814,7 @@ function AvailableChallengeCard({
   onStart: (challengeId: string) => void
   isActive: boolean 
 }) {
+  const t = useTranslations('GamificationCenter')
   const categoryInfo = CHALLENGE_CATEGORIES[challenge.category as keyof typeof CHALLENGE_CATEGORIES]
   const Icon = categoryInfo.icon
 

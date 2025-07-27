@@ -33,15 +33,15 @@ import { startOfMonth, endOfMonth } from 'date-fns'
 
 const kakeiboBudgetSchema = z.object({
   name: z.string().min(1, 'Budget name is required'),
-  description: z.string().optional(),
-  budget_period: z.enum(['weekly', 'monthly', 'yearly']).default('monthly'),
+  budget_period: z.enum(['weekly', 'monthly', 'yearly']),
   total_budget: z.number().positive('Total budget must be positive'),
-  alert_threshold_percentage: z.number().min(50).max(100).default(80),
+  alert_threshold_percentage: z.number().min(50).max(100),
   survival_budget: z.number().min(0),
   optional_budget: z.number().min(0), 
   culture_budget: z.number().min(0),
   extra_budget: z.number().min(0),
   category_mapping: z.record(z.string(), z.enum(['survival', 'optional', 'culture', 'extra'])),
+  description: z.string().optional(),
 })
 
 type FormData = z.infer<typeof kakeiboBudgetSchema>

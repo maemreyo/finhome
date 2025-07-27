@@ -65,16 +65,16 @@ const fetchUserProgress = async (userId: string): Promise<UserProgress> => {
     return {
       userId,
       totalPoints,
-      level: userExperience.current_level,
+      level: userExperience.current_level || 1,
       completedAchievements,
       progressData: {
-        plansCreated: userExperience.plans_created,
+        plansCreated: userExperience.plans_created || 0,
         totalSavingsOptimized,
         highestROI,
         plansCompleted,
         exportsGenerated: (userExperience as any).exports_generated || 0, // Add to user_experience table if needed
-        streakDays: userExperience.current_login_streak,
-        lastActivityDate: new Date(userExperience.last_activity_date)
+        streakDays: userExperience.current_login_streak || 0,
+        lastActivityDate: userExperience.last_activity_date ? new Date(userExperience.last_activity_date) : new Date()
       }
     }
   } catch (error) {

@@ -66,7 +66,7 @@ const createGoalSchema = (t: any) => z.object({
   }).optional(),
 })
 
-type FormData = z.infer<typeof createGoalSchema>
+// FormData type will be inferred from goalSchema in the component
 
 interface Goal {
   id: string
@@ -153,8 +153,11 @@ export function GoalManager({
   const [selectedWallet, setSelectedWallet] = useState('')
   const [showAdvice, setShowAdvice] = useState<Set<string>>(new Set())
 
-  const form = useForm<FormData>({
-    // resolver: zodResolver(createGoalSchema),
+  // Create the schema with the current t function
+  const goalSchema = createGoalSchema(t)
+
+  const form = useForm<z.infer<typeof goalSchema>>({
+    resolver: zodResolver(goalSchema),
     defaultValues: {
       goal_type: 'general_savings',
       house_purchase_data: {
@@ -169,7 +172,7 @@ export function GoalManager({
     return GOAL_TYPES.find(t => t.key === type) || GOAL_TYPES[0]
   }
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: z.infer<typeof goalSchema>) => {
     setIsSubmitting(true)
 
     try {
@@ -200,51 +203,14 @@ export function GoalManager({
         toast.success(t('goalCreated'))
       }
 
-      form.reset()
       setIsCreateDialogOpen(false)
       setEditingGoal(null)
-
+      form.reset()
     } catch (error) {
       console.error('Error saving goal:', error)
-      toast.error(error instanceof Error ? error.message : t('errorSaving'))
+      toast.error(error instanceof Error ? error.message : t('errorSavingGoal'))
     } finally {
       setIsSubmitting(false)
-    }
-  }
-
-  const handleContribution = async () => {
-    if (!selectedGoal || !contributionAmount || !selectedWallet) {
-      toast.error(t('fillAllFields'))
-      return
-    }
-
-    try {
-      const response = await fetch(`/api/expenses/goals/${selectedGoal.id}/contributions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: parseFloat(contributionAmount),
-          wallet_id: selectedWallet,
-          description: t('contributionDescription', { goalName: selectedGoal.name })
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to add contribution')
-      }
-
-      onContribution?.(selectedGoal.id, parseFloat(contributionAmount))
-      toast.success(t('contributionAdded'))
-      
-      setSelectedGoal(null)
-      setContributionAmount('')
-      setSelectedWallet('')
-
-    } catch (error) {
-      console.error('Error adding contribution:', error)
-      toast.error(t('errorAddingContribution'))
     }
   }
 
@@ -252,7 +218,7 @@ export function GoalManager({
     setEditingGoal(goal)
     form.reset({
       name: goal.name,
-      description: goal.description,
+      description: goal.description || '',
       goal_type: goal.goal_type as any,
       target_amount: goal.target_amount,
       monthly_target: goal.monthly_target,
@@ -264,8 +230,6 @@ export function GoalManager({
   }
 
   const handleDelete = async (goalId: string) => {
-    if (!confirm(t('confirmDelete'))) return
-
     try {
       const response = await fetch(`/api/expenses/goals/${goalId}`, {
         method: 'DELETE',
@@ -277,18 +241,42 @@ export function GoalManager({
 
       onGoalDelete?.(goalId)
       toast.success(t('goalDeleted'))
-
     } catch (error) {
       console.error('Error deleting goal:', error)
-      toast.error(t('errorDeleting'))
+      toast.error(t('errorDeletingGoal'))
     }
   }
 
+  const handleContribution = async () => {
+    if (!selectedGoal || !contributionAmount || !selectedWallet) return
+
+    try {
+      const amount = parseFloat(contributionAmount)
+      await onContribution?.(selectedGoal.id, amount)
+      setSelectedGoal(null)
+      setContributionAmount('')
+      setSelectedWallet('')
+      toast.success(t('contributionAdded'))
+    } catch (error) {
+      console.error('Error adding contribution:', error)
+      toast.error(t('errorAddingContribution'))
+    }
+  }
+
+  const toggleAdvice = (goalId: string) => {
+    const newShowAdvice = new Set(showAdvice)
+    if (newShowAdvice.has(goalId)) {
+      newShowAdvice.delete(goalId)
+    } else {
+      newShowAdvice.add(goalId)
+    }
+    setShowAdvice(newShowAdvice)
+  }
+
   const getGoalStatusColor = (goal: Goal) => {
-    if (goal.status === 'completed') return 'text-green-600 dark:text-green-400'
-    if (goal.is_on_track === false) return 'text-red-600 dark:text-red-400'
-    if (goal.progress_percentage > 75) return 'text-blue-600 dark:text-blue-400'
-    return 'text-muted-foreground'
+    if (goal.status === 'completed') return 'text-green-600'
+    if (goal.is_on_track) return 'text-blue-600'
+    return 'text-orange-600'
   }
 
   const getTimeUntilDeadline = (deadline: string) => {
@@ -297,29 +285,16 @@ export function GoalManager({
     if (days === 0) return t('today')
     if (days === 1) return t('tomorrow')
     if (days < 30) return t('daysLeft', { count: days })
-    
-    const months = differenceInMonths(new Date(deadline), new Date())
+    const months = Math.floor(days / 30)
     return t('monthsLeft', { count: months })
   }
 
-  const toggleAdvice = (goalId: string) => {
-    setShowAdvice(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(goalId)) {
-        newSet.delete(goalId)
-      } else {
-        newSet.add(goalId)
-      }
-      return newSet
-    })
-  }
-
   // Filter goals by type
-  const houseGoals = goals.filter(g => g.goal_type === 'buy_house')
-  const otherGoals = goals.filter(g => g.goal_type !== 'buy_house')
+  const houseGoals = goals.filter(goal => goal.goal_type === 'buy_house')
+  const otherGoals = goals.filter(goal => goal.goal_type !== 'buy_house')
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -328,14 +303,15 @@ export function GoalManager({
             {t('subtitle')}
           </p>
         </div>
-
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => {
               setEditingGoal(null)
               form.reset({
                 goal_type: 'general_savings',
-                house_purchase_data: { down_payment_percentage: 20 }
+                house_purchase_data: {
+                  down_payment_percentage: 20
+                }
               })
             }}>
               <Plus className="h-4 w-4 mr-2" />

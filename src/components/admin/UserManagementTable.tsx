@@ -97,7 +97,8 @@ const mockUsers: UserProfile[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-20T14:30:00Z',
     last_login_at: '2024-01-20T09:15:00Z',
-    is_active: true
+    is_active: true,
+    is_admin: false
   },
   {
     id: '2',
@@ -131,7 +132,8 @@ const mockUsers: UserProfile[] = [
     created_at: '2024-01-10T09:00:00Z',
     updated_at: '2024-01-19T16:45:00Z',
     last_login_at: '2024-01-19T14:20:00Z',
-    is_active: true
+    is_active: true,
+    is_admin: false
   },
   {
     id: '3',
@@ -165,7 +167,8 @@ const mockUsers: UserProfile[] = [
     created_at: '2023-11-05T11:30:00Z',
     updated_at: '2024-01-18T13:20:00Z',
     last_login_at: '2024-01-18T11:45:00Z',
-    is_active: true
+    is_active: true,
+    is_admin: true
   },
   {
     id: '4',
@@ -199,7 +202,8 @@ const mockUsers: UserProfile[] = [
     created_at: '2024-01-25T15:00:00Z',
     updated_at: '2024-01-25T15:00:00Z',
     last_login_at: '2024-01-25T15:30:00Z',
-    is_active: true
+    is_active: true,
+    is_admin: false
   },
   {
     id: '5',
@@ -233,7 +237,8 @@ const mockUsers: UserProfile[] = [
     created_at: '2023-08-12T12:00:00Z',
     updated_at: '2023-12-15T10:30:00Z',
     last_login_at: '2023-12-15T10:30:00Z',
-    is_active: false
+    is_active: false,
+    is_admin: false
   }
 ]
 
@@ -336,7 +341,7 @@ export const UserManagementTable: React.FC = () => {
           const user = row.original
           const initials = user.full_name
             .split(' ')
-            .map(name => name.charAt(0))
+            .map((name: string) => name.charAt(0))
             .join('')
             .toUpperCase()
           
@@ -393,7 +398,7 @@ export const UserManagementTable: React.FC = () => {
         },
         filterFn: (row, _id, value) => {
           if (value === 'all') return true
-          return row.getValue('subscription_tier') === value
+          return (row.getValue('subscription_tier') as string) === value
         },
       },
       {
@@ -454,11 +459,11 @@ export const UserManagementTable: React.FC = () => {
               {row.getValue('experience_points')} XP
             </div>
             <div className="text-xs text-gray-500">
-              {row.original.achievement_badges.length} badges
+              {row.original.achievement_badges?.length || 0} badges
             </div>
-            {row.original.achievement_badges.length > 0 && (
+            {row.original.achievement_badges && row.original.achievement_badges.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-1">
-                {row.original.achievement_badges.slice(0, 2).map((badge) => (
+                {row.original.achievement_badges.slice(0, 2).map((badge: string) => (
                   <Badge key={badge} variant="secondary" className="text-xs">
                     {badge.replace('_', ' ')}
                   </Badge>
@@ -532,7 +537,7 @@ export const UserManagementTable: React.FC = () => {
         },
         filterFn: (row, _id, value) => {
           if (value === 'all') return true
-          if (value === 'active') return row.original.is_active
+          if (value === 'active') return !!row.original.is_active
           if (value === 'inactive') return !row.original.is_active
           if (value === 'incomplete') return !row.original.onboarding_completed
           return true

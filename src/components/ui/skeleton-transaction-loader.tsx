@@ -139,7 +139,7 @@ export function ConfidenceScore({
       
       {/* Human review flag */}
       {isUnusual && (
-        <Eye className="h-3 w-3 text-amber-600" title="Needs human review" />
+        <Eye className="h-3 w-3 text-amber-600" />
       )}
     </div>
   );

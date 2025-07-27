@@ -19,12 +19,12 @@ import { cn } from '@/lib/utils'
 
 const createWalletSchema = z.object({
   name: z.string().min(1, 'Tên ví là bắt buộc').max(100, 'Tên ví không được quá 100 ký tự'),
-  description: z.string().max(500, 'Mô tả không được quá 500 ký tự').optional(),
   wallet_type: z.enum(['cash', 'bank_account', 'credit_card', 'e_wallet', 'investment', 'other']),
-  currency: z.string().default('VND'),
+  currency: z.string(),
   color: z.string().regex(/^#([0-9A-F]{3}){1,2}$/i, 'Màu không hợp lệ'),
   initial_balance: z.number().min(0, 'Số dư ban đầu phải >= 0'),
-  require_approval_for_expenses: z.boolean().default(false),
+  require_approval_for_expenses: z.boolean(),
+  description: z.string().max(500, 'Mô tả không được quá 500 ký tự').optional(),
   expense_approval_threshold: z.number().min(0, 'Ngưỡng phê duyệt phải >= 0').optional(),
 })
 

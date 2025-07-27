@@ -130,7 +130,7 @@ export class GamificationService {
       throw new Error('Failed to fetch challenges')
     }
 
-    return (data || []) as Challenge[]
+    return (data || []) as unknown as Challenge[]
   }
 
   /**
@@ -185,7 +185,7 @@ export class GamificationService {
     }
 
     // Initialize progress data based on challenge type
-    const initialProgressData = this.initializeProgressData(challenge.requirement_description as ChallengeRequirement)
+    const initialProgressData = this.initializeProgressData(challenge.requirement_description as unknown as ChallengeRequirement)
 
     // Create user challenge record
     const { data: userChallenge, error } = await this.supabase

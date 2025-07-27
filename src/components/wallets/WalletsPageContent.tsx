@@ -89,7 +89,7 @@ export function WalletsPageContent({
         </TabsContent>
 
         <TabsContent value="shared" className="space-y-4">
-          <SharedWalletManager initialWallets={initialSharedWallets} />
+          <SharedWalletManager />
         </TabsContent>
       </Tabs>
     </div>

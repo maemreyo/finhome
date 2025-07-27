@@ -4789,3 +4789,7 @@ export type PlanMilestoneUpdate = Database['public']['Tables']['plan_milestones'
 export type UserFavorite = Database['public']['Tables']['user_favorites']['Row']
 export type UserFavoriteInsert = Database['public']['Tables']['user_favorites']['Insert']
 
+export type FinancialPlan = Database['public']['Tables']['financial_plans']['Row']
+export type Property = Database['public']['Tables']['properties']['Row']
+export type UserProfile = Database['public']['Tables']['user_profiles']['Row']
+

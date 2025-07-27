@@ -141,8 +141,7 @@ const DynamicIcon = ({
   name,
   ...props
 }: { name: string } & React.ComponentProps<typeof LucideIcons.HelpCircle>) => {
-  const IconComponent =
-    LucideIcons[name as keyof typeof LucideIcons] || LucideIcons.HelpCircle;
+  const IconComponent = (LucideIcons as any)[name as string] || LucideIcons.HelpCircle;
   return <IconComponent {...props} />;
 };
 
@@ -553,9 +552,7 @@ export function ConversationalTransactionDialog({
                                   )}
                                   <span>•</span>
                                   <span>
-                                    {new Date(
-                                      editing.transaction_date
-                                    ).toLocaleDateString("vi-VN")}
+                                    {new Date(editing.transaction_date || new Date()).toLocaleDateString("vi-VN")}
                                   </span>
                                   <span>•</span>
                                   <ConfidenceScore

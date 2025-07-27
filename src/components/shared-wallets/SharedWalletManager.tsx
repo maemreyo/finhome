@@ -70,6 +70,34 @@ interface SharedWallet {
     total_spent_amount: number
     budgets_over_threshold: number
   }
+  active_members: Array<{
+    id: string
+    user_id: string
+    role: string
+    user: {
+      full_name: string
+      avatar_url?: string
+    }
+    joined_at: string
+  }>
+  recent_transactions: Array<{
+    id: string
+    transaction_type: string
+    amount: number
+    description: string
+    transaction_date: string
+    is_approved: boolean
+    requires_approval: boolean
+    user: {
+      full_name: string
+      avatar_url?: string
+    }
+    expense_category?: {
+      name_vi: string
+      color: string
+      icon: string
+    }
+  }>
   created_at: string
   updated_at: string
 }

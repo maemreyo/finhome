@@ -610,7 +610,7 @@ export const InterestRateManagementTable: React.FC = () => {
         },
         filterFn: (row, _id, value) => {
           if (value === 'all') return true
-          if (value === 'active') return row.original.is_active
+          if (value === 'active') return !!row.original.is_active
           if (value === 'inactive') return !row.original.is_active
           if (value === 'expired') return row.original.expiry_date ? isExpired(row.original.expiry_date) : false
           if (value === 'expiring') return row.original.expiry_date ? isExpiringSoon(row.original.expiry_date) : false
